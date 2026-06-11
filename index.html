@@ -5773,9 +5773,6 @@ function clearSelection(){
 function giveHint(){
   if(gameOver) return;
 
-  cheatCount++;
-  updateGameStatus();
-
   if(cheatCount >= MAX_CHEATS){
     hintButton.disabled = true;
     hintButton.style.opacity = "0.35";
@@ -5788,17 +5785,17 @@ function giveHint(){
   cheatCount++;
   updateGameStatus();
 
-  if(cheatCount === MAX_CHEATS){
-    message.textContent =
-      "Dernière ☘︎ astuce utilisée!";
+  if(cheatCount >= MAX_CHEATS){
+    hintButton.disabled = true;
+    hintButton.style.opacity = "0.35";
+    hintButton.style.pointerEvents = "none";
   }
-
-  message.textContent =
-    `☘︎ ASTUCE : ${cheatCount}/${MAX_CHEATS}.`;
 
   const unsolved = solution.filter(g=>!g.solved);
 
   if(unsolved.length === 0){
+    message.textContent =
+      `☘︎ ASTUCE : ${cheatCount}/${MAX_CHEATS}.`;
     hint.textContent = "☘︎ Le puzzle est terminé.";
     return;
   }
@@ -5813,6 +5810,8 @@ function giveHint(){
     if(possibleGroups.length === 1){
       targetGroup = possibleGroups[0];
     }else{
+      message.textContent =
+        `☘︎ ASTUCE : ${cheatCount}/${MAX_CHEATS}.`;
       hint.textContent =
         "☘︎ Les points sélectionnés ne semblent pas appartenir à une même catégorie.";
       return;
@@ -5851,6 +5850,11 @@ function giveHint(){
   }
 
   hintStep++;
+
+  message.textContent =
+    cheatCount >= MAX_CHEATS
+      ? `☘︎ ASTUCE : ${cheatCount}/${MAX_CHEATS}. Dernière ☘︎ astuce utilisée !`
+      : `☘︎ ASTUCE : ${cheatCount}/${MAX_CHEATS}.`;
 }
 
 function applyPreset(pageBg,text,shadow){
