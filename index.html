@@ -11,7 +11,7 @@
 
 <style>
 :root{
-  --ui-font-size:15px;
+  --ui-font-size:13px;
   --ui-font-family:'Archivo', sans-serif;
 
   --page-bg:#FCFCFA;
@@ -2078,6 +2078,30 @@ body.tour-disable-grid #grid *{
   pointer-events:none !important;
 }
 
+@media(max-width:520px){
+
+  #suggestionMailButton,
+  #supportCoffeeButton{
+    font-size:1.35rem !important;
+    padding:6px 8px !important;
+    min-width:34px !important;
+    min-height:34px !important;
+    line-height:1 !important;
+  }
+
+}
+
+@media(max-width:430px){
+
+  #suggestionMailButton,
+  #supportCoffeeButton{
+    font-size:1.6rem !important;
+    min-width:40px !important;
+    min-height:40px !important;
+  }
+
+}
+
 </style>
 <link
   href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
@@ -2136,7 +2160,7 @@ body.tour-disable-grid #grid *{
     <label>Halo <input type="color" id="shadowPicker"></label>
     <label class="font-size-control">
       <span class="small-a">A</span>
-      <input type="range" id="fontSizeSlider" min="12" max="34" value="18">
+      <input type="range" id="fontSizeSlider" min="10" max="34" value="13">
       <span class="big-a">A</span>
     </label>
   </div>
@@ -2906,7 +2930,7 @@ function applySettings(){
     tileBg:localStorage.getItem("mtc_tileBg") || "#ffffff",
     text:localStorage.getItem("mtc_text") || "#111111",
     shadow:localStorage.getItem("mtc_shadow") || "#0000FF",
-    fontSize:localStorage.getItem("mtc_fontSize") || "18"
+    fontSize:localStorage.getItem("mtc_fontSize") || "12"
   };
 
   document.documentElement.style.setProperty("--page-bg", settings.pageBg);
@@ -5961,7 +5985,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     title="Envoyer une suggestion"
     aria-label="Envoyer une suggestion par email"
   >
-    ✉
+    ✉️
   </a>
 
   <a
