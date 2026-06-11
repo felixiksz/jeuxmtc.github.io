@@ -2102,6 +2102,17 @@ body.tour-disable-grid #grid *{
 
 }
 
+
+/* Sur téléphone, le panneau de fiche ne respire plus sur la grille quand il est fermé */
+@media(max-width:699px){
+
+  .point-panel.available:not(.open){
+    right:-100vw !important;
+    animation:none !important;
+  }
+
+}
+
 </style>
 <link
   href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
@@ -4376,6 +4387,10 @@ function getContextLabelForPoint(groupKey, point){
 function toggleTile(tile, point){
   if(gameOver) return;
 
+  if(window.innerWidth <= 699){
+    closePointPanelCompletelyOnMobile();
+  }
+
   // Désélection toujours autorisée
   if(tile.classList.contains("selected")){
 
@@ -4999,6 +5014,27 @@ function closePointPanel(){
 
   document.body.classList.remove("panel-open");
 }
+
+function closePointPanelCompletelyOnMobile(){
+
+  if(window.innerWidth > 699) return;
+
+  const panel = document.getElementById("pointPanel");
+  const toggle = document.getElementById("panelToggle");
+
+  if(!panel) return;
+
+  panel.classList.remove("open");
+  panel.classList.remove("available");
+  panel.classList.remove("point-panel-peek");
+
+  document.body.classList.remove("panel-open");
+
+  if(toggle){
+    toggle.innerHTML = "&lt;";
+  }
+}
+
 
 function formatPointCode(point){
   return String(point).replace(
@@ -5954,7 +5990,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       title="Exporter mes notes personnelles"
       aria-label="Exporter mes notes personnelles"
     >
-      Export notes
+      Exporter les notes
     </button>
 
     <button
@@ -5964,7 +6000,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       title="Importer mes notes personnelles"
       aria-label="Importer mes notes personnelles"
     >
-      Import notes
+      Importer des notes
     </button>
 
     <input
