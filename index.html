@@ -3593,6 +3593,132 @@ select{
 .review-basket-panel .stats-small:first-of-type{
   display:none !important;
 }
+/* === Mobile : panier lisible + menu du bas en couleur normale === */
+
+/* Panier : donne plus de place aux points */
+@media(max-width:699px){
+
+  #reviewBasketPanel .basket-list{
+    display:grid !important;
+    grid-template-columns:repeat(auto-fill, minmax(118px, 1fr)) !important;
+    gap:6px 8px !important;
+  }
+
+  #reviewBasketPanel .basket-list-item{
+    padding:0 !important;
+  }
+
+  #reviewBasketPanel .compact-point-row{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+
+    min-height:34px !important;
+    padding:4px 5px !important;
+
+    gap:6px !important;
+  }
+
+  #reviewBasketPanel .compact-point-code{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+
+    font-size:1em !important;
+    font-weight:800 !important;
+
+    white-space:nowrap !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+
+    color:var(--text-color) !important;
+  }
+
+  #reviewBasketPanel .basket-item-buttons{
+    flex:0 0 auto !important;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    gap:3px !important;
+  }
+
+  #reviewBasketPanel .comparison-slot-button{
+    min-width:24px !important;
+    min-height:24px !important;
+
+    padding:0 !important;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    font-size:.9em !important;
+    font-weight:900 !important;
+
+    color:var(--shadow-color) !important;
+    background:transparent !important;
+    border:none !important;
+
+    box-shadow:none !important;
+    text-shadow:0 0 6px var(--shadow-color) !important;
+
+    transform:none !important;
+  }
+
+  #reviewBasketPanel .basket-item-buttons button:not(.comparison-slot-button){
+    min-width:20px !important;
+    min-height:20px !important;
+
+    padding:0 !important;
+
+    font-size:.85em !important;
+
+    color:var(--text-color) !important;
+    background:transparent !important;
+    border:none !important;
+
+    box-shadow:none !important;
+    transform:none !important;
+  }
+}
+
+/* Menu du bas : couleur des lettres, taille normale */
+#footerTitle,
+#footerTitle button,
+.footer-main-tools button,
+.footer-tools button,
+#suggestionMailButton,
+#supportCoffeeButton{
+  color:var(--text-color) !important;
+  font-size:1em !important;
+  opacity:1 !important;
+}
+
+.footer-main-tools button,
+.footer-tools button{
+  padding:4px 7px !important;
+
+  background:transparent !important;
+  border:none !important;
+
+  box-shadow:none !important;
+  transform:none !important;
+
+  text-transform:none !important;
+  letter-spacing:.02em !important;
+  font-weight:700 !important;
+}
+
+.footer-main-tools button:hover,
+.footer-tools button:hover,
+#suggestionMailButton:hover,
+#supportCoffeeButton:hover{
+  color:var(--text-color) !important;
+  text-shadow:0 0 8px var(--shadow-color) !important;
+
+  box-shadow:none !important;
+  transform:none !important;
+}
+
 </style>
 <link
   href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
