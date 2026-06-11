@@ -1,0 +1,6005 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connections MTC</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;500&display=swap"
+  rel="stylesheet">
+
+<style>
+:root{
+  --ui-font-size:15px;
+  --ui-font-family:'Archivo', sans-serif;
+
+  --page-bg:#FCFCFA;
+  --text-color:#271629;
+  --shadow-color:#0000FF;
+}
+
+@media (min-width:900px){
+  :root{
+    --ui-font-size:12px;
+  }
+}
+
+*{box-sizing:border-box}
+
+body{
+  font-family:var(--ui-font-family);
+  font-size:var(--ui-font-size);
+
+  background:
+    var(--page-bg);
+
+  color:var(--text-color);
+
+  max-width:1100px;
+  margin:auto;
+  padding:28px;
+  min-height:100vh;
+}
+
+.topbar,.manual-controls,.settings-grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  margin:10px 0;
+}
+
+button,select,input,label{
+  font-family:var(--ui-font-family);
+  font-size:1em;
+}
+
+button,select{
+  padding:8px 12px;
+
+  border:none;
+  border-radius:999px;
+
+  background:transparent;
+  color:var(--text-color);
+
+  cursor:pointer;
+
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+
+  box-shadow:none;
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease,
+    background .12s ease;
+}
+
+button:hover,
+select:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px var(--shadow-color);
+}
+
+button:active,
+select:active{
+  transform:translateY(1px);
+  box-shadow:0 2px 5px rgba(0,0,0,.12);
+}
+
+label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+
+  border:none;
+  border-radius:999px;
+  background:transparent;
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+label:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px var(--shadow-color);
+}
+
+label:active{
+  transform:translateY(1px);
+  box-shadow:0 2px 5px var(--shadow-color);
+}
+
+input[type="color"]{
+  width:36px;
+  height:28px;
+  border:0;
+  background:transparent;
+}
+
+#message,#hint{
+  text-align:center;
+  font-weight:bold;
+  min-height:26px;
+  margin:10px 0;
+}
+
+#solved{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin:16px 0;
+}
+
+.solved-row{
+  padding:12px 0 14px;
+  text-align:left;
+  color:var(--shadow-color-color);
+  background:transparent !important;
+  box-shadow:none;
+  border-radius:0;
+  border-bottom:1px solid var(--shadow-color);
+}
+
+.solved-title{
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.solved-points{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.solved-point{
+  background:transparent;
+  border-radius:999px;
+  padding:8px;
+  font-weight:bold;
+  position:relative;
+  cursor:pointer;
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+.solved-point:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px var(--shadow-color);
+}
+
+.solved-point:active{
+  transform:translateY(1px);
+  box-shadow:0 2px 5px var(--shadow-color);
+}
+
+.solved-point:hover .solved-location-tooltip{
+  opacity:.9;
+}
+
+.solved-location-tooltip{
+  position:absolute;
+  bottom:110%;
+  left:50%;
+  transform:translateX(-50%);
+
+  width:min(320px,80vw);
+
+  background:rgba(0,0,0,.75);
+  color:white;
+
+  padding:8px;
+  border-radius:8px;
+
+  font-size:.72em;
+  font-weight:400;
+  line-height:1.25;
+  text-align:left;
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:opacity .2s;
+  z-index:1000;
+}
+
+.solved-point:hover .solved-location-tooltip{
+  opacity:.9;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:18px;
+}
+
+.tile{
+    font-family:"Libre Baskerville", serif;
+
+  min-height:72px;
+  padding:10px;
+
+  border:none;
+  background:transparent;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+  user-select:none;
+
+  font-size:1.15em;
+  font-weight:800;
+  letter-spacing:.02em;
+
+  color:var(--text-color);
+
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.18));
+
+  transition:
+    transform .12s ease,
+    filter .12s ease,
+    color .12s ease;
+}
+
+.tile:hover{
+  transform:translateY(-2px);
+
+  filter:drop-shadow(0 7px 14px rgba(0,0,0,.22));
+}
+
+.tile.selected{
+  transform:translateY(2px) scale(1.08);
+  filter:
+    drop-shadow(0 0 6px var(--shadow-color))
+    drop-shadow(0 0 14px var(--shadow-color));
+    color:var(--text-color);
+}
+
+.tile-tooltip{
+  position:absolute;
+  bottom:80%;
+  left:50%;
+  transform:translateX(-50%);
+  color:var(--text-color);
+  padding:3px 7px;
+  border-radius:6px;
+  font-size:.65em;
+  font-weight:400;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease;
+  transition-delay:.45s;
+  z-index:999;
+}
+
+.tile.selected:hover .tile-tooltip{
+  opacity:.75;
+}
+
+#settingsPanel{
+  max-width:700px;
+  margin:12px auto 0;
+}
+
+#settingsPanel label{
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+#settingsPanel label:hover{
+  transform:translateY(-2px);
+}
+
+#footerTitle{
+  text-align:center;
+  margin-top:50px;
+  margin-bottom:4px;
+  font-size:0.65em;
+  opacity:0.55;
+  letter-spacing:1px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+#suggestionMailButton,
+#supportCoffeeButton{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-width:22px;
+  min-height:22px;
+  padding:0 4px;
+
+  color:var(--text-color);
+  text-decoration:none;
+
+  border:none;
+  border-radius:999px;
+
+  opacity:.75;
+
+  box-shadow:none !important;
+  transform:none !important;
+
+  transition:opacity .15s ease, text-shadow .15s ease;
+}
+
+#suggestionMailButton:hover,
+#suggestionMailButton:active,
+#supportCoffeeButton:hover,
+#supportCoffeeButton:active{
+  opacity:1;
+  text-shadow:
+    0 0 6px var(--shadow-color),
+    0 0 12px var(--shadow-color);
+}
+
+@media(max-width:650px){
+  body{padding:10px}
+  .grid,.solved-points{gap:6px}
+  .tile{min-height:58px;padding:8px}
+}
+
+#finalGuess{
+
+  text-align:center;
+
+  margin:18px 0;
+  padding:12px;
+
+  border:none;
+  border-radius:0;
+
+  background:transparent;
+}
+
+#finalGuessText{
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+#finalGuessChoices{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+
+.final-choice{
+
+  padding:10px;
+
+  border:none;
+  border-radius:999px;
+
+  background:transparent;
+
+  color:var(--text-color);
+
+  cursor:pointer;
+  font-weight:bold;
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+.final-choice:hover{
+
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 0 8px #E1FF68,
+    0 0 18px #E1FF68;
+}
+
+.final-choice:active{
+
+  transform:translateY(1px);
+
+  box-shadow:
+    0 0 4px #E1FF68;
+}
+
+#finalGuessText{
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.point-panel{
+  position:fixed;
+  top:0;
+
+  right:-332px;
+
+  width:min(340px,86vw);
+  height:100vh;
+
+  background:var(--page-bg);
+  color:var(--text-color);
+
+  box-shadow:-8px 0 30px var(--shadow-color);
+
+  padding:22px;
+  padding-left:42px;
+
+  z-index:2000;
+  overflow-y:auto;
+
+  transition:right .9s ease;
+
+  font-family:"Libre Baskerville", serif;
+}
+
+.point-panel.available{
+  right:-322px;
+  animation:panelBreath 3.6s ease-in-out infinite;
+}
+
+.point-panel.open{
+  right:0;
+  animation:none;
+}
+
+@keyframes panelBreath{
+  0%{ right:-326px; }
+  50%{ right:-312px; }
+  100%{ right:-326px; }
+}
+
+.point-info-section summary{
+  font-family:"Libre Baskerville", serif;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+
+.point-info-section div{
+  font-family:"Libre Baskerville", serif;
+  line-height:1.7;
+}
+
+.point-header{
+  font-family:"Libre Baskerville", serif;
+  font-size:1.99em;
+  line-height:1.5;
+}
+
+
+.panel-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  border:none;
+  background:transparent;
+  font-size:1.8em;
+  box-shadow:none;
+}
+
+.point-panel h2{
+  margin-top:28px;
+  margin-bottom:4px;
+}
+
+.point-panel .subtitle{
+  opacity:.65;
+  margin-bottom:18px;
+}
+
+.point-info-section{
+  border-top:1px solid rgba(0,0,0,.12);
+  padding:10px 0;
+}
+
+.point-info-section summary{
+  cursor:pointer;
+  font-weight:800;
+}
+
+.point-info-section div{
+  margin-top:8px;
+  white-space:pre-line;
+  line-height:1.35;
+}
+
+.point-panel-peek{
+  right:-360px;
+  animation:panelPeek 1.4s ease 2;
+}
+
+@keyframes panelPeek{
+  0%{right:-420px;}
+  35%{right:-330px;}
+  70%{right:-330px;}
+  100%{right:-420px;}
+}
+
+.point-code{
+  font-weight:700;
+  letter-spacing:.08em;
+}
+
+.point-fr-inline{
+  font-style:italic;
+  opacity:.85;
+}
+
+.panel-hint{
+  position:fixed;
+  right:14px;
+  bottom:18px;
+  background:var(--tile-bg);
+  color:var(--text-color);
+  padding:10px 14px;
+  border-radius:999px;
+  box-shadow:0 4px 16px rgba(0,0,0,.18);
+  font-weight:700;
+  z-index:1999;
+  animation:fadeHint 4s ease forwards;
+}
+
+@keyframes fadeHint{
+  0%{opacity:0; transform:translateY(8px);}
+  15%{opacity:1; transform:translateY(0);}
+  80%{opacity:1;}
+  100%{opacity:0;}
+}
+
+.tone1{color:#e74c3c}
+.tone2{color:#f39c12}
+.tone3{color:#27ae60}
+.tone4{color:#2980b9}
+.tone5{color:#8e44ad}
+
+.point-header{
+  margin-top:32px;
+  margin-bottom:20px;
+
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+
+  line-height:1.4;
+}
+
+.point-code{
+  font-size:1.35em;
+  font-weight:900;
+}
+
+.point-hanzi-inline{
+  font-size:1.5em;
+}
+
+.point-pinyin-inline{
+  font-weight:700;
+}
+
+.point-fr-inline{
+  opacity:.75;
+}
+
+.point-separator{
+  opacity:.35;
+}
+
+
+@media(min-width:700px){
+  body.panel-open{
+    padding-right:min(340px,86vw);
+  }
+}
+
+@media(max-width:699px){
+  body.panel-open{
+    padding-right:0;
+  }
+
+  .point-panel{
+    width:100vw;
+    right:-100vw;
+  }
+
+  .point-panel.open{
+    right:0;
+  }
+}
+
+.manual-controls{
+  flex-direction:column;
+  align-items:center;
+}
+
+.manual-checklist{
+  column-count:3;
+  column-gap:14px;
+
+  width:100%;
+  max-width:900px;
+}
+
+.manual-checkitem{
+  break-inside:avoid;
+  margin-bottom:0;
+  justify-content:flex-start;
+
+  border:none;
+  border-radius:999px;
+
+  background:transparent;
+
+  cursor:pointer;
+
+  opacity:.55;
+
+  box-shadow:none !important;
+  transform:none !important;
+
+  transition:opacity .15s ease;
+
+  padding:1px 4px !important;
+  gap:4px !important;
+  min-height:auto !important;
+}
+
+.manual-checkitem:hover,
+.manual-checkitem:active{
+  opacity:1;
+
+  box-shadow:none !important;
+  transform:none !important;
+  background:transparent !important;
+}
+
+.manual-help{
+  text-align:center;
+  font-size:1em;
+  opacity:100;
+  max-width:700px;
+  font-weight: bold;
+}
+
+.settings-presets{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+
+
+body.darkroom{
+  --page-bg:#000000;
+  --tile-bg:#ff3b1f;
+  --text-color:#ff3b1f;
+  --shadow-color:#ff3b1f;
+  --selected-text-color:#000000;
+}
+
+body.darkroom .mode-label{
+  border:none !important;
+  box-shadow:none !important;
+  background:transparent !important;
+}
+
+body.darkroom .mode-label:hover{
+  border:none !important;
+  box-shadow:none !important;
+  background:transparent !important;
+}
+
+body.darkroom,
+body.darkroom #settingsPanel,
+body.darkroom label,
+body.darkroom select,
+body.darkroom button,
+body.darkroom .final-choice,
+body.darkroom .point-panel{
+  background:#000000 !important;
+  color:#ff3b1f !important;
+  border-color:#ff3b1f !important;
+}
+body.darkroom button:hover,
+body.darkroom select:hover,
+body.darkroom label:hover,
+body.darkroom .manual-checkitem:hover,
+body.darkroom .solved-point:hover{
+  box-shadow:0 6px 14px var(--shadow-color) !important;
+}
+
+body.darkroom button:active,
+body.darkroom select:active,
+body.darkroom label:active,
+body.darkroom .manual-checkitem:active,
+body.darkroom .solved-point:active{
+  box-shadow:0 2px 5px var(--shadow-color) !important;
+}
+
+body.darkroom .point-panel.open{
+  box-shadow:-10px 0 35px var(--shadow-color) !important;
+  border-left:1px solid var(--shadow-color) !important;
+}
+
+body.darkroom .tile{
+  color:#ff3b1f !important;
+  filter:drop-shadow(0 4px 8px #ff3b1f) !important;
+}
+
+body.darkroom .tile.selected{
+  color:#000000 !important;
+  filter:drop-shadow(0 2px 4px #ff3b1f) !important;
+}
+
+body.darkroom .solved-row{
+  background:#000000 !important;
+  color:#ff3b1f !important;
+  border:none !important;
+  border-bottom:1px solid #ff3b1f !important;
+}
+
+body.darkroom .solved-point{
+  background:#000000 !important;
+  color:#ff3b1f !important;
+  border:1px solid #ff3b1f;
+}
+
+body.darkroom .point-info-section{
+  border-top:1px solid #ff3b1f;
+}
+
+.panel-hint{
+  color:#000 !important;
+}
+
+.panel-hint{
+
+  opacity:0;
+  transform:translateY(10px);
+
+  transition:
+    opacity 1.2s ease,
+    transform 1.2s ease;
+
+  color:#000;
+}
+
+.game-finished .panel-hint{
+
+  opacity:1;
+  transform:translateY(0);
+}
+
+.game-complete .solved-point{
+  cursor:pointer;
+}
+
+#tourOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.36);
+  z-index:10000;
+  pointer-events:none;
+}
+
+.tour-highlight{
+  position:relative;
+  z-index:10001 !important;
+  box-shadow:
+    0 0 0 3px var(--page-bg),
+    0 0 20px var(--shadow-color) !important;
+}
+
+#tourBox{
+  box-sizing:border-box;
+  position:fixed;
+  z-index:10002;
+
+  max-width:320px;
+  padding:14px;
+
+  background:var(--page-bg);
+  color:var(--text-color);
+
+  border-radius:18px;
+  box-shadow:0 8px 24px var(--shadow-color);
+
+  font-weight:600;
+  line-height:1.35;
+}
+
+#tourBox h3{
+  margin:0 0 6px;
+  font-size:1.05em;
+}
+
+.tour-actions{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin-top:12px;
+  flex-wrap:nowrap;
+}
+
+.tour-actions button{
+  font-size:.82em;
+  padding:5px 8px;
+  white-space:nowrap;
+}
+
+@media(max-width:430px){
+  #tourBox{
+    padding:12px;
+    font-size:.9em;
+    line-height:1.3;
+    border-radius:14px;
+  }
+
+  #tourBox h3{
+    font-size:1em;
+  }
+
+  .tour-actions{
+    gap:4px;
+  }
+
+  .tour-actions button{
+    font-size:.75em;
+    padding:4px 6px;
+  }
+
+  .tour-highlight{
+    box-shadow:
+      0 0 0 2px var(--page-bg),
+      0 0 14px var(--shadow-color) !important;
+  }
+}
+
+.bottom-actions{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  overflow-x:auto;
+
+  scrollbar-width:none;
+}
+
+.bottom-actions::-webkit-scrollbar{
+  display:none;
+}
+
+.joker-bubble{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  flex-wrap:nowrap;
+
+  width:100%;
+}
+
+.joker-bubble button{
+  font-size:.8em;
+  padding:4px 8px;
+}
+
+.settings-grid{
+  gap:16px;
+}
+
+.font-size-control{
+  gap:10px;
+}
+
+.small-a{
+  font-size:.75em;
+  font-weight:700;
+}
+
+.big-a{
+  font-size:1.45em;
+  font-weight:700;
+}
+
+@keyframes shake{
+  0%   { transform:translateX(0); }
+  20%  { transform:translateX(-6px); }
+  40%  { transform:translateX(6px); }
+  60%  { transform:translateX(-4px); }
+  80%  { transform:translateX(4px); }
+  100% { transform:translateX(0); }
+}
+
+.tile.shake{
+  animation:shake .35s ease;
+}
+
+.mode-label{
+  padding:0 !important;
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+
+.mode-label:hover{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.mode-label select{
+  background:transparent;
+}
+
+.mode-label select:hover{
+  box-shadow:0 6px 14px var(--shadow-color);
+}
+
+#lifeDisplay,
+#cheatDisplay{
+  font-weight:700;
+  letter-spacing:2px;
+}
+.wave-separator{
+
+  width:100%;
+  height:0.5px;
+
+  background:var(--shadow-color);
+
+  margin:30px 0 22px;
+
+  box-shadow:
+    0 3px 12px var(--shadow-color);
+    opacity: 30%;
+}
+.mode-choice{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.mode-choice button{
+  padding:4px 8px;
+  font-size:.9em;
+}
+
+.mode-choice button.active{
+  text-shadow:
+    0 0 6px var(--shadow-color),
+    0 0 12px var(--shadow-color);
+}
+
+.mode-choice button{
+  padding:0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  transform:none;
+  cursor:pointer;
+
+  font-weight:700;
+  text-transform:none;
+  letter-spacing:normal;
+}
+
+.mode-choice button:hover,
+.mode-choice button:active{
+  box-shadow:none;
+  transform:none;
+  background:transparent;
+}
+
+.mode-choice button.active{
+  text-shadow:
+    0 0 6px var(--shadow-color),
+    0 0 12px var(--shadow-color);
+}
+
+.panel-toggle{
+  position:absolute;
+  left:0;
+  top:0;
+
+  width:34px;
+  height:100%;
+
+  padding:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:transparent;
+  border:none;
+
+  font-family:"Tomorrow", sans-serif;
+  font-size:1.3em;
+  line-height:1;
+
+  font-weight:400;
+
+  color:var(--shadow-color);
+  opacity:.25;
+
+  cursor:pointer;
+
+  box-shadow:none !important;
+  transform:none !important;
+
+  transition:opacity .2s ease;
+}
+
+.panel-toggle:hover,
+.panel-toggle:active{
+  opacity:.55;
+
+  background:transparent;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.mode-switch{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.switch{
+  position:relative;
+  display:inline-block;
+
+  width:34px;
+  height:18px;
+}
+
+.switch input{
+  display:none;
+}
+
+.slider{
+  position:absolute;
+  inset:0;
+
+  border-radius:999px;
+
+  box-shadow:
+    0 0 8px var(--shadow-color);
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+.slider::before{
+  content:"";
+
+  position:absolute;
+
+  width:10px;
+  height:10px;
+
+  left:4px;
+  top:4px;
+
+  border-radius:50%;
+
+  background:var(--text-color);
+
+  transition:.2s;
+}
+
+.switch input:checked + .slider::before{
+  transform:translateX(16px);
+}
+
+.cheatsheet-panel{
+  position:fixed;
+  top:0;
+  left:-360px;
+
+  width:min(340px,86vw);
+  height:100vh;
+
+  background:var(--page-bg);
+  color:var(--text-color);
+
+  box-shadow:8px 0 30px var(--shadow-color);
+
+  padding:22px;
+  padding-left:42px;
+
+  z-index:2000;
+  overflow-y:auto;
+
+  transition:left .9s ease;
+
+  font-family:"Libre Baskerville", serif;
+}
+
+.cheatsheet-panel.available{
+  left:-340px;
+  animation:none;
+}
+
+.cheatsheet-panel.open{
+  left:0;
+  animation:none;
+}
+
+.cheatsheet-toggle{
+  position:absolute;
+  right:0;
+  top:0;
+
+  width:34px;
+  height:100%;
+
+  padding:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:transparent;
+  border:none;
+
+  font-family:"Tomorrow", sans-serif;
+  font-size:1.5em;
+  font-weight:300;
+
+  color:var(--text-color);
+  opacity:.22;
+
+  cursor:pointer;
+
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.cheatsheet-toggle:hover,
+.cheatsheet-toggle:active{
+  opacity:.55;
+  background:transparent;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.cheatsheet-section{
+  border-top:1px solid rgba(0,0,0,.12);
+  padding:10px 0;
+}
+
+.cheatsheet-section summary{
+  cursor:pointer;
+  font-weight:800;
+}
+
+.cheatsheet-section div{
+  margin-top:3px;
+  white-space:normal;
+  line-height:1.05;
+}
+
+.cheatsheet-footer{
+  margin-top:24px;
+
+  display:flex;
+  justify-content:center;
+}
+
+.cheatsheet-print{
+  background:transparent;
+  border:none;
+
+  font-size:1.2em;
+
+  opacity:.35;
+
+  cursor:pointer;
+
+  box-shadow:none !important;
+  transform:none !important;
+
+  transition:opacity .15s ease;
+}
+
+.cheatsheet-print:hover,
+.cheatsheet-print:active{
+  opacity:.8;
+
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.cheatsheet-line{
+  position:relative;
+
+  margin:0;
+  padding:1px 0 1px 14px;
+
+  line-height:1.05;
+}
+
+.cheatsheet-line::before{
+  content:"•";
+
+  position:absolute;
+  left:0;
+  top:0;
+  color: var(--shadow-color);
+}
+
+.cheatsheet-section{
+  padding:5px 0;
+}
+
+.cheatsheet-section div{
+  margin-top:3px;
+  line-height:1.05;
+}
+
+.cheatsheet-point-code{
+  font-weight:700;
+  letter-spacing:.03em;
+}
+
+.cheatsheet-line strong{
+  font-weight:800 !important;
+}
+
+@media(max-width:650px){
+
+  .topbar-row{
+    flex-wrap:nowrap;
+    justify-content:center;
+  }
+
+  .topbar-row button,
+  .topbar-row .mode-switch{
+    flex-shrink:1;
+    min-width:0;
+  }
+
+  .topbar-row button{
+    font-size:.82em;
+    padding:4px 8px;
+  }
+
+  .mode-switch{
+    font-size:.82em;
+  }
+}
+
+@media(max-width:430px){
+
+  body{
+    padding:8px;
+    font-size:11px;
+  }
+
+  .topbar{
+    gap:4px;
+  }
+
+  .topbar-row{
+    gap:4px;
+    flex-wrap:nowrap;
+  }
+
+  .topbar-row button{
+    font-size:.72em;
+    padding:3px 5px;
+    letter-spacing:.02em;
+  }
+
+  .mode-switch{
+    font-size:.72em;
+    gap:4px;
+  }
+
+  .switch{
+    width:28px;
+    height:15px;
+  }
+
+  .slider::before{
+    width:8px;
+    height:8px;
+    left:3px;
+    top:3.5px;
+  }
+
+  .switch input:checked + .slider::before{
+    transform:translateX(14px);
+  }
+
+  .bottom-actions{
+    overflow-x:auto;
+    justify-content:flex-start;
+  }
+
+   .joker-bubble{
+      gap:3px;
+    }
+
+    .joker-bubble button{
+      padding:3px 4px;
+      font-size:.68em;
+    }
+
+    #lifeDisplay,
+    #cheatDisplay{
+      font-size:.75em;
+  }
+
+  .grid{
+    gap:5px;
+  }
+
+  .tile{
+    min-height:48px;
+    padding:4px;
+    font-size:1em;
+  }
+}
+
+.topbar{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.topbar-row{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.game-over-title{
+  font-family:"Libre Baskerville", serif;
+  font-size:1.8em;
+  font-weight:800;
+  letter-spacing:.08em;
+
+  margin-bottom:6px;
+}
+
+.game-over-reason{
+  opacity:.8;
+  margin-bottom:8px;
+}
+
+.game-over-subtitle{
+  font-style:italic;
+  font-family:"Libre Baskerville", serif;
+  opacity:.8;
+}
+
+.solved-title{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.category-postit{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+
+  width:min(420px, calc(100vw - 32px));
+  max-height:min(70vh, 520px);
+  overflow-y:auto;
+
+  padding:16px 18px;
+
+  background:#FAF9D1;
+  color:#0000FF;
+
+  box-shadow:0 8px 30px #0000FF;
+
+  border-radius:0;
+  border:none;
+
+  z-index:5000;
+
+  font-family:var(--ui-font-family);
+}
+
+.category-postit-title{
+  font-size:1.05em;
+  font-weight:800;
+  margin-bottom:12px;
+  padding-right:28px;
+}
+
+.category-postit ul{
+  margin:0;
+  padding-left:22px;
+}
+
+.category-postit li{
+  margin:6px 0;
+  line-height:1.35;
+}
+
+.category-postit-close{
+  position:absolute;
+  top:8px;
+  right:10px;
+
+  padding:0;
+  border:none;
+  background:transparent;
+
+  color:#0000FF;
+  box-shadow:none !important;
+  transform:none !important;
+
+  font-size:1.2em;
+  line-height:1;
+
+  cursor:pointer;
+}
+
+.category-postit-close:hover,
+.category-postit-close:active{
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+@media(max-width:430px){
+  .category-postit{
+    width:calc(100vw - 20px);
+    max-height:72vh;
+    padding:14px;
+    font-size:.9em;
+  }
+}
+
+.category-postit{
+  cursor:grab;
+}
+
+.category-postit:active{
+  cursor:grabbing;
+}
+
+.category-postit-close{
+  cursor:pointer;
+}
+
+.cheatsheet-point-link{
+  padding:0;
+  margin:0 3px 0 0;
+
+  border:none;
+  background:transparent;
+
+  color:inherit;
+
+  font-weight:800;
+  letter-spacing:.03em;
+
+  text-transform:none;
+  box-shadow:none !important;
+  transform:none !important;
+
+  cursor:pointer;
+}
+
+.cheatsheet-point-link:hover,
+.cheatsheet-point-link:active{
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+
+  text-decoration:underline;
+}
+
+.category-info-button{
+  margin-left:2px;
+
+  border:none;
+  background:none;
+
+  cursor:pointer;
+
+  opacity:.65;
+
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.category-info-button:hover{
+  opacity:1;
+}
+
+.cheatsheet-point-link{
+  padding:0;
+  margin:0 3px 0 0;
+  border:none;
+  background:transparent;
+  color:inherit;
+  font-weight:800;
+  text-transform:none;
+  letter-spacing:.03em;
+  box-shadow:none !important;
+  transform:none !important;
+  cursor:pointer;
+}
+
+.cheatsheet-point-link:hover{
+  text-decoration:underline;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+#solved{
+  position:relative;
+  overflow:visible;
+  padding-left:34px;
+}
+
+.association-link-svg{
+  position:absolute;
+  left:0;
+  top:0;
+  width:34px;
+  pointer-events:none;
+  overflow:visible;
+  z-index:50;
+}
+
+.association-link-path{
+  fill:none;
+  stroke:var(--shadow-color);
+  stroke-width:1.4;
+  opacity:.45;
+}
+
+.association-plus{
+  width:22px;
+  height:22px;
+
+  border:none;
+  border-radius:50%;
+
+  background:#0000FF;
+  color:#FAF9D1;
+
+  font-weight:900;
+  font-size:16px;
+  line-height:20px;
+
+  cursor:pointer;
+  pointer-events:auto;
+
+  box-shadow:0 2px 8px rgba(0,0,255,.35) !important;
+  transform:none !important;
+}
+
+.association-plus:hover{
+  opacity:.85;
+  background:#0000FF !important;
+}
+
+.association-postit{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+
+  width:min(420px, calc(100vw - 32px));
+  max-height:min(70vh, 520px);
+  overflow-y:auto;
+
+  padding:16px 18px;
+
+  background:var(--association-postit-bg,#0000FF);
+  color:var(--association-postit-text,#FAF9D1);
+
+  box-shadow:0 8px 30px var(--association-postit-bg,#0000FF);
+
+  border-radius:0;
+  border:none;
+
+  z-index:5100;
+
+  font-family:var(--ui-font-family);
+  cursor:grab;
+}
+
+.association-postit-title{
+  font-weight:800;
+  margin-bottom:10px;
+  padding-right:28px;
+}
+
+.association-postit ul{
+  margin:0;
+  padding-left:18px;
+}
+
+.association-postit li{
+  margin:4px 0;
+  line-height:1.25;
+}
+
+.association-postit-close{
+  position:absolute;
+  top:8px;
+  right:10px;
+
+  padding:0;
+  border:none;
+  background:transparent;
+
+  color:var(--association-postit-text,#FAF9D1);
+
+  box-shadow:none !important;
+  transform:none !important;
+
+  font-size:1.2em;
+  cursor:pointer;
+}
+
+#solved.association-mode .solved-row{
+  padding-left:46px;
+}
+
+.association-overlay{
+  position:fixed;
+  inset:0;
+  z-index:4500;
+  pointer-events:none;
+}
+
+.association-overlay-svg{
+  position:absolute;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  overflow:visible;
+}
+
+.association-link-path{
+  fill:none;
+  stroke:var(--shadow-color);
+  stroke-width:1.5;
+  opacity:.5;
+  stroke-linecap:round;
+}
+
+.association-plus{
+  position:absolute;
+
+  width:22px;
+  height:22px;
+
+  border:none;
+  border-radius:50%;
+
+  background:#0000FF;
+  color:#FAF9D1;
+
+  font-weight:900;
+  font-size:16px;
+  line-height:20px;
+
+  cursor:pointer;
+  pointer-events:auto;
+
+  box-shadow:0 2px 8px rgba(0,0,255,.35) !important;
+  transform:none !important;
+
+  padding:0;
+  z-index:4501;
+}
+
+.association-plus:hover{
+  opacity:.85;
+  background:#0000FF !important;
+  transform:none !important;
+}
+
+@media(max-width:520px){
+
+  #solved.association-mode .solved-row{
+    padding-left:34px;
+  }
+
+  .association-link-path{
+    stroke-width:1.3;
+    opacity:.55;
+  }
+
+  .association-plus{
+    width:20px;
+    height:20px;
+
+    font-size:14px;
+    line-height:18px;
+  }
+}
+
+
+/* === Associations Game Over — traits colorés + boutons cliquables === */
+
+.association-overlay{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:8500 !important;
+  pointer-events:none !important;
+}
+
+.association-overlay-svg{
+  position:absolute !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  pointer-events:none !important;
+  overflow:visible !important;
+}
+
+.association-link-path{
+  fill:none !important;
+  stroke-width:2.2 !important;
+  opacity:.84 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+}
+
+.association-link-plus{
+  position:fixed !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  min-width:24px !important;
+  min-height:24px !important;
+
+  padding:0 !important;
+  border:none !important;
+  border-radius:50% !important;
+
+  color:#FAF9D1 !important;
+
+  font-weight:900 !important;
+  font-size:17px !important;
+  line-height:1 !important;
+
+  cursor:pointer !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+  -webkit-tap-highlight-color:transparent !important;
+
+  transform:none !important;
+  z-index:9001 !important;
+}
+
+.association-link-plus:hover,
+.association-link-plus:active{
+  opacity:.92 !important;
+  transform:none !important;
+}
+
+.category-postit,
+.association-postit{
+  z-index:10050 !important;
+}
+
+@media(max-width:520px){
+
+  #solved.association-mode .solved-row{
+    padding-left:34px !important;
+  }
+
+  .association-link-path{
+    stroke-width:2 !important;
+    opacity:.88 !important;
+  }
+
+  .association-link-plus{
+    min-width:24px !important;
+    min-height:24px !important;
+    font-size:16px !important;
+  }
+}
+
+.cheatsheet-panel{
+  z-index:4900 !important;
+}
+
+.cheatsheet-panel.open{
+  z-index:4900 !important;
+}
+
+.cheatsheet-toggle{
+  z-index:4901 !important;
+}
+
+.association-overlay{
+  z-index:4400 !important;
+}
+
+.association-link-plus,
+.association-plus{
+  z-index:4450 !important;
+}
+
+.category-postit{
+  z-index:5000 !important;
+}
+
+.association-postit{
+  z-index:5100 !important;
+}
+
+
+/* === Notes éditables du panneau latéral === */
+
+.point-note-textarea{
+  width:100%;
+  min-height:150px;
+  resize:vertical;
+
+  padding:10px 11px;
+
+  border:1px solid rgba(0,0,255,.28);
+  border-radius:0;
+
+  background:transparent;
+  color:var(--text-color);
+
+  font-family:"Libre Baskerville", serif;
+  font-size:.95em;
+  line-height:1.45;
+
+  outline:none;
+}
+
+.point-note-textarea:focus{
+  box-shadow:0 0 14px var(--shadow-color);
+  border-color:var(--shadow-color);
+}
+
+.point-note-hint{
+  margin-top:6px;
+  font-family:var(--ui-font-family);
+  font-size:.75em;
+  line-height:1.3;
+  opacity:.6;
+}
+
+
+
+/* === Speech bubbles de la visite guidée + responsive === */
+#tourOverlay{
+  pointer-events:none !important;
+}
+
+#tourBox{
+  border-radius:22px !important;
+  max-height:min(60vh,260px) !important;
+  overflow-y:auto !important;
+  font-size:.92em !important;
+  line-height:1.32 !important;
+}
+
+#tourBox::after{
+  content:"";
+  position:absolute;
+  left:var(--tour-arrow-left,50%);
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+}
+
+#tourBox[data-placement="bottom"]::after{
+  top:-9px;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-bottom:10px solid var(--page-bg);
+}
+
+#tourBox[data-placement="top"]::after{
+  bottom:-9px;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-top:10px solid var(--page-bg);
+}
+
+.tour-highlight{
+  outline:2px solid var(--shadow-color);
+  outline-offset:4px;
+}
+
+@media(max-width:520px){
+  #tourBox{
+    max-height:min(54vh,230px) !important;
+    padding:11px 12px !important;
+    font-size:.84em !important;
+  }
+
+  .tour-actions{
+    flex-wrap:nowrap !important;
+    gap:4px !important;
+  }
+
+  .tour-actions button{
+    font-size:.72em !important;
+    padding:4px 6px !important;
+  }
+}
+
+/* === Notes personnelles : affichage + édition au crayon === */
+.point-note-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.point-note-edit-button{
+  padding:0 !important;
+  min-width:24px;
+  min-height:24px;
+  border:none !important;
+  border-radius:999px;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  cursor:pointer;
+  font-size:.9em;
+  line-height:1;
+}
+
+.point-note-display{
+  margin-top:8px;
+  white-space:pre-line;
+  line-height:1.35;
+  font-family:"Libre Baskerville", serif;
+}
+
+.point-note-empty{
+  opacity:.55;
+  font-style:italic;
+}
+
+.point-note-textarea{
+  margin-top:8px;
+  width:100%;
+  min-height:130px;
+  resize:vertical;
+  padding:10px 11px;
+  border:1px solid rgba(0,0,255,.28);
+  border-radius:0;
+  background:transparent;
+  color:var(--text-color);
+  font-family:"Libre Baskerville", serif;
+  font-size:.95em;
+  line-height:1.45;
+  outline:none;
+}
+
+.point-note-textarea:focus{
+  box-shadow:0 0 14px var(--shadow-color);
+  border-color:var(--shadow-color);
+}
+
+.point-note-hint{
+  margin-top:6px;
+  font-family:var(--ui-font-family);
+  font-size:.72em;
+  line-height:1.25;
+  opacity:.58;
+}
+
+/* === Footer : notes + contact === */
+#footerTitle{
+  flex-wrap:wrap;
+  gap:8px 10px;
+  pointer-events:auto;
+}
+
+.footer-tools{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  flex-wrap:wrap;
+}
+
+.footer-tools button,
+#suggestionMailButton,
+#supportCoffeeButton{
+  font-size:1em;
+}
+
+.footer-tools button{
+  padding:2px 6px !important;
+  text-transform:none !important;
+  letter-spacing:.02em !important;
+  opacity:.7;
+}
+
+.footer-tools button:hover,
+.footer-tools button:active,
+#suggestionMailButton:hover,
+#suggestionMailButton:active,
+#supportCoffeeButton:hover,
+#supportCoffeeButton:active{
+  opacity:1;
+  box-shadow:none !important;
+  transform:none !important;
+  text-shadow:0 0 8px var(--shadow-color);
+}
+
+@media(max-width:520px){
+  #footerTitle{
+    margin-top:36px;
+    font-size:.6em;
+  }
+
+  .footer-tools{
+    width:100%;
+  }
+}
+
+
+/* Pendant la visite : la grille peut être montrée sans déclencher de sélection */
+body.tour-disable-grid #grid,
+body.tour-disable-grid #grid *{
+  pointer-events:none !important;
+}
+
+</style>
+<link
+  href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
+  rel="stylesheet">
+</head>
+
+<body>
+
+
+<div class="topbar">
+
+  <div class="topbar-row">
+    <button onclick="newGame()">⟳ Nouvelle partie</button>
+    <button onclick="toggleSettings()">⚆ Affichage</button>
+    <button onclick="startTour()">? Aide</button>
+  </div>
+
+  <div class="topbar-row">
+    <div class="mode-switch">
+      <span>Auto</span>
+
+      <label class="switch">
+        <input
+          type="checkbox"
+          id="modeToggle"
+          onchange="toggleManualMode()"
+        >
+        <span class="slider"></span>
+      </label>
+
+      <span>Manuel</span>
+    </div>
+
+    <button
+      id="manualEditButton"
+      onclick="toggleManualChecklist()"
+      style="display:none;"
+    >
+      Catégories de points
+    </button>
+  </div>
+
+</div>
+
+<div class="manual-controls" id="manualControls" style="display:none;">
+  <div id="manualHelp" class="manual-help">Choisis au moins 4 catégories!
+  </div>
+  <div id="manualChecklist" class="manual-checklist"></div>
+    
+</div>
+
+<div id="settingsPanel" style="display:none;">
+  <div class="settings-grid">
+    <label>Fond <input type="color" id="pageBgPicker"></label>
+    <label>Lettres <input type="color" id="textPicker"></label>
+    <label>Halo <input type="color" id="shadowPicker"></label>
+    <label class="font-size-control">
+      <span class="small-a">A</span>
+      <input type="range" id="fontSizeSlider" min="12" max="34" value="18">
+      <span class="big-a">A</span>
+    </label>
+  </div>
+  <div class="settings-presets">
+    <button onclick="resetAppearance()">↺ Réinitialiser</button>
+    <button onclick="applyDarkroomMode()">Mode labo photo</button>
+    <button onclick="applyNightInvertMode()">Mode nuit</button>
+  </div>
+</div>
+<div id="message"></div>
+<div id="hint"></div>
+<div id="solved"></div>
+<div id="grid" class="grid"></div>
+<div id="finalGuess" style="display:none;">
+  <div id="finalGuessText"></div>
+  <div id="finalGuessChoices"></div>
+</div>
+
+<div class="wave-separator"></div>
+<div class="bottom-actions">
+  <div id="jokerBubble" class="joker-bubble">
+    <span id="lifeDisplay">♥♥♥♥♥</span>
+    <button id="hintButton" onclick="giveHint()">ASTUCE</button>
+    <span id="cheatDisplay">☘︎☘︎☘︎☘︎☘︎</span>
+    <button onclick="clearSelection()">🗑️</button>
+    <button
+      id="cheatsheetButton"
+      onclick="openCheatsheetPanel()"
+    >
+      Cheatsheet
+    </button>
+  </div>
+</div>
+<script>
+
+</script>
+<script src="point_details.js"></script>
+<script src="raw_data.js"></script>
+<script>
+
+let CATEGORY_COLORS = [];
+let pool = [];
+let solution = [];
+let selected = [];
+let solvedCount = 0;
+let categoryColors = {};
+let hintCategory = null;
+let hintStep = 0;
+let mistakeCount = 0;
+let cheatCount = 0;
+let gameOver = false;
+let currentPointPanelPoint = null;
+
+function toggleCheatsheetPanel(){
+
+  cheatsheetPanel.classList.toggle("open");
+
+  if(cheatsheetPanel.classList.contains("open")){
+    cheatsheetToggle.innerHTML = "&lt;";
+  }else{
+    cheatsheetPanel.classList.remove("open");
+    cheatsheetToggle.innerHTML = "&gt;";
+  }
+    cheatsheetPanel.addEventListener("mouseleave", ()=>{
+    cheatsheetPanel.classList.remove("open");
+    cheatsheetToggle.innerHTML = "&gt;";
+  });
+}
+
+function openCheatsheetPanel(){
+  try{
+    renderCheatsheetPanel();
+
+    const shouldOpenDemoCategory =
+      document.getElementById("tourBox") ||
+      localStorage.getItem(progressHintKey("cheatsheet_points")) !== "1";
+
+    if(shouldOpenDemoCategory){
+      openCheatsheetDemoCategory();
+    }
+
+    cheatsheetPanel.classList.add("available");
+    cheatsheetPanel.classList.add("open");
+
+    cheatsheetToggle.innerHTML = "&lt;";
+
+    showProgressHintSoon(
+      "cheatsheet_points",
+      ".cheatsheet-point-link",
+      "Cheatsheet",
+      "Cette catégorie est ouverte pour l’exemple. En cliquant sur un code de point, tu ouvres sa fiche détaillée.",
+      {},
+      360
+    );
+  }catch(error){
+    console.error("Erreur cheatsheet :", error);
+    message.textContent = "Erreur dans le cheatsheet. Regarde la console.";
+  }
+}
+
+function renderCheatsheetPanel(){
+
+  function asArray(value){
+    if(!value) return [];
+    return Array.isArray(value) ? value : [value];
+  }
+
+  function flattenLocal(value){
+    if(!value) return [];
+
+    if(Array.isArray(value)){
+      return value.flatMap(flattenLocal);
+    }
+
+    if(typeof value === "object"){
+      return Object.values(value).flatMap(flattenLocal);
+    }
+
+    return [String(value)];
+  }
+
+  function pointFullName(point){
+    const code = String(point).trim();
+    const d = POINT_DETAILS[code] || {};
+
+    return `
+      <button
+        type="button"
+        class="cheatsheet-point-link"
+        onclick="openPointPanelDirect('${code}')"
+      >
+        ${formatPointCode(code)}
+      </button>
+      ${d.pinyin || ""}
+      ${d.hanzi || ""}
+      ${d.nom_francais || d.nom_complet || ""}
+    `;
+  }
+
+  function openPointPanelFromCheatsheet(point){
+
+    let fakeGroup = solution.find(group =>
+      group.points.includes(point)
+    );
+
+    if(!fakeGroup){
+      fakeGroup = {
+        solved:true,
+        points:[point]
+      };
+
+      solution.push(fakeGroup);
+    }
+
+    openPointPanel(point);
+  }
+
+  function line(labelText, value){
+    const points = flattenLocal(value);
+    if(points.length === 0) return "";
+
+    return `
+      <div class="cheatsheet-line">
+        <strong>${labelText}</strong> : ${points.map(pointFullName).join(", ")}
+      </div>
+    `;
+  }
+
+  function simplePointLines(value){
+    return flattenLocal(value).map(point => `
+      <div class="cheatsheet-line">
+        ${pointFullName(point)}
+      </div>
+    `);
+  }
+
+  function section(title, rows){
+    const cleanRows = rows.filter(Boolean);
+
+    if(cleanRows.length === 0) return "";
+
+    return `
+      <details class="cheatsheet-section">
+        <summary>${title}</summary>
+        <div>${cleanRows.join("")}</div>
+      </details>
+    `;
+  }
+
+  function label(key){
+    return LABEL_NAMES[key] || displayLabel(key);
+  }
+
+  const canalOrder = [
+    "IG","V","TF","VB","GI","E",
+    "P","Rt","C","Rn","EC","F",
+    "RM","DM"
+  ];
+
+  let html = `
+    <div class="point-header">
+      <span class="point-code">Cheatsheet</span>
+    </div>
+  `;
+
+  Object.entries(RAW_DATA.Categories_de_points || {}).forEach(([key,value])=>{
+
+    const title = DISPLAY_NAMES[key] || key;
+
+    if([
+      "Points_Jing_Puits",
+      "Points_Ying_Jaillissement",
+      "Points_Shu_Riviere",
+      "Points_Jing_Fleuve",
+      "Points_He_Reunion",
+      "Points_Yuan_Source",
+      "Points_Xi_Crevasse",
+      "Points_Luo_Liaison"
+    ].includes(key)){
+
+      html += section(
+        title,
+        canalOrder.map(canal =>
+          line(
+            labelForCanalOrVessel(canal),
+            flattenLocal(value).filter(p => canalOfPoint(p) === canal)
+          )
+        )
+      );
+
+    }else{
+
+      html += section(
+        title,
+        simplePointLines(value)
+      );
+    }
+  });
+
+  [
+    "Points_d_ouverture_des_merveilleux_vaisseaux",
+    "Points_Hui_Reunion",
+    "Points_generaux",
+    "Les_4_mers"
+  ].forEach(sectionKey=>{
+    const data = RAW_DATA[sectionKey];
+    if(!data) return;
+
+    html += section(
+      DISPLAY_NAMES[sectionKey] || sectionKey,
+      Object.entries(data).map(([labelKey,points]) =>
+        line(label(labelKey), points)
+      )
+    );
+  });
+
+  [
+    "Points_fenetre_du_ciel",
+    "Points_pour_faire_revenir_le_Yang",
+    "Points_fantomes_de_Sun_Si_Miao"
+  ].forEach(sectionKey=>{
+    const data = RAW_DATA[sectionKey];
+    if(!data) return;
+
+    html += section(
+      DISPLAY_NAMES[sectionKey] || sectionKey,
+      simplePointLines(data)
+    );
+  });
+
+  if(typeof POINT_DETAILS !== "undefined"){
+    function isRegularChannelPointCode(code){
+      return /^(P|GI|E|Rt|C|IG|V|Rn|EC|TF|VB|F|RM|DM)\d+$/.test(String(code));
+    }
+
+    function extraordinarySortLabel(point){
+      const d = POINT_DETAILS[point] || {};
+
+      return String(
+        d.pinyin ||
+        d.nom_francais ||
+        d.nom_complet ||
+        point
+      )
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .toLowerCase();
+    }
+
+    const extraordinaryPoints =
+      Object.keys(POINT_DETAILS)
+        .filter(point => !isRegularChannelPointCode(point))
+        .sort((a,b) =>
+          extraordinarySortLabel(a).localeCompare(
+            extraordinarySortLabel(b),
+            "fr"
+          )
+        );
+
+    html += section(
+      "Points extraordinaires",
+      simplePointLines(extraordinaryPoints)
+    );
+  }
+
+  cheatsheetPanelContent.innerHTML = html;
+}
+
+function openCheatsheetDemoCategory(){
+
+  if(!cheatsheetPanelContent) return;
+
+  const sections =
+    [...cheatsheetPanelContent.querySelectorAll("details.cheatsheet-section")];
+
+  if(!sections.length) return;
+
+  sections.forEach(section=>{
+    section.open = false;
+  });
+
+  const demoSection =
+    sections.find(section => section.querySelector(".cheatsheet-point-link")) ||
+    sections[0];
+
+  demoSection.open = true;
+
+  setTimeout(()=>{
+    const demoPoint =
+      demoSection.querySelector(".cheatsheet-point-link");
+
+    if(demoPoint){
+      demoPoint.scrollIntoView({
+        block:"center",
+        inline:"nearest",
+        behavior:"smooth"
+      });
+    }
+  }, 120);
+}
+
+function closeCheatsheetPanel(){
+
+  const panel = document.getElementById("cheatsheetPanel");
+  const toggle = document.getElementById("cheatsheetToggle");
+
+  if(!panel) return;
+
+  panel.classList.remove("open");
+
+  if(toggle){
+    toggle.innerHTML = "&gt;";
+  }
+}
+
+document.addEventListener("pointerdown", event=>{
+
+  if(!cheatsheetPanel.classList.contains("open")){
+    return;
+  }
+
+  if(cheatsheetPanel.contains(event.target)){
+    return;
+  }
+
+  if(event.target.closest("#cheatsheetButton")){
+    return;
+  }
+
+  if(event.target.closest(".category-postit")){
+    return;
+  }
+
+  if(event.target.closest("#tourBox")){
+    return;
+  }
+
+  closeCheatsheetPanel();
+
+});
+
+document.addEventListener("keydown", event=>{
+
+  if(event.key === "Escape"){
+    closeCheatsheetPanel();
+  }
+
+});
+
+function currentMode(){
+  return modeToggle.checked
+    ? "manual"
+    : "auto";
+}
+
+function toggleManualMode(){
+
+  pool = buildPool();
+  fillManualSelectors();
+
+  if(currentMode() === "manual"){
+
+    manualEditButton.style.display = "inline-block";
+
+    const alreadyOpenedManual =
+      localStorage.getItem("mtc_manual_opened_once") === "1";
+
+    if(!alreadyOpenedManual){
+      manualControls.style.display = "flex";
+      localStorage.setItem("mtc_manual_opened_once", "1");
+    }else{
+      manualControls.style.display = "none";
+    }
+
+  }else{
+
+    manualEditButton.style.display = "none";
+    manualControls.style.display = "none";
+  }
+}
+
+const CANAL_LABELS = {
+  P:"Shǒu tài yīn",
+  GI:"Shǒu yáng míng",
+  E:"Zú yáng míng",
+  Rt:"Zú tài yīn",
+  C:"Shǒu shǎo yīn",
+  IG:"Shǒu tài yáng",
+  V:"Zú tài yáng",
+  Rn:"Zú shǎo yīn",
+  EC:"Shǒu jué yīn",
+  TF:"Shǒu shǎo yáng",
+  VB:"Zú shǎo yáng",
+  F:"Zú jué yīn",
+  RM:"Rèn mài",
+  DM:"Dū mài",
+  ChongMai:"Chōng mài",
+  DaiMai:"Dài mài",
+  YinQiaoMai:"Yīn qiāo mài",
+  YangQiaoMai:"Yáng qiāo mài",
+  YinWeiMai:"Yīn wéi mài",
+  YangWeiMai:"Yáng wéi mài"
+};
+
+function labelForCanalOrVessel(key){
+  return CANAL_LABELS[key] || LABEL_NAMES[key] || displayLabel(key);
+}
+
+function canalOfPoint(point){
+  const match = String(point).match(/^[A-Za-z]+/);
+  return match ? match[0] : "";
+}
+
+function pointLineWithCanal(point){
+  const canal = canalOfPoint(point);
+  const label = CANAL_LABELS[canal] || canal;
+
+  return `${label} : ${shortPointLine(point)}`;
+}
+
+const MAX_MISTAKES = 5;
+const MAX_CHEATS = 5;
+
+function unique(arr){
+  if(!arr) return [];
+
+  if(!Array.isArray(arr)){
+    arr = [arr];
+  }
+
+  return [...new Set(arr)];
+}
+
+function flattenPoints(value){
+  if(!value) return [];
+
+  if(Array.isArray(value)){
+    return value.flatMap(flattenPoints);
+  }
+
+  if(typeof value === "object"){
+    return Object.values(value).flatMap(flattenPoints);
+  }
+
+  return [String(value)];
+}
+
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+function displayLabel(label){
+  return LABEL_NAMES[label] || label.replaceAll("_"," ");
+}
+
+function buildPool(){
+  const p = [];
+
+  for(const [key,points] of Object.entries(RAW_DATA.Categories_de_points)){
+    p.push({
+      key,
+      mainGroup:"Categories_de_points",
+      name:DISPLAY_NAMES[key] || key,
+      points:unique(flattenPoints(points))
+    });
+  }
+
+  const sections = [
+    "Points_d_ouverture_des_merveilleux_vaisseaux",
+    "Points_Hui_Reunion",
+    "Points_generaux",
+    "Les_4_mers",
+    "Points_fenetre_du_ciel",
+    "Points_pour_faire_revenir_le_Yang",
+    "Points_fantomes_de_Sun_Si_Miao"
+  ];
+
+  sections.forEach(section=>{
+    let pts = [];
+    pts = flattenPoints(RAW_DATA[section]);
+    pts = unique(pts);
+
+    if(pts.length >= 4){
+      p.push({
+        key:section,
+        mainGroup:section,
+        name:DISPLAY_NAMES[section] || section,
+        points:pts
+      });
+    }
+  });
+
+  return p.filter(cat=>cat.points.length >= 4);
+}
+function toggleSettings(){
+  const panel = document.getElementById("settingsPanel");
+
+  panel.style.display =
+    panel.style.display === "none"
+      ? "block"
+      : "none";
+
+  if(panel.style.display !== "none"){
+    showProgressHintSoon(
+      "display_options",
+      "#settingsPanel",
+      "Affichage",
+      "Fond, lettres, halo, taille : règle le jeu pour qu’il soit confortable pour toi."
+    );
+  }
+}
+
+function shakeTile(tile){
+
+  tile.classList.remove("shake");
+
+  void tile.offsetWidth;
+
+  tile.classList.add("shake");
+
+  setTimeout(()=>{
+    tile.classList.remove("shake");
+  },350);
+}
+
+function hasConflict(cat, chosen){
+  return chosen.some(other =>
+    cat.points.some(p => other.points.includes(p))
+  );
+}
+
+function chooseCompatibleCategories(){
+
+  const byKey = Object.fromEntries(
+    pool.map(cat => [canonicalAssociationKey(cat.key), cat])
+  );
+
+  const associationSets =
+    Object.keys(
+      typeof ASSOCIATION_EXPLANATIONS !== "undefined"
+        ? ASSOCIATION_EXPLANATIONS
+        : {}
+    )
+      .map(key =>
+        key
+          .split("__")
+          .map(canonicalAssociationKey)
+          .map(categoryKey => byKey[categoryKey])
+          .filter(Boolean)
+      )
+      .filter(set => set.length >= 2 && set.length <= 4);
+
+  function setIsCompatible(cats){
+    const chosen = [];
+
+    for(const cat of cats){
+      if(!cat) return false;
+      if(chosen.includes(cat)) continue;
+      if(hasConflict(cat, chosen)) return false;
+      chosen.push(cat);
+    }
+
+    return true;
+  }
+
+  for(let attempt=0; attempt<3000; attempt++){
+
+    const chosen = [];
+
+    const possibleAssociationSets =
+      shuffle(associationSets).filter(set => setIsCompatible(set));
+
+    if(possibleAssociationSets.length){
+      possibleAssociationSets[0].forEach(cat=>{
+        if(!chosen.includes(cat) && !hasConflict(cat, chosen)){
+          chosen.push(cat);
+        }
+      });
+    }
+
+    const importantKeys = [
+      "Points_Jing_Puits",
+      "Points_Ying_Jaillissement",
+      "Points_Shu_Riviere",
+      "Points_Jing_Fleuve",
+      "Points_He_Reunion",
+      "Points_Yuan_Source",
+      "Points_Xi_Crevasse",
+      "Points_Luo_Liaison",
+      "Points_Bei_Shu_Transport_du_dos",
+      "Points_Mu_Collecteur",
+      "Points_fenetre_du_ciel",
+      "Points_pour_faire_revenir_le_Yang"
+    ];
+
+    const boosted = pool.flatMap(cat =>
+      importantKeys.includes(canonicalAssociationKey(cat.key))
+        ? [cat, cat, cat]
+        : [cat]
+    );
+
+    const candidates = shuffle(boosted);
+
+    for(const cat of candidates){
+      if(chosen.includes(cat)) continue;
+      if(hasConflict(cat, chosen)) continue;
+
+      chosen.push(cat);
+
+      if(chosen.length === 4){
+        return chosen;
+      }
+    }
+  }
+
+  alert("Impossible de trouver 4 catégories compatibles.");
+  return [];
+}
+
+function fillManualSelectors(){
+
+  const savedKeys =
+    JSON.parse(
+      localStorage.getItem("mtc_manual_categories") || "[]"
+    );
+
+  manualChecklist.innerHTML = "";
+
+  pool.forEach(cat=>{
+    const label = document.createElement("label");
+    label.className = "manual-checkitem";
+
+    const checked =
+      savedKeys.includes(cat.key)
+        ? "checked"
+        : "";
+
+    label.innerHTML = `
+      <input
+        type="checkbox"
+        value="${cat.key}"
+        ${checked}
+        onchange="saveManualCategories()"
+      >
+      ${cat.name}
+    `;
+
+    manualChecklist.appendChild(label);
+  });
+}
+
+function saveManualCategories(){
+
+  const checkedKeys =
+    [...manualChecklist.querySelectorAll("input:checked")]
+      .map(input => input.value);
+
+  localStorage.setItem(
+    "mtc_manual_categories",
+    JSON.stringify(checkedKeys)
+  );
+}
+
+function canBuildCategorySet(categories){
+  const chosen = [];
+  const usedMainGroups = new Set();
+
+  for(const cat of shuffle(categories)){
+    if(usedMainGroups.has(cat.mainGroup)) continue;
+
+    chosen.push(cat);
+    usedMainGroups.add(cat.mainGroup);
+
+    if(chosen.length === 4){
+      return chosen;
+    }
+  }
+
+  return [];
+}
+
+function chooseManualCategories(){
+  const checkedKeys =
+    [...manualChecklist.querySelectorAll("input:checked")]
+      .map(input => input.value);
+
+      localStorage.setItem(
+      "mtc_manual_categories",
+      JSON.stringify(checkedKeys)
+    );
+
+  if(checkedKeys.length < 4){
+    message.textContent =
+      "Choisis au moins 4 catégories.";
+    return [];
+  }
+
+  const selectedCats =
+    checkedKeys
+      .map(key => pool.find(cat => cat.key === key))
+      .filter(Boolean);
+
+  return shuffle(selectedCats).slice(0,4);
+}
+
+function toggleManualMode(){
+  pool = buildPool();
+  fillManualSelectors();
+
+  if(currentMode() === "manual"){
+    manualEditButton.style.display = "inline-block";
+    manualControls.style.display = "flex";
+  }else{
+    manualEditButton.style.display = "none";
+    manualControls.style.display = "none";
+  }
+}
+
+function toggleManualChecklist(){
+  manualControls.style.display =
+    manualControls.style.display === "none"
+      ? "flex"
+      : "none";
+}
+
+function applySettings(){
+  const settings = {
+    pageBg:localStorage.getItem("mtc_pageBg") || "#ffffff",
+    tileBg:localStorage.getItem("mtc_tileBg") || "#ffffff",
+    text:localStorage.getItem("mtc_text") || "#111111",
+    shadow:localStorage.getItem("mtc_shadow") || "#0000FF",
+    fontSize:localStorage.getItem("mtc_fontSize") || "18"
+  };
+
+  document.documentElement.style.setProperty("--page-bg", settings.pageBg);
+  document.documentElement.style.setProperty("--tile-bg", settings.tileBg);
+  document.documentElement.style.setProperty(  "--selected-text-color", getContrastColor(settings.tileBg));
+  generateCategoryColors();
+  document.documentElement.style.setProperty("--text-color", settings.text);
+  document.documentElement.style.setProperty("--shadow-color", settings.shadow);
+  document.documentElement.style.setProperty("--ui-font-size", settings.fontSize+"px");
+
+  pageBgPicker.value = settings.pageBg;
+  textPicker.value = settings.text;
+  shadowPicker.value = settings.shadow;
+  fontSizeSlider.value = settings.fontSize;
+
+  if(localStorage.getItem("mtc_darkroom") === "1"){
+    document.body.classList.add("darkroom");
+  }else{
+    document.body.classList.remove("darkroom");
+  }
+
+  if(localStorage.getItem("mtc_night_invert") === "1"){
+  document.body.classList.add("night-invert");
+}else{
+  document.body.classList.remove("night-invert");
+}
+}
+
+function getContrastColor(hex){
+  if(!hex) return "#ffffff";
+
+  hex = hex.replace("#","");
+
+  const r = parseInt(hex.substring(0,2),16);
+  const g = parseInt(hex.substring(2,4),16);
+  const b = parseInt(hex.substring(4,6),16);
+
+  const luminance =
+    0.299 * r + 0.587 * g + 0.114 * b;
+
+  return luminance > 186
+    ? "#111111"
+    : "#ffffff";
+}
+
+
+function hexToRgb(hex){
+  hex = hex.replace("#","");
+  return {
+    r:parseInt(hex.substring(0,2),16),
+    g:parseInt(hex.substring(2,4),16),
+    b:parseInt(hex.substring(4,6),16)
+  };
+}
+
+function rgbToHex(r,g,b){
+  return "#" + [r,g,b].map(x=>{
+    x = Math.max(0,Math.min(255,Math.round(x)));
+    return x.toString(16).padStart(2,"0");
+  }).join("");
+}
+
+function mixColors(hex1, hex2, amount){
+  const a = hexToRgb(hex1);
+  const b = hexToRgb(hex2);
+
+  return rgbToHex(
+    a.r + (b.r - a.r) * amount,
+    a.g + (b.g - a.g) * amount,
+    a.b + (b.b - a.b) * amount
+  );
+}
+
+function generateCategoryColors(){
+  const base =
+    localStorage.getItem("mtc_tileBg") || "#ffffff";
+
+  CATEGORY_COLORS = [
+    mixColors(base,"#ffffff",0.38),
+    mixColors(base,"#ffffff",0.48),
+    mixColors(base,"#000000",0.38),
+    mixColors(base,"#000000",0.48)
+  ];
+}
+
+function saveColorSetting(key,value,cssVar){
+  localStorage.setItem(key,value);
+  document.documentElement.style.setProperty(cssVar,value);
+  updateSelectionFeedback();
+}
+
+function distributeBoard(groups){
+  const allPoints = [];
+
+  groups.forEach(group=>{
+    group.points.forEach(point=>{
+      allPoints.push({
+        point: point,
+        groupKey: group.key
+      });
+    });
+  });
+
+  for(let attempt=0; attempt<5000; attempt++){
+    const shuffled = shuffle(allPoints);
+    let ok = true;
+
+    for(let row=0; row<4; row++){
+      const rowItems = shuffled.slice(row*4, row*4+4);
+      const rowGroups = rowItems.map(item=>item.groupKey);
+
+      if(new Set(rowGroups).size < 3){
+        ok = false;
+        break;
+      }
+    }
+
+    for(let col=0; col<4; col++){
+      const colItems = [
+        shuffled[col],
+        shuffled[col+4],
+        shuffled[col+8],
+        shuffled[col+12]
+      ];
+
+      const colGroups = colItems.map(item=>item.groupKey);
+
+      if(new Set(colGroups).size < 3){
+        ok = false;
+        break;
+      }
+    }
+
+    if(ok){
+      return shuffled.map(item=>item.point);
+    }
+  }
+
+  return shuffle(allPoints).map(item=>item.point);
+}
+
+function pickFourVariedPoints(categoryKey, points){
+  const uniquePoints = [...new Set(points)];
+
+  if(uniquePoints.length <= 4){
+    return shuffle(uniquePoints);
+  }
+
+  const historyKey = "mtc_recent_points_" + categoryKey;
+
+  const recent =
+    JSON.parse(localStorage.getItem(historyKey) || "[]");
+
+  let preferred =
+    uniquePoints.filter(p => !recent.includes(p));
+
+  if(preferred.length < 4){
+    preferred = uniquePoints;
+  }
+
+  const picked =
+    shuffle(preferred).slice(0,4);
+
+  const newRecent =
+    [...picked, ...recent]
+      .filter((p,index,self) => self.indexOf(p) === index)
+      .slice(0, Math.min(uniquePoints.length, 12));
+
+  localStorage.setItem(
+    historyKey,
+    JSON.stringify(newRecent)
+  );
+
+  return picked;
+}
+
+
+function revealAllSolutions(){
+  if(solvedCount >= 4){
+    return;
+  }
+
+  solution.forEach(group=>{
+    if(!group.solved){
+      solveGroup(group);
+    }
+  });
+
+  finalGuess.style.display = "none";
+  finalGuessChoices.innerHTML = "";
+  finalGuess.dataset.correctKey = "";
+
+  message.textContent = "Toutes les solutions ont été révélées.";
+}
+
+function showTutorial(){
+
+  const overlay = document.createElement("div");
+  overlay.id = "tutorialOverlay";
+
+  overlay.innerHTML = `
+    <div class="tutorial-box">
+
+      <h2>Bienvenue dans Connections MTC</h2>
+
+      <p>
+        Trouve les 4 catégories de points cachées parmi les 16 points affichés.
+      </p>
+
+      <ol>
+        <li>Sélectionne 4 points.</li>
+        <li>Si les 4 appartiennent à la même catégorie, elle est validée.</li>
+        <li>Trouve les 4 catégories pour terminer la partie.</li>
+        <li>À la fin, clique sur les points validés pour consulter leur fiche détaillée.</li>
+      </ol>
+
+      <button id="closeTutorial">
+        OK
+      </button>
+
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  document
+    .getElementById("closeTutorial")
+    .onclick = ()=>{
+
+      localStorage.setItem(
+        "mtc_tutorial_seen",
+        "1"
+      );
+
+      overlay.remove();
+    };
+}
+
+function showEndReviewScreen(mode){
+
+  showCategoryInfoButtons();
+
+  const title =
+    mode === "win"
+      ? "BRAVO !"
+      : mode === "tour"
+        ? "DÉMONSTRATION"
+        : "GAME OVER !";
+
+  const subtitle =
+    mode === "win"
+      ? " "
+      : mode === "tour"
+        ? "Regarde les éléments de révision autour de la grille."
+        : "Fin de partie. Tu peux maintenant réviser ta grille.";
+
+  message.innerHTML = `
+    <div class="game-over-title">
+      ${title}
+    </div>
+
+    <div class="game-over-subtitle">
+      ${subtitle}
+    </div>
+  `;
+
+  showAssociationLinks();
+
+  showProgressHintSoon(
+    "review_bulbs",
+    ".category-info-button",
+    "Réviser les catégories",
+    "En cliquant sur une ampoule, tu ouvres un post-it pour réviser la catégorie. Tu peux le déplacer."
+  );
+
+  showProgressHintSoon(
+    "review_associations",
+    ".association-link-plus",
+    "Associations",
+    "Les traits colorés relient les catégories qui fonctionnent ensemble. En cliquant sur +, tu ouvres la fiche de l’association.",
+    {},
+    760
+  );
+}
+
+function triggerGameOver(reason){
+
+  gameOver = true;
+
+  revealAllSolutions();
+
+  showEndReviewScreen("gameover");
+}
+
+function updateGameStatus(){
+  lifeDisplay.textContent =
+    "♥".repeat(MAX_MISTAKES - mistakeCount) +
+    "♡".repeat(mistakeCount);
+
+  cheatDisplay.textContent =
+    "☘︎".repeat(MAX_CHEATS - cheatCount) +
+    "".repeat(cheatCount);
+}
+
+let tourStep = 0;
+let tourSteps = [];
+
+function startTour(){
+  endTour(false);
+
+  closeCheatsheetPanel();
+  closePointPanel();
+
+  tourSteps = [
+    {
+      selector: ".topbar-row button[onclick='newGame()']",
+      title: "Nouvelle partie",
+      text: "Ce bouton relance une grille."
+    },
+    {
+      selector: ".topbar-row button[onclick='toggleSettings()']",
+      title: "Affichage",
+      text: "En cliquant sur Affichage, tu peux adapter les couleurs, le halo et la taille du texte."
+    },
+    {
+      selector: ".mode-switch",
+      title: "Auto / Manuel",
+      text: "En Auto, le jeu choisit les catégories. En Manuel, tu choisis ce que tu veux réviser."
+    },
+    {
+      selector: "#grid",
+      title: "La grille",
+      text: "En cliquant sur 4 points qui vont ensemble, tu proposes une catégorie. Si c’est juste, la ligne se range au-dessus.",
+      disableGridClick:true
+    },
+    {
+      selector: "#jokerBubble",
+      title: "La roue de la chance",
+      text: "Tu as cinq ♥ vies et cinq ☘︎ astuces. Attention, une erreur = une ♥ vie !"
+    },
+    {
+      selector: "#cheatsheetButton",
+      title: "Cheatsheet",
+      text: "C’est un secret..."
+    },
+    {
+      selector: "#suggestionMailButton",
+      title: "Suggestions",
+      text: "Tu peux m’envoyer un message ici.",
+      fallback: () => document.querySelector("#footerTitle"),
+      position:"aboveBottom"
+    },
+    {
+      selector: "#supportCoffeeButton",
+      title: "Soutenir le projet",
+      text: "Le développement de ce jeu m’a pris plusieurs mois. En cliquant ici, tu peux soutenir mon travail.",
+      fallback: () => document.querySelector("#footerTitle"),
+      position:"aboveBottom"
+    },
+    {
+      selector: "#grid",
+      title: " ",
+      text: "Bonnes révisions !"
+    }
+  ];
+
+  tourStep = 0;
+  showTourStep();
+}
+
+function showTourStep(){
+  const step = tourSteps[tourStep];
+
+  if(!step){
+    endTour(true);
+    return;
+  }
+
+  if(typeof step.before === "function"){
+    step.before();
+  }
+
+  let target = document.querySelector(step.selector);
+
+  if(!target && typeof step.fallback === "function"){
+    target = step.fallback();
+  }
+
+  if(!target && !step._retriedAfterBefore){
+    step._retriedAfterBefore = true;
+    setTimeout(showTourStep, 160);
+    return;
+  }
+
+  if(!target){
+    tourStep++;
+    showTourStep();
+    return;
+  }
+
+  document.body.classList.toggle(
+    "tour-disable-grid",
+    !!step.disableGridClick
+  );
+
+  document
+    .querySelectorAll(".tour-highlight")
+    .forEach(el=>el.classList.remove("tour-highlight"));
+
+  let overlay = document.getElementById("tourOverlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "tourOverlay";
+    document.body.appendChild(overlay);
+  }
+
+  let box = document.getElementById("tourBox");
+  if(!box){
+    box = document.createElement("div");
+    box.id = "tourBox";
+    document.body.appendChild(box);
+  }
+
+  target.classList.add("tour-highlight");
+
+  try{
+    target.scrollIntoView({
+      block:"center",
+      inline:"center",
+      behavior:"auto"
+    });
+  }catch(error){}
+
+  box.innerHTML = `
+    <h3>${step.title}</h3>
+    <div>${step.text}</div>
+
+    <div class="tour-actions">
+      <button onclick="endTour(true)">Passer</button>
+      <button onclick="previousTourStep()">Retour</button>
+      <button onclick="nextTourStep()">
+        ${tourStep === tourSteps.length - 1 ? "Terminer" : "Suivant"}
+      </button>
+    </div>
+  `;
+
+  requestAnimationFrame(()=>{
+    const rect = target.getBoundingClientRect();
+    positionTourBox(box, rect, step);
+  });
+}
+
+function positionTourBox(box, rect, step = {}){
+  const margin = 10;
+  const isSmall = window.innerWidth <= 520;
+
+  const boxWidth = isSmall
+    ? Math.min(292, window.innerWidth - 20)
+    : Math.min(320, window.innerWidth - 24);
+
+  box.style.width = boxWidth + "px";
+  box.style.maxHeight = Math.min(260, window.innerHeight - 24) + "px";
+
+  const boxHeight = Math.min(
+    box.offsetHeight || 180,
+    window.innerHeight - 24
+  );
+
+  let left;
+  let top;
+  let placement = "bottom";
+
+  if(step.position === "aboveBottom"){
+    const bottomBlock =
+      document.querySelector(".bottom-actions") ||
+      document.querySelector("#jokerBubble");
+
+    const bottomRect = bottomBlock
+      ? bottomBlock.getBoundingClientRect()
+      : rect;
+
+    left = bottomRect.left + bottomRect.width / 2 - boxWidth / 2;
+    top = bottomRect.top - boxHeight - 14;
+    placement = "top";
+  }else{
+    left = rect.left + rect.width / 2 - boxWidth / 2;
+    top = rect.bottom + 12;
+    placement = "bottom";
+
+    if(top + boxHeight > window.innerHeight - margin){
+      top = rect.top - boxHeight - 12;
+      placement = "top";
+    }
+  }
+
+  if(left < margin) left = margin;
+
+  if(left + boxWidth > window.innerWidth - margin){
+    left = window.innerWidth - boxWidth - margin;
+  }
+
+  if(top < margin){
+    top = margin;
+  }
+
+  if(top + boxHeight > window.innerHeight - margin){
+    top = Math.max(margin, window.innerHeight - boxHeight - margin);
+  }
+
+  const targetCenter = rect.left + rect.width / 2;
+  const arrowLeft = Math.max(
+    18,
+    Math.min(boxWidth - 18, targetCenter - left)
+  );
+
+  box.dataset.placement = placement;
+  box.style.setProperty("--tour-arrow-left", arrowLeft + "px");
+  box.style.left = left + "px";
+  box.style.top = top + "px";
+}
+
+let progressHintActive = false;
+
+function progressHintKey(id){
+  return "mtc_progress_hint_" + id;
+}
+
+function showProgressHint(id, selector, title, text, options = {}){
+
+  if(!id || !selector) return;
+
+  if(document.getElementById("tourBox")) return;
+  if(progressHintActive) return;
+
+  if(localStorage.getItem(progressHintKey(id)) === "1"){
+    return;
+  }
+
+  const target = document.querySelector(selector);
+  if(!target) return;
+
+  progressHintActive = true;
+  localStorage.setItem(progressHintKey(id), "1");
+
+  document
+    .querySelectorAll(".tour-highlight")
+    .forEach(el=>el.classList.remove("tour-highlight"));
+
+  let overlay = document.getElementById("tourOverlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "tourOverlay";
+    document.body.appendChild(overlay);
+  }
+
+  const box = document.createElement("div");
+  box.id = "tourBox";
+  box.className = "progress-hint-box";
+
+  box.innerHTML = `
+    <h3>${title}</h3>
+    <div>${text}</div>
+
+    <div class="tour-actions">
+      <button type="button" class="progress-hint-ok">OK</button>
+    </div>
+  `;
+
+  document.body.appendChild(box);
+  target.classList.add("tour-highlight");
+
+  function closeHint(){
+    target.classList.remove("tour-highlight");
+    if(box) box.remove();
+    if(overlay) overlay.remove();
+    progressHintActive = false;
+  }
+
+  const okButton =
+    box.querySelector(".progress-hint-ok");
+
+  okButton.addEventListener("pointerdown", event=>{
+    event.stopPropagation();
+  });
+
+  okButton.addEventListener("click", event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    closeHint();
+  });
+
+  try{
+    target.scrollIntoView({
+      block:"center",
+      inline:"center",
+      behavior:"smooth"
+    });
+  }catch(error){}
+
+  setTimeout(()=>{
+    const rect = target.getBoundingClientRect();
+    positionTourBox(box, rect, options);
+  }, 120);
+}
+
+function showProgressHintSoon(id, selector, title, text, options = {}, delay = 260){
+  setTimeout(()=>{
+    showProgressHint(id, selector, title, text, options);
+  }, delay);
+}
+
+
+function setupGuidedTourManualDemo(){
+
+  closeCheatsheetPanel();
+  closePointPanel();
+  removeAssociationLinks();
+
+  document
+    .querySelectorAll(".category-postit, .association-postit")
+    .forEach(el=>el.remove());
+
+  if(!pool || pool.length === 0){
+    pool = buildPool();
+  }
+
+  modeToggle.checked = true;
+  manualEditButton.style.display = "inline-block";
+  manualControls.style.display = "none";
+
+  selected = [];
+  solution = [];
+  solvedCount = 0;
+  categoryColors = {};
+  hintCategory = null;
+  hintStep = 0;
+  mistakeCount = 0;
+  cheatCount = 0;
+  gameOver = false;
+
+  updateGameStatus();
+
+  document.body.classList.remove("game-complete");
+  document.body.classList.remove("game-finished");
+
+  message.innerHTML = `
+    <div class="game-over-subtitle">
+      Visite guidée : partie manuelle de démonstration.
+    </div>
+  `;
+
+  hint.textContent = "";
+  solved.innerHTML = "";
+  grid.innerHTML = "";
+
+  finalGuess.style.display = "none";
+  finalGuess.dataset.correctKey = "";
+  finalGuessChoices.innerHTML = "";
+
+  const wantedKeys = [
+    "Points_Jing_Puits",
+    "Points_Ying_Jaillissement",
+    "Points_Shu_Riviere",
+    "Points_Jing_Fleuve"
+  ];
+
+  const demoCats = wantedKeys
+    .map(findCategoryByCanonicalKey)
+    .filter(Boolean);
+
+  const cats =
+    demoCats.length === 4
+      ? demoCats
+      : chooseCompatibleCategories();
+
+  if(!cats || cats.length !== 4){
+    newGame();
+    return;
+  }
+
+  cats.forEach((cat,index)=>{
+    const alreadyUsed =
+      solution.flatMap(g => g.points || []);
+
+    const availablePoints =
+      cat.points.filter(p => !alreadyUsed.includes(p));
+
+    const pts =
+      availablePoints.length >= 4
+        ? pickFourVariedPoints(cat.key, availablePoints)
+        : pickFourVariedPoints(cat.key, cat.points);
+
+    categoryColors[cat.key] =
+      CATEGORY_COLORS[index] || "#cccccc";
+
+    solution.push({
+      key:cat.key,
+      name:cat.name,
+      points:pts,
+      solved:false
+    });
+  });
+
+  renderCurrentBoard();
+}
+
+function findCategoryByCanonicalKey(key){
+  const canonicalKey = canonicalAssociationKey(key);
+
+  return pool.find(cat =>
+    canonicalAssociationKey(cat.key) === canonicalKey
+  );
+}
+
+function renderCurrentBoard(){
+  grid.innerHTML = "";
+
+  const board = distributeBoard(solution);
+
+  if(!board || board.length !== 16){
+    message.textContent = "Erreur : la grille de démonstration n’a pas pu être générée.";
+    return;
+  }
+
+  board.forEach(point=>{
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.dataset.point = point;
+    tile.innerHTML = `<span>${formatPointCode(point)}</span>`;
+    tile.onclick = () => toggleTile(tile, point);
+    grid.appendChild(tile);
+  });
+}
+
+function prepareGuidedTourReviewDemo(){
+
+  if(!solution || solution.length !== 4){
+    setupGuidedTourManualDemo();
+  }
+
+  if(solvedCount < 4){
+    gameOver = true;
+
+    solution.forEach(group=>{
+      if(!group.solved){
+        solveGroup(group);
+      }
+    });
+
+    finalGuess.style.display = "none";
+    finalGuessChoices.innerHTML = "";
+    finalGuess.dataset.correctKey = "";
+  }
+
+  gameOver = true;
+  document.body.classList.add("game-complete");
+  showEndReviewScreen("tour");
+}
+
+function openGuidedTourCategoryPostit(){
+  if(document.querySelector(".category-postit")) return;
+
+  const button = document.querySelector(".category-info-button");
+
+  if(button){
+    toggleCategoryExplanation(button);
+  }
+}
+
+function closeGuidedTourCategoryPostits(){
+  document
+    .querySelectorAll(".category-postit")
+    .forEach(el=>el.remove());
+}
+
+function openGuidedTourAssociationPostit(){
+  document
+    .querySelectorAll(".association-postit")
+    .forEach(el=>el.remove());
+
+  const button = document.querySelector(".association-link-plus");
+
+  if(button){
+    const key = button.dataset.associationKey;
+    const color = associationLinkColorsByKey[key] || button.style.background || "#0000FF";
+    toggleAssociationPostit(key, color);
+  }
+}
+
+function openGuidedTourPointPanel(){
+  const point =
+    solution?.[0]?.points?.[0] ||
+    document.querySelector(".solved-point")?.dataset.point;
+
+  if(point){
+    openPointPanelDirect(point);
+  }
+}
+
+function nextTourStep(){
+  tourStep++;
+  showTourStep();
+}
+
+function previousTourStep(){
+  if(tourStep > 0){
+    tourStep--;
+    showTourStep();
+  }
+}
+
+function endTour(save){
+  document.body.classList.remove("tour-disable-grid");
+
+  document
+    .querySelectorAll(".tour-highlight")
+    .forEach(el=>el.classList.remove("tour-highlight"));
+
+  const overlay = document.getElementById("tourOverlay");
+  const box = document.getElementById("tourBox");
+
+  if(overlay) overlay.remove();
+  if(box) box.remove();
+
+  if(save){
+    localStorage.setItem("mtc_tutorial_seen","1");
+  }
+}
+
+window.addEventListener("resize", ()=>{
+  if(document.getElementById("tourBox")){
+    showTourStep();
+  }
+});
+
+function formatPointCode(point){
+
+  return point.replace(
+    /^([A-ZÀ-ÿ]+)(\d+)$/,
+    "$1 $2"
+  );
+}
+
+const CATEGORY_EXPLANATIONS = {
+
+  Points_Jing_Puits: [
+    "DRAINE LA PLÉNITUDE, DISPERSE LA STAGNATION, CLARIFIE LA CHALEUR",
+    "ÉLIMINE L’OBSTRUCTION, DISPERSE LES NOUURES",
+    "RÉVEILLE LE CERVEAU, RESTAURE LA CONSCIENCE, OUVRE LES ORIFICES, CALME L’ESPRIT",
+    "TRAITE LES ZONES LES PLUS ÉLOIGNÉES DU CANAL",
+    "Maladies des organes zàng",
+    "Plénitude sous le cœur",
+    "Plénitude et stagnations dans les organes zàng et les canaux",
+    "Obstruction, nouure des canaux par vide",
+    "Maladies de la chaleur",
+    "Troubles mentaux, psychoémotionnels",
+    "Troubles neurologiques",
+    "En hiver pour la prévention, en traitement général, quel que soit l’organe",
+    "Au printemps, en cas de pathologie du bois, du foie"
+  ],
+
+  Points_Ying_Jaillissement: [
+    "CLARIFIE LA CHALEUR VIDE",
+    "NOURRIT LE YĪN ET ENRICHIT LE SANG",
+    "Maladies qui font changer la couleur du teint, de la peau",
+    "Maladie de la chaleur, fièvre",
+    "Pathologies des canaux [association possible avec le shū-rivière]",
+    "Pathologies des organes zàng [en association avec le shū-rivière]",
+    "Au printemps pour prévenir les pathologies qui font changer de couleur le teint ou d’autres tissus",
+    "En été en cas de pathologie du cœur/feu"
+  ],
+
+  Points_Shu_Riviere: [
+    "SOUTIENT LE QÌ ET TIÉDIT LE YÁNG",
+    "TRANSFORME L’HUMIDITÉ",
+    "Maladies avec alternance d’amélioration et d’aggravation",
+    "Douleur et lourdeur du corps et des articulations",
+    "Maladie de l’humidité",
+    "Maladies par vide de qì, vide de yáng, stagnation de qì",
+    "Pathologies des canaux [association possible avec le yíng-jaillissement]",
+    "Pathologies des organes zàng [en association avec le yíng-jaillissement]",
+    "En été, pour prévenir les pathologies avec alternance d’amélioration et d’aggravation",
+    "En fin d’été, en cas de pathologie de la rate/terre"
+  ],
+
+  Points_Jing_Fleuve: [
+    "MOBILISE LE QÌ DU MÉRIDIEN",
+    "LIBÈRE LA SURFACE",
+    "TRAITE LES TENDONS ET LES OS",
+    "Maladies avec changement du son de la voix, de la respiration, de la toux ou avec des bruits intestinaux, clapotis dans l’estomac, etc.",
+    "Pathologies des os et des tendons des canaux yīn",
+    "Stagnation de qì dans les jīng luò",
+    "Toux, dyspnée, asthme",
+    "Fièvre et frissons, syndrome grippal, refroidissement, etc.",
+    "En fin d’été, pour prévenir les pathologies qui entraînent du bruit (toux, asthme, troubles intestinaux, etc.)",
+    "En automne, en cas de pathologie du poumon/métal"
+  ],
+
+  Points_He_Reunion: [
+    "TRAITE L’INVERSION",
+    "MET EN ORDRE LA TRANSFORMATION DU QÌ DES ORGANES",
+    "Stase de sang, stagnation de qì dans les canaux",
+    "Maladie de l’estomac, diarrhée",
+    "Maladies provenant d’une alimentation déréglée",
+    "Inversion du qì",
+    "Dérèglement des fonctions des organes fǔ",
+    "Maladies de la peau pour les canaux yáng",
+    "En automne, pour prévenir les pathologies induites par une stase de sang ou les maladies de l’estomac",
+    "En hiver, en cas de pathologie des reins/eau",
+    "Le point hé-réunion agit puissamment sur la surface"
+  ],
+
+  Points_Yuan_Source: [
+    "TONIFIE LE QÌ ET RÉCHAUFFE LE YÁNG",
+    "MOBILISE LE QÌ ET LE YUÁN QÌ",
+    "RÉGULARISE YĪN YÁNG",
+    "TRAITE LE VIDE ET LA PLÉNITUDE",
+    "TRAITE LES ORGANES ET LES CANAUX",
+    "Maladies par vide de qì, vide de yáng, stagnation de qì",
+    "Maladies des organes zàng fǔ et des canaux et vaisseaux liaisons",
+    "Maladies avec dérèglement du yīn et/ou du yáng"
+  ],
+
+  Points_Xi_Crevasse: [
+    "MOBILISE LE QÌ ET ARRÊTE LA DOULEUR",
+    "ARRÊTE LES SAIGNEMENTS PAR STAGNATION DE QÌ DES CANAUX YĪN",
+    "SERT D’OUTIL DE DIAGNOSTIC POUR LA STAGNATION DU QÌ ET DU SANG",
+    "Stase de sang, stagnation de qì dans les canaux avec douleur aiguë",
+    "Saignements, hémorragies par stagnation de qì"
+  ],
+
+  Points_Luo_Liaison: [
+    "RÉGULARISE EN SURFACE LA MICROCIRCULATION DU QÌ ET DU SANG ET EXPULSE LES PERVERS RETENUS",
+    "FAVORISE EN PROFONDEUR LE TRANSFERT DE QÌ ENTRE LES CANAUX ET LE DISTRIBUE VERS LES AUTRES CATÉGORIES DE POINTS",
+    "SERT D’OUTIL DE DIAGNOSTIC",
+    "RÉGULARISE LES ÉMOTIONS",
+    "Stase de sang, stagnation de qì dans les canaux",
+    "Maladies des organes zàng fǔ et des canaux et vaisseaux liaisons",
+    "Facteur pathogène caché",
+    "Maladies des 6 organes creux",
+    "Maladies complexes qui impliquent plusieurs organes zàng fǔ et systèmes",
+    "Syndromes des vaisseaux liaisons luò-liaison"
+  ],
+
+  Points_Bei_Shu_Transport_du_dos: [
+    "TRAITE LES MALADIES YĪN",
+    "TRAITE DES MALADIES QUI SE DIRIGENT VERS LE YÁNG : L’EXTERNE ET LE HAUT (ÉGALEMENT PEAU, TENDON ET MUSCLES)",
+    "TRAITE L’ORGANE DE SENS ASSOCIÉ À L’ORGANE ZÀNG FǓ MAIS NE TRAITE PAS SON CANAL DIRECTEMENT",
+    "SERT D’OUTIL DE DIAGNOSTIC POUR LA MALADIE DES YĪN QUI VOYAGE DANS LE YÁNG",
+    "Maladies yīn : froid, humidité, maladies de vide et maladies chroniques, maladies du sang, des liquides, du jīng, maladies des 5 zàng, maladies des organes zàng qui se manifestent vers les organes fǔ",
+    "Douleur sourde, chronique, demande de palpation",
+    "Maladies des organes des sens",
+    "Maladies de l’interne se manifestant vers l’externe",
+    "Maladies du bas se manifestant vers le haut"
+  ],
+
+  Points_Mu_Collecteur: [
+    "TRAITE LES MALADIES DE TYPE YÁNG",
+    "TRAITE LE DYSFONCTIONNEMENT DES ORGANES FǓ SEULS",
+    "TRAITE LE DYSFONCTIONNEMENT DES ORGANES FǓ QUI AFFECTENT LES ORGANES ZÀNG",
+    "TRAITE LES MALADIES QUI VOYAGENT DU YÁNG VERS LE YĪN",
+    "Maladies yáng : chaleur, stagnation, accumulation, oppression, maladie par déséquilibre du qì, maladie par déséquilibre du shén par le yáng, maladie de plénitude, maladie aiguë, maladie récente",
+    "Maladie de l’externe se manifestant dans l’interne",
+    "Maladie du haut se manifestant vers le bas",
+    "Douleur forte, symptômes intenses, refus de palpation"
+  ],
+
+  Points_Xia_He_Reunion: [
+    "Traitent les organes fǔ correspondants"
+  ],
+
+  Points_d_ouverture_des_merveilleux_vaisseaux: [
+    "Traitent les merveilleux vaisseaux correspondants"
+  ],
+
+  Points_Hui_Reunion: [
+    "Orientent le traitement vers un tissu spécifique"
+  ],
+
+  Points_generaux: [
+    "E 36 : Point zǒng-général de l’abdomen",
+    "V 40 : Point zǒng-général des lombes et du dos",
+    "P 7 : Point zǒng-général de la tête et de la nuque",
+    "GI 4 : Point zǒng-général de la face et de la bouche",
+    "EC 6 : Point zǒng-général de la poitrine et des hypocondres",
+    "Rt 6 : Point zǒng-général de l’abdomen inférieur",
+    "DM 26 : Point zǒng-général pour la réanimation"
+  ],
+
+  Les_4_mers: [
+    "Réserves de ressources"
+  ],
+
+  Points_fenetre_du_ciel: [
+    "Régularisent le qì vers et depuis la tête et peuvent donc avoir un effet sur l’esprit",
+    "Régularisent le qì vers et depuis la tête et peuvent donc faire descendre l’inversion et traiter les troubles de la tête"
+  ],
+
+  Points_pour_faire_revenir_le_Yang: [
+    "Traitent l’effondrement du qì / yáng, situations d’urgence"
+  ],
+
+  Points_fantomes_de_Sun_Si_Miao: [
+    "Traitement du shén propre à Sūn Sī Miǎo"
+  ]
+
+};
+
+const ASSOCIATION_EXPLANATIONS = {
+
+  "Points_Jing_Puits__Points_Ying_Jaillissement": [
+    "Ils clarifient la chaleur plénitude ou déficience des organes zàng.",
+    "Ils désobstruent et régularisent la circulation du qì des canaux en général et en cas d’obstruction par nouure de chaleur en particulier.",
+    "Ils régularisent la circulation du sang dans les canaux en éliminant la stase et en vivifiant le sang.",
+    "Pathologies qui se manifestent par un tableau de chaleur interne ou externe, par plénitude ou déficience.",
+    "Trouble mental, psychique, émotionnel par chaleur vide ou plénitude, par vide de yīn ou vide de sang, par stagnation de qì ou stase de sang et désobstruent les orifices des organes de sens et du cœur."
+  ],
+
+  "Points_Jing_Puits__Points_Shu_Riviere": [
+    "Ils tonifient le qì des organes zàng et des canaux et régularise la circulation de yáng qì.",
+    "Ils clarifient et éliminent la chaleur humidité, désobstruent les canaux et les organes zàng fǔ et soulagent la douleur lourde et chaude due à la chaleur humidité.",
+    "Ils régularisent la circulation du qì dans les canaux, éliminent l’obstruction qu’elle soit due à la chaleur ou à l’humidité, et les douleurs dues à la stagnation de qì ou au vide de qì.",
+    "Toute douleur due à la chaleur se manifestant par rougeur et brûlure.",
+    "Les maladies des organes zàng qui alternent avec des périodes d’amélioration et d’aggravation.",
+    "Des troubles mentaux, psychiques et émotionnels dues au vide de qì, au vide de yáng, à la chaleur, à la stagnation et à l’humidité."
+  ],
+
+  "Points_Jing_Puits__Points_Jing_Fleuve": [
+    "Ils désobstruent les canaux et régulariser la circulation du qì et du sang.",
+    "Ils libèrent la surface de l’attaque externe, désobstruent les orifices, apaisent l’esprit dans le cas d’une attaque de facteur pathogène externe.",
+    "Toute maladie se manifestant par un bruit inhabituel sur les canaux ou dans les organes zàng (zone sous l’estomac inclue) : toux, dyspnée, asthme, voix rauque, aphonie, borborygmes, flatulences, clapotis de l’estomac, ainsi que toute douleur ou restriction de mouvement associées à un bruit comme craquement articulaire.",
+    "L’atteinte par la chaleur des tendons et des os des canaux yīn."
+  ],
+
+  "Points_Jing_Puits__Points_He_Reunion": [
+    "Ils dispersent la stase de sang dans les canaux et les organes zàng fǔ et soulagent la douleur pongitive.",
+    "Ils régularisent le système digestif blessé par une alimentation irrégulière et incorrecte.",
+    "Ils régularisent les mouvements de qì des organes zàng fǔ et traitent tout type de contre-courant.",
+    "Ils harmonisent et organisent le système des canaux et des organes zàng fǔ.",
+    "Toute douleur due à la chaleur se manifestant par rougeur et brûlure.",
+    "Les maladies des organes zàng qui alternent avec des périodes d’amélioration et d’aggravation.",
+    "Troubles mentaux, psychiques et émotionnels dues au vide de qì, au vide de yáng, à la chaleur, à la stagnation et à l’humidité."
+  ],
+
+  "Points_Jing_Puits__Points_Yuan_Source": [
+    "Ils renforcent les organes zàng en qì, en yáng et tonifient leur yuán qì.",
+    "Ils restaurent yuán qì affaibli par une déperdition de liquides à cause d’une maladie de la chaleur.",
+    "Ils régularisent la circulation dans les canaux atteints par une maladie de plénitude ou de vide.",
+    "Tout trouble psychique, mental, émotionnel qui se caractérise par une déficience de yuán qì."
+  ],
+
+  "Points_Jing_Puits__Points_Luo_Liaison": [
+    "Ils régularisent la circulation lorsque plusieurs canaux sont touchés en même temps.",
+    "Des maladies complexes qui touchent plusieurs organes zàng fǔ en même temps.",
+    "La maladie de la chaleur quand elle touche plusieurs systèmes et régularise la microcirculation lésée par la chaleur.",
+    "Les troubles psychiques dus à la rétention d’un facteur pathogène et de la stase de sang."
+  ],
+
+  "Points_Jing_Puits__Points_Xi_Crevasse__Points_Bei_Shu_Transport_du_dos__Points_Luo_Liaison": [
+    "Ajouter à cette association le POINT LUÒ-LIAISON permettra d’élargir cette action sur d’autres zàng fǔ impliqués dans le déséquilibre. Le point bèi shù-transport du dos régularisera encore mieux la circulation de qì et de sang dans cet organe pour soulager la douleur et arrêter le saignement éventuel."
+  ],
+
+  "Points_Jing_Puits__Points_Xi_Crevasse": [
+    "Désobstruent la circulation du qì dans les canaux et arrêtent le saignement par stagnation de qì des canaux yīn, surtout lorsque cette stagnation est due à l’accumulation de chaleur.",
+    "Traitent la douleur en désobstruant la circulation du qì dans les canaux et arrêtent le saignement par stagnation de qì des canaux yīn, surtout lorsque cette stagnation est due à l’accumulation de chaleur."
+  ],
+
+  "Points_Jing_Puits__Points_Bei_Shu_Transport_du_dos": [
+    "Maladies de vide, les maladies chroniques, surtout lorsqu’elles impliquent la chaleur.",
+    "Épuisement du yīn par la chaleur.",
+    "Maladies des organes de sens dues à la stagnation dans les canaux ou à la chaleur.",
+    "Tout déséquilibre de l’esprit dû à un mouvement de bas vers le haut, du yīn vers le yáng."
+  ],
+
+  "Points_Jing_Puits__Points_Mu_Collecteur": [
+    "Ils clarifient la chaleur plénitude ou chaleur vide et libèrent la stagnation dans les organes zàng.",
+    "Maladies des organes zàng conditionnées par une atteinte de l’organe fǔ associé.",
+    "Tout déséquilibre psychique dû à une atteinte externe de chaleur."
+  ],
+
+  "Points_Ying_Jaillissement__Points_Shu_Riviere": [
+    "Sur les canaux yīn, ils traitent les maladies des organes zàng.",
+    "Ils tonifient le yīn et le yáng, le qì et le sang.",
+    "Les maladies qui se manifestent par crises de montée de fièvre (émission de chaleur) suivies d’épisodes de baisse de la fièvre (émission de chaleur).",
+    "Les maladies des canaux.",
+    "Les maladies des canaux lorsque ces maladies se manifestent par un changement de couleur dans son contexte le plus large.",
+    "Les maladies de la chaleur humidité qui se caractérisent par lourdeur, chaleur et rougeur."
+  ],
+
+  "Points_Ying_Jaillissement__Points_Jing_Fleuve": [
+    "Ils libèrent la surface, surtout lorsque l’émission de chaleur est plus importante que l’intensité des frissons et la crainte du froid.",
+    "Ils nourrissent en yīn et en sang les tendons et les os des canaux yīn et répondent aux maladies de vide qui affaiblissent et fragilisent les os et les tendons.",
+    "Ils désobstruent les canaux, régularisent leur circulation et arrêtent la douleur.",
+    "Les maladies qui présentent un changement de la couleur habituelle et la présence de sons et de bruits inhabituels.",
+    "Tout trouble respiratoire incluant la présence de chaleur plénitude ou chaleur vide."
+  ],
+
+  "Points_Ying_Jaillissement__Points_He_Reunion": [
+    "Ils régularisent les fonctions des organes zàng fǔ et des canaux perturbées par la chaleur plénitude ou chaleur vide ou/et par vide de yīn / vide de sang.",
+    "Toute stase de sang et stagnation de qì, toute maladie alimentaire, toute dermatose et tout contre-courant qui se manifestent par un changement de couleur.",
+    "Toute stase de sang et stagnation de qì, toute maladie alimentaire, toute dermatose et tout contre-courant provoqués par la chaleur plénitude ou chaleur vide.",
+    "Les maladies des organes fǔ causées par la chaleur plénitude ou chaleur vide.",
+    "Les dermatoses dues à un vide de yīn et vide de sang."
+  ],
+
+  "Points_Ying_Jaillissement__Points_Yuan_Source": [
+    "Les maladies qui se manifestent par un changement de couleur dû à un vide de qì ou vide de yáng.",
+    "Les maladies complexes qui intègrent une déficience simultanée de vide de qì et de sang, vide de yáng et de vide de yīn, ou bien des maladies dont la racine est la déficience de yuán qì qui provoque un vide de yīn et vide de yáng.",
+    "Toute pathologie de canal ou d’organe zàng qui se manifeste par un vide ou par une stagnation de yuán qì.",
+    "Les maladies de vide de qì qui génère une chaleur déficience chaleur vide."
+  ],
+
+  "Points_Ying_Jaillissement__Points_Luo_Liaison": [
+    "Ils régularisent la microcirculation et les systèmes souffrant simultanément par le vide de sang.",
+    "Ils interviennent pour restaurer l’équilibre des zàng fǔ atteints principalement par la chaleur plénitude ou chaleur vide et par le vide de sang et de vide de yīn.",
+    "Maladie de la chaleur plénitude ou chaleur vide quand elle touche plusieurs systèmes simultanément et régularise la microcirculation lésée par la chaleur."
+  ],
+
+  "Points_Ying_Jaillissement__Points_Xi_Crevasse": [
+    "Ils soulagent la douleur, en régularisant la circulation dans les canaux perturbée par une stagnation de qì provoquée par la chaleur ou générant de la chaleur.",
+    "Ils arrêtent le saignement causé par une stagnation de qì résultant d’une chaleur plénitude ou chaleur vide et par le vide de sang et de vide de yīn."
+  ],
+
+  "Points_Ying_Jaillissement__Points_Bei_Shu_Transport_du_dos": [
+    "Maladies de vide de sang et de vide de yīn des organes zàng.",
+    "Organes de sens lésés par une chaleur plénitude ou chaleur vide, par le vide de sang et de vide de yīn.",
+    "Maladies du froid et de l’humidité qui empêchent la bonne production du sang.",
+    "Maladies de la chaleur qui lèse les liquides dans leur sens le plus général."
+  ],
+
+  "Points_Ying_Jaillissement__Points_Mu_Collecteur": [
+    "Maladie de la chaleur.",
+    "Vide de sang et de vide de yīn lésés par la chaleur.",
+    "Maladies des organes zàng, causées par un dérèglement des organes fǔ surtout sur un terrain de chaleur, de vide de sang et de vide de yīn."
+  ],
+
+  "Points_Shu_Riviere__Points_Jing_Fleuve": [
+    "Ils désobstruent la stagnation de qì (par plénitude ou vide) et libèrent la circulation dans les canaux.",
+    "Maladies des os et des tendons des canaux yīn, les maladies respiratoires et les maladies qui se caractérisent par des bruits inhabituels, ainsi que l’atteinte de la surface quand ces pathologies se caractérisent par une alternance d’amélioration et d’aggravation ou quand elles apparaissent par des périodes (heures, mois…).",
+    "Maladies des tendons et des os, accompagnées de douleur et provoquées par le facteur pathogène de l’humidité.",
+    "Déséquilibre du poumon par vide de qì et vide de yáng ou par stagnation de qì.",
+    "Attaque de la surface associée à un terrain interne d’humidité et de vide de qì."
+  ],
+
+  "Points_Shu_Riviere__Points_He_Reunion": [
+    "Ils régularisent la circulation de qì dans les canaux, dispersent la stase de sang de qì.",
+    "Ils régularisent les fonctions des organes zàng fǔ qui souffrent d’un vide de qì, vide de yáng ou de stagnation de qì.",
+    "Crises répétitives et par épisodes de toute pathologie se caractérisant par un contre-courant, ainsi que l’alimentation irrégulière caractérisée par des épisodes de boulimie suivis d’épisodes d’anorexie.",
+    "Toute dermatose associée à la présence d’humidité."
+  ],
+
+  "Points_Shu_Riviere__Points_Yuan_Source": [
+    "Ils se potentialisent pour réaliser un traitement plus efficace au niveau de la tonification du qì et du yáng, de la désobstruction du yáng qì et du traitement des maladies de l’humidité.",
+    "Ils se potentialisent lorsque l’objectif du traitement est de consolider le qì et le yáng par l’apport de yuán qì.",
+    "Toute maladie qui se caractérise par une alternance d’amélioration et d’aggravation associée à une déficience de yuán qì."
+  ],
+
+  "Points_Shu_Riviere__Points_Luo_Liaison": [
+    "Ils se potentialisent pour libérer la stase de sang et le facteur pathogène emprisonné.",
+    "Ils se potentialisent pour régulariser la microcirculation des zones touchées.",
+    "Ils se potentialisent pour tonifier, réchauffer et mettre en mouvement le qì et le yáng qì lorsque plusieurs canaux et/ou zàng fǔ sont lésés par le vide, le froid, l’humidité et la stagnation."
+  ],
+
+  "Points_Shu_Riviere__Points_Xi_Crevasse": [
+    "Ils dispersent la stagnation de qì et arrêtent le saignement.",
+    "Douleurs provoquées par la stagnation de qì et résultante d’un vide de qì, d’un vide de yáng, d’une obstruction et d’une accumulation d’humidité."
+  ],
+
+  "Points_Shu_Riviere__Points_Bei_Shu_Transport_du_dos": [
+    "Ils tonifient le qì et tiédissent le yáng des organes zàng.",
+    "La perturbation des fonctions des zàng par stagnation de qì et accumulation d’humidité."
+  ],
+
+  "Points_Shu_Riviere__Points_Mu_Collecteur": [
+    "Ils se potentialisent dans le traitement de l’humidité.",
+    "Stagnation de qì qui affecte les zàng fǔ."
+  ],
+
+  "Points_Jing_Fleuve__Points_He_Reunion": [
+    "Ils activent la circulation dans les canaux, libèrent la stagnation de qì et dispersent la stase de sang.",
+    "Ils se potentialisent dans le traitement des maladies respiratoires provoquées ou accompagnées par un contre-courant.",
+    "Ils se potentialisent dans le traitement des dermatoses qui incluent un déséquilibre du poumon, mais aussi des stases de sang.",
+    "Ils se potentialisent pour traiter les maladies des os et des tendons qui impliquent une stagnation de qì et une stase de sang.",
+    "Maladie d’un organe fǔ dont les symptômes sont accompagnés par une émission de bruit."
+  ],
+
+  "Points_Jing_Fleuve__Points_Yuan_Source": [
+    "Ils se potentialisent pour traiter les maladies des canaux, des os et des tendons provoquées par le froid, l’humidité, le vide ou la stagnation de qì.",
+    "Ils tonifient et réchauffent la faiblesse du poumon.",
+    "Ils se potentialisent pour libérer la surface et pour traiter les maladies de la surface qui impliquent simultanément un vide.",
+    "Maladie qui se manifeste par des bruits dus à un vide ou à une stagnation."
+  ],
+
+  "Points_Jing_Fleuve__Points_Luo_Liaison": [
+    "Ils se potentialisent pour traiter les maladies respiratoires et les maladies qui impliquent des bruits qui touchent simultanément plusieurs canaux, plusieurs zàng fǔ.",
+    "Ils se potentialisent dans la lutte contre le facteur pathogène externe.",
+    "L’atteinte des canaux, des tendons et des os, lorsqu’elle se généralise."
+  ],
+
+  "Points_Jing_Fleuve__Points_Xi_Crevasse": [
+    "Toute douleur de la surface, incluant la douleur des courbatures pendant l’attaque du froid et la raideur et les spasmes par l’atteinte du vent.",
+    "Les maladies respiratoires accompagnées de douleur et de saignement.",
+    "Les douleurs tendino-musculaires et articulaires associées à une stagnation de qì et tout déséquilibre qui s’en suit."
+  ],
+
+  "Points_Jing_Fleuve__Points_Bei_Shu_Transport_du_dos": [
+    "Ils se potentialisent dans le traitement de la maladie respiratoire ou/et dans l’émission de bruit inhabituel.",
+    "Ils se potentialisent pour libérer la surface de l’atteinte externe.",
+    "Ils se potentialisent dans le traitement des tendons et des os, point bèi shù-transport du dos du foie et des reins."
+  ],
+
+  "Points_Jing_Fleuve__Points_Mu_Collecteur": [
+    "L’un pour le canal, l’autre pour l’organe fǔ, ils se potentialisent pour régulariser la circulation du qì dans le système des organes yáng.",
+    "Ils agissent de concert pour régulariser les organes yáng dont la maladie s’exprime par des bruits et par une perturbation de la respiration.",
+    "Ils luttent contre l’invasion du facteur pathogène externe, surtout lorsque son attaque est dirigée directement ou par transmission vers les organes yáng."
+  ],
+
+  "Points_He_Reunion__Points_Yuan_Source": [
+    "Ils favorisent et désobstruent la circulation dans les canaux, perturbée par vide ou plénitude, par stase de sang, stagnation de qì et par tout facteur pathogène yīn.",
+    "Ils régularisent les mouvements de qì et traitent le contre-courant lorsqu’il est dû à un vide de qì ou vide de yáng et de yuán qì, et lorsqu’il est dû à une stagnation de qì.",
+    "Ils mobilisent yuán qì et le feu ministre qui sont indispensables pour réguler la digestion et entretenir les fonctions du pivot central de la terre.",
+    "Maladies de vide des zàng fǔ et les maladies de stagnation des zàng fǔ."
+  ],
+
+  "Points_He_Reunion__Points_Luo_Liaison": [
+    "Ils se potentialisent dans la régulation et la désobstruction de la circulation du qì et du sang.",
+    "Diarrhée et contre-courant.",
+    "Dermatoses et les maladies des organes yáng lorsque plusieurs canaux et organes sont impliqués dans la pathologie."
+  ],
+
+  "Points_He_Reunion__Points_Xi_Crevasse": [
+    "Ils se potentialisent pour disperser la stagnation dans les canaux et arrêter la douleur.",
+    "Ils forment un couple très efficace dans le traitement des douleurs des zàng fǔ et des saignements des zàng."
+  ],
+
+  "Points_He_Reunion__Points_Bei_Shu_Transport_du_dos": [
+    "Ils régulent et ordonnent les organes zàng.",
+    "Dermatoses ayant pour racine un déséquilibre d’un organe yīn et impliquant une lésion du sang avec ou sans présence d’humidité.",
+    "Contre-courant qui se caractérise par un mouvement du yīn vers le yáng.",
+    "Stases de sang des organes zàng."
+  ],
+
+  "Points_He_Reunion__Points_Mu_Collecteur": [
+    "Ils constituent une barrière à l’enfoncement du facteur pathogène vers les organes yáng.",
+    "Stagnation des organes yáng.",
+    "Maladies des organes yáng, surtout par stagnation de qì, stase de sang et contre-courant, et les maladies des organes zàng causées par un dysfonctionnement des organes yáng."
+  ],
+
+  "Points_Yuan_Source__Points_Luo_Liaison": [
+    "Tonification et transfert de qì d’un canal fort vers un canal faible."
+  ],
+
+  "Points_Yuan_Source__Points_Bei_Shu_Transport_du_dos": [
+    "Tonification et réchauffement des zàng fǔ."
+  ],
+
+  "Points_Yuan_Source__Points_Mu_Collecteur": [
+    "Tonification et réchauffement des zàng fǔ."
+  ]
+
+};
+
+function newGame(){
+  removeAssociationLinks();
+
+  document
+    .querySelectorAll(".association-postit")
+    .forEach(el=>el.remove());
+    
+  document.body.classList.remove("game-complete");
+  document.body.classList.remove("game-finished");
+
+  mistakeCount = 0;
+  cheatCount = 0;
+  gameOver = false;
+
+  updateGameStatus();
+
+  if(typeof hintButton !== "undefined"){
+    hintButton.disabled = false;
+    hintButton.style.opacity = "1";
+    hintButton.style.pointerEvents = "auto";
+  }
+    if(typeof revealButton !== "undefined"){
+      revealButton.style.display = "none";
+    }
+  selected = [];
+  solution = [];
+  solvedCount = 0;
+  categoryColors = {};
+  hintCategory = null;
+  hintStep = 0;
+
+  message.textContent = "";
+  hint.textContent = "";
+  solved.innerHTML = "";
+  grid.innerHTML = "";
+
+  finalGuess.style.display = "none";
+  finalGuess.dataset.correctKey = "";
+  finalGuessChoices.innerHTML = "";
+
+  if(
+    !Array.isArray(CATEGORY_COLORS) ||
+    CATEGORY_COLORS.length < 4
+  ){
+    generateCategoryColors();
+  }
+
+  const cats =
+    currentMode() === "manual"
+      ? chooseManualCategories()
+      : chooseCompatibleCategories();
+
+  if(!cats || cats.length !== 4){
+    message.textContent =
+      "Impossible de créer une partie. Choisis plus de catégories ou relance.";
+    return;
+  }
+
+  cats.forEach((cat,index)=>{
+    const alreadyUsed =
+      solution.flatMap(g => g.points || []);
+
+    const availablePoints =
+      cat.points.filter(p => !alreadyUsed.includes(p));
+
+    const pts =
+      availablePoints.length >= 4
+        ? pickFourVariedPoints(cat.key, availablePoints)
+        : pickFourVariedPoints(cat.key, cat.points);
+
+    categoryColors[cat.key] =
+      CATEGORY_COLORS[index] || "#cccccc";
+
+    solution.push({
+      key:cat.key,
+      name:cat.name,
+      points:pts,
+      solved:false
+    });
+  });
+
+  const board = distributeBoard(solution);
+
+  if(!board || board.length !== 16){
+    message.textContent =
+      "Erreur : la grille n’a pas pu être générée.";
+    return;
+  }
+
+  board.forEach(point=>{
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.dataset.point = point;
+    tile.innerHTML = `<span>${formatPointCode(point)}</span>`;
+    tile.onclick = () => toggleTile(tile, point);
+    grid.appendChild(tile);
+  });
+
+  if(currentMode() === "manual"){
+    manualControls.style.display =
+      currentMode() === "manual"
+      ? "flex"
+      : "none";
+  }
+
+  if(currentMode() === "manual"){
+    manualControls.style.display = "none";
+    manualEditButton.style.display = "inline-block";
+  }else{
+    manualControls.style.display = "none";
+    manualEditButton.style.display = "none";
+  }
+}
+
+function getContextLabelForPoint(groupKey, point){
+  const usefulSections = [
+    "Points_Hui_Reunion",
+    "Points_generaux",
+    "Les_4_mers",
+    "Points_d_ouverture_des_merveilleux_vaisseaux"
+  ];
+
+  if(usefulSections.includes(groupKey)){
+    const section = RAW_DATA[groupKey];
+
+    for(const [label,points] of Object.entries(section)){
+      if(points.includes(point)){
+        return displayLabel(label);
+      }
+    }
+  }
+
+  if(groupKey === "Points_Xi_Crevasse"){
+    const xiExtra = {
+      "Rn8":"Yīn Qiāo Mài",
+      "V59":"Yáng Qiāo Mài",
+      "Rn9":"Yīn Wéi Mài",
+      "VB35":"Yáng Wéi Mài"
+    };
+
+    return xiExtra[point] || "";
+  }
+
+  if(groupKey === "Points_Yuan_Source"){
+    const yuanExtra = {
+      "RM15":"Graisses (Gāo)",
+      "RM6":"Fascias (Huāng)"
+    };
+
+    return yuanExtra[point] || "";
+  }
+
+  if(groupKey === "Points_Bei_Shu_Transport_du_dos"){
+    const beiShuExtra = {
+      "V27":"Intestin Grêle",
+      "V28":"Vessie",
+      "V22":"Trois Foyers",
+      "V19":"Vésicule Biliaire",
+      "V25":"Gros Intestin",
+      "V21":"Estomac",
+      "V13":"Poumon",
+      "V20":"Rate",
+      "V15":"Cœur",
+      "V23":"Rein",
+      "V14":"Enveloppe du Cœur",
+      "V18":"Foie",
+      "V11":"Os",
+      "V17":"Sang / Diaphragme",
+      "V24":"Qì Hǎi",
+      "V26":"Guān Yuán",
+      "V29":"Sacrum",
+      "V30":"Cercle blanc"
+    };
+
+    return beiShuExtra[point] || "";
+  }
+
+  return "";
+}
+
+function toggleTile(tile, point){
+  if(gameOver) return;
+
+  // Désélection toujours autorisée
+  if(tile.classList.contains("selected")){
+
+    tile.classList.remove("selected");
+
+    selected =
+      selected.filter(p => p !== point);
+
+    tile.innerHTML = `<div>${formatPointCode(point)}</div>`;
+
+    updateSelectionFeedback();
+
+    return;
+  }
+
+  // Vérification de compatibilité
+  if(selected.length > 0){
+
+    const compatible =
+      solution.some(group =>
+        !group.solved &&
+        selected.every(p => group.points.includes(p)) &&
+        group.points.includes(point)
+      );
+
+    if(!compatible){
+      mistakeCount++;
+      updateGameStatus();
+
+      shakeTile(tile);
+
+      if(mistakeCount >= MAX_MISTAKES){
+        triggerGameOver("5 erreurs.");
+        return;
+      }
+
+      message.textContent =
+        `Point incompatible. Erreur ${mistakeCount}/${MAX_MISTAKES}.`;
+
+      return;
+    }
+  }
+
+  // Sélection
+  tile.classList.add("selected");
+
+  if(!selected.includes(point)){
+    selected.push(point);
+  }
+
+  const group = solution.find(g =>
+    !g.solved &&
+    g.points.includes(point)
+  );
+
+  const label =
+    group
+      ? getContextLabelForPoint(group.key, point)
+      : "";
+
+  if(label){
+
+    tile.innerHTML = `
+      <div>${formatPointCode(point)}</div>
+      <div class="tile-tooltip">${label}</div>
+    `;
+
+  }else{
+
+    tile.innerHTML = `
+      <div>${formatPointCode(point)}</div>
+    `;
+  }
+
+  updateSelectionFeedback();
+
+  if(selected.length === 4){
+    setTimeout(checkSelection, 220);
+  }
+}
+
+function updateSelectionFeedback(){
+  document.querySelectorAll(".tile").forEach(tile=>{
+    tile.style.boxShadow = "";
+    tile.style.background = "transparent";
+    tile.style.borderColor = "transparent";
+    tile.style.filter = "";
+    tile.style.color = "var(--text-color)";
+    tile.style.opacity = "1";
+  });
+
+  if(selected.length === 0) return;
+
+  const matchingGroups = solution.filter(group =>
+    !group.solved &&
+    selected.every(p => group.points.includes(p))
+  );
+
+  if(matchingGroups.length === 1){
+    const color = categoryColors[matchingGroups[0].key];
+
+    document.querySelectorAll(".tile.selected").forEach(tile=>{
+      tile.style.background = "transparent";
+      tile.style.borderColor = "transparent";
+      tile.style.boxShadow = "";
+      tile.style.filter =
+  "drop-shadow(0 0 6px var(--shadow-color)) drop-shadow(0 0 14px var(--shadow-color))";
+      tile.style.color = "var(--text-color)";    });
+
+    document.querySelectorAll(".tile.selected").forEach(tile=>{
+      tile.style.opacity = "1";
+    });
+
+  }else{
+    document.querySelectorAll(".tile.selected").forEach(tile=>{
+      tile.style.background = "transparent";
+      tile.style.borderColor = "transparent";
+      tile.style.boxShadow = "";
+      tile.style.filter =
+  "drop-shadow(0 0 6px var(--shadow-color)) drop-shadow(0 0 14px var(--shadow-color))";
+    });
+  }
+}
+
+function checkSelection(){
+  if(gameOver) return;
+
+  const remainingTiles =
+    [...document.querySelectorAll(".tile")];
+
+  const remainingGroups =
+    solution.filter(g => !g.solved);
+
+  if(remainingTiles.length === 4 && remainingGroups.length === 1){
+    clearSelection();
+    prepareFinalGuess();
+
+    message.textContent =
+      "Dernière étape : les 4 derniers points ne sont pas validés automatiquement. Devine leur catégorie avec les choix proposés.";
+
+    return;
+  }
+
+  if(selected.length !== 4){
+    message.textContent = "Sélectionne exactement 4 points.";
+    return;
+  }
+
+  for(const group of solution){
+    if(group.solved) continue;
+
+    if(selected.every(p => group.points.includes(p))){
+      solveGroup(group);
+      return;
+    }
+  }
+
+  mistakeCount++;
+  updateGameStatus();
+
+  clearSelection();
+
+  if(mistakeCount >= MAX_MISTAKES){
+    triggerGameOver("5 erreurs.");
+    return;
+  }
+
+  message.textContent =
+    `Combinaison incorrecte ${mistakeCount}/${MAX_MISTAKES}.`;
+}
+
+function colorizePinyin(text){
+  if(!text) return "";
+
+  const toneMap = {
+    tone1:"āēīōūǖĀĒĪŌŪǕ",
+    tone2:"áéíóúǘÁÉÍÓÚǗ",
+    tone3:"ǎěǐǒǔǚǍĚǏǑǓǙ",
+    tone4:"àèìòùǜÀÈÌÒÙǛ"
+  };
+
+  return text.split(/\s+/).map(word=>{
+    let toneClass = "";
+
+    for(const [cls,chars] of Object.entries(toneMap)){
+      if([...word].some(ch => chars.includes(ch))){
+        toneClass = cls;
+        break;
+      }
+    }
+
+    return toneClass
+      ? `<span class="${toneClass}">${word}</span>`
+      : word;
+  }).join(" ");
+}
+
+function showPanelHint(){
+
+  const old =
+    document.getElementById("panelHint");
+
+  if(old) old.remove();
+
+  const hint =
+    document.createElement("div");
+
+  hint.id = "panelHint";
+  hint.className = "panel-hint";
+
+  hint.textContent =
+    "Clique sur un point pour voir ses détails";
+
+  document.body.appendChild(hint);
+
+  document.body.classList.add("game-finished");
+
+  setTimeout(()=>{
+    hint.classList.add("visible");
+  },50);
+
+  setTimeout(()=>{
+
+    hint.classList.remove("visible");
+
+    document.body.classList.remove("game-finished");
+
+    setTimeout(()=>{
+      hint.remove();
+    },500);
+
+  },5000);
+}
+
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+
+function escapeAttribute(value){
+  return escapeHtml(value);
+}
+
+const NOTES_STORAGE_PREFIX = "mtc_point_note_";
+
+function noteStorageKey(point){
+  return NOTES_STORAGE_PREFIX + String(point);
+}
+
+function getEditablePointNote(point, originalNote){
+  const saved =
+    localStorage.getItem(noteStorageKey(point));
+
+  return saved !== null
+    ? saved
+    : (originalNote || "");
+}
+
+function formatNoteTextForDisplay(value){
+  const clean = String(value || "").trim();
+
+  if(!clean){
+    return `<span class="point-note-empty">Aucune note pour l’instant.</span>`;
+  }
+
+  return escapeHtml(clean).replaceAll("\n","<br>");
+}
+
+function savePointNoteFromTextarea(textarea){
+  const point = textarea.dataset.point;
+  if(!point) return;
+
+  localStorage.setItem(
+    noteStorageKey(point),
+    textarea.value
+  );
+
+  const section = textarea.closest(".point-info-section");
+  const display = section?.querySelector(".point-note-display");
+
+  if(display){
+    display.innerHTML = formatNoteTextForDisplay(textarea.value);
+  }
+}
+
+function togglePointNoteEdit(button){
+  const section = button.closest(".point-info-section");
+  if(!section) return;
+
+  const display = section.querySelector(".point-note-display");
+  const textarea = section.querySelector(".point-note-textarea");
+
+  if(!display || !textarea) return;
+
+  const isEditing =
+    textarea.style.display !== "none";
+
+  if(isEditing){
+    savePointNoteFromTextarea(textarea);
+    textarea.style.display = "none";
+    display.style.display = "block";
+    button.textContent = "✎";
+    button.title = "Modifier les notes";
+    button.setAttribute("aria-label", "Modifier les notes");
+  }else{
+    display.style.display = "none";
+    textarea.style.display = "block";
+    button.textContent = "✓";
+    button.title = "Valider les notes";
+    button.setAttribute("aria-label", "Valider les notes");
+    textarea.focus();
+  }
+}
+
+function exportPersonalNotes(){
+  const notes = {};
+
+  for(let index=0; index<localStorage.length; index++){
+    const key = localStorage.key(index);
+
+    if(key && key.startsWith(NOTES_STORAGE_PREFIX)){
+      const point = key.slice(NOTES_STORAGE_PREFIX.length);
+      notes[point] = localStorage.getItem(key);
+    }
+  }
+
+  const payload = {
+    app:"Connections MTC",
+    type:"personal-notes",
+    exportedAt:new Date().toISOString(),
+    notes
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(payload,null,2)],
+    {type:"application/json"}
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "connections-mtc-notes.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
+
+function openImportPersonalNotesDialog(){
+  const input = document.getElementById("notesImportInput");
+  if(input){
+    input.value = "";
+    input.click();
+  }
+}
+
+function importPersonalNotesFromFile(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      const notes = parsed.notes || parsed;
+
+      if(!notes || typeof notes !== "object"){
+        throw new Error("Format de notes invalide.");
+      }
+
+      Object.entries(notes).forEach(([point,value])=>{
+        localStorage.setItem(
+          noteStorageKey(point),
+          String(value ?? "")
+        );
+      });
+
+      if(currentPointPanelPoint){
+        openPointPanelDirect(currentPointPanelPoint);
+      }
+
+      message.textContent = "Notes importées.";
+    }catch(error){
+      console.error(error);
+      message.textContent = "Import impossible : fichier de notes invalide.";
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function renderPointInfoSections(sections, point){
+
+  return sections
+    .filter(([title,value]) =>
+      title === "Notes" ||
+      (
+        value &&
+        value !== "(Aucune)" &&
+        value !== "Aucune"
+      )
+    )
+    .map(([title,value]) => {
+
+      if(title === "Notes"){
+        const noteValue =
+          getEditablePointNote(point, value);
+
+        return `
+          <details class="point-info-section point-note-section" open>
+            <summary class="point-note-summary">
+              <span>${title}</span>
+              <button
+                type="button"
+                class="point-note-edit-button"
+                onclick="togglePointNoteEdit(this)"
+                title="Modifier les notes"
+                aria-label="Modifier les notes"
+              >✎</button>
+            </summary>
+
+            <div class="point-note-display">
+              ${formatNoteTextForDisplay(noteValue)}
+            </div>
+
+            <textarea
+              class="point-note-textarea"
+              data-point="${escapeAttribute(point)}"
+              oninput="savePointNoteFromTextarea(this)"
+              style="display:none;"
+              placeholder="Ajoute tes remarques personnelles sur ce point..."
+            >${escapeHtml(noteValue)}</textarea>
+
+            <div class="point-note-hint">
+              Clique sur le crayon pour écrire. Tes notes restent dans ce navigateur. Tu peux toujours les exporter pour les sauvegarder, puis importer pour les récupérer sur un autre appareil ou navigateur.
+            </div>
+          </details>
+        `;
+      }
+
+      return `
+        <details class="point-info-section">
+          <summary>${title}</summary>
+          <div>${value}</div>
+        </details>
+      `;
+    })
+    .join("");
+}
+
+function openPointPanel(point){
+
+  currentPointPanelPoint = point;
+
+  const isSolvedPoint =
+    solution.some(group =>
+      group.solved &&
+      group.points.includes(point)
+    );
+
+  if(!isSolvedPoint){
+    return;
+  }
+
+  const details = POINT_DETAILS[point];
+
+  if(!details){
+    pointPanelContent.innerHTML = `
+      <div class="point-header">
+        <span class="point-code">${formatPointCode(point)}</span>
+      </div>
+      <p>Aucune fiche trouvée pour ce point.</p>
+    `;
+
+    pointPanel.classList.add("available");
+    pointPanel.classList.add("open");
+
+    panelToggle.innerHTML = "&gt;";
+
+    document.body.classList.add("panel-open");
+    return;
+  }
+
+  const pinyin = details.pinyin || "";
+  const hanzi = details.hanzi || "";
+  const nomFrancais =
+    details.nom_francais || details.nom_complet || "";
+
+  const sections = [
+    ["Localisation", details.localisation],
+    ["Méthode de localisation", details.methode_localisation],
+    ["Méthode de travail", details.methode_travail],
+    ["Catégories du point", details.categories_du_point],
+    ["Correspondances", details.correspondances],
+    ["Actions", details.actions],
+    ["Indications", details.indications],
+    ["Associations", details.associations],
+    ["Notes", details.notes]
+  ];
+
+  pointPanelContent.innerHTML = `
+    <div class="point-header">
+      <span class="point-code">${formatPointCode(point)}</span>
+
+      ${
+        pinyin
+          ? `<span class="point-separator">·</span>
+             <span class="point-pinyin-inline">${colorizePinyin(pinyin)}</span>`
+          : ""
+      }
+
+      ${
+        hanzi
+          ? `<span class="point-separator">·</span>
+             <span class="point-hanzi-inline">${hanzi}</span>`
+          : ""
+      }
+
+      ${
+        nomFrancais
+          ? `<span class="point-separator">·</span>
+             <span class="point-fr-inline">${nomFrancais}</span>`
+          : ""
+      }
+    </div>
+
+    ${renderPointInfoSections(sections, point)}
+  `;
+
+  pointPanel.classList.add("available");
+  pointPanel.classList.add("open");
+
+  panelToggle.innerHTML = "&gt;";
+
+  document.body.classList.add("panel-open");
+
+  showProgressHintSoon(
+    "point_notes",
+    ".point-note-edit-button",
+    "Notes perso",
+    "En cliquant sur le crayon, tu peux ajouter tes remarques sur ce point. Elles restent dans ton navigateur."
+  );
+}
+
+function openPointPanelDirect(point){
+
+  currentPointPanelPoint = point;
+
+  const details = POINT_DETAILS[point];
+
+  if(!details){
+    pointPanelContent.innerHTML = `
+      <div class="point-header">
+        <span class="point-code">${formatPointCode(point)}</span>
+      </div>
+      <p>Aucune fiche trouvée pour ce point.</p>
+    `;
+
+    pointPanel.classList.add("available");
+    pointPanel.classList.add("open");
+    panelToggle.innerHTML = "&gt;";
+    document.body.classList.add("panel-open");
+    return;
+  }
+
+  const pinyin = details.pinyin || "";
+  const hanzi = details.hanzi || "";
+  const nomFrancais =
+    details.nom_francais || details.nom_complet || "";
+
+  const sections = [
+    ["Localisation", details.localisation],
+    ["Méthode de localisation", details.methode_localisation],
+    ["Méthode de travail", details.methode_travail],
+    ["Catégories du point", details.categories_du_point],
+    ["Correspondances", details.correspondances],
+    ["Actions", details.actions],
+    ["Indications", details.indications],
+    ["Associations", details.associations],
+    ["Notes", details.notes]
+  ];
+
+  pointPanelContent.innerHTML = `
+    <div class="point-header">
+      <span class="point-code">${formatPointCode(point)}</span>
+
+      ${pinyin ? `<span class="point-separator">·</span><span class="point-pinyin-inline">${colorizePinyin(pinyin)}</span>` : ""}
+      ${hanzi ? `<span class="point-separator">·</span><span class="point-hanzi-inline">${hanzi}</span>` : ""}
+      ${nomFrancais ? `<span class="point-separator">·</span><span class="point-fr-inline">${nomFrancais}</span>` : ""}
+    </div>
+
+    ${renderPointInfoSections(sections, point)}
+  `;
+
+  pointPanel.classList.add("available");
+  pointPanel.classList.add("open");
+  panelToggle.innerHTML = "&gt;";
+  document.body.classList.add("panel-open");
+}
+
+function closePointPanel(){
+
+  const panel = document.getElementById("pointPanel");
+  const toggle = document.getElementById("panelToggle");
+
+  if(!panel) return;
+
+  panel.classList.remove("open");
+
+  if(toggle){
+    toggle.innerHTML = "&lt;";
+  }
+
+  document.body.classList.remove("panel-open");
+}
+
+function formatPointCode(point){
+  return String(point).replace(
+    /^([A-Za-zÀ-ÿ]+)\s*(\d+)$/,
+    "$1 $2"
+  );
+}
+
+function solveGroup(group){
+  group.solved = true;
+  solvedCount++;
+
+  const row = document.createElement("div");
+  row.className = "solved-row";
+  row.dataset.categoryKey = group.key;
+
+  row.innerHTML = `
+    <div class="solved-title">
+      <span>${group.name}</span>
+
+      ${
+        gameOver
+          ? `
+            <button
+              class="category-info-button"
+              onclick="toggleCategoryExplanation(this)"
+              title="Explication"
+            >
+              💡
+            </button>
+          `
+          : ""
+      }
+    </div>
+
+    <div class="category-explanation" style="display:none;">
+      ${CATEGORY_EXPLANATIONS[group.key] || "Explication à compléter pour cette catégorie."}
+    </div>
+
+    <div class="solved-points">
+      ${group.points.map(p=>`
+        <div class="solved-point" data-point="${p}">
+          ${formatPointCode(p)}
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  solved.appendChild(row);
+
+  row.querySelectorAll(".solved-point").forEach(el=>{
+    el.onclick = () =>
+      openPointPanel(el.dataset.point);
+  });
+
+  document.querySelectorAll(".tile").forEach(tile=>{
+    if(group.points.includes(tile.dataset.point)){
+      tile.remove();
+    }
+  });
+
+  selected = [];
+  message.textContent = "Catégorie trouvée !";
+  hint.textContent = "";
+
+  if(hintCategory && hintCategory.key === group.key){
+    hintCategory = null;
+    hintStep = 0;
+  }
+
+  prepareFinalGuess();
+
+  if(!localStorage.getItem("mtc_point_panel_hint_seen")){
+    showPanelHint();
+    localStorage.setItem("mtc_point_panel_hint_seen","1");
+  }
+
+  showProgressHintSoon(
+    "first_category",
+    "#solved .solved-row:last-child",
+    "Catégorie trouvée",
+    "Bien joué. En cliquant sur un point rangé ici, tu ouvres sa fiche détaillée."
+  );
+
+  if(solvedCount === 4 && !gameOver){
+    gameOver = true;
+    document.body.classList.add("game-complete");
+    showEndReviewScreen("win");
+  }
+}
+
+
+const ASSOCIATION_LINK_COLORS = [
+  "#0000FF",
+  "#FF3B1F",
+  "#00A676",
+  "#8E44AD",
+  "#F39C12",
+  "#00A7B5",
+  "#E91E63",
+  "#6D4C41",
+  "#7CB342",
+  "#D81B60"
+];
+
+let associationLinkColorsByKey = {};
+
+const ASSOCIATION_KEY_ALIASES = {
+  JING_PUITS:"Points_Jing_Puits",
+  YING_JAILLISSEMENT:"Points_Ying_Jaillissement",
+  SHU_RIVIERE:"Points_Shu_Riviere",
+  JING_FLEUVE:"Points_Jing_Fleuve",
+  HE_REUNION:"Points_He_Reunion",
+  Points_Xia_He_Reunion_inferieure:"Points_Xia_He_Reunion"
+};
+
+function canonicalAssociationKey(key){
+  return ASSOCIATION_KEY_ALIASES[key] || key;
+}
+
+function clampAssociationNumber(value,min,max){
+  return Math.max(min, Math.min(max, value));
+}
+
+let associationLinksRaf = null;
+let associationLinksRedrawBound = false;
+
+function showAssociationLinks(){
+
+  const solvedEl = document.getElementById("solved");
+  if(!solvedEl) return;
+
+  solvedEl.classList.add("association-mode");
+
+  bindAssociationLinksRedraw();
+
+  scheduleAssociationLinksRedraw();
+  setTimeout(scheduleAssociationLinksRedraw, 80);
+  setTimeout(scheduleAssociationLinksRedraw, 260);
+  setTimeout(scheduleAssociationLinksRedraw, 520);
+}
+
+function removeAssociationLinks(){
+
+  document
+    .querySelectorAll(".association-overlay, .association-link-plus")
+    .forEach(el=>el.remove());
+
+  const solvedEl = document.getElementById("solved");
+  if(solvedEl){
+    solvedEl.classList.remove("association-mode");
+  }
+}
+
+function scheduleAssociationLinksRedraw(){
+
+  if(!gameOver) return;
+
+  if(associationLinksRaf){
+    cancelAnimationFrame(associationLinksRaf);
+  }
+
+  associationLinksRaf = requestAnimationFrame(drawAssociationLinksNow);
+}
+
+function bindAssociationLinksRedraw(){
+
+  if(associationLinksRedrawBound) return;
+
+  window.addEventListener("resize", scheduleAssociationLinksRedraw, {passive:true});
+  window.addEventListener("orientationchange", scheduleAssociationLinksRedraw, {passive:true});
+
+  document.addEventListener(
+    "scroll",
+    scheduleAssociationLinksRedraw,
+    {capture:true, passive:true}
+  );
+
+  associationLinksRedrawBound = true;
+}
+
+function drawAssociationLinksNow(){
+
+  document
+    .querySelectorAll(".association-overlay, .association-link-plus")
+    .forEach(el=>el.remove());
+
+  associationLinkColorsByKey = {};
+
+  if(!gameOver) return;
+
+  const solvedEl = document.getElementById("solved");
+  if(!solvedEl) return;
+
+  if(typeof ASSOCIATION_EXPLANATIONS === "undefined") return;
+
+  const rows = [...document.querySelectorAll(".solved-row")];
+
+  const rowByKey = {};
+
+  rows.forEach(row=>{
+    const key = canonicalAssociationKey(row.dataset.categoryKey || "");
+    if(key){
+      rowByKey[key] = row;
+    }
+  });
+
+  const visibleAssociations = [];
+
+  Object.entries(ASSOCIATION_EXPLANATIONS).forEach(([associationKey,items])=>{
+
+    const keys =
+      associationKey
+        .split("__")
+        .map(canonicalAssociationKey);
+
+    const linkedRows =
+      keys.map(key=>rowByKey[key]);
+
+    if(linkedRows.some(row=>!row)){
+      return;
+    }
+
+    visibleAssociations.push({
+      associationKey,
+      items,
+      rows: linkedRows
+    });
+  });
+
+  if(!visibleAssociations.length){
+    return;
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "association-overlay";
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.classList.add("association-overlay-svg");
+  svg.setAttribute("width", window.innerWidth);
+  svg.setAttribute("height", window.innerHeight);
+  svg.setAttribute("viewBox", `0 0 ${window.innerWidth} ${window.innerHeight}`);
+
+  overlay.appendChild(svg);
+  document.body.appendChild(overlay);
+
+  visibleAssociations.forEach(({associationKey,rows},index)=>{
+
+    const color =
+      ASSOCIATION_LINK_COLORS[index % ASSOCIATION_LINK_COLORS.length];
+
+    associationLinkColorsByKey[associationKey] = color;
+
+    const firstRow = rows[0];
+    const lastRow = rows[rows.length - 1];
+
+    const firstTitle =
+      firstRow.querySelector(".solved-title") || firstRow;
+
+    const lastTitle =
+      lastRow.querySelector(".solved-title") || lastRow;
+
+    const firstRect = firstTitle.getBoundingClientRect();
+    const lastRect = lastTitle.getBoundingClientRect();
+
+    const yA = firstRect.top + firstRect.height / 2;
+    const yB = lastRect.top + lastRect.height / 2;
+
+    const titleLeft = Math.min(firstRect.left, lastRect.left);
+
+    const isMobile = window.innerWidth <= 520;
+    const lane = index % 6;
+    const laneGap = isMobile ? 5 : 8;
+
+    const xRight =
+      Math.max(
+        isMobile ? 30 : 42,
+        titleLeft - 10 - lane * laneGap
+      );
+
+    const xCurve =
+      Math.max(
+        8,
+        xRight - (isMobile ? 18 : 28)
+      );
+
+    const midY = (yA + yB) / 2;
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+
+    path.setAttribute(
+      "d",
+      `M ${xRight} ${yA}
+       C ${xCurve} ${yA},
+         ${xCurve} ${yB},
+         ${xRight} ${yB}`
+    );
+
+    path.classList.add("association-link-path");
+    path.style.stroke = color;
+
+    svg.appendChild(path);
+
+    const buttonSize = isMobile ? 24 : 26;
+
+    const buttonLeft =
+      clampAssociationNumber(
+        xCurve - buttonSize / 2,
+        4,
+        window.innerWidth - buttonSize - 4
+      );
+
+    const buttonTop =
+      clampAssociationNumber(
+        midY - buttonSize / 2,
+        4,
+        window.innerHeight - buttonSize - 4
+      );
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "association-link-plus";
+    button.textContent = "+";
+    button.title = "Voir la fonction de l’association";
+    button.dataset.associationKey = associationKey;
+
+    button.style.left = `${buttonLeft}px`;
+    button.style.top = `${buttonTop}px`;
+    button.style.width = `${buttonSize}px`;
+    button.style.height = `${buttonSize}px`;
+    button.style.background = color;
+    button.style.boxShadow = `0 3px 12px ${color}`;
+
+    button.addEventListener("pointerdown", event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      toggleAssociationPostit(associationKey, color);
+    });
+
+    button.addEventListener("click", event=>{
+      event.preventDefault();
+      event.stopPropagation();
+    });
+
+    document.body.appendChild(button);
+  });
+
+
+  showProgressHintSoon(
+    "association_plus_created",
+    ".association-link-plus",
+    "Associations",
+    "En cliquant sur +, tu ouvres la fiche de cette association.",
+    {},
+    360
+  );
+}
+
+function toggleCategoryExplanation(button){
+
+  const row = button.closest(".solved-row");
+  const key = row.dataset.categoryKey;
+
+  const categoryName =
+    DISPLAY_NAMES[key] ||
+    row.querySelector(".solved-title span")?.textContent ||
+    key;
+
+  const existing =
+    document.querySelector(`.category-postit[data-key="${key}"]`);
+
+  if(existing){
+    existing.remove();
+    return;
+  }
+
+  const items =
+  getCategoryExplanationItems(key);
+
+  function getCategoryExplanationItems(key){
+
+    const aliases = {
+      JING_PUITS:"Points_Jing_Puits",
+      YING_JAILLISSEMENT:"Points_Ying_Jaillissement",
+      SHU_RIVIERE:"Points_Shu_Riviere",
+      JING_FLEUVE:"Points_Jing_Fleuve",
+      HE_REUNION:"Points_He_Reunion",
+
+      Points_Jing_Puits:"JING_PUITS",
+      Points_Ying_Jaillissement:"YING_JAILLISSEMENT",
+      Points_Shu_Riviere:"SHU_RIVIERE",
+      Points_Jing_Fleuve:"JING_FLEUVE",
+      Points_He_Reunion:"HE_REUNION"
+    };
+
+    return (
+      CATEGORY_EXPLANATIONS[key] ||
+      CATEGORY_EXPLANATIONS[aliases[key]] ||
+      ["Fonctions à compléter pour cette catégorie."]
+    );
+  }
+
+  const postit = document.createElement("div");
+  postit.className = "category-postit";
+  postit.dataset.key = key;
+
+  postit.innerHTML = `
+    <button
+      class="category-postit-close"
+      onclick="this.closest('.category-postit').remove()"
+      title="Fermer"
+    >
+      ×
+    </button>
+
+    <div class="category-postit-title">
+      Fonctions des points ${categoryName}
+    </div>
+
+    <ul>
+      ${items.map(item => `<li>${item}</li>`).join("")}
+    </ul>
+  `;
+
+  document.body.appendChild(postit);
+  makeDraggablePostit(postit);
+}
+
+function associationDisplayName(key){
+
+  const canonicalKey = canonicalAssociationKey(key);
+
+  return (
+    DISPLAY_NAMES[canonicalKey] ||
+    DISPLAY_NAMES[key] ||
+    String(canonicalKey).replaceAll("_"," ")
+  );
+}
+
+function buildAssociationPostitTitle(pairKey){
+
+  return pairKey
+    .split("__")
+    .map(associationDisplayName)
+    .join(" + ");
+}
+
+function readableTextColorForHex(hex){
+
+  if(!hex || !hex.startsWith("#")){
+    return "#FAF9D1";
+  }
+
+  const clean = hex.replace("#","");
+
+  const r = parseInt(clean.substring(0,2),16);
+  const g = parseInt(clean.substring(2,4),16);
+  const b = parseInt(clean.substring(4,6),16);
+
+  const luminance =
+    0.299 * r +
+    0.587 * g +
+    0.114 * b;
+
+  return luminance > 170
+    ? "#271629"
+    : "#FAF9D1";
+}
+
+function toggleAssociationPostit(pairKey, color){
+
+  const existing =
+    document.querySelector(`.association-postit[data-key="${pairKey}"]`);
+
+  if(existing){
+    existing.remove();
+    return;
+  }
+
+  const items =
+    ASSOCIATION_EXPLANATIONS[pairKey] || [
+      "Texte à compléter pour cette association."
+    ];
+
+  const postitColor =
+    color ||
+    associationLinkColorsByKey[pairKey] ||
+    "#0000FF";
+
+  const postitTextColor =
+    readableTextColorForHex(postitColor);
+
+  const postitTitle =
+    buildAssociationPostitTitle(pairKey);
+
+  const postit = document.createElement("div");
+  postit.className = "association-postit";
+  postit.dataset.key = pairKey;
+
+  postit.style.setProperty("--association-postit-bg", postitColor);
+  postit.style.setProperty("--association-postit-text", postitTextColor);
+
+  postit.innerHTML = `
+    <button
+      type="button"
+      class="association-postit-close"
+      title="Fermer"
+    >
+      ×
+    </button>
+
+    <div class="association-postit-title">
+      ${postitTitle}
+    </div>
+
+    <ul>
+      ${items.map(item=>`<li>${item}</li>`).join("")}
+    </ul>
+  `;
+
+  const closeButton =
+    postit.querySelector(".association-postit-close");
+
+  closeButton.addEventListener("pointerdown", event=>{
+    event.stopPropagation();
+  });
+
+  closeButton.addEventListener("click", event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    postit.remove();
+  });
+
+  document.body.appendChild(postit);
+  makeDraggablePostit(postit);
+}
+
+function makeDraggablePostit(postit){
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let startLeft = 0;
+  let startTop = 0;
+
+  postit.addEventListener("pointerdown", event=>{
+
+    if(
+      event.target.closest(".category-postit-close") ||
+      event.target.closest(".association-postit-close") ||
+      event.target.closest("button")
+    ){
+      return;
+    }
+
+    isDragging = true;
+
+    const rect = postit.getBoundingClientRect();
+
+    postit.style.left = rect.left + "px";
+    postit.style.top = rect.top + "px";
+    postit.style.transform = "none";
+
+    startX = event.clientX;
+    startY = event.clientY;
+    startLeft = rect.left;
+    startTop = rect.top;
+
+    postit.setPointerCapture(event.pointerId);
+  });
+
+  postit.addEventListener("pointermove", event=>{
+    if(!isDragging) return;
+
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+
+    postit.style.left = startLeft + dx + "px";
+    postit.style.top = startTop + dy + "px";
+  });
+
+  postit.addEventListener("pointerup", ()=>{
+    isDragging = false;
+  });
+
+  postit.addEventListener("pointercancel", ()=>{
+    isDragging = false;
+  });
+}
+
+
+function showCategoryInfoButtons(){
+
+  document
+    .querySelectorAll(".solved-row")
+    .forEach(row=>{
+
+      if(row.querySelector(".category-info-button")){
+        return;
+      }
+
+      const title =
+        row.querySelector(".solved-title");
+
+      if(!title){
+        return;
+      }
+
+      title.insertAdjacentHTML(
+        "beforeend",
+        `
+          <button
+            class="category-info-button"
+            onclick="toggleCategoryExplanation(this)"
+            title="Explication"
+          >
+            💡
+          </button>
+        `
+      );
+    });
+}
+
+function prepareFinalGuess(){
+  const remaining = solution.filter(g=>!g.solved);
+  const remainingTiles = [...document.querySelectorAll(".tile")];
+
+  if(remaining.length !== 1 || remainingTiles.length !== 4){
+    return;
+  }
+
+  const correctGroup = remaining[0];
+
+  finalGuess.style.display = "block";
+  finalGuessText.textContent =
+    "Derniers 4 points : devine leur catégorie.";
+
+  finalGuessChoices.innerHTML = "";
+
+  const currentGameKeys =
+    solution.map(g => g.key);
+
+  const wrongOptions =
+    shuffle(
+      pool.filter(cat =>
+        !currentGameKeys.includes(cat.key)
+      )
+    ).slice(0,3);
+
+  const options =
+    shuffle([
+      {
+        key:correctGroup.key,
+        name:correctGroup.name
+      },
+      ...wrongOptions.map(cat => ({
+        key:cat.key,
+        name:cat.name
+      }))
+    ]);
+
+  options.forEach(opt=>{
+    const btn = document.createElement("button");
+
+    btn.className = "final-choice";
+    btn.textContent = opt.name;
+    btn.onclick = () => checkFinalGuess(opt.key);
+
+    finalGuessChoices.appendChild(btn);
+  });
+
+  finalGuess.dataset.correctKey = correctGroup.key;
+}
+
+function checkFinalGuess(chosenKey){
+  if(gameOver) return;
+
+  const correctKey = finalGuess.dataset.correctKey;
+
+  if(!correctKey){
+    message.textContent = "Aucune dernière catégorie à valider.";
+    return;
+  }
+
+  if(chosenKey !== correctKey){
+    mistakeCount++;
+    updateGameStatus();
+
+    if(mistakeCount >= MAX_MISTAKES){
+      triggerGameOver("5 erreurs.");
+      return;
+    }
+
+    message.textContent =
+      `Ce n’est pas la bonne catégorie. Erreur ${mistakeCount}/${MAX_MISTAKES}.`;
+
+    return;
+  }
+
+  const group = solution.find(g => g.key === correctKey);
+
+  if(!group){
+    message.textContent = "Erreur : catégorie introuvable.";
+    return;
+  }
+
+  finalGuess.style.display = "none";
+  finalGuess.dataset.correctKey = "";
+  finalGuessChoices.innerHTML = "";
+
+  solveGroup(group);
+}
+
+function clearSelection(){
+  selected = [];
+
+  document.querySelectorAll(".tile.selected").forEach(tile=>{
+    tile.classList.remove("selected");
+  });
+
+  document.querySelectorAll(".tile").forEach(tile=>{
+    tile.style.boxShadow = "";
+    tile.style.background = "transparent";
+    tile.style.borderColor = "transparent";
+    tile.style.filter = "";
+    tile.style.color = "var(--text-color)";
+    tile.style.opacity = "1";
+  });
+
+  grid.classList.remove("has-selection");
+
+  message.textContent = "";
+  updateSelectionFeedback();
+}
+
+function giveHint(){
+  if(gameOver) return;
+
+  cheatCount++;
+  updateGameStatus();
+
+  if(cheatCount >= MAX_CHEATS){
+    hintButton.disabled = true;
+    hintButton.style.opacity = "0.35";
+    hintButton.style.pointerEvents = "none";
+
+    message.textContent = "Plus aucune ☘︎ disponible :(";
+    return;
+  }
+
+  cheatCount++;
+  updateGameStatus();
+
+  if(cheatCount === MAX_CHEATS){
+    message.textContent =
+      "Dernière ☘︎ astuce utilisée!";
+  }
+
+  message.textContent =
+    `☘︎ ASTUCE : ${cheatCount}/${MAX_CHEATS}.`;
+
+  const unsolved = solution.filter(g=>!g.solved);
+
+  if(unsolved.length === 0){
+    hint.textContent = "☘︎ Le puzzle est terminé.";
+    return;
+  }
+
+  let targetGroup = null;
+
+  if(selected.length > 0){
+    const possibleGroups = unsolved.filter(group =>
+      selected.every(p => group.points.includes(p))
+    );
+
+    if(possibleGroups.length === 1){
+      targetGroup = possibleGroups[0];
+    }else{
+      hint.textContent =
+        "☘︎ Les points sélectionnés ne semblent pas appartenir à une même catégorie.";
+      return;
+    }
+  }else{
+    if(!hintCategory || hintCategory.solved){
+      hintCategory = shuffle(unsolved)[0];
+      hintStep = 0;
+    }
+
+    targetGroup = hintCategory;
+  }
+
+  if(!hintCategory || hintCategory.key !== targetGroup.key){
+    hintCategory = targetGroup;
+    hintStep = 0;
+  }
+
+  if(hintStep === 0){
+    hint.textContent = "☘︎ " + targetGroup.name;
+  }else{
+    const remainingPoints =
+      targetGroup.points.filter(p => !selected.includes(p));
+
+    const point =
+      remainingPoints[
+        Math.min(hintStep - 1, remainingPoints.length - 1)
+      ];
+
+    const label =
+      hintStep === 1
+        ? "Un autre point de cette catégorie"
+        : "Encore un autre point";
+
+    hint.textContent = "☘︎ " + label + " : " + point;
+  }
+
+  hintStep++;
+}
+
+function applyPreset(pageBg,text,shadow){
+  pageBgPicker.value = pageBg;
+  textPicker.value = text;
+  shadowPicker.value = shadow;
+
+  saveColorSetting("mtc_pageBg", pageBg, "--page-bg");
+  saveColorSetting("mtc_text", text, "--text-color");
+  saveColorSetting("mtc_shadow", shadow, "--shadow-color");
+}
+
+function resetAppearance(){
+  document.body.classList.remove("darkroom");
+  localStorage.removeItem("mtc_darkroom");
+
+  applyPreset("#FCFCFA","#271629","#0000FF");
+
+  localStorage.setItem("mtc_fontSize", "18");
+  fontSizeSlider.value = 18;
+  document.documentElement.style.setProperty("--ui-font-size", "18px");
+}
+
+function applyDarkroomMode(){
+  document.body.classList.remove("night-invert");
+  localStorage.removeItem("mtc_night_invert");
+  document.body.classList.add("darkroom");
+  applyPreset(
+    "#000000",
+    "#ff3b1f",
+    "#ff3b1f",
+    "#ff3b1f"
+  );
+
+  localStorage.setItem("mtc_darkroom", "1");
+}
+
+function shortPointLine(point){
+  const details = POINT_DETAILS[point] || {};
+
+  const pinyin = details.pinyin || "";
+  const hanzi = details.hanzi || "";
+  const fr =
+    details.nom_francais ||
+    details.nom_complet ||
+    "";
+
+  return [
+    formatPointCode(point),
+    pinyin,
+    hanzi,
+    fr
+  ].filter(Boolean).join(" ");
+}
+
+function pointListByCanal(section){
+  return Object.entries(section)
+    .map(([label,points]) => {
+      return `
+${displayLabel(label)}
+${points.map(p => "• " + shortPointLine(p)).join("\n")}
+`;
+    })
+    .join("\n");
+}
+
+function togglePointPanel(){
+
+  pointPanel.classList.toggle("open");
+
+  if(pointPanel.classList.contains("open")){
+
+    panelToggle.innerHTML = "&gt;";
+
+    document.body.classList.add("panel-open");
+
+  }else{
+
+    panelToggle.innerHTML = "&lt;";
+
+    document.body.classList.remove("panel-open");
+  }
+}
+
+function applyNightInvertMode(){
+
+  document.body.classList.remove("darkroom");
+  localStorage.removeItem("mtc_darkroom");
+
+  applyPreset(
+    "#271629", // ancien texte devient fond
+    "#FCFCFA", // ancien fond devient texte
+    "#0000FF"  // halo inchangé
+  );
+}
+
+pageBgPicker.oninput =
+  e => saveColorSetting("mtc_pageBg", e.target.value, "--page-bg");
+
+textPicker.oninput =
+  e => saveColorSetting("mtc_text", e.target.value, "--text-color");
+
+shadowPicker.oninput =
+  e => saveColorSetting("mtc_shadow", e.target.value, "--shadow-color");
+
+fontSizeSlider.oninput = e => {
+  const size = e.target.value;
+
+  localStorage.setItem("mtc_fontSize", size);
+
+  document.documentElement
+    .style
+    .setProperty("--ui-font-size", size + "px");
+};
+
+pool = buildPool();
+applySettings();
+fillManualSelectors();
+newGame();
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  if(!localStorage.getItem("mtc_tutorial_seen")){
+    startTour();
+  }
+});
+
+</script>
+
+<div id="footerTitle">
+  <span>Connections MTC</span>
+
+  <span id="notesToolsGroup" class="footer-tools" aria-label="Importer ou exporter les notes personnelles">
+    <button
+      id="exportNotesButton"
+      type="button"
+      onclick="exportPersonalNotes()"
+      title="Exporter mes notes personnelles"
+      aria-label="Exporter mes notes personnelles"
+    >
+      Export notes
+    </button>
+
+    <button
+      id="importNotesButton"
+      type="button"
+      onclick="openImportPersonalNotesDialog()"
+      title="Importer mes notes personnelles"
+      aria-label="Importer mes notes personnelles"
+    >
+      Import notes
+    </button>
+
+    <input
+      id="notesImportInput"
+      type="file"
+      accept="application/json,.json"
+      onchange="importPersonalNotesFromFile(this)"
+      hidden
+    >
+  </span>
+
+  <a
+    id="suggestionMailButton"
+    href="mailto:papemesedorottya@gmail.com?subject=Suggestion%20Connections%20MTC"
+    target="_blank"
+    rel="noopener"
+    onclick="window.open(this.href, '_blank', 'noopener'); return false;"
+    title="Envoyer une suggestion"
+    aria-label="Envoyer une suggestion par email"
+  >
+    ✉
+  </a>
+
+  <a
+    id="supportCoffeeButton"
+    href="https://paypal.me/emesepap1"
+    target="_blank"
+    rel="noopener noreferrer"
+    onclick="window.open(this.href, '_blank', 'noopener,noreferrer'); return false;"
+    title="Soutenir le projet avec un café"
+    aria-label="Soutenir le projet sur PayPal"
+  >
+    🎁
+  </a>
+</div>
+
+<div id="cheatsheetPanel" class="cheatsheet-panel">
+  <button
+    id="cheatsheetToggle"
+    class="cheatsheet-toggle"
+    onclick="toggleCheatsheetPanel()"
+  >
+    &gt;
+  </button>
+
+  <div id="cheatsheetPanelContent"></div>
+</div>
+
+<div id="pointPanel" class="point-panel">
+  <button
+    id="panelToggle"
+    class="panel-toggle"
+    onclick="togglePointPanel()"
+  >
+    &gt;
+  </button>
+
+  <div id="pointPanelContent"></div>
+</div>
+
+</body>
+</html>
