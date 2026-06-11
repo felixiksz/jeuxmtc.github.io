@@ -5036,6 +5036,67 @@ function closePointPanelCompletelyOnMobile(){
 }
 
 
+function enableMobilePointPanelSwipeClose(){
+
+  const panel = document.getElementById("pointPanel");
+
+  if(!panel) return;
+
+  if(panel.dataset.swipeCloseBound === "1") return;
+
+  panel.dataset.swipeCloseBound = "1";
+
+  let startX = 0;
+  let startY = 0;
+  let trackingSwipe = false;
+
+  panel.addEventListener("touchstart", event=>{
+
+    if(window.innerWidth > 699) return;
+
+    if(!panel.classList.contains("open")) return;
+
+    if(event.target.closest("textarea,input,select")) return;
+
+    const touch = event.changedTouches[0];
+
+    if(!touch) return;
+
+    startX = touch.clientX;
+    startY = touch.clientY;
+    trackingSwipe = true;
+
+  }, {passive:true});
+
+  panel.addEventListener("touchend", event=>{
+
+    if(!trackingSwipe) return;
+
+    trackingSwipe = false;
+
+    if(window.innerWidth > 699) return;
+
+    if(!panel.classList.contains("open")) return;
+
+    const touch = event.changedTouches[0];
+
+    if(!touch) return;
+
+    const deltaX = touch.clientX - startX;
+    const deltaY = touch.clientY - startY;
+
+    const isSwipeRight =
+      deltaX > 70 &&
+      Math.abs(deltaX) > Math.abs(deltaY) * 1.35;
+
+    if(isSwipeRight){
+      closePointPanelCompletelyOnMobile();
+    }
+
+  }, {passive:true});
+}
+
+
 function formatPointCode(point){
   return String(point).replace(
     /^([A-Za-zÀ-ÿ]+)\s*(\d+)$/,
@@ -5976,6 +6037,8 @@ fillManualSelectors();
 newGame();
 
 document.addEventListener("DOMContentLoaded", ()=>{
+  enableMobilePointPanelSwipeClose();
+
   if(!localStorage.getItem("mtc_tutorial_seen")){
     startTour();
   }
