@@ -2113,6 +2113,24 @@ body.tour-disable-grid #grid *{
 
 }
 
+
+/* Sur mobile, le panneau latéral passe au-dessus des traits d’associations */
+@media(max-width:699px){
+
+  .point-panel,
+  .point-panel.open{
+    z-index:9200 !important;
+  }
+
+  body.panel-open .association-overlay,
+  body.panel-open .association-link-plus,
+  body.panel-open .association-plus{
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+
+}
+
 </style>
 <link
   href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
