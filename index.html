@@ -3222,6 +3222,12 @@ function startTour(){
 
   tourSteps = [
     {
+      selector: "#grid",
+      title: "La grille",
+      text: "Le but du jeu est de deviner les 4 catégories des 16 points qui sont présentés. En cliquant sur 4 points qui vont ensemble, tu proposes une catégorie. Si c’est juste, la ligne se range au-dessus.",
+      disableGridClick:true
+    },
+    {
       selector: ".topbar-row button[onclick='newGame()']",
       title: "Nouvelle partie",
       text: "Ce bouton relance une grille."
@@ -3235,12 +3241,6 @@ function startTour(){
       selector: ".mode-switch",
       title: "Auto / Manuel",
       text: "En Auto, le jeu choisit les catégories. En Manuel, tu choisis ce que tu veux réviser."
-    },
-    {
-      selector: "#grid",
-      title: "La grille",
-      text: "En cliquant sur 4 points qui vont ensemble, tu proposes une catégorie. Si c’est juste, la ligne se range au-dessus.",
-      disableGridClick:true
     },
     {
       selector: "#jokerBubble",
