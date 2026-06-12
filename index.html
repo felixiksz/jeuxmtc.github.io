@@ -21098,6 +21098,150 @@ function correspondenceChecklistHtml(selected = []){
   }
 }
 
+
+
+/* === Recherche Intersections : switch compact + aides non transparentes === */
+#advancedSearchPanel .intersection-filter-label{
+  position:relative !important;
+  min-width:64px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:4px !important;
+  opacity:1 !important;
+}
+
+#advancedSearchPanel .intersection-label-text{
+  opacity:.62 !important;
+}
+
+#advancedSearchPanel .intersection-switch-line{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:6px !important;
+  min-height:22px !important;
+  font-family:var(--ui-font-family) !important;
+}
+
+#advancedSearchPanel .intersection-switch{
+  width:34px !important;
+  height:18px !important;
+  flex:0 0 auto !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:none !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+#advancedSearchPanel .intersection-switch:hover,
+#advancedSearchPanel .intersection-switch:active{
+  box-shadow:none !important;
+  transform:none !important;
+  background:transparent !important;
+}
+
+#advancedSearchPanel .intersection-switch-value{
+  font-size:.72em !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  opacity:.45 !important;
+  white-space:nowrap !important;
+}
+
+#advancedSearchPanel .intersection-switch-value.active{
+  opacity:1 !important;
+  text-shadow:0 0 7px var(--shadow-color) !important;
+}
+
+#advancedSearchPanel .intersection-help-wrap{
+  position:relative !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  opacity:1 !important;
+  z-index:20 !important;
+}
+
+#advancedSearchPanel .intersection-help-button{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:16px !important;
+  height:16px !important;
+  min-width:16px !important;
+  min-height:16px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:none !important;
+  border-radius:50% !important;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+  font-size:.78em !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  box-shadow:none !important;
+  transform:none !important;
+  opacity:1 !important;
+}
+
+#advancedSearchPanel .intersection-help-text{
+  position:absolute !important;
+  left:0 !important;
+  top:calc(100% + 6px) !important;
+  right:auto !important;
+  bottom:auto !important;
+  transform:none !important;
+  display:none !important;
+
+  width:min(280px, calc(100vw - 32px)) !important;
+  max-height:min(42vh,280px) !important;
+  overflow:auto !important;
+
+  padding:9px 10px !important;
+  background:#FAF9D1 !important;
+  color:#0000FF !important;
+  box-shadow:0 8px 24px #0000FF !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:.74rem !important;
+  font-weight:700 !important;
+  line-height:1.25 !important;
+  letter-spacing:normal !important;
+  text-transform:none !important;
+  text-align:left !important;
+
+  opacity:1 !important;
+  z-index:14000 !important;
+}
+
+#advancedSearchPanel .intersection-help-wrap:hover .intersection-help-text,
+#advancedSearchPanel .intersection-help-wrap:focus-within .intersection-help-text{
+  display:block !important;
+}
+
+@media(max-width:520px){
+  #advancedSearchPanel .intersection-filter-row{
+    flex-wrap:wrap !important;
+    align-items:center !important;
+  }
+
+  #advancedSearchPanel .intersection-switch-line{
+    gap:5px !important;
+  }
+
+  #advancedSearchPanel .intersection-switch-value{
+    font-size:.64em !important;
+  }
+
+  #advancedSearchPanel .intersection-help-text{
+    width:min(260px, calc(100vw - 24px)) !important;
+    left:0 !important;
+  }
+}
 </style>
 
 <script>
@@ -21479,11 +21623,30 @@ function correspondenceChecklistHtml(selected = []){
     return `<span class="search-help-wrap"><button type="button" class="search-help" tabindex="0" aria-label="Aide">?</button><span class="search-help-text">${escapeHtml(text)}</span></span>`;
   }
 
+  function intersectionHelpHtml(text){
+    return `
+      <span class="intersection-help-wrap">
+        <button type="button" class="intersection-help-button" tabindex="0" aria-label="Aide">?</button>
+        <span class="intersection-help-text">${escapeHtml(text)}</span>
+      </span>
+    `;
+  }
+
   window.getAdvancedSearchIntersectionMatchMode = function(){
+    const switchInput = document.getElementById("advancedSearchIntersectionMatchSwitch");
+    if(switchInput){
+      return switchInput.checked ? "all" : "any";
+    }
+
     return document.querySelector("input[name='advancedSearchIntersectionMatch']:checked")?.value || "any";
   };
 
   window.getAdvancedSearchIntersectionActionMode = function(){
+    const switchInput = document.getElementById("advancedSearchIntersectionActionSwitch");
+    if(switchInput){
+      return switchInput.checked ? "exclude" : "include";
+    }
+
     return document.querySelector("input[name='advancedSearchIntersectionAction']:checked")?.value || "include";
   };
 
@@ -21648,63 +21811,52 @@ function correspondenceChecklistHtml(selected = []){
   };
 
   function intersectionOptionsHtml(currentFilters){
+    const actionIsExclude = currentFilters.intersectionActionMode === "exclude";
+    const matchIsAll = currentFilters.intersectionMatchMode === "all";
+
     return `
       <div class="intersection-filter-options" aria-label="Mode de filtrage des intersections">
         <div class="intersection-filter-row">
           <span class="intersection-filter-label">
-            Action
-            ${helpHtml("Inclure montre les points liés aux intersections cochées. Exclure retire ces points des résultats.")}
+            <span class="intersection-label-text">Action</span>
+            ${intersectionHelpHtml("Inclure montre les points liés aux intersections cochées. Exclure retire ces points des résultats.")}
           </span>
-          <span class="intersection-togglebar" role="radiogroup" aria-label="Inclure ou exclure les intersections cochées">
-            <label>
+
+          <span class="intersection-switch-line" aria-label="Inclure ou exclure les intersections cochées">
+            <span class="intersection-switch-value ${actionIsExclude ? "" : "active"}">Inclure</span>
+            <label class="switch intersection-switch">
               <input
-                type="radio"
-                name="advancedSearchIntersectionAction"
-                value="include"
-                ${intersectionModeChecked(currentFilters.intersectionActionMode, "include")}
-                onchange="renderAdvancedSearchResults()"
+                id="advancedSearchIntersectionActionSwitch"
+                type="checkbox"
+                ${actionIsExclude ? "checked" : ""}
+                onchange="renderAdvancedSearchPanel()"
+                aria-label="Exclure les intersections cochées"
               >
-              <span>Inclure</span>
+              <span class="slider"></span>
             </label>
-            <label>
-              <input
-                type="radio"
-                name="advancedSearchIntersectionAction"
-                value="exclude"
-                ${intersectionModeChecked(currentFilters.intersectionActionMode, "exclude")}
-                onchange="renderAdvancedSearchResults()"
-              >
-              <span>Exclure</span>
-            </label>
+            <span class="intersection-switch-value ${actionIsExclude ? "active" : ""}">Exclure</span>
           </span>
         </div>
 
         <div class="intersection-filter-row">
           <span class="intersection-filter-label">
-            Lien
-            ${helpHtml("Au moins un trouve les points liés à n’importe quel canal coché. Tous trouve seulement les points liés à tous les canaux cochés en même temps.")}
+            <span class="intersection-label-text">Lien</span>
+            ${intersectionHelpHtml("Au moins un trouve les points liés à n’importe quel canal coché. Tous trouve seulement les points liés à tous les canaux cochés en même temps.")}
           </span>
-          <span class="intersection-togglebar" role="radiogroup" aria-label="Au moins un canal ou tous les canaux cochés">
-            <label>
+
+          <span class="intersection-switch-line" aria-label="Au moins un canal ou tous les canaux cochés">
+            <span class="intersection-switch-value ${matchIsAll ? "" : "active"}">Au moins un</span>
+            <label class="switch intersection-switch">
               <input
-                type="radio"
-                name="advancedSearchIntersectionMatch"
-                value="any"
-                ${intersectionModeChecked(currentFilters.intersectionMatchMode, "any")}
-                onchange="renderAdvancedSearchResults()"
+                id="advancedSearchIntersectionMatchSwitch"
+                type="checkbox"
+                ${matchIsAll ? "checked" : ""}
+                onchange="renderAdvancedSearchPanel()"
+                aria-label="Exiger tous les canaux cochés"
               >
-              <span>Au moins un</span>
+              <span class="slider"></span>
             </label>
-            <label>
-              <input
-                type="radio"
-                name="advancedSearchIntersectionMatch"
-                value="all"
-                ${intersectionModeChecked(currentFilters.intersectionMatchMode, "all")}
-                onchange="renderAdvancedSearchResults()"
-              >
-              <span>Tous</span>
-            </label>
+            <span class="intersection-switch-value ${matchIsAll ? "active" : ""}">Tous</span>
           </span>
         </div>
       </div>
