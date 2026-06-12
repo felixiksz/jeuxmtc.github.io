@@ -15867,7 +15867,7 @@ function startTour(){
     {
       selector: "#grid",
       title: "La grille",
-      text: "Le but du jeu est de deviner les 4 catégories des 16 points qui sont présentés. En cliquant sur 4 points qui vont ensemble, tu proposes une catégorie. Si c’est juste, la ligne se range au-dessus.",
+      text: "Le but du jeu est de deviner les 4 catégories des 16 points qui sont présentés dans la grille. En cliquant sur 4 points qui vont ensemble, tu proposes une catégorie. Si c’est juste, la ligne se range au-dessus.",
       disableGridClick:true
     },
     {
@@ -15878,16 +15878,16 @@ function startTour(){
     {
       selector: ".topbar-row button[onclick='toggleSettings()']",
       title: "Affichage",
-      text: "En cliquant sur Affichage, tu peux adapter les couleurs, le halo et la taille du texte."
+      text: "Ici tu peux adapter les couleurs et la taille du texte pour que ce soit confortable pour toi."
     },
     {
       selector: ".mode-switch",
       title: "Auto / Manuel",
-      text: "En Auto, le jeu choisit les catégories. En Manuel, tu choisis ce que tu veux réviser. Dans les statistiques, tu peux aussi orienter le mode Auto vers les catégories à travailler ou déjà maîtrisées."
+      text: "En Auto, le jeu choisit les catégories. En Manuel, tu choisis ce que tu veux réviser. Tu peux aussi affiner selon ton niveau de concentration, si tu veux une grille facile, moyenne ou difficile. Plus tu joues, mieux le jeu connaitra tes lacunes ..."
     },
     {
       selector: "#jokerBubble",
-      title: "La roue de la chance",
+      title: "La roue de la fortune",
       text: "Tu as cinq ♥ vies et cinq ☘︎ astuces. Attention, une erreur = une ♥ vie !"
     },
     {
@@ -15898,14 +15898,14 @@ function startTour(){
     {
       selector: "#statsButton",
       title: "Stats",
-      text: "En cliquant sur Stats, tu vois les catégories les plus révisées, les mieux réussies et celles conseillées à réviser.",
+      text: "C'est un miroir...",
       fallback: () => document.querySelector("#footerTitle"),
       position:"aboveBottom"
     },
     {
       selector: "#advancedSearchButton",
       title: "Recherche",
-      text: "En cliquant sur Recherche, tu peux filtrer les points par mot-clé, catégorie, canal, correspondance, fonctions, indications ou notes.",
+      text: "Ici tu peux filtrer les points par mot-clé, catégorie, canal, correspondance, fonctions, indications ou notes.",
       fallback: () => document.querySelector("#footerTitle"),
       position:"aboveBottom"
     },
@@ -15926,14 +15926,14 @@ function startTour(){
     {
       selector: "#suggestionMailButton",
       title: "Suggestions",
-      text: "Tu peux m’envoyer un message ici.",
+      text: "Tu peux m’envoyer un coucou, une suggestion ou une proposition ici.",
       fallback: () => document.querySelector("#footerTitle"),
       position:"aboveBottom"
     },
     {
       selector: "#supportCoffeeButton",
-      title: "Soutenir le projet",
-      text: "Ce jeu a été conçu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois. Toute contribution est bienvenue ❤️‍🔥 avec beaucoup de gratitude!",
+      title: "Me soutenir",
+      text: "Ce jeu a été conçu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de manger pendant le développement d'autres outils similaires ;)",
       fallback: () => document.querySelector("#footerTitle"),
       position:"aboveBottom"
     },
@@ -16002,6 +16002,10 @@ function showTourStep(){
   }
 
   target.classList.add("tour-highlight");
+
+  if(step.selector === "#supportCoffeeButton"){
+    rememberSupportCoffeeReminderShown();
+  }
 
   try{
     target.scrollIntoView({
@@ -16187,6 +16191,207 @@ function showProgressHintSoon(id, selector, title, text, options = {}, delay = 2
   setTimeout(()=>{
     showProgressHint(id, selector, title, text, options);
   }, delay);
+}
+
+
+const MTC_SUPPORT_COFFEE_CLICKED_KEY =
+  "mtc_support_coffee_clicked";
+
+const MTC_SUPPORT_COFFEE_LAST_HINT_KEY =
+  "mtc_support_coffee_last_hint_at";
+
+const MTC_SUPPORT_COFFEE_INTERVAL_MS =
+  2 * 24 * 60 * 60 * 1000;
+
+const SUPPORT_COFFEE_REMINDER_TITLE =
+  "Me soutenir";
+
+const SUPPORT_COFFEE_REMINDER_TEXT =
+  "Ce jeu a été conçu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de manger pendant le développement d'autres outils similaires ;)";
+
+function markSupportCoffeeClicked(){
+  localStorage.setItem(
+    MTC_SUPPORT_COFFEE_CLICKED_KEY,
+    "1"
+  );
+}
+
+function rememberSupportCoffeeReminderShown(){
+  localStorage.setItem(
+    MTC_SUPPORT_COFFEE_LAST_HINT_KEY,
+    String(Date.now())
+  );
+}
+
+function shouldReplaySupportCoffeeReminder(){
+
+  if(
+    localStorage.getItem(MTC_SUPPORT_COFFEE_CLICKED_KEY) === "1"
+  ){
+    return false;
+  }
+
+  if(!document.getElementById("supportCoffeeButton")){
+    return false;
+  }
+
+  if(document.getElementById("tourBox")){
+    return false;
+  }
+
+  if(progressHintActive){
+    return false;
+  }
+
+  const lastShown =
+    Number(
+      localStorage.getItem(MTC_SUPPORT_COFFEE_LAST_HINT_KEY) || "0"
+    );
+
+  return Date.now() - lastShown >= MTC_SUPPORT_COFFEE_INTERVAL_MS;
+}
+
+function showSupportCoffeeReminder(){
+
+  const target =
+    document.getElementById("supportCoffeeButton") ||
+    document.getElementById("footerTitle");
+
+  if(!target) return false;
+
+  progressHintActive = true;
+  rememberSupportCoffeeReminderShown();
+
+  document
+    .querySelectorAll(".tour-highlight")
+    .forEach(el=>el.classList.remove("tour-highlight"));
+
+  let overlay = document.getElementById("tourOverlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "tourOverlay";
+    document.body.appendChild(overlay);
+  }
+
+  const box = document.createElement("div");
+  box.id = "tourBox";
+  box.className = "progress-hint-box support-coffee-reminder-box";
+
+  box.innerHTML = `
+    <h3>${SUPPORT_COFFEE_REMINDER_TITLE}</h3>
+    <div>${SUPPORT_COFFEE_REMINDER_TEXT}</div>
+
+    <div class="tour-actions">
+      <button type="button" class="support-coffee-reminder-ok">OK</button>
+    </div>
+  `;
+
+  document.body.appendChild(box);
+  target.classList.add("tour-highlight");
+
+  function closeSupportCoffeeReminder(){
+    target.classList.remove("tour-highlight");
+    if(box) box.remove();
+    if(overlay) overlay.remove();
+    progressHintActive = false;
+  }
+
+  const okButton =
+    box.querySelector(".support-coffee-reminder-ok");
+
+  okButton.addEventListener("pointerdown", event=>{
+    event.stopPropagation();
+  });
+
+  okButton.addEventListener("click", event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    closeSupportCoffeeReminder();
+  });
+
+  try{
+    target.scrollIntoView({
+      block:"center",
+      inline:"center",
+      behavior:"smooth"
+    });
+  }catch(error){}
+
+  setTimeout(()=>{
+    const rect = target.getBoundingClientRect();
+    positionTourBox(
+      box,
+      rect,
+      {
+        fallback: () => document.querySelector("#footerTitle"),
+        position:"aboveBottom"
+      }
+    );
+  }, 120);
+
+  return true;
+}
+
+function maybeReplaySupportCoffeeReminder(){
+
+  if(shouldReplaySupportCoffeeReminder()){
+    showSupportCoffeeReminder();
+    return;
+  }
+
+  if(
+    localStorage.getItem(MTC_SUPPORT_COFFEE_CLICKED_KEY) !== "1" &&
+    (
+      document.getElementById("tourBox") ||
+      progressHintActive
+    )
+  ){
+    setTimeout(maybeReplaySupportCoffeeReminder, 60 * 1000);
+  }
+}
+
+function setupSupportCoffeeReminder(){
+
+  const button =
+    document.getElementById("supportCoffeeButton");
+
+  if(button){
+    button.addEventListener(
+      "click",
+      markSupportCoffeeClicked,
+      {capture:true}
+    );
+
+    button.addEventListener(
+      "auxclick",
+      markSupportCoffeeClicked,
+      {capture:true}
+    );
+
+    button.addEventListener(
+      "keydown",
+      event=>{
+        if(event.key === "Enter" || event.key === " "){
+          markSupportCoffeeClicked();
+        }
+      },
+      {capture:true}
+    );
+  }
+
+  if(
+    localStorage.getItem("mtc_tutorial_seen") !== "1" &&
+    !localStorage.getItem(MTC_SUPPORT_COFFEE_LAST_HINT_KEY)
+  ){
+    rememberSupportCoffeeReminderShown();
+  }
+
+  setTimeout(maybeReplaySupportCoffeeReminder, 1800);
+
+  setInterval(
+    maybeReplaySupportCoffeeReminder,
+    60 * 60 * 1000
+  );
 }
 
 
@@ -16407,6 +16612,10 @@ function endTour(save){
 
   if(save){
     localStorage.setItem("mtc_tutorial_seen","1");
+
+    if(!localStorage.getItem(MTC_SUPPORT_COFFEE_LAST_HINT_KEY)){
+      rememberSupportCoffeeReminderShown();
+    }
   }
 }
 
@@ -18823,6 +19032,7 @@ newGame();
 
 document.addEventListener("DOMContentLoaded", ()=>{
   enableMobilePointPanelSwipeClose();
+  setupSupportCoffeeReminder();
 
   if(!localStorage.getItem("mtc_tutorial_seen")){
     startTour();
@@ -18889,11 +19099,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
       href="https://paypal.me/emesepap1"
       target="_blank"
       rel="noopener noreferrer"
-      onclick="window.open(this.href, '_blank', 'noopener,noreferrer'); return false;"
+      onclick="markSupportCoffeeClicked(); window.open(this.href, '_blank', 'noopener,noreferrer'); return false;"
       title="Soutenir le projet"
       aria-label="Soutenir le projet sur PayPal"
     >
-      🎁
+      ❤️‍🔥
     </a>
   </span>
 
