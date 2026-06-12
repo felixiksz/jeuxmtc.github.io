@@ -5156,6 +5156,104 @@ body{
   display:block !important;
 }
 
+
+
+/* === Support / Buy me a coffee : image centrale + texte en arc === */
+:root{
+  /* Taille facile à modifier */
+  --support-coffee-image-size:76px;
+  --support-coffee-image-rotation-speed:26s;
+  --support-coffee-image-gap:10px;
+}
+
+.support-coffee-message{
+  max-width:100%;
+  margin-top:2px;
+  text-align:left;
+  font-family:var(--ui-font-family);
+  line-height:1.34;
+}
+
+.support-coffee-message::after{
+  content:"";
+  display:block;
+  clear:both;
+}
+
+.support-coffee-visual{
+  width:var(--support-coffee-image-size);
+  height:var(--support-coffee-image-size);
+
+  float:left;
+
+  /* C’est ça qui fait légèrement contourner le texte autour du rond */
+  shape-outside:circle(50%);
+  -webkit-shape-outside:circle(50%);
+  shape-margin:var(--support-coffee-image-gap);
+
+  margin:2px 12px 8px 0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+  overflow:hidden;
+
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:none !important;
+
+  animation:supportCoffeeSlowRotate var(--support-coffee-image-rotation-speed) linear infinite;
+}
+
+/* Sur une bulle assez large, on décale un peu l’image vers le centre du message. */
+@media(min-width:380px){
+  .support-coffee-visual{
+    margin-left:clamp(
+      0px,
+      calc((100% - var(--support-coffee-image-size)) / 2 - 58px),
+      54px
+    );
+  }
+}
+
+.support-coffee-visual::before{
+  content:"☕";
+  font-size:calc(var(--support-coffee-image-size) * .42);
+  line-height:1;
+}
+
+.support-coffee-visual img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:50%;
+
+  box-shadow:none !important;
+  filter:none !important;
+}
+
+.support-coffee-visual:has(img)::before{
+  content:"";
+}
+
+.support-coffee-text{
+  margin:0;
+}
+
+@keyframes supportCoffeeSlowRotate{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .support-coffee-visual{
+    animation:none !important;
+  }
+}
+
 </style>
 <link
   href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
@@ -15948,6 +16046,25 @@ function startTour(){
   showTourStep();
 }
 
+
+function supportCoffeeVisualHtml(){
+  return `
+    <div class="support-coffee-visual" aria-hidden="true">
+      <!-- Taille : voir --support-coffee-image-size dans le CSS -->
+      <img src="me.png" alt="" onerror="this.remove()">
+    </div>
+  `;
+}
+
+function supportCoffeeMessageHtml(text){
+  return `
+    <div class="support-coffee-message">
+      ${supportCoffeeVisualHtml()}
+      <div class="support-coffee-text">${text}</div>
+    </div>
+  `;
+}
+
 function showTourStep(){
   const step = tourSteps[tourStep];
 
@@ -16017,7 +16134,7 @@ function showTourStep(){
 
   box.innerHTML = `
     <h3>${step.title}</h3>
-    <div>${step.text}</div>
+    ${step.selector === "#supportCoffeeButton" ? supportCoffeeMessageHtml(step.text) : "<div>" + step.text + "</div>"}
 
     <div class="tour-actions">
       <button onclick="endTour(true)">Passer</button>
@@ -16279,7 +16396,7 @@ function showSupportCoffeeReminder(){
 
   box.innerHTML = `
     <h3>${SUPPORT_COFFEE_REMINDER_TITLE}</h3>
-    <div>${SUPPORT_COFFEE_REMINDER_TEXT}</div>
+    ${supportCoffeeMessageHtml(SUPPORT_COFFEE_REMINDER_TEXT)}
 
     <div class="tour-actions">
       <button type="button" class="support-coffee-reminder-ok">OK</button>
@@ -19103,7 +19220,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       title="Soutenir le projet"
       aria-label="Soutenir le projet sur PayPal"
     >
-      ❤️‍🔥
+      🎁
     </a>
   </span>
 
