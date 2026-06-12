@@ -5101,6 +5101,61 @@ body{
   }
 }
 
+
+
+/* === Aides Recherche : texte visible seulement au survol === */
+.search-help-button,
+.search-help{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:16px !important;
+  height:16px !important;
+  min-width:16px !important;
+  min-height:16px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:none !important;
+  border-radius:50% !important;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+  font-size:.78em !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  box-shadow:none !important;
+  transform:none !important;
+  opacity:.7 !important;
+}
+
+.search-help-tooltip,
+.search-help-text{
+  position:absolute !important;
+  left:50% !important;
+  bottom:130% !important;
+  transform:translateX(-50%) !important;
+  display:none !important;
+  width:min(310px,78vw) !important;
+  max-height:min(42vh,280px) !important;
+  overflow:auto !important;
+  padding:9px 10px !important;
+  background:#FAF9D1 !important;
+  color:#0000FF !important;
+  box-shadow:0 8px 24px #0000FF !important;
+  font-size:.74rem !important;
+  font-weight:600 !important;
+  line-height:1.25 !important;
+  letter-spacing:normal !important;
+  text-transform:none !important;
+  z-index:12000 !important;
+}
+
+.search-help-wrap:hover .search-help-tooltip,
+.search-help-wrap:focus-within .search-help-tooltip,
+.search-help-wrap:hover .search-help-text,
+.search-help-wrap:focus-within .search-help-text{
+  display:block !important;
+}
+
 </style>
 <link
   href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"
@@ -20912,6 +20967,862 @@ function correspondenceChecklistHtml(selected = []){
   };
 
   updatePracticeModeSwitch();
+})();
+</script>
+
+
+
+<!-- === Correctif recherche : merveilleux vaisseaux en Intersections, pas en Catégories === -->
+<style>
+/* Recherche avancée : groupes d'intersections plus lisibles */
+.correspondence-checklist .intersection-filter-heading{
+  grid-column:1 / -1 !important;
+  margin:5px 0 1px !important;
+  font-family:var(--ui-font-family) !important;
+  font-size:.72em !important;
+  font-weight:900 !important;
+  letter-spacing:.04em !important;
+  text-transform:uppercase !important;
+  opacity:.62 !important;
+}
+
+.correspondence-checklist label{
+  align-items:start !important;
+}
+
+
+/* === Recherche Intersections : mode Tous/Au moins un + Inclure/Exclure === */
+#advancedSearchPanel .intersection-filter-options{
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  gap:6px !important;
+  margin:6px 0 8px !important;
+  font-family:var(--ui-font-family) !important;
+}
+
+#advancedSearchPanel .intersection-filter-row{
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+
+#advancedSearchPanel .intersection-filter-label{
+  min-width:78px !important;
+  font-size:.72em !important;
+  font-weight:800 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  opacity:.62 !important;
+}
+
+#advancedSearchPanel .intersection-togglebar{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:0 !important;
+  padding:0 !important;
+  border:none !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  box-shadow:0 0 7px var(--shadow-color) !important;
+  overflow:hidden !important;
+}
+
+#advancedSearchPanel .intersection-togglebar label{
+  position:relative !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-height:22px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:none !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+  cursor:pointer !important;
+}
+
+#advancedSearchPanel .intersection-togglebar input{
+  position:absolute !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+
+#advancedSearchPanel .intersection-togglebar span{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:76px !important;
+  min-height:22px !important;
+  padding:2px 8px !important;
+  color:var(--text-color) !important;
+  font-size:.72em !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  opacity:.58 !important;
+}
+
+#advancedSearchPanel .intersection-togglebar input:checked + span{
+  opacity:1 !important;
+  text-shadow:0 0 7px var(--shadow-color) !important;
+}
+
+#advancedSearchPanel .intersection-togglebar label:hover span{
+  opacity:1 !important;
+}
+
+@media(max-width:520px){
+  #advancedSearchPanel .intersection-filter-row{
+    gap:5px !important;
+  }
+
+  #advancedSearchPanel .intersection-filter-label{
+    min-width:62px !important;
+    font-size:.64em !important;
+  }
+
+  #advancedSearchPanel .intersection-togglebar span{
+    min-width:58px !important;
+    padding:2px 5px !important;
+    font-size:.64em !important;
+  }
+}
+
+</style>
+
+<script>
+/* === Recherche vaisseaux extraordinaires : les vaisseaux deviennent des filtres d'intersections === */
+(function(){
+  const EXTRAORDINARY_INTERSECTION_PREFIX = "EXTRA_VESSEL::";
+
+  const EXTRAORDINARY_VESSEL_INTERSECTIONS = [
+    {
+      key:"Chong_Mai",
+      label:"Chōng Mài",
+      shortLabel:"Chōng",
+      points:[
+        "RM1","E30","Rn11","Rn12","Rn13","Rn14","Rn15","RM7","Rn16","Rn17",
+        "Rn18","Rn19","Rn20","Rn21","Rn22","Rn23","Rn24","Rn25","Rn26","Rn27"
+      ]
+    },
+    {
+      key:"Ren_Mai",
+      label:"Rèn Mài",
+      shortLabel:"Rèn",
+      points:["DM1","DM26","DM28","E1"]
+    },
+    {
+      key:"Du_Mai",
+      label:"Dū Mài",
+      shortLabel:"Dū",
+      points:["RM1","V12","V11","V1","V35"]
+    },
+    {
+      key:"Yin_Qiao_Mai",
+      label:"Yīn Qiāo Mài",
+      shortLabel:"Yīn Qiāo",
+      points:["Rn2","Rn6","Rn8","E9","E12","V1"]
+    },
+    {
+      key:"Yang_Qiao_Mai",
+      label:"Yáng Qiāo Mài",
+      shortLabel:"Yáng Qiāo",
+      points:["V62","V61","V59","VB29","IG10","GI16","GI15","E9","E4","E3","E1","V1","VB20"]
+    },
+    {
+      key:"Yin_Wei_Mai",
+      label:"Yīn Wéi Mài",
+      shortLabel:"Yīn Wéi",
+      points:["Rn9","Rt12","Rt13","Rt15","Rt16","F14","RM22","RM23","VB14"]
+    },
+    {
+      key:"Yang_Wei_Mai",
+      label:"Yáng Wéi Mài",
+      shortLabel:"Yáng Wéi",
+      points:["V63","VB35","GI14","TF13","IG10","TF15","VB21","VB13","VB14","VB15","VB16","VB17","VB18","VB19","VB20","DM16","DM15"]
+    },
+    {
+      key:"Dai_Mai",
+      label:"Dài Mài",
+      shortLabel:"Dài",
+      points:["F13","VB26","VB27","VB28"]
+    }
+  ];
+
+  window.MTC_EXTRAORDINARY_VESSEL_INTERSECTIONS = EXTRAORDINARY_VESSEL_INTERSECTIONS;
+
+  function cleanPointCode(point){
+    return String(point || "").replace(/\s+/g,"").trim();
+  }
+
+  function extraordinaryFilterValue(key){
+    return `${EXTRAORDINARY_INTERSECTION_PREFIX}${key}`;
+  }
+
+  function extraordinaryGroupFromValue(value){
+    const raw = String(value || "");
+    if(!raw.startsWith(EXTRAORDINARY_INTERSECTION_PREFIX)) return null;
+
+    const key = raw.slice(EXTRAORDINARY_INTERSECTION_PREFIX.length);
+    return EXTRAORDINARY_VESSEL_INTERSECTIONS.find(group => group.key === key) || null;
+  }
+
+  function extraordinaryGroupsForPoint(point){
+    const clean = cleanPointCode(point);
+    return EXTRAORDINARY_VESSEL_INTERSECTIONS.filter(group =>
+      group.points.includes(clean)
+    );
+  }
+
+  function pointMatchesExtraordinaryGroup(point, group){
+    if(!group) return false;
+    return group.points.includes(cleanPointCode(point));
+  }
+
+  /* Les points d'ouverture des merveilleux vaisseaux ne sont plus proposés comme catégories de points. */
+  window.extraSearchCategoryGroups = function(){
+    return [];
+  };
+
+  window.categoryDisplayNameFromSearchKey = function(key){
+    if(!key) return "";
+    if(key.includes("::")){
+      const [section, subkey] = key.split("::");
+      const prefix = DISPLAY_NAMES[section] || displayLabel(section);
+      const sub = LABEL_NAMES[subkey] || CANAL_LABELS[subkey] || displayLabel(subkey);
+      return `${prefix} — ${sub}`;
+    }
+    return DISPLAY_NAMES[key] || displayLabel(key);
+  };
+
+  window.categoryOptionsHtml = function(){
+    if(!pool || !pool.length) pool = buildPool();
+
+    const options = pool.map(cat => ({
+      key:cat.key,
+      name:cat.name || DISPLAY_NAMES[cat.key] || displayLabel(cat.key)
+    }));
+
+    return options
+      .sort((a,b)=>normalizeSearchText(a.name).localeCompare(normalizeSearchText(b.name), "fr"))
+      .map(cat => `<option value="${escapeAttribute(cat.key)}">${escapeHtml(cat.name)}</option>`)
+      .join("");
+  };
+
+  window.pointCategoryKeys = function(point){
+    if(!pool || !pool.length) pool = buildPool();
+
+    return pool
+      .filter(cat => (cat.points || []).includes(point))
+      .map(cat => cat.key);
+  };
+
+  window.pointCategoryNames = function(point){
+    return pointCategoryKeys(point).map(categoryDisplayNameFromSearchKey);
+  };
+
+  window.pointMatchesCategory = function(point, categoryKey){
+    if(!categoryKey) return true;
+    return pointCategoryKeys(point).includes(categoryKey);
+  };
+
+  const previousPointCorrespondenceRawText = window.pointCorrespondenceRawText;
+
+  window.pointCorrespondenceRawText = function(point){
+    const original = typeof previousPointCorrespondenceRawText === "function"
+      ? previousPointCorrespondenceRawText(point)
+      : flattenSearchText((POINT_DETAILS[point] || {}).correspondances || "");
+
+    const extraordinaryLabels = extraordinaryGroupsForPoint(point)
+      .map(group => group.label)
+      .join(" ");
+
+    return [original, extraordinaryLabels].filter(Boolean).join(" ");
+  };
+
+  window.pointHasCorrespondence = function(point){
+    const text = normalizeSearchText(pointCorrespondenceRawText(point));
+
+    if(!text) return false;
+
+    return ![
+      "aucune",
+      "sans correspondance",
+      "pas de correspondance"
+    ].some(emptyLabel => text === normalizeSearchText(emptyLabel));
+  };
+
+  window.pointCorrespondenceSearchText = function(point){
+    return normalizeSearchText(pointCorrespondenceRawText(point));
+  };
+
+  window.pointMatchesSingleCorrespondenceCanal = function(point, value){
+    if(!value) return true;
+
+    if(value === MTC_CORRESPONDENCE_FILTER_ANY){
+      return pointHasCorrespondence(point);
+    }
+
+    const extraordinaryGroup = extraordinaryGroupFromValue(value);
+    if(extraordinaryGroup){
+      return pointMatchesExtraordinaryGroup(point, extraordinaryGroup);
+    }
+
+    const text = pointCorrespondenceSearchText(point);
+    if(!text) return false;
+
+    const tokens = MTC_SEARCH_CORRESPONDENCE_CHANNEL_KEYWORDS[value] || [];
+
+    return tokens
+      .map(normalizeSearchText)
+      .filter(token => token.length > 2)
+      .some(token => text.includes(token));
+  };
+
+  window.pointMatchesCorrespondenceCanal = function(point, correspondences){
+    const selected = Array.isArray(correspondences)
+      ? correspondences.filter(Boolean)
+      : (correspondences ? [correspondences] : []);
+
+    if(!selected.length) return true;
+
+    const withoutAny = selected.filter(value => value !== MTC_CORRESPONDENCE_FILTER_ANY);
+
+    if(!withoutAny.length){
+      return pointHasCorrespondence(point);
+    }
+
+    return withoutAny.some(value =>
+      pointMatchesSingleCorrespondenceCanal(point, value)
+    );
+  };
+
+  window.correspondenceChecklistHtml = function(selected = []){
+    const values = Array.isArray(selected) ? selected : [];
+    const regularCanals = MTC_SEARCH_CANAL_ORDER.filter(canal => !["RM","DM"].includes(canal));
+
+    const regularHtml = regularCanals.map(canal => `
+      <label title="${escapeAttribute(CANAL_LABELS[canal] || canal)}">
+        <input
+          type="checkbox"
+          name="advancedSearchCorrespondence"
+          value="${escapeAttribute(canal)}"
+          ${correspondenceChecked(values, canal)}
+          onchange="renderAdvancedSearchResults()"
+        >
+        <span class="correspondence-filter-code">${escapeHtml(canal)}</span>
+        <span class="correspondence-filter-name">${escapeHtml(CANAL_LABELS[canal] || canal)}</span>
+      </label>
+    `).join("");
+
+    const extraordinaryHtml = EXTRAORDINARY_VESSEL_INTERSECTIONS.map(group => {
+      const value = extraordinaryFilterValue(group.key);
+      return `
+        <label title="${escapeAttribute(group.label)} · ${group.points.map(formatPointCode).join(", ")}">
+          <input
+            type="checkbox"
+            name="advancedSearchCorrespondence"
+            value="${escapeAttribute(value)}"
+            ${correspondenceChecked(values, value)}
+            onchange="renderAdvancedSearchResults()"
+          >
+          <span class="correspondence-filter-code">☍</span>
+          <span class="correspondence-filter-name">${escapeHtml(group.label)}</span>
+        </label>
+      `;
+    }).join("");
+
+    return `
+      <div class="intersection-filter-heading">Canaux principaux</div>
+      ${regularHtml}
+      <div class="intersection-filter-heading">Merveilleux vaisseaux</div>
+      ${extraordinaryHtml}
+    `;
+  };
+
+  window.renderAdvancedSearchPanel = function(){
+    const content = document.getElementById("advancedSearchPanelContent");
+    if(!content) return;
+
+    const currentFilters = getAdvancedSearchFilters();
+    const hasIntersectionFilter = currentFilters.correspondences.includes(MTC_CORRESPONDENCE_FILTER_ANY);
+    const resultsAll = advancedSearchResults();
+    const results = resultsAll.slice(0,80);
+    const total = resultsAll.length;
+
+    const help = typeof searchHelp === "function"
+      ? searchHelp
+      : (text => `<span class="search-help-wrap"><button type="button" class="search-help" tabindex="0" aria-label="Aide">?</button><span class="search-help-text">${escapeHtml(text)}</span></span>`);
+
+    content.innerHTML = `
+      <div class="search-compact-head">
+        <h2 class="search-panel-title">Recherche</h2>
+        ${help("Recherche un point par mot-clé, catégorie, canal du point ou intersections. Les merveilleux vaisseaux sont classés ici comme filtres d’intersections, pas comme catégories de points.")}
+      </div>
+
+      <div class="search-controls">
+        <label class="search-control search-keyword-control">
+          <span class="search-control-label">
+            Mot-clé
+            ${help("Exemples : douleur, luò, Estomac, Rt4. La recherche ignore les accents et accepte les variantes proches.")}
+          </span>
+          <input
+            id="advancedSearchKeywords"
+            type="search"
+            value="${escapeAttribute(currentFilters.keywords)}"
+            placeholder="douleur, luò, Estomac, Rt4..."
+            oninput="renderAdvancedSearchResults()"
+          >
+        </label>
+
+        <label class="search-control">
+          <span class="search-control-label">Catégorie</span>
+          <select id="advancedSearchCategory" onchange="renderAdvancedSearchResults()">
+            <option value="">Toutes les catégories</option>
+            ${categoryOptionsHtml()}
+          </select>
+        </label>
+
+        <label class="search-control">
+          <span class="search-control-label">Canal</span>
+          <select id="advancedSearchCanal" onchange="renderAdvancedSearchResults()">
+            <option value="">Tous les canaux</option>
+            ${canalOptionsHtml()}
+          </select>
+        </label>
+
+        <div class="search-scope-options" aria-label="Champs de recherche">
+          <span>
+            Dans
+            ${help("Limite le mot-clé à certains champs. Par défaut, tous les champs sont cochés.")}
+          </span>
+          <label><input type="checkbox" name="advancedSearchScope" value="name" ${searchScopeChecked(currentFilters.scopes,"name")} onchange="renderAdvancedSearchResults()"> nom</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="functions" ${searchScopeChecked(currentFilters.scopes,"functions")} onchange="renderAdvancedSearchResults()"> fonctions</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="indications" ${searchScopeChecked(currentFilters.scopes,"indications")} onchange="renderAdvancedSearchResults()"> indications</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="notes" ${searchScopeChecked(currentFilters.scopes,"notes")} onchange="renderAdvancedSearchResults()"> notes</label>
+        </div>
+
+        <div class="search-control search-correspondence-control">
+          <span class="search-control-label">
+            Intersections
+            ${help("Filtre les points jiāo huì-intersection : points où plusieurs canaux ou vaisseaux se croisent. Les huit merveilleux vaisseaux sont maintenant disponibles ici.")}
+          </span>
+
+          <label class="search-correspondence-any">
+            <input
+              type="checkbox"
+              name="advancedSearchCorrespondence"
+              value="${MTC_CORRESPONDENCE_FILTER_ANY}"
+              ${correspondenceChecked(currentFilters.correspondences, MTC_CORRESPONDENCE_FILTER_ANY)}
+              onchange="renderAdvancedSearchPanel()"
+            >
+            points d’intersection
+          </label>
+
+          ${hasIntersectionFilter
+            ? `<div class="correspondence-checklist" aria-label="Intersections">${correspondenceChecklistHtml(currentFilters.correspondences)}</div>`
+            : ""
+          }
+        </div>
+      </div>
+
+      <div class="search-actions">
+        <button type="button" onclick="resetAdvancedSearchFilters()">Réinitialiser</button>
+      </div>
+
+      <h3 class="search-section-title">Résultats</h3>
+      <div id="advancedSearchResults"></div>
+    `;
+
+    const categorySelect = document.getElementById("advancedSearchCategory");
+    const canalSelect = document.getElementById("advancedSearchCanal");
+
+    if(categorySelect){
+      categorySelect.value = currentFilters.category;
+    }
+
+    if(canalSelect){
+      canalSelect.value = currentFilters.canal;
+    }
+
+    renderAdvancedSearchResultsWith(results, total);
+  };
+
+  window.renderAdvancedSearchPanelIfOpen = function(){
+    const panel = document.getElementById("advancedSearchPanel");
+    if(panel && panel.classList.contains("open")){
+      renderAdvancedSearchPanel();
+    }
+  };
+})();
+</script>
+
+
+
+<script>
+/* === Recherche Intersections : mode de correspondance + inclure/exclure === */
+(function(){
+  const EXTRA_PREFIX = "EXTRA_VESSEL::";
+
+  function helpHtml(text){
+    if(typeof searchHelp === "function") return searchHelp(text);
+    return `<span class="search-help-wrap"><button type="button" class="search-help" tabindex="0" aria-label="Aide">?</button><span class="search-help-text">${escapeHtml(text)}</span></span>`;
+  }
+
+  window.getAdvancedSearchIntersectionMatchMode = function(){
+    return document.querySelector("input[name='advancedSearchIntersectionMatch']:checked")?.value || "any";
+  };
+
+  window.getAdvancedSearchIntersectionActionMode = function(){
+    return document.querySelector("input[name='advancedSearchIntersectionAction']:checked")?.value || "include";
+  };
+
+  window.intersectionModeChecked = function(current, value){
+    return current === value ? "checked" : "";
+  };
+
+  function extraordinaryGroupFromValueForSearch(value){
+    const raw = String(value || "");
+    if(!raw.startsWith(EXTRA_PREFIX)) return null;
+    const key = raw.slice(EXTRA_PREFIX.length);
+    return (window.MTC_EXTRAORDINARY_VESSEL_INTERSECTIONS || [])
+      .find(group => group.key === key) || null;
+  }
+
+  function cleanPointCodeForSearch(point){
+    return String(point || "").replace(/\s+/g, "").trim();
+  }
+
+  function pointMatchesExtraordinaryGroupForSearch(point, group){
+    if(!group || !Array.isArray(group.points)) return false;
+
+    const ownCanalByExtraordinaryKey = {
+      Ren_Mai:"RM",
+      Du_Mai:"DM"
+    };
+
+    const ownCanal = ownCanalByExtraordinaryKey[group.key];
+    if(ownCanal && canalOfPoint(point) === ownCanal){
+      return true;
+    }
+
+    return group.points.includes(cleanPointCodeForSearch(point));
+  }
+
+  function extraordinaryFilterValueForSearch(key){
+    return `${EXTRA_PREFIX}${key}`;
+  }
+
+  window.pointMatchesSingleCorrespondenceCanal = function(point, value){
+    if(!value) return true;
+
+    if(value === MTC_CORRESPONDENCE_FILTER_ANY){
+      return pointHasCorrespondence(point);
+    }
+
+    const extraordinaryGroup = extraordinaryGroupFromValueForSearch(value);
+    if(extraordinaryGroup){
+      return pointMatchesExtraordinaryGroupForSearch(point, extraordinaryGroup);
+    }
+
+    /* Dans Intersections, un canal coché doit aussi inclure tous ses propres points. */
+    if(MTC_SEARCH_CANAL_ORDER.includes(value) && canalOfPoint(point) === value){
+      return true;
+    }
+
+    const text = pointCorrespondenceSearchText(point);
+    if(!text) return false;
+
+    const tokens = MTC_SEARCH_CORRESPONDENCE_CHANNEL_KEYWORDS[value] || [];
+
+    return tokens
+      .map(normalizeSearchText)
+      .filter(token => token.length > 2)
+      .some(token => text.includes(token));
+  };
+
+  window.pointMatchesCorrespondenceCanal = function(point, correspondences, matchMode = "any", actionMode = "include"){
+    const selected = Array.isArray(correspondences)
+      ? correspondences.filter(Boolean)
+      : (correspondences ? [correspondences] : []);
+
+    if(!selected.length) return true;
+
+    const withoutAny = selected.filter(value => value !== MTC_CORRESPONDENCE_FILTER_ANY);
+
+    let matches;
+
+    if(!withoutAny.length){
+      matches = pointHasCorrespondence(point);
+    }else if(matchMode === "all"){
+      matches = withoutAny.every(value =>
+        pointMatchesSingleCorrespondenceCanal(point, value)
+      );
+    }else{
+      matches = withoutAny.some(value =>
+        pointMatchesSingleCorrespondenceCanal(point, value)
+      );
+    }
+
+    return actionMode === "exclude" ? !matches : matches;
+  };
+
+  window.getAdvancedSearchFilters = function(){
+    return {
+      keywords:document.getElementById("advancedSearchKeywords")?.value || "",
+      scopes:getAdvancedSearchScopes(),
+      category:document.getElementById("advancedSearchCategory")?.value || "",
+      canal:document.getElementById("advancedSearchCanal")?.value || "",
+      correspondences:getAdvancedSearchCorrespondences(),
+      intersectionMatchMode:getAdvancedSearchIntersectionMatchMode(),
+      intersectionActionMode:getAdvancedSearchIntersectionActionMode()
+    };
+  };
+
+  window.advancedSearchResults = function(){
+    const filters = getAdvancedSearchFilters();
+
+    return allSearchPoints()
+      .filter(point => pointMatchesKeywords(point, filters.keywords, filters.scopes))
+      .filter(point => pointMatchesCategory(point, filters.category))
+      .filter(point => pointMatchesCanal(point, filters.canal))
+      .filter(point => pointMatchesCorrespondenceCanal(
+        point,
+        filters.correspondences,
+        filters.intersectionMatchMode,
+        filters.intersectionActionMode
+      ));
+  };
+
+  window.correspondenceChecklistHtml = function(selected = []){
+    const values = Array.isArray(selected) ? selected : [];
+    const regularCanals = MTC_SEARCH_CANAL_ORDER.filter(canal => !["RM","DM"].includes(canal));
+
+    const regularHtml = regularCanals.map(canal => `
+      <label title="${escapeAttribute(CANAL_LABELS[canal] || canal)}">
+        <input
+          type="checkbox"
+          name="advancedSearchCorrespondence"
+          value="${escapeAttribute(canal)}"
+          ${correspondenceChecked(values, canal)}
+          onchange="renderAdvancedSearchResults()"
+        >
+        <span class="correspondence-filter-code">${escapeHtml(canal)}</span>
+        <span class="correspondence-filter-name">${escapeHtml(CANAL_LABELS[canal] || canal)}</span>
+      </label>
+    `).join("");
+
+    const extraordinaryHtml = (window.MTC_EXTRAORDINARY_VESSEL_INTERSECTIONS || []).map(group => {
+      const value = extraordinaryFilterValueForSearch(group.key);
+      return `
+        <label title="${escapeAttribute(group.label)} · ${group.points.map(formatPointCode).join(", ")}">
+          <input
+            type="checkbox"
+            name="advancedSearchCorrespondence"
+            value="${escapeAttribute(value)}"
+            ${correspondenceChecked(values, value)}
+            onchange="renderAdvancedSearchResults()"
+          >
+          <span class="correspondence-filter-code">☍</span>
+          <span class="correspondence-filter-name">${escapeHtml(group.label)}</span>
+        </label>
+      `;
+    }).join("");
+
+    return `
+      <div class="intersection-filter-heading">Canaux principaux</div>
+      ${regularHtml}
+      <div class="intersection-filter-heading">Merveilleux vaisseaux</div>
+      ${extraordinaryHtml}
+    `;
+  };
+
+  function intersectionOptionsHtml(currentFilters){
+    return `
+      <div class="intersection-filter-options" aria-label="Mode de filtrage des intersections">
+        <div class="intersection-filter-row">
+          <span class="intersection-filter-label">
+            Action
+            ${helpHtml("Inclure montre les points liés aux intersections cochées. Exclure retire ces points des résultats.")}
+          </span>
+          <span class="intersection-togglebar" role="radiogroup" aria-label="Inclure ou exclure les intersections cochées">
+            <label>
+              <input
+                type="radio"
+                name="advancedSearchIntersectionAction"
+                value="include"
+                ${intersectionModeChecked(currentFilters.intersectionActionMode, "include")}
+                onchange="renderAdvancedSearchResults()"
+              >
+              <span>Inclure</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="advancedSearchIntersectionAction"
+                value="exclude"
+                ${intersectionModeChecked(currentFilters.intersectionActionMode, "exclude")}
+                onchange="renderAdvancedSearchResults()"
+              >
+              <span>Exclure</span>
+            </label>
+          </span>
+        </div>
+
+        <div class="intersection-filter-row">
+          <span class="intersection-filter-label">
+            Lien
+            ${helpHtml("Au moins un trouve les points liés à n’importe quel canal coché. Tous trouve seulement les points liés à tous les canaux cochés en même temps.")}
+          </span>
+          <span class="intersection-togglebar" role="radiogroup" aria-label="Au moins un canal ou tous les canaux cochés">
+            <label>
+              <input
+                type="radio"
+                name="advancedSearchIntersectionMatch"
+                value="any"
+                ${intersectionModeChecked(currentFilters.intersectionMatchMode, "any")}
+                onchange="renderAdvancedSearchResults()"
+              >
+              <span>Au moins un</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="advancedSearchIntersectionMatch"
+                value="all"
+                ${intersectionModeChecked(currentFilters.intersectionMatchMode, "all")}
+                onchange="renderAdvancedSearchResults()"
+              >
+              <span>Tous</span>
+            </label>
+          </span>
+        </div>
+      </div>
+    `;
+  }
+
+  window.renderAdvancedSearchPanel = function(){
+    const content = document.getElementById("advancedSearchPanelContent");
+    if(!content) return;
+
+    const currentFilters = getAdvancedSearchFilters();
+    const hasIntersectionFilter = currentFilters.correspondences.includes(MTC_CORRESPONDENCE_FILTER_ANY);
+    const resultsAll = advancedSearchResults();
+    const results = resultsAll.slice(0,80);
+    const total = resultsAll.length;
+
+    const help = helpHtml;
+
+    content.innerHTML = `
+      <div class="search-compact-head">
+        <h2 class="search-panel-title">Recherche</h2>
+        ${help("Recherche un point par mot-clé, catégorie, canal du point ou intersections. Les merveilleux vaisseaux sont classés ici comme filtres d’intersections, pas comme catégories de points.")}
+      </div>
+
+      <div class="search-controls">
+        <label class="search-control search-keyword-control">
+          <span class="search-control-label">
+            Mot-clé
+            ${help("Exemples : douleur, luò, Estomac, Rt4. La recherche ignore les accents et accepte les variantes proches.")}
+          </span>
+          <input
+            id="advancedSearchKeywords"
+            type="search"
+            value="${escapeAttribute(currentFilters.keywords)}"
+            placeholder="douleur, luò, Estomac, Rt4..."
+            oninput="renderAdvancedSearchResults()"
+          >
+        </label>
+
+        <label class="search-control">
+          <span class="search-control-label">Catégorie</span>
+          <select id="advancedSearchCategory" onchange="renderAdvancedSearchResults()">
+            <option value="">Toutes les catégories</option>
+            ${categoryOptionsHtml()}
+          </select>
+        </label>
+
+        <label class="search-control">
+          <span class="search-control-label">Canal</span>
+          <select id="advancedSearchCanal" onchange="renderAdvancedSearchResults()">
+            <option value="">Tous les canaux</option>
+            ${canalOptionsHtml()}
+          </select>
+        </label>
+
+        <div class="search-scope-options" aria-label="Champs de recherche">
+          <span>
+            Dans
+            ${help("Limite le mot-clé à certains champs. Par défaut, tous les champs sont cochés.")}
+          </span>
+          <label><input type="checkbox" name="advancedSearchScope" value="name" ${searchScopeChecked(currentFilters.scopes,"name")} onchange="renderAdvancedSearchResults()"> nom</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="functions" ${searchScopeChecked(currentFilters.scopes,"functions")} onchange="renderAdvancedSearchResults()"> fonctions</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="indications" ${searchScopeChecked(currentFilters.scopes,"indications")} onchange="renderAdvancedSearchResults()"> indications</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="notes" ${searchScopeChecked(currentFilters.scopes,"notes")} onchange="renderAdvancedSearchResults()"> notes</label>
+        </div>
+
+        <div class="search-control search-correspondence-control">
+          <span class="search-control-label">
+            Intersections
+            ${help("Filtre les points jiāo huì-intersection : points où plusieurs canaux ou vaisseaux se croisent. Les huit merveilleux vaisseaux sont disponibles ici.")}
+          </span>
+
+          <label class="search-correspondence-any">
+            <input
+              type="checkbox"
+              name="advancedSearchCorrespondence"
+              value="${MTC_CORRESPONDENCE_FILTER_ANY}"
+              ${correspondenceChecked(currentFilters.correspondences, MTC_CORRESPONDENCE_FILTER_ANY)}
+              onchange="renderAdvancedSearchPanel()"
+            >
+            points d’intersection
+          </label>
+
+          ${hasIntersectionFilter
+            ? `${intersectionOptionsHtml(currentFilters)}<div class="correspondence-checklist" aria-label="Intersections">${correspondenceChecklistHtml(currentFilters.correspondences)}</div>`
+            : ""
+          }
+        </div>
+      </div>
+
+      <div class="search-actions">
+        <button type="button" onclick="resetAdvancedSearchFilters()">Réinitialiser</button>
+      </div>
+
+      <h3 class="search-section-title">Résultats</h3>
+      <div id="advancedSearchResults"></div>
+    `;
+
+    const categorySelect = document.getElementById("advancedSearchCategory");
+    const canalSelect = document.getElementById("advancedSearchCanal");
+
+    if(categorySelect){
+      categorySelect.value = currentFilters.category;
+    }
+
+    if(canalSelect){
+      canalSelect.value = currentFilters.canal;
+    }
+
+    renderAdvancedSearchResultsWith(results, total);
+  };
+
+  window.renderAdvancedSearchPanelIfOpen = function(){
+    const panel = document.getElementById("advancedSearchPanel");
+    if(panel && panel.classList.contains("open")){
+      renderAdvancedSearchPanel();
+    }
+  };
 })();
 </script>
 
