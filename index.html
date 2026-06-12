@@ -5169,9 +5169,12 @@ body{
 .support-coffee-message{
   max-width:100%;
   margin-top:2px;
+  margin-bottom:8px;
   text-align:left;
   font-family:var(--ui-font-family);
   line-height:1.34;
+  position:relative;
+  z-index:1;
 }
 
 .support-coffee-message::after{
@@ -5193,18 +5196,13 @@ body{
 
   margin:2px 12px 8px 0;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:50%;
-  overflow:hidden;
+  display:block;
 
   background:transparent !important;
   box-shadow:none !important;
   filter:none !important;
 
-  animation:supportCoffeeSlowRotate var(--support-coffee-image-rotation-speed) linear infinite;
+  pointer-events:none !important;
 }
 
 /* Sur une bulle assez large, on décale un peu l’image vers le centre du message. */
@@ -5218,13 +5216,50 @@ body{
   }
 }
 
-.support-coffee-visual::before{
-  content:"☕";
-  font-size:calc(var(--support-coffee-image-size) * .42);
-  line-height:1;
+.support-coffee-spin{
+  position:relative;
+
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+  overflow:hidden;
+
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:none !important;
+
+  transform-origin:50% 50%;
+  will-change:transform;
+
+  animation:supportCoffeeSlowRotate var(--support-coffee-image-rotation-speed) linear infinite !important;
+
+  pointer-events:none !important;
 }
 
-.support-coffee-visual img{
+.support-coffee-spin::before{
+  content:"☕";
+  position:absolute;
+  inset:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:calc(var(--support-coffee-image-size) * .42);
+  line-height:1;
+
+  z-index:1;
+}
+
+.support-coffee-spin img{
+  position:relative;
+  z-index:2;
+
   width:100%;
   height:100%;
   display:block;
@@ -5235,12 +5270,20 @@ body{
   filter:none !important;
 }
 
-.support-coffee-visual:has(img)::before{
-  content:"";
-}
-
 .support-coffee-text{
   margin:0;
+}
+
+.support-coffee-message + .tour-actions{
+  clear:both !important;
+  position:relative !important;
+  z-index:5 !important;
+  margin-top:10px !important;
+}
+
+.support-coffee-message + .tour-actions button{
+  position:relative !important;
+  z-index:6 !important;
 }
 
 @keyframes supportCoffeeSlowRotate{
@@ -5248,9 +5291,21 @@ body{
   to{ transform:rotate(360deg); }
 }
 
+/* Le rappel doit continuer à tourner même si le téléphone réduit certaines animations. */
 @media (prefers-reduced-motion: reduce){
+  .support-coffee-spin{
+    animation:supportCoffeeSlowRotate var(--support-coffee-image-rotation-speed) linear infinite !important;
+  }
+}
+
+@media(max-width:520px){
+  .support-coffee-message{
+    margin-bottom:10px;
+  }
+
   .support-coffee-visual{
-    animation:none !important;
+    margin-right:10px;
+    margin-bottom:10px;
   }
 }
 
@@ -16031,7 +16086,7 @@ function startTour(){
     {
       selector: "#supportCoffeeButton",
       title: "Me soutenir",
-      text: "Ce jeu a été conçu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de manger pendant le développement d'autres outils similaires ;)",
+      text: "Ce jeu a été conçu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de nourrir mon sang pendant le développement d'autres outils similaires ;)",
       fallback: () => document.querySelector("#footerTitle"),
       position:"aboveBottom"
     },
@@ -16051,7 +16106,9 @@ function supportCoffeeVisualHtml(){
   return `
     <div class="support-coffee-visual" aria-hidden="true">
       <!-- Taille : voir --support-coffee-image-size dans le CSS -->
-      <img src="me.png" alt="" onerror="this.remove()">
+      <div class="support-coffee-spin">
+        <img src="me.png" alt="" onerror="this.remove()">
+      </div>
     </div>
   `;
 }
@@ -16134,7 +16191,7 @@ function showTourStep(){
 
   box.innerHTML = `
     <h3>${step.title}</h3>
-    ${step.selector === "#supportCoffeeButton" ? supportCoffeeMessageHtml(step.text) : "<div>" + step.text + "</div>"}
+    ${step.selector === "#supportCoffeeButton" ? supportCoffeeMessageHtml(step.text) : `<div>${step.text}</div>`}
 
     <div class="tour-actions">
       <button onclick="endTour(true)">Passer</button>
@@ -19220,7 +19277,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       title="Soutenir le projet"
       aria-label="Soutenir le projet sur PayPal"
     >
-      🎁
+      🩸
     </a>
   </span>
 
