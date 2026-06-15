@@ -3,17 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Jeu de révision interactif pour apprendre les points d’acupuncture, les canaux, les catégories de points et diverses notions de médecine traditionnelle chinoise.">
-<meta name="keywords" content="acupuncture, points acupuncture, médecine chinoise, MTC, médecine traditionnelle chinoise, méridiens, canaux, points d'acupuncture, révision acupuncture, jeu acupuncture, quiz MTC, Connections MTC, points shu antiques, points shu transport, wu shu xue, points yuan source, points luo liaison, points xi crevasse, points mu, points shu du dos, merveilleux vaisseaux, huit canaux extraordinaires, qi jing ba mai, zang fu, étudiant acupuncture, école acupuncture, apprentissage MTC">
+<meta name="description" content="Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées.">
+<meta name="keywords" content="acupuncture, points acupuncture, médecine chinoise, MTC, médecine traditionnelle chinoise, canaux, canaux, points d'acupuncture, révision acupuncture, jeu acupuncture, quiz MTC, Connections MTC, points shu antiques, points yuan source, points luo liaison, points xi crevasse, points mu, points shu du dos, merveilleux vaisseaux, huit canaux extraordinaires, qi jing ba mai, zang fu, étudiant acupuncture, école acupuncture, apprentissage MTC">
 <meta name="author" content="Connections MTC">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Connections MTC — Jeu de révision d’acupuncture">
-<meta property="og:description" content="Un jeu interactif pour réviser les points d’acupuncture, les méridiens et les catégories de points en médecine chinoise.">
+<meta property="og:title" content="Jeu acupuncture MTC – points, canaux et merveilleux vaisseaux">
+<meta property="og:description" content="Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Connections MTC — Jeu de révision d’acupuncture">
-<meta name="twitter:description" content="Réviser les points d’acupuncture, les méridiens et les catégories de points en médecine chinoise.">
-<title>Connections MTC</title>
+<meta name="twitter:title" content="Jeu acupuncture MTC – points, canaux et merveilleux vaisseaux">
+<meta name="twitter:description" content="Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées.">
+
+<!-- SEO invisible ajouté -->
+<meta name="application-name" content="Jeu acupuncture MTC">
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": [
+    "WebApplication",
+    "LearningResource"
+  ],
+  "name": "Jeu acupuncture MTC",
+  "alternateName": "Connections MTC",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "fr",
+  "isAccessibleForFree": true,
+  "description": "Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées.",
+  "learningResourceType": "jeu de révision",
+  "educationalUse": [
+    "révision",
+    "mémorisation",
+    "auto-évaluation"
+  ],
+  "teaches": [
+    "points d’acupuncture",
+    "méridiens de médecine chinoise",
+    "canaux d'acupuncture'",
+    "catégories de points",
+    "correspondances des points",
+    "merveilleux vaisseaux",
+    "qí jīng bā mài",
+    "associations cliniques en acupuncture"
+  ],
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "keywords": [
+    "acupuncture",
+    "médecine chinoise",
+    "MTC",
+    "points d’acupuncture",
+    "canaux",
+    "canaux",
+    "localisation point d'acupuncture",
+    "merveilleux vaisseaux",
+    "qí jīng bā mài",
+    "jeu de révision acupuncture",
+    "quiz MTC"
+  ]
+}
+</script>
+<!-- /SEO invisible ajouté -->
+<title>Jeu acupuncture MTC – réviser les points, canaux et merveilleux vaisseaux</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link
   href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;500&display=swap"
@@ -4609,9 +4663,134 @@ body{
   z-index:12000 !important;
 }
 
-.stats-help-wrap:hover .stats-help-text,
-.stats-help-wrap:focus-within .stats-help-text{
-  display:block !important;
+.stats-help-wrap{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  width:18px !important;
+  height:18px !important;
+  min-width:18px !important;
+  min-height:18px !important;
+
+  margin-left:2px !important;
+  vertical-align:middle !important;
+}
+
+.stats-help{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  width:18px !important;
+  height:18px !important;
+  min-width:18px !important;
+  min-height:18px !important;
+  max-width:18px !important;
+  max-height:18px !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  border:none !important;
+  border-radius:50% !important;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  line-height:18px !important;
+
+  text-align:center !important;
+  text-transform:none !important;
+  letter-spacing:0 !important;
+
+  opacity:1 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  transform:none !important;
+}
+
+.stats-help:hover,
+.stats-help:focus{
+  opacity:1 !important;
+  text-shadow:0 0 8px var(--shadow-color) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.stats-floating-help-tooltip{
+  position:fixed !important;
+  left:0;
+  top:0;
+
+  box-sizing:border-box !important;
+
+  width:min(320px, calc(100vw - 32px)) !important;
+  max-height:min(60vh,260px) !important;
+  overflow-y:auto !important;
+
+  padding:14px !important;
+
+  background:var(--page-bg) !important;
+  color:var(--text-color) !important;
+
+  border:none !important;
+  border-radius:22px !important;
+  box-shadow:0 8px 24px var(--shadow-color) !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:calc(var(--ui-font-size) * .92) !important;
+  font-weight:600 !important;
+  line-height:1.32 !important;
+
+  text-align:left !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  white-space:normal !important;
+
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+
+  z-index:30020 !important;
+
+  transition:
+    opacity .12s ease,
+    visibility .12s ease !important;
+}
+
+.stats-floating-help-tooltip.visible{
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+.stats-floating-help-tooltip::after{
+  content:"";
+  position:absolute;
+
+  left:var(--stats-help-arrow-left,50%);
+  bottom:-9px;
+  transform:translateX(-50%);
+
+  width:0;
+  height:0;
+
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-top:10px solid var(--page-bg);
+}
+
+@media(max-width:520px){
+  .stats-floating-help-tooltip{
+    width:min(300px, calc(100vw - 24px)) !important;
+    max-height:min(54vh,230px) !important;
+    padding:11px 12px !important;
+    font-size:calc(var(--ui-font-size) * .84) !important;
+    line-height:1.3 !important;
+  }
 }
 
 .stats-rank-list{
@@ -7245,7 +7424,7 @@ const POINT_DETAILS = {
     "actions": "➢ Renforce la rate et l'estomac\n➢ Régularise et tonifie le foie et les reins\n➢ Régularise les règles et arrête les leucorrhées",
     "indications": "- Douleurs et distension abdominales, gastralgie, diarrhée, vide de la rate et de l'estomac, hoquet, indigestion.\n- Règles irrégulières, dysménorrhée, aménorrhée, leucorrhées, prolapsus de l'utérus, accouchement retardé ou difficile, stérilité, masses abdominales, rétention placentaire, lochies.\n- Difficulté à uriner, énurésie, rétention d'urine, œdème.\n- Spermatorrhée, émissions nocturnes, impuissance, hernie, testicules contractés dans l'abdomen.\n- Insomnie.\n- Convulsions infantiles.\n- Jaunisse.\n- Choléra.\n- Atrophie et paralysie des jambes, pied d’athlète, douleur des membres inférieurs.",
     "notes": "Un des points des 9 aiguilles pour faire revenir le yáng.",
-    "associations": "- Troubles du sommeil par vide de sang : Rt 6 + C 7 → tonifier le qì, nourrir le sang du C + F + jīng des Rn.\n- Tonification du qì, du sang, des liquides organiques : Rt 6 + E 36.\n- Douleurs de type stagnation de qì et stase de sang : Rt 6 + GI 4 (+ F3 pour l’aspect drainage) → combinaison de la grande circulation du qì et du sang\n- Avortement : Rt 6 en dispersion + GI 4 en tonification.\n- Menace d’avortement : Rt 6 en tonification + GI 4 en dispersion.a- Rt 6 = réunion des 3 méridiens yīn (Rt + F + Rn) → ils régissent le sang qu’il faut toujours tonifier et ne jamais disperser en endocrinologie féminine.b- GI 4 = point yuán-source du GI, entraille du poumon qui régit l’énergie qu’il faut toujours disperser et ne jamais tonifier en endocrinologie féminine.→ Disperser Rt 6 + tonifier GI 4 = hypovolémie + augmentation du potentiel énergétique.→ Tonifier Rt 6 + disperser GI 4 = hypervolémie + diminution du potentiel énergétique.Liu Yuan Jin : « l'insuffisance du sang avec un potentiel énergétique élevé est la cause de la stérilité ; l'insuffisance d'énergie avec une volémie élevée favorise la fécondation. »",
+    "associations": "- Troubles du sommeil par vide de sang : Rt 6 + C 7 → tonifier le qì, nourrir le sang du C + F + jīng des Rn.\n- Tonification du qì, du sang, des liquides organiques : Rt 6 + E 36.\n- Douleurs de type stagnation de qì et stase de sang : Rt 6 + GI 4 (+ F3 pour l’aspect drainage) → combinaison de la grande circulation du qì et du sang\n- Avortement : Rt 6 en dispersion + GI 4 en tonification.\n- Menace d’avortement : Rt 6 en tonification + GI 4 en dispersion.a- Rt 6 = réunion des 3 canaux yīn (Rt + F + Rn) → ils régissent le sang qu’il faut toujours tonifier et ne jamais disperser en endocrinologie féminine.b- GI 4 = point yuán-source du GI, entraille du poumon qui régit l’énergie qu’il faut toujours disperser et ne jamais tonifier en endocrinologie féminine.→ Disperser Rt 6 + tonifier GI 4 = hypovolémie + augmentation du potentiel énergétique.→ Tonifier Rt 6 + disperser GI 4 = hypervolémie + diminution du potentiel énergétique.Liu Yuan Jin : « l'insuffisance du sang avec un potentiel énergétique élevé est la cause de la stérilité ; l'insuffisance d'énergie avec une volémie élevée favorise la fécondation. »",
     "canal": "Rt",
     "_source_sheet": "Rt",
     "_source_row": 7
@@ -7476,7 +7655,7 @@ const POINT_DETAILS = {
     "categories_du_point": "Point du grand luò-liaison du zù tài yīn",
     "actions": "➢ Détend la poitrine et arrête la douleur\n➢ Favorise la région costale et régularise le qì et le sang",
     "indications": "- Douleur de la région sterno-costale, plénitude et douleur au thorax et aux hypocondres, douleur dans la poitrine lors de la respiration\n- Douleur de tout le corps\n- Faiblesse des quatre membres\n- Toux, dyspnée, essoufflement",
-    "notes": "« Grand luò-liaison de la rate régissant les luò-liaison des méridiens yīn et des méridiens yáng en les amenant vers les 5 organes/6 entrailles ». Grand réservoir périphérique de sang",
+    "notes": "« Grand luò-liaison de la rate régissant les luò-liaison des canaux yīn et des canaux yáng en les amenant vers les 5 organes/6 entrailles ». Grand réservoir périphérique de sang",
     "canal": "Rt",
     "_source_sheet": "Rt",
     "_source_row": 22
@@ -21930,10 +22109,107 @@ function correspondenceChecklistHtml(selected = []){
   function statsHelp(text){
     return `
       <span class="stats-help-wrap">
-        <button type="button" class="stats-help" aria-label="${escapeAttribute(text)}">?</button>
-        <span class="stats-help-text">${escapeHtml(text)}</span>
+        <button
+          type="button"
+          class="stats-help"
+          data-stats-help="${escapeAttribute(text)}"
+          aria-label="${escapeAttribute(text)}"
+        >?</button>
       </span>
     `;
+  }
+
+  window.initStatsHelpTooltips = function initStatsHelpTooltips(){
+  let floating = document.getElementById("statsFloatingHelpTooltip");
+
+  if(!floating){
+    floating = document.createElement("div");
+    floating.id = "statsFloatingHelpTooltip";
+    floating.className = "stats-floating-help-tooltip";
+    floating.setAttribute("role", "tooltip");
+    document.body.appendChild(floating);
+  }
+
+  function clamp(value, min, max){
+    return Math.max(min, Math.min(value, max));
+  }
+
+  function hide(){
+    floating.classList.remove("visible");
+  }
+
+  function show(button){
+      const text = button.getAttribute("data-stats-help");
+      if(!text) return;
+
+      floating.textContent = text;
+      floating.classList.add("visible");
+
+      const panel =
+        document.getElementById("statsPanel") ||
+        document.querySelector(".stats-panel");
+
+      const panelRect = panel
+        ? panel.getBoundingClientRect()
+        : { top: window.innerHeight * .25 };
+
+      const buttonRect = button.getBoundingClientRect();
+      const tooltipRect = floating.getBoundingClientRect();
+
+      const margin = 12;
+
+      const desiredLeft =
+        buttonRect.left + buttonRect.width / 2 - tooltipRect.width / 2;
+
+      const left = clamp(
+        desiredLeft,
+        margin,
+        window.innerWidth - tooltipRect.width - margin
+      );
+
+      let top = panelRect.top - tooltipRect.height - 12;
+
+      if(top < margin){
+        top = margin;
+      }
+
+      const arrowLeft = clamp(
+        buttonRect.left + buttonRect.width / 2 - left,
+        18,
+        tooltipRect.width - 18
+      );
+
+      floating.style.left = left + "px";
+      floating.style.top = top + "px";
+      floating.style.setProperty("--stats-help-arrow-left", arrowLeft + "px");
+    }
+
+    document
+      .querySelectorAll("#statsPanel .stats-help, .stats-panel .stats-help")
+      .forEach(button => {
+        if(button.dataset.statsHelpReady === "1") return;
+
+        button.dataset.statsHelpReady = "1";
+
+        button.addEventListener("mouseenter", () => show(button));
+        button.addEventListener("mouseleave", hide);
+
+        button.addEventListener("focus", () => show(button));
+        button.addEventListener("blur", hide);
+
+        button.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if(floating.classList.contains("visible")){
+            hide();
+          }else{
+            show(button);
+          }
+        });
+      });
+
+    window.addEventListener("resize", hide, { passive:true });
   }
 
   function statsRankRowHtml(row, meta, barValue){
@@ -25422,6 +25698,7 @@ function correspondenceChecklistHtml(selected = []){
           html += `
             <details class="cheatsheet-section" data-cheatsheet-only="eight-vessels">
               <summary>Les 8 merveilleux vaisseaux</summary>
+              <div>
                 ${Object.values(EXTRAORDINARY_VESSEL_CHEATSHEET_POINTS).map(vesselSubsection).join("")}
               </div>
             </details>
@@ -25593,8 +25870,12 @@ function correspondenceChecklistHtml(selected = []){
   function statsHelp(text){
     return `
       <span class="stats-help-wrap">
-        <button type="button" class="stats-help" aria-label="${escapeAttribute(text)}">?</button>
-        <span class="stats-help-text">${escapeHtml(text)}</span>
+        <button
+          type="button"
+          class="stats-help"
+          data-stats-help="${escapeAttribute(text)}"
+          aria-label="${escapeAttribute(text)}"
+        >?</button>
       </span>
     `;
   }
@@ -25981,7 +26262,10 @@ function correspondenceChecklistHtml(selected = []){
         </div>
       </div>
     `;
-
+    if(typeof window.initStatsHelpTooltips === "function"){
+      window.initStatsHelpTooltips();
+    }
+    
     if(typeof updatePracticeModeSwitch === "function"){
       updatePracticeModeSwitch();
     }
