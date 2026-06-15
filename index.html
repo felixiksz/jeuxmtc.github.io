@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Jeu de révision interactif pour apprendre les points d’acupuncture, les canaux, les catégories de points et diverses notions de médecine traditionnelle chinoise.">
+<meta name="keywords" content="acupuncture, points acupuncture, médecine chinoise, MTC, médecine traditionnelle chinoise, méridiens, canaux, points d'acupuncture, révision acupuncture, jeu acupuncture, quiz MTC, Connections MTC, points shu antiques, points shu transport, wu shu xue, points yuan source, points luo liaison, points xi crevasse, points mu, points shu du dos, merveilleux vaisseaux, huit canaux extraordinaires, qi jing ba mai, zang fu, étudiant acupuncture, école acupuncture, apprentissage MTC">
+<meta name="author" content="Connections MTC">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Connections MTC — Jeu de révision d’acupuncture">
+<meta property="og:description" content="Un jeu interactif pour réviser les points d’acupuncture, les méridiens et les catégories de points en médecine chinoise.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Connections MTC — Jeu de révision d’acupuncture">
+<meta name="twitter:description" content="Réviser les points d’acupuncture, les méridiens et les catégories de points en médecine chinoise.">
 <title>Connections MTC</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link
@@ -1958,7 +1968,7 @@ body.tour-disable-grid #grid *{
   background:var(--page-bg);
   color:var(--text-color);
 
-  box-shadow:0 -8px 30px var(--shadow-color);
+  box-shadow:0 -3px 10px var(--shadow-color);
 
   padding:22px;
   padding-top:30px;
@@ -2098,7 +2108,7 @@ body.tour-disable-grid #grid *{
   background:var(--page-bg);
   color:var(--text-color);
 
-  box-shadow:0 -8px 30px var(--shadow-color);
+  box-shadow:0 -3px 10px var(--shadow-color);
 
   padding:22px;
   padding-top:30px;
@@ -2320,7 +2330,7 @@ body.tour-disable-grid #grid *{
   height:min(76vh,620px);
   background:var(--page-bg);
   color:var(--text-color);
-  box-shadow:0 -8px 30px var(--shadow-color);
+  box-shadow:0 -3px 10px var(--shadow-color);
   padding:22px;
   padding-top:0 !important;
   z-index:9360;
@@ -3462,11 +3472,11 @@ select{
 .review-basket-panel,
 .comparison-panel{
   bottom:calc(2px - min(76vh, 620px)) !important;
-  box-shadow:0 -8px 30px var(--shadow-color) !important;
+  box-shadow:0 -3px 10px var(--shadow-color) !important;
 }
 .stats-panel{
   bottom:calc(2px - min(62vh, 480px)) !important;
-  box-shadow:0 -8px 30px var(--shadow-color) !important;
+  box-shadow:0 -3px 10px var(--shadow-color) !important;
 }
 .advanced-search-panel.open,
 .review-basket-panel.open,
@@ -5307,6 +5317,221 @@ body{
     margin-right:10px;
     margin-bottom:10px;
   }
+}
+
+
+
+/* === Support sang : rappel hebdomadaire + goutte pseudo-physique === */
+:root{
+  /* Taille de la goutte facilement modifiable */
+  --support-blooddrop-size:34px;
+  --support-blooddrop-z-index:9100;
+}
+
+#supportBloodDrop{
+  position:fixed !important;
+  left:0 !important;
+  top:0 !important;
+
+  width:var(--support-blooddrop-size) !important;
+  height:var(--support-blooddrop-size) !important;
+
+  display:none;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  border:none !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:#9b0018 !important;
+
+  font-size:var(--support-blooddrop-live-font-size, calc(var(--support-blooddrop-size) * .72)) !important;
+  line-height:1 !important;
+
+  cursor:pointer !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+  -webkit-tap-highlight-color:transparent !important;
+
+  box-shadow:none !important;
+  filter:none !important;
+
+  z-index:var(--support-blooddrop-z-index) !important;
+
+  will-change:transform;
+  transform:translate3d(-999px,-999px,0);
+}
+
+#supportBloodDrop.support-blooddrop-visible{
+  display:flex !important;
+}
+
+#supportBloodDrop:hover,
+#supportBloodDrop:active{
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+
+#supportBloodDrop .support-blooddrop-core{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  width:100%;
+  height:100%;
+
+  transform-origin:50% 58%;
+  pointer-events:none;
+}
+
+#supportBloodDrop.support-blooddrop-idle .support-blooddrop-core{
+  animation:supportBloodDropPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes supportBloodDropPulse{
+  0%,100%{ transform:scale(1) rotate(var(--support-blooddrop-angle,0deg)); }
+  50%{ transform:scale(1.08) rotate(var(--support-blooddrop-angle,0deg)); }
+}
+
+@media(max-width:520px){
+  :root{
+    --support-blooddrop-size:31px;
+  }
+}
+
+
+
+/* === Support sang : le bouton existant quitte le footer et tombe === */
+:root{
+  /* Taille facile à modifier */
+  --support-blooddrop-size:31px;
+  --support-blooddrop-z-index:9100;
+}
+
+#supportCoffeeButton.support-blooddrop-moving{
+  position:fixed !important;
+  left:0 !important;
+  top:0 !important;
+  right:auto !important;
+  bottom:auto !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  width:var(--support-blooddrop-live-width, var(--support-blooddrop-size)) !important;
+  height:var(--support-blooddrop-live-height, var(--support-blooddrop-size)) !important;
+  min-width:var(--support-blooddrop-live-width, var(--support-blooddrop-size)) !important;
+  min-height:var(--support-blooddrop-live-height, var(--support-blooddrop-size)) !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  border:none !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:#9b0018 !important;
+
+  font-size:var(--support-blooddrop-live-font-size, calc(var(--support-blooddrop-size) * .72)) !important;
+  line-height:1 !important;
+
+  box-shadow:none !important;
+  filter:none !important;
+  text-shadow:none !important;
+
+  transform:translate3d(-999px,-999px,0) !important;
+  will-change:transform;
+
+  z-index:var(--support-blooddrop-z-index) !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+  -webkit-tap-highlight-color:transparent !important;
+}
+
+#supportCoffeeButton.support-blooddrop-moving:hover,
+#supportCoffeeButton.support-blooddrop-moving:active{
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:none !important;
+  text-shadow:none !important;
+}
+
+#supportCoffeeButton.support-blooddrop-moving .support-blooddrop-core{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100% !important;
+  height:100% !important;
+  pointer-events:none !important;
+  transform-origin:50% 58%;
+}
+
+#supportCoffeeButton.support-blooddrop-idle .support-blooddrop-core{
+  animation:supportBloodDropPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes supportBloodDropPulse{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.045); }
+}
+
+@media(max-width:520px){
+  :root{
+    --support-blooddrop-size:29px;
+  }
+}
+
+
+/* === Support sang : placeholder du bouton pendant la chute === */
+.support-coffee-button-placeholder{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex:0 0 var(--support-blooddrop-placeholder-width, 30px) !important;
+  width:var(--support-blooddrop-placeholder-width, 30px) !important;
+  height:var(--support-blooddrop-placeholder-height, 30px) !important;
+  min-width:var(--support-blooddrop-placeholder-width, 30px) !important;
+  min-height:var(--support-blooddrop-placeholder-height, 30px) !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:none !important;
+  background:transparent !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+
+
+/* === Message soutien : deux choix, sans image === */
+.support-coffee-reminder-box .support-coffee-message-no-image{
+  margin:4px 0 10px !important;
+  text-align:left !important;
+}
+
+.support-coffee-reminder-box .support-coffee-text{
+  display:block !important;
+}
+
+.support-coffee-choice-actions{
+  justify-content:center !important;
+  gap:8px !important;
+}
+
+.support-coffee-choice-actions button{
+  text-transform:none !important;
+  letter-spacing:.01em !important;
+  font-size:.82em !important;
+  padding:6px 10px !important;
+}
+
+.support-coffee-reminder-donate{
+  text-shadow:0 0 8px var(--shadow-color) !important;
 }
 
 </style>
@@ -13714,7 +13939,7 @@ function openAdvancedSearchPanel(){
     "advanced_search_panel",
     "#advancedSearchKeywords",
     "Recherche avancée",
-    "Tu peux rechercher un point par mot-clé, puis préciser où chercher : nom, fonctions, indications ou notes.",
+    "Tu peux rechercher un point par mot-clé, nomenclauture, catégorie, etc. tu peux aussi filtrer par catégoriede points, ou intersections avec différents canaux.",
     {position:"aboveBottom"},
     320
   );
@@ -14792,7 +15017,7 @@ function openReviewBasketPanel(){
     "review_basket_panel",
     "#reviewBasketPanel",
     "Panier",
-    "Le panier garde les points à réviser. Clique sur un code pour ouvrir sa fiche, ou choisis A et B pour comparer deux points.",
+    "Le panier garde les points à réviser. Clique sur un point pour ouvrir sa fiche, ou ajoute des points au panneau de comparaison.",
     {position:"aboveBottom"},
     320
   );
@@ -16072,7 +16297,7 @@ function startTour(){
     {
       selector: "#comparisonButton",
       title: "Comparaison",
-      text: "Après avoir choisi deux points dans le panier, le panneau Comparaison s’ouvre pour les regarder côte à côte.",
+      text: "Après avoir choisi des points dans le panier, le panneau Comparaison s’ouvre pour les regarder côte à côte.",
       fallback: () => document.querySelector("#footerTitle"),
       position:"aboveBottom"
     },
@@ -16080,13 +16305,6 @@ function startTour(){
       selector: "#suggestionMailButton",
       title: "Suggestions",
       text: "Tu peux m’envoyer un coucou, une suggestion ou une proposition ici.",
-      fallback: () => document.querySelector("#footerTitle"),
-      position:"aboveBottom"
-    },
-    {
-      selector: "#supportCoffeeButton",
-      title: "Me soutenir",
-      text: "Ce jeu a été conçu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de nourrir mon sang pendant le développement d'autres outils similaires. Clique sur la goutte de sang!",
       fallback: () => document.querySelector("#footerTitle"),
       position:"aboveBottom"
     },
@@ -16115,8 +16333,7 @@ function supportCoffeeVisualHtml(){
 
 function supportCoffeeMessageHtml(text){
   return `
-    <div class="support-coffee-message">
-      ${supportCoffeeVisualHtml()}
+    <div class="support-coffee-message support-coffee-message-no-image">
       <div class="support-coffee-text">${text}</div>
     </div>
   `;
@@ -16371,23 +16588,40 @@ function showProgressHintSoon(id, selector, title, text, options = {}, delay = 2
 const MTC_SUPPORT_COFFEE_CLICKED_KEY =
   "mtc_support_coffee_clicked";
 
+const MTC_SUPPORT_COFFEE_FIRST_SEEN_KEY =
+  "mtc_support_coffee_first_seen_at";
+
+const MTC_SUPPORT_COFFEE_LAST_SESSION_KEY =
+  "mtc_support_coffee_last_session_at";
+
+const MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY =
+  "mtc_support_coffee_return_eligible";
+
 const MTC_SUPPORT_COFFEE_LAST_HINT_KEY =
   "mtc_support_coffee_last_hint_at";
 
+const MTC_SUPPORT_COFFEE_RETURN_DELAY_MS =
+  24 * 60 * 60 * 1000;
+
 const MTC_SUPPORT_COFFEE_INTERVAL_MS =
-  2 * 24 * 60 * 60 * 1000;
+  7 * 24 * 60 * 60 * 1000;
 
 const SUPPORT_COFFEE_REMINDER_TITLE =
   "Me soutenir";
 
 const SUPPORT_COFFEE_REMINDER_TEXT =
-  "Ce jeu a été conçu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de manger pendant le développement d'autres outils similaires ;)";
+  "J'ai conçue ce jeu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de nourrir mon sang pendant le développement d'autres outils similaires.";
+
+let supportBloodDropState = null;
+let supportBloodDropFrame = null;
 
 function markSupportCoffeeClicked(){
   localStorage.setItem(
     MTC_SUPPORT_COFFEE_CLICKED_KEY,
     "1"
   );
+
+  hideSupportBloodDrop();
 }
 
 function rememberSupportCoffeeReminderShown(){
@@ -16397,15 +16631,77 @@ function rememberSupportCoffeeReminderShown(){
   );
 }
 
-function shouldReplaySupportCoffeeReminder(){
+function registerSupportCoffeeVisit(){
+  const now = Date.now();
+
+  const firstSeen =
+    Number(
+      localStorage.getItem(MTC_SUPPORT_COFFEE_FIRST_SEEN_KEY) || "0"
+    );
+
+  if(!firstSeen){
+    localStorage.setItem(
+      MTC_SUPPORT_COFFEE_FIRST_SEEN_KEY,
+      String(now)
+    );
+  }
+
+  const lastSession =
+    Number(
+      localStorage.getItem(MTC_SUPPORT_COFFEE_LAST_SESSION_KEY) || "0"
+    );
 
   if(
-    localStorage.getItem(MTC_SUPPORT_COFFEE_CLICKED_KEY) === "1"
+    lastSession &&
+    now - lastSession >= MTC_SUPPORT_COFFEE_RETURN_DELAY_MS
   ){
+    localStorage.setItem(
+      MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY,
+      "1"
+    );
+  }
+
+  localStorage.setItem(
+    MTC_SUPPORT_COFFEE_LAST_SESSION_KEY,
+    String(now)
+  );
+}
+
+function hasSupportCoffeeClicked(){
+  return localStorage.getItem(MTC_SUPPORT_COFFEE_CLICKED_KEY) === "1";
+}
+
+function isSupportCoffeeReminderEligible(){
+
+  if(hasSupportCoffeeClicked()){
     return false;
   }
 
   if(!document.getElementById("supportCoffeeButton")){
+    return false;
+  }
+
+  if(
+    localStorage.getItem(MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY) !== "1"
+  ){
+    return false;
+  }
+
+  const lastShown =
+    Number(
+      localStorage.getItem(MTC_SUPPORT_COFFEE_LAST_HINT_KEY) || "0"
+    );
+
+  if(!lastShown){
+    return true;
+  }
+
+  return Date.now() - lastShown >= MTC_SUPPORT_COFFEE_INTERVAL_MS;
+}
+
+function shouldReplaySupportCoffeeReminder(){
+
+  if(!isSupportCoffeeReminderEligible()){
     return false;
   }
 
@@ -16417,19 +16713,19 @@ function shouldReplaySupportCoffeeReminder(){
     return false;
   }
 
-  const lastShown =
-    Number(
-      localStorage.getItem(MTC_SUPPORT_COFFEE_LAST_HINT_KEY) || "0"
-    );
+  return true;
+}
 
-  return Date.now() - lastShown >= MTC_SUPPORT_COFFEE_INTERVAL_MS;
+function supportCoffeeTarget(){
+  return (
+    document.getElementById("supportCoffeeButton") ||
+    document.getElementById("footerTitle")
+  );
 }
 
 function showSupportCoffeeReminder(){
 
-  const target =
-    document.getElementById("supportCoffeeButton") ||
-    document.getElementById("footerTitle");
+  const target = supportCoffeeTarget();
 
   if(!target) return false;
 
@@ -16447,6 +16743,11 @@ function showSupportCoffeeReminder(){
     document.body.appendChild(overlay);
   }
 
+  const existingBox = document.getElementById("tourBox");
+  if(existingBox){
+    existingBox.remove();
+  }
+
   const box = document.createElement("div");
   box.id = "tourBox";
   box.className = "progress-hint-box support-coffee-reminder-box";
@@ -16455,41 +16756,73 @@ function showSupportCoffeeReminder(){
     <h3>${SUPPORT_COFFEE_REMINDER_TITLE}</h3>
     ${supportCoffeeMessageHtml(SUPPORT_COFFEE_REMINDER_TEXT)}
 
-    <div class="tour-actions">
-      <button type="button" class="support-coffee-reminder-ok">OK</button>
+    <div class="tour-actions support-coffee-choice-actions">
+      <button type="button" class="support-coffee-reminder-donate">Je donne</button>
+      <button type="button" class="support-coffee-reminder-later">Non, désolé</button>
     </div>
   `;
 
   document.body.appendChild(box);
   target.classList.add("tour-highlight");
 
-  function closeSupportCoffeeReminder(){
+  function closeSupportCoffeeReminder({restoreDrop = false} = {}){
     target.classList.remove("tour-highlight");
     if(box) box.remove();
     if(overlay) overlay.remove();
     progressHintActive = false;
+
+    if(restoreDrop){
+      hideSupportBloodDrop();
+    }else if(
+      typeof showSupportBloodDrop === "function" &&
+      !hasSupportCoffeeClicked() &&
+      localStorage.getItem(MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY) === "1"
+    ){
+      /* Après “Non, désolé”, la goutte reste tombée et continue
+         à interagir avec les panneaux du bas. */
+      showSupportBloodDrop();
+    }
   }
 
-  const okButton =
-    box.querySelector(".support-coffee-reminder-ok");
+  const donateButton =
+    box.querySelector(".support-coffee-reminder-donate");
 
-  okButton.addEventListener("pointerdown", event=>{
-    event.stopPropagation();
-  });
+  const laterButton =
+    box.querySelector(".support-coffee-reminder-later");
 
-  okButton.addEventListener("click", event=>{
-    event.preventDefault();
-    event.stopPropagation();
-    closeSupportCoffeeReminder();
-  });
+  [donateButton, laterButton].forEach(button=>{
+    if(!button) return;
 
-  try{
-    target.scrollIntoView({
-      block:"center",
-      inline:"center",
-      behavior:"smooth"
+    button.addEventListener("pointerdown", event=>{
+      event.stopPropagation();
     });
-  }catch(error){}
+  });
+
+  if(donateButton){
+    donateButton.addEventListener("click", event=>{
+      event.preventDefault();
+      event.stopPropagation();
+
+      const supportLink =
+        document.getElementById("supportCoffeeButton")?.getAttribute("href") ||
+        "https://paypal.me/emesepap1";
+
+      markSupportCoffeeClicked();
+      closeSupportCoffeeReminder({restoreDrop:true});
+
+      try{
+        window.open(supportLink, "_blank", "noopener,noreferrer");
+      }catch(error){}
+    });
+  }
+
+  if(laterButton){
+    laterButton.addEventListener("click", event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      closeSupportCoffeeReminder({restoreDrop:false});
+    });
+  }
 
   setTimeout(()=>{
     const rect = target.getBoundingClientRect();
@@ -16501,12 +16834,457 @@ function showSupportCoffeeReminder(){
         position:"aboveBottom"
       }
     );
-  }, 120);
+  }, 80);
 
   return true;
 }
 
+function handleSupportCoffeeButtonClick(event, link){
+
+  if(event){
+    if(event.__supportCoffeeButtonHandled){
+      return false;
+    }
+
+    event.__supportCoffeeButtonHandled = true;
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  if(hasSupportCoffeeClicked()){
+    const href =
+      link?.getAttribute("href") ||
+      "https://paypal.me/emesepap1";
+
+    try{
+      window.open(href, "_blank", "noopener,noreferrer");
+    }catch(error){}
+
+    return false;
+  }
+
+  localStorage.setItem(
+    MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY,
+    "1"
+  );
+
+  showSupportCoffeeReminder();
+
+  return false;
+}
+function panelGroundForSupportBloodDrop(dropWidth, dropHeight){
+  /*
+    Sol réel = bas visible de l'écran.
+    On ne tient pas compte du footbar.
+
+    Petite correction visuelle : les emojis ont souvent un peu de blanc interne
+    en bas de leur boîte de texte. On autorise donc la boîte du bouton à descendre
+    de quelques pixels, pour que la goutte VISUELLE touche vraiment le bas,
+    sans disparaître.
+  */
+  const visualFloorOverlap =
+    Math.min(5, Math.max(2, dropHeight * .14));
+
+  let ground =
+    window.innerHeight - dropHeight + visualFloorOverlap;
+
+  document
+    .querySelectorAll(
+      ".stats-panel.open, .advanced-search-panel.open, .review-basket-panel.open, .comparison-panel.open"
+    )
+    .forEach(panel=>{
+      const rect = panel.getBoundingClientRect();
+
+      if(
+        rect.top > 0 &&
+        rect.top < window.innerHeight &&
+        rect.height > 40
+      ){
+        ground = Math.min(
+          ground,
+          rect.top - dropHeight + 2
+        );
+      }
+    });
+
+  return Math.max(-visualFloorOverlap, ground);
+}
+
+function createSupportCoffeeButtonPlaceholder(drop, rect, computedStyle){
+  let placeholder =
+    document.getElementById("supportCoffeeButtonPlaceholder");
+
+  if(placeholder){
+    placeholder.remove();
+  }
+
+  placeholder = document.createElement("span");
+  placeholder.id = "supportCoffeeButtonPlaceholder";
+  placeholder.className = "support-coffee-button-placeholder";
+  placeholder.setAttribute("aria-hidden", "true");
+
+  const width = Math.max(1, rect.width || 30);
+  const height = Math.max(1, rect.height || 30);
+
+  placeholder.style.setProperty(
+    "--support-blooddrop-placeholder-width",
+    width + "px"
+  );
+
+  placeholder.style.setProperty(
+    "--support-blooddrop-placeholder-height",
+    height + "px"
+  );
+
+  placeholder.style.order = computedStyle.order || "0";
+  placeholder.style.flex = `0 0 ${width}px`;
+
+  if(drop.parentNode){
+    drop.parentNode.insertBefore(placeholder, drop);
+  }
+
+  return placeholder;
+}
+
+function prepareSupportCoffeeButtonForPhysics(drop, rect, computedStyle){
+
+  if(!drop) return null;
+
+  if(!drop.dataset.supportBlooddropOriginalHtml){
+    drop.dataset.supportBlooddropOriginalHtml = drop.innerHTML;
+  }
+
+  const originalParent = drop.parentNode;
+
+  createSupportCoffeeButtonPlaceholder(
+    drop,
+    rect,
+    computedStyle
+  );
+
+  if(originalParent && originalParent.id){
+    drop.dataset.supportBlooddropOriginalParentId = originalParent.id;
+  }
+
+  drop.style.setProperty(
+    "--support-blooddrop-live-width",
+    Math.max(1, rect.width || 30) + "px"
+  );
+
+  drop.style.setProperty(
+    "--support-blooddrop-live-height",
+    Math.max(1, rect.height || 30) + "px"
+  );
+
+  drop.style.setProperty(
+    "--support-blooddrop-live-font-size",
+    computedStyle.fontSize || "1.3em"
+  );
+
+  drop.style.setProperty(
+    "--support-blooddrop-angle",
+    "0deg"
+  );
+
+  drop.innerHTML = `
+    <span class="support-blooddrop-core" aria-hidden="true">🩸</span>
+  `;
+
+  /* Important : le footer est transformé avec translateX(-50%).
+     Un élément position:fixed à l'intérieur d'un parent transformé peut être
+     positionné relativement à ce parent, ce qui fait disparaître la goutte.
+     On déplace donc le vrai bouton dans body pendant la chute, et un
+     placeholder garde sa place dans le footer. */
+  if(drop.parentNode !== document.body){
+    document.body.appendChild(drop);
+  }
+
+  return drop;
+}
+
+function restoreSupportCoffeeButtonToFooter(drop){
+  if(!drop) return;
+
+  const placeholder =
+    document.getElementById("supportCoffeeButtonPlaceholder");
+
+  if(placeholder && placeholder.parentNode){
+    placeholder.parentNode.insertBefore(drop, placeholder);
+    placeholder.remove();
+    return;
+  }
+
+  const originalParentId =
+    drop.dataset.supportBlooddropOriginalParentId || "";
+
+  const originalParent =
+    originalParentId
+      ? document.getElementById(originalParentId)
+      : null;
+
+  if(originalParent){
+    originalParent.appendChild(drop);
+    return;
+  }
+
+  const footerIconTools =
+    document.querySelector(".footer-icon-tools");
+
+  if(footerIconTools){
+    footerIconTools.appendChild(drop);
+  }
+}
+
+function hideSupportBloodDrop(){
+  const drop = document.getElementById("supportCoffeeButton");
+
+  if(drop){
+    drop.classList.remove(
+      "support-blooddrop-moving",
+      "support-blooddrop-visible",
+      "support-blooddrop-idle"
+    );
+
+    restoreSupportCoffeeButtonToFooter(drop);
+
+    drop.style.removeProperty("transform");
+    drop.style.removeProperty("left");
+    drop.style.removeProperty("top");
+    drop.style.removeProperty("right");
+    drop.style.removeProperty("bottom");
+    drop.style.removeProperty("position");
+    drop.style.removeProperty("--support-blooddrop-live-width");
+    drop.style.removeProperty("--support-blooddrop-live-height");
+    drop.style.removeProperty("--support-blooddrop-live-font-size");
+    drop.style.setProperty("--support-blooddrop-angle", "0deg");
+
+    if(drop.dataset.supportBlooddropOriginalHtml){
+      drop.innerHTML = drop.dataset.supportBlooddropOriginalHtml;
+      delete drop.dataset.supportBlooddropOriginalHtml;
+    }
+
+    delete drop.dataset.supportBlooddropOriginalParentId;
+  }
+
+  const placeholder =
+    document.getElementById("supportCoffeeButtonPlaceholder");
+
+  if(placeholder){
+    placeholder.remove();
+  }
+
+  if(supportBloodDropFrame){
+    cancelAnimationFrame(supportBloodDropFrame);
+    supportBloodDropFrame = null;
+  }
+
+  supportBloodDropState = null;
+}
+
+function showSupportBloodDrop(){
+
+  if(hasSupportCoffeeClicked()){
+    hideSupportBloodDrop();
+    return;
+  }
+
+  let drop = document.getElementById("supportCoffeeButton");
+
+  if(!drop) return;
+
+  if(
+    drop.classList.contains("support-blooddrop-moving") &&
+    supportBloodDropState
+  ){
+    if(!supportBloodDropFrame){
+      supportBloodDropFrame =
+        requestAnimationFrame(stepSupportBloodDropPhysics);
+    }
+    return;
+  }
+
+  if(drop.classList.contains("support-blooddrop-moving")){
+    hideSupportBloodDrop();
+    drop = document.getElementById("supportCoffeeButton");
+    if(!drop) return;
+  }
+
+  const beforeRect = drop.getBoundingClientRect();
+  const computedStyle = window.getComputedStyle(drop);
+
+  if(
+    beforeRect.width <= 0 ||
+    beforeRect.height <= 0
+  ){
+    return;
+  }
+
+  const startX =
+    clampAssociationNumber(
+      beforeRect.left,
+      6,
+      Math.max(6, window.innerWidth - beforeRect.width - 6)
+    );
+
+  const startY =
+    clampAssociationNumber(
+      beforeRect.top,
+      -beforeRect.height - 12,
+      Math.max(-beforeRect.height - 12, window.innerHeight - beforeRect.height - 6)
+    );
+
+  prepareSupportCoffeeButtonForPhysics(
+    drop,
+    beforeRect,
+    computedStyle
+  );
+
+  drop.classList.add(
+    "support-blooddrop-moving",
+    "support-blooddrop-visible"
+  );
+
+  supportBloodDropState = {
+    x:startX,
+    y:startY,
+    vx:0,
+    vy:.10,
+    angle:0,
+    lastTime:performance.now(),
+    settled:false
+  };
+
+  drop.style.setProperty(
+    "transform",
+    `translate3d(${startX}px, ${startY}px, 0) rotate(0deg)`,
+    "important"
+  );
+
+  if(!supportBloodDropFrame){
+    supportBloodDropFrame =
+      requestAnimationFrame(stepSupportBloodDropPhysics);
+  }
+}
+
+function stepSupportBloodDropPhysics(time){
+  const drop = document.getElementById("supportCoffeeButton");
+
+  if(
+    !drop ||
+    !drop.classList.contains("support-blooddrop-moving") ||
+    !supportBloodDropState ||
+    hasSupportCoffeeClicked()
+  ){
+    hideSupportBloodDrop();
+    return;
+  }
+
+  const state = supportBloodDropState;
+
+  const dropRect = drop.getBoundingClientRect();
+  const dropWidth =
+    Math.max(1, drop.offsetWidth || dropRect.width || 30);
+  const dropHeight =
+    Math.max(1, drop.offsetHeight || dropRect.height || 30);
+
+  const dt =
+    Math.min(
+      32,
+      Math.max(8, time - state.lastTime)
+    ) / 16.6667;
+
+  state.lastTime = time;
+
+  const groundY =
+    panelGroundForSupportBloodDrop(dropWidth, dropHeight);
+
+  const leftWall = 6;
+  const rightWall =
+    Math.max(leftWall, window.innerWidth - dropWidth - 6);
+
+  const panelMovedUp =
+    state.y > groundY;
+
+  state.vy += .26 * dt;
+  state.x += state.vx * dt;
+  state.y += state.vy * dt;
+
+  if(state.x < leftWall){
+    state.x = leftWall;
+    state.vx = 0;
+  }
+
+  if(state.x > rightWall){
+    state.x = rightWall;
+    state.vx = 0;
+  }
+
+  if(state.y >= groundY){
+    const impact =
+      Math.max(
+        Math.abs(state.vy),
+        panelMovedUp ? 2.4 : 0
+      );
+
+    state.y = groundY;
+
+    if(impact > .82){
+      state.vy =
+        -impact * .32;
+
+      /* Pas de déplacement latéral aléatoire : la goutte rebondit seulement. */
+      state.vx = 0;
+    }else{
+      state.vy = 0;
+      state.vx *= .90;
+    }
+
+    state.vx *= .975;
+  }
+
+  if(state.y < groundY - 1){
+    drop.classList.remove("support-blooddrop-idle");
+  }else if(
+    Math.abs(state.vx) < .028 &&
+    Math.abs(state.vy) < .055
+  ){
+    drop.classList.add("support-blooddrop-idle");
+    state.vx = 0;
+    state.vy = 0;
+  }else{
+    drop.classList.remove("support-blooddrop-idle");
+  }
+
+  /* Pas de rotation finale ni de roulade : uniquement chute + rebond vertical. */
+  state.angle = 0;
+
+  drop.style.setProperty(
+    "--support-blooddrop-angle",
+    "0deg"
+  );
+
+  drop.style.setProperty(
+    "transform",
+    `translate3d(${state.x}px, ${state.y}px, 0) rotate(0deg)`,
+    "important"
+  );
+
+  supportBloodDropFrame =
+    requestAnimationFrame(stepSupportBloodDropPhysics);
+}
+
 function maybeReplaySupportCoffeeReminder(){
+
+  if(hasSupportCoffeeClicked()){
+    hideSupportBloodDrop();
+    return;
+  }
+
+  if(
+    localStorage.getItem(MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY) === "1"
+  ){
+    showSupportBloodDrop();
+  }
 
   if(shouldReplaySupportCoffeeReminder()){
     showSupportCoffeeReminder();
@@ -16514,7 +17292,7 @@ function maybeReplaySupportCoffeeReminder(){
   }
 
   if(
-    localStorage.getItem(MTC_SUPPORT_COFFEE_CLICKED_KEY) !== "1" &&
+    !hasSupportCoffeeClicked() &&
     (
       document.getElementById("tourBox") ||
       progressHintActive
@@ -16526,19 +17304,25 @@ function maybeReplaySupportCoffeeReminder(){
 
 function setupSupportCoffeeReminder(){
 
+  registerSupportCoffeeVisit();
+
   const button =
     document.getElementById("supportCoffeeButton");
 
   if(button){
     button.addEventListener(
       "click",
-      markSupportCoffeeClicked,
+      event=>{
+        handleSupportCoffeeButtonClick(event, button);
+      },
       {capture:true}
     );
 
     button.addEventListener(
       "auxclick",
-      markSupportCoffeeClicked,
+      event=>{
+        handleSupportCoffeeButtonClick(event, button);
+      },
       {capture:true}
     );
 
@@ -16546,19 +17330,22 @@ function setupSupportCoffeeReminder(){
       "keydown",
       event=>{
         if(event.key === "Enter" || event.key === " "){
-          markSupportCoffeeClicked();
+          handleSupportCoffeeButtonClick(event, button);
         }
       },
       {capture:true}
     );
   }
 
-  if(
-    localStorage.getItem("mtc_tutorial_seen") !== "1" &&
-    !localStorage.getItem(MTC_SUPPORT_COFFEE_LAST_HINT_KEY)
-  ){
-    rememberSupportCoffeeReminderShown();
-  }
+  window.addEventListener(
+    "resize",
+    ()=>{
+      if(supportBloodDropState){
+        supportBloodDropState.lastTime = performance.now();
+      }
+    },
+    {passive:true}
+  );
 
   setTimeout(maybeReplaySupportCoffeeReminder, 1800);
 
@@ -16567,6 +17354,7 @@ function setupSupportCoffeeReminder(){
     60 * 60 * 1000
   );
 }
+
 
 
 function setupGuidedTourManualDemo(){
@@ -18893,7 +19681,7 @@ function prepareFinalGuess(){
 
   finalGuess.style.display = "block";
   finalGuessText.textContent =
-    "Derniers 4 points : devine leur catégorie.";
+    "Devine la dernière catégorie!";
 
   finalGuessChoices.innerHTML = "";
 
@@ -19273,7 +20061,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       href="https://paypal.me/emesepap1"
       target="_blank"
       rel="noopener noreferrer"
-      onclick="markSupportCoffeeClicked(); window.open(this.href, '_blank', 'noopener,noreferrer'); return false;"
+      onclick="return handleSupportCoffeeButtonClick(event, this);"
       title="Soutenir le projet"
       aria-label="Soutenir le projet sur PayPal"
     >
@@ -22359,6 +23147,3291 @@ function correspondenceChecklistHtml(selected = []){
       renderAdvancedSearchPanel();
     }
   };
+})();
+</script>
+
+
+
+<style id="mtc-fullscreen-links-style">
+/* === Plein écran + liens automatiques dans notes/associations === */
+.fullscreen-toggle-button{
+  opacity:.48;
+  padding:5px 7px !important;
+  min-width:28px;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  font-size:1.05em;
+}
+
+.fullscreen-toggle-button:hover,
+.fullscreen-toggle-button:active{
+  opacity:1;
+}
+
+.inline-point-link{
+  display:inline;
+  padding:0 1px !important;
+  margin:0 !important;
+  border:none !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  font:inherit !important;
+  font-weight:800 !important;
+  text-decoration:underline;
+  text-underline-offset:2px;
+  cursor:pointer;
+}
+
+.inline-point-link:hover,
+.inline-point-link:active{
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+  text-shadow:0 0 7px var(--shadow-color);
+}
+
+.inline-point-basket-button{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  width:15px !important;
+  min-width:15px !important;
+  height:15px !important;
+  min-height:15px !important;
+
+  padding:0 !important;
+  margin:0 2px 0 1px !important;
+  border:none !important;
+  border-radius:50% !important;
+
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+
+  box-shadow:none !important;
+  transform:none !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:.74em !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+
+  text-transform:none !important;
+  letter-spacing:normal !important;
+
+  opacity:.64;
+  vertical-align:super;
+  cursor:pointer !important;
+}
+
+.inline-point-basket-button:hover,
+.inline-point-basket-button:active{
+  opacity:1;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+  text-shadow:0 0 7px var(--shadow-color);
+}
+</style>
+
+<script id="mtc-fullscreen-links-script">
+(function(){
+  const POINT_CANONICAL_ALIASES = {
+    P:"P",
+    GI:"GI",
+    GL:"GI",
+    E:"E",
+    RT:"Rt",
+    RP:"Rt",
+    C:"C",
+    IG:"IG",
+    LG:"IG",
+    V:"V",
+    RN:"Rn",
+    R:"Rn",
+    EC:"EC",
+    MC:"EC",
+    TF:"TF",
+    TR:"TF",
+    VB:"VB",
+    F:"F",
+    RM:"RM",
+    REN:"RM",
+    VC:"RM",
+    DM:"DM",
+    DU:"DM",
+    VG:"DM"
+  };
+
+  function normalizePointCodeFromParts(rawCanal, rawNumber){
+    let canal = String(rawCanal || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
+    const number = String(rawNumber || "").trim();
+    if(!canal || !number) return "";
+
+    canal = canal.toUpperCase();
+
+    /* Confusions fréquentes : IG tapé lG, GI tapé Gl. */
+    if(/^[IL]G$/.test(canal)) canal = "IG";
+    if(/^G[IL]$/.test(canal)) canal = "GI";
+
+    const normalizedCanal = POINT_CANONICAL_ALIASES[canal];
+    if(!normalizedCanal) return "";
+
+    return normalizedCanal + number;
+  }
+
+  function pointExists(point){
+    return !!(point && window.POINT_DETAILS && POINT_DETAILS[point]);
+  }
+
+  function pointReferenceHtml(point){
+    const label = typeof formatPointCode === "function"
+      ? formatPointCode(point)
+      : String(point).replace(/^([A-Za-zÀ-ÿ]+)\s*(\d+)$/, "$1 $2");
+
+    const openButton = `
+      <button
+        type="button"
+        class="inline-point-link"
+        onclick="event.stopPropagation(); openPointPanelDirect('${escapeAttribute(point)}')"
+        title="Ouvrir la fiche ${escapeAttribute(label)}"
+        aria-label="Ouvrir la fiche ${escapeAttribute(label)}"
+      >${escapeHtml(label)}</button>
+    `;
+
+    const basketButton = typeof basketButtonHtml === "function"
+      ? basketButtonHtml(point, "inline-point-basket-button", true)
+      : "";
+
+    return openButton + basketButton;
+  }
+
+  window.linkPointReferencesInText = function(value){
+    const text = String(value || "");
+    if(!text) return "";
+
+    const regex = /(^|[^A-Za-zÀ-ÿ0-9])((?:GI|Gl|G[IiLl]|IG|lG|LG|[iIlL]G|Rt|RT|RP|Rn|RN|EC|MC|TF|TR|VB|RM|REN|VC|DM|DU|VG|P|E|C|V|R|F)\s*[-.]?\s*(\d{1,2}))(?![A-Za-zÀ-ÿ0-9])/g;
+
+    let html = "";
+    let lastIndex = 0;
+    let match;
+
+    while((match = regex.exec(text)) !== null){
+      const prefix = match[1] || "";
+      const fullReference = match[2] || "";
+      const number = match[3] || "";
+      const matchStart = match.index + prefix.length;
+      const matchEnd = match.index + match[0].length;
+      const canalPart = fullReference.replace(number, "").replace(/[-.\s]/g, "");
+      const normalizedPoint = normalizePointCodeFromParts(canalPart, number);
+
+      if(!pointExists(normalizedPoint)){
+        continue;
+      }
+
+      html += escapeHtml(text.slice(lastIndex, matchStart));
+      html += pointReferenceHtml(normalizedPoint);
+      lastIndex = matchEnd;
+    }
+
+    html += escapeHtml(text.slice(lastIndex));
+    return html;
+  };
+
+  function linkedTextWithBreaks(value){
+    return linkPointReferencesInText(value).replace(/\n/g, "<br>");
+  }
+
+  window.formatNoteTextForDisplay = function(value){
+    const clean = String(value || "").trim();
+
+    if(!clean){
+      return `<span class="point-note-empty">Aucune note pour l’instant.</span>`;
+    }
+
+    return linkedTextWithBreaks(clean);
+  };
+
+  function categoryInfoForLine(line){
+    if(typeof categoryInlineInfoButtons !== "function") return "";
+    try{
+      return categoryInlineInfoButtons(line) || "";
+    }catch(error){
+      return "";
+    }
+  }
+
+  function formatPanelSectionValue(title, value){
+    const raw = String(value || "");
+
+    if(title === "Catégories du point"){
+      return raw
+        .split(/\n/)
+        .map(line => `${escapeHtml(line)}${categoryInfoForLine(line)}`)
+        .join("\n");
+    }
+
+    if(title === "Associations"){
+      return linkedTextWithBreaks(raw);
+    }
+
+    return escapeHtml(raw);
+  }
+
+  window.renderPointInfoSections = function(sections, point){
+    return sections
+      .filter(([title,value]) =>
+        title === "Notes" ||
+        (
+          value &&
+          value !== "(Aucune)" &&
+          value !== "Aucune"
+        )
+      )
+      .map(([title,value]) => {
+        if(title === "Notes"){
+          const noteValue = getEditablePointNote(point, value);
+
+          return `
+            <details class="point-info-section point-note-section" open>
+              <summary class="point-note-summary">
+                <span>${escapeHtml(title)}</span>
+                <button
+                  type="button"
+                  class="point-note-edit-button"
+                  onclick="togglePointNoteEdit(this)"
+                  title="Modifier les notes"
+                  aria-label="Modifier les notes"
+                >✎</button>
+              </summary>
+
+              <div class="point-note-display">
+                ${formatNoteTextForDisplay(noteValue)}
+              </div>
+
+              <textarea
+                class="point-note-textarea"
+                data-point="${escapeAttribute(point)}"
+                oninput="savePointNoteFromTextarea(this)"
+                style="display:none;"
+                placeholder="Ajoute tes remarques personnelles sur ce point..."
+              >${escapeHtml(noteValue)}</textarea>
+
+              <div class="point-note-hint">
+                Clique sur le crayon pour écrire. Tes notes restent dans ce navigateur. Tu peux toujours les exporter pour les sauvegarder, puis importer pour les récupérer sur un autre appareil ou navigateur.
+              </div>
+            </details>
+          `;
+        }
+
+        return `
+          <details class="point-info-section">
+            <summary>${escapeHtml(title)}</summary>
+            <div>${formatPanelSectionValue(title, value)}</div>
+          </details>
+        `;
+      })
+      .join("");
+  };
+
+  function browserFullscreenElement(){
+    return document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement ||
+      null;
+  }
+
+  window.updateFullscreenToggleButton = function(){
+    const button = document.getElementById("fullscreenToggleButton");
+    if(!button) return;
+
+    const active = !!browserFullscreenElement();
+    button.textContent = active ? "↙" : "⛶";
+    button.title = active ? "Revenir en mode normal" : "Passer en plein écran";
+    button.setAttribute("aria-label", button.title);
+  };
+
+  window.toggleFullscreenMode = function(){
+    const active = !!browserFullscreenElement();
+
+    if(active){
+      const exit = document.exitFullscreen ||
+        document.webkitExitFullscreen ||
+        document.mozCancelFullScreen ||
+        document.msExitFullscreen;
+
+      if(exit){
+        try{ exit.call(document); }catch(error){ console.error(error); }
+      }
+      return;
+    }
+
+    const root = document.documentElement;
+    const request = root.requestFullscreen ||
+      root.webkitRequestFullscreen ||
+      root.mozRequestFullScreen ||
+      root.msRequestFullscreen;
+
+    if(request){
+      try{ request.call(root); }catch(error){ console.error(error); }
+    }
+  };
+
+  function installFullscreenButton(){
+    if(document.getElementById("fullscreenToggleButton")) return;
+
+    const firstTopbarRow = document.querySelector(".topbar .topbar-row");
+    if(!firstTopbarRow) return;
+
+    const button = document.createElement("button");
+    button.id = "fullscreenToggleButton";
+    button.type = "button";
+    button.className = "fullscreen-toggle-button";
+    button.onclick = toggleFullscreenMode;
+
+    firstTopbarRow.appendChild(button);
+    updateFullscreenToggleButton();
+  }
+
+  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"]
+    .forEach(eventName => document.addEventListener(eventName, updateFullscreenToggleButton));
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", installFullscreenButton);
+  }else{
+    installFullscreenButton();
+  }
+})();
+</script>
+
+
+
+
+<style id="mtc-final-point-links-fix-style">
+/* === Correctif final : liens de points dans notes/associations + panneau au-dessus des panneaux bas === */
+#pointPanel,
+.point-panel,
+.point-panel.open{
+  z-index:9900 !important;
+}
+
+#panelToggle,
+.panel-toggle{
+  z-index:9901 !important;
+}
+
+.inline-point-link{
+  display:inline !important;
+  padding:0 2px !important;
+  margin:0 !important;
+  border:none !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  font-family:inherit !important;
+  font-size:1em !important;
+  font-weight:800 !important;
+  line-height:inherit !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  text-decoration:underline;
+  text-underline-offset:2px;
+  cursor:pointer;
+}
+
+.inline-point-link:hover,
+.inline-point-link:active{
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+  text-shadow:0 0 8px var(--shadow-color);
+}
+
+.inline-point-basket-button{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:15px !important;
+  min-width:15px !important;
+  height:15px !important;
+  min-height:15px !important;
+  padding:0 !important;
+  margin:0 3px 0 1px !important;
+  border:1px solid currentColor !important;
+  border-radius:50% !important;
+  background:var(--page-bg) !important;
+  color:var(--shadow-color) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  font-family:var(--ui-font-family) !important;
+  font-size:10px !important;
+  font-weight:700 !important;
+  line-height:1 !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  vertical-align:baseline !important;
+  cursor:pointer !important;
+  opacity:.46 !important;
+}
+
+.inline-point-basket-button:hover,
+.inline-point-basket-button:active{
+  opacity:.82 !important;
+  background:var(--page-bg) !important;
+  box-shadow:0 0 4px var(--shadow-color) !important;
+  transform:none !important;
+}
+</style>
+
+<script id="mtc-final-point-links-fix-script">
+(function(){
+  const POINT_LINK_ALIASES = {
+    P:"P",
+    PO:"P",
+    LU:"P",
+    GI:"GI",
+    G1:"GI",
+    GL:"GI",
+    LI:"GI",
+    E:"E",
+    ES:"E",
+    ST:"E",
+    RT:"Rt",
+    RP:"Rt",
+    SP:"Rt",
+    C:"C",
+    HT:"C",
+    IG:"IG",
+    IL:"IG",
+    LG:"IG",
+    SI:"IG",
+    V:"V",
+    BL:"V",
+    R:"Rn",
+    RN:"Rn",
+    RE:"Rn",
+    KI:"Rn",
+    EC:"EC",
+    MC:"EC",
+    PC:"EC",
+    TF:"TF",
+    TR:"TF",
+    SJ:"TF",
+    VB:"VB",
+    GB:"VB",
+    F:"F",
+    LR:"F",
+    RM:"RM",
+    REN:"RM",
+    VC:"RM",
+    DM:"DM",
+    DU:"DM",
+    VG:"DM"
+  };
+
+  function safeEscapeHtml(value){
+    if(typeof escapeHtml === "function") return escapeHtml(value);
+    return String(value ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+
+  function safeEscapeAttribute(value){
+    if(typeof escapeAttribute === "function") return escapeAttribute(value);
+    return safeEscapeHtml(value);
+  }
+
+  function normalizePointReference(canal, number){
+    let c = String(canal || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toUpperCase();
+
+    c = c.replace(/[^A-Z0-9]/g, "");
+
+    /* Confusions fréquentes au clavier ou à l’OCR : IG/lG/LG, GI/Gl/G1. */
+    if(c === "LG" || c === "IL") c = "IG";
+    if(c === "GL" || c === "G1") c = "GI";
+
+    const canonical = POINT_LINK_ALIASES[c];
+    if(!canonical) return "";
+
+    const n = String(number || "").replace(/^0+/, "") || String(number || "");
+    const point = canonical + n;
+
+    return (typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point])
+      ? point
+      : "";
+  }
+
+  function displayPoint(point){
+    if(typeof formatPointCode === "function") return formatPointCode(point);
+    return String(point || "").replace(/^([A-Za-z]+)(\d+)$/, "$1 $2");
+  }
+
+  function makeInlinePointLink(point){
+    const label = displayPoint(point);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "inline-point-link";
+    button.textContent = label;
+    button.title = "Ouvrir la fiche " + label;
+    button.setAttribute("aria-label", "Ouvrir la fiche " + label);
+    button.addEventListener("click", function(event){
+      event.stopPropagation();
+      if(typeof openPointPanelDirect === "function"){
+        openPointPanelDirect(point);
+      }
+    });
+    return button;
+  }
+
+  function makeInlineBasketButton(point){
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "inline-point-basket-button";
+    button.dataset.basketPoint = point;
+    button.dataset.basketCompact = "1";
+    button.textContent = "+";
+    button.title = "Mettre de côté";
+    button.setAttribute("aria-label", "Mettre de côté");
+    button.addEventListener("click", function(event){
+      event.stopPropagation();
+      if(typeof toggleReviewBasketPoint === "function"){
+        toggleReviewBasketPoint(point);
+      }
+    });
+    return button;
+  }
+
+  const pointReferenceRegex = /(^|[^A-Za-zÀ-ÿ0-9])((?:GI|Gl|GL|G1|IG|lG|LG|IL|Rt|RT|RP|Rn|RN|EC|MC|TF|TR|VB|RM|REN|VC|DM|DU|VG|P|E|C|V|R|F)\s*[-.]?\s*(\d{1,2}))(?![A-Za-zÀ-ÿ0-9])/gi;
+
+  function replacePointReferencesInTextNode(textNode){
+    const text = textNode.nodeValue || "";
+    pointReferenceRegex.lastIndex = 0;
+
+    let match;
+    let lastIndex = 0;
+    let changed = false;
+    const fragment = document.createDocumentFragment();
+
+    while((match = pointReferenceRegex.exec(text)) !== null){
+      const prefix = match[1] || "";
+      const fullReference = match[2] || "";
+      const number = match[3] || "";
+      const matchStart = match.index + prefix.length;
+      const matchEnd = match.index + match[0].length;
+      const canal = fullReference.replace(number, "").replace(/[-.\s]/g, "");
+      const point = normalizePointReference(canal, number);
+
+      if(!point) continue;
+
+      fragment.appendChild(document.createTextNode(text.slice(lastIndex, matchStart)));
+      fragment.appendChild(makeInlinePointLink(point));
+      fragment.appendChild(makeInlineBasketButton(point));
+      lastIndex = matchEnd;
+      changed = true;
+    }
+
+    if(!changed) return;
+
+    fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+    textNode.parentNode.replaceChild(fragment, textNode);
+  }
+
+  function shouldSkipNode(node){
+    if(!node || node.nodeType !== 1) return false;
+    return !!node.closest("button,a,textarea,script,style,select,.inline-point-link,.inline-point-basket-button");
+  }
+
+  window.enhancePointReferencesInPanel = function(root){
+    root = root || document.getElementById("pointPanelContent");
+    if(!root) return;
+
+    const targets = root.querySelectorAll(".js-point-ref-content, .point-note-display");
+
+    targets.forEach(target => {
+      const walker = document.createTreeWalker(
+        target,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode(node){
+            if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+            if(shouldSkipNode(node.parentElement)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        }
+      );
+
+      const nodes = [];
+      while(walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(replacePointReferencesInTextNode);
+    });
+  };
+
+  function plainTextWithBreaks(value){
+    return safeEscapeHtml(String(value || "").trim()).replace(/\n/g, "<br>");
+  }
+
+  function pointNoteDisplayHtml(value){
+    const clean = String(value || "").trim();
+    if(!clean) return `<span class="point-note-empty">Aucune note pour l’instant.</span>`;
+    return plainTextWithBreaks(clean);
+  }
+
+  window.formatNoteTextForDisplay = pointNoteDisplayHtml;
+
+  function categoryInfoForLineFinal(line){
+    if(typeof categoryInlineInfoButtons !== "function") return "";
+    try{ return categoryInlineInfoButtons(line) || ""; }
+    catch(error){ return ""; }
+  }
+
+  window.renderPointInfoSections = function(sections, point){
+    return sections
+      .filter(([title,value]) =>
+        title === "Notes" ||
+        (
+          value &&
+          value !== "(Aucune)" &&
+          value !== "Aucune"
+        )
+      )
+      .map(([title,value]) => {
+        if(title === "Notes"){
+          const noteValue = typeof getEditablePointNote === "function"
+            ? getEditablePointNote(point, value)
+            : (value || "");
+
+          return `
+            <details class="point-info-section point-note-section" open>
+              <summary class="point-note-summary">
+                <span>${safeEscapeHtml(title)}</span>
+                <button
+                  type="button"
+                  class="point-note-edit-button"
+                  onclick="togglePointNoteEdit(this)"
+                  title="Modifier les notes"
+                  aria-label="Modifier les notes"
+                >✎</button>
+              </summary>
+
+              <div class="point-note-display js-point-ref-content">
+                ${pointNoteDisplayHtml(noteValue)}
+              </div>
+
+              <textarea
+                class="point-note-textarea"
+                data-point="${safeEscapeAttribute(point)}"
+                oninput="savePointNoteFromTextarea(this)"
+                style="display:none;"
+                placeholder="Ajoute tes remarques personnelles sur ce point..."
+              >${safeEscapeHtml(noteValue)}</textarea>
+
+              <div class="point-note-hint">
+                Clique sur le crayon pour écrire. Tes notes restent dans ce navigateur. Tu peux toujours les exporter pour les sauvegarder, puis importer pour les récupérer sur un autre appareil ou navigateur.
+              </div>
+            </details>
+          `;
+        }
+
+        let content;
+        if(title === "Catégories du point"){
+          content = String(value || "")
+            .split(/\n/)
+            .map(line => `${safeEscapeHtml(line)}${categoryInfoForLineFinal(line)}`)
+            .join("\n");
+        }else{
+          content = plainTextWithBreaks(value);
+        }
+
+        const linkClass = title === "Associations" ? " js-point-ref-content" : "";
+
+        return `
+          <details class="point-info-section">
+            <summary>${safeEscapeHtml(title)}</summary>
+            <div class="${linkClass.trim()}">${content}</div>
+          </details>
+        `;
+      })
+      .join("");
+  };
+
+  window.savePointNoteFromTextarea = function(textarea){
+    const point = textarea?.dataset?.point;
+    if(!point) return;
+
+    try{
+      if(typeof noteStorageKey === "function"){
+        localStorage.setItem(noteStorageKey(point), textarea.value);
+      }else{
+        localStorage.setItem("mtc_point_note_" + String(point), textarea.value);
+      }
+    }catch(error){
+      console.error(error);
+    }
+
+    const section = textarea.closest(".point-info-section");
+    const display = section?.querySelector(".point-note-display");
+
+    if(display){
+      display.innerHTML = pointNoteDisplayHtml(textarea.value);
+      display.classList.add("js-point-ref-content");
+      enhancePointReferencesInPanel(section);
+    }
+  };
+
+  function wrapPanelOpenFunction(name){
+    const original = window[name];
+    if(typeof original !== "function" || original.__pointLinksFixed) return;
+
+    const wrapped = function(){
+      const result = original.apply(this, arguments);
+      enhancePointReferencesInPanel(document.getElementById("pointPanelContent"));
+      return result;
+    };
+
+    wrapped.__pointLinksFixed = true;
+    window[name] = wrapped;
+  }
+
+  wrapPanelOpenFunction("openPointPanel");
+  wrapPanelOpenFunction("openPointPanelDirect");
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", function(){
+      enhancePointReferencesInPanel(document.getElementById("pointPanelContent"));
+    });
+  }else{
+    enhancePointReferencesInPanel(document.getElementById("pointPanelContent"));
+  }
+})();
+</script>
+
+
+<style>
+/* === Comparaison A-Z + affichage horizontal mobile === */
+.comparison-panel{
+  z-index:9400 !important;
+}
+
+.comparison-grid.comparison-grid-az{
+  --comparison-count:2;
+
+  display:grid !important;
+  grid-template-columns:repeat(var(--comparison-count), minmax(260px, 1fr)) !important;
+  gap:14px !important;
+
+  width:100%;
+  overflow-x:auto;
+  overflow-y:visible;
+  padding-bottom:10px;
+  scroll-snap-type:x proximity;
+}
+
+.comparison-grid.comparison-grid-az .comparison-card{
+  min-width:260px;
+  scroll-snap-align:start;
+}
+
+.comparison-slot-label{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  min-width:24px;
+  min-height:24px;
+  margin-right:6px;
+  padding:1px 6px;
+
+  border-radius:999px;
+  border:1px solid currentColor;
+
+  font-family:var(--ui-font-family);
+  font-size:.8em;
+  font-weight:900;
+  line-height:1;
+
+  opacity:.72;
+}
+
+.comparison-add-button,
+.comparison-present-button{
+  min-width:22px !important;
+  min-height:22px !important;
+  padding:1px 6px !important;
+
+  border:1px solid currentColor !important;
+  border-radius:999px !important;
+  background:transparent !important;
+
+  color:var(--shadow-color) !important;
+  box-shadow:none !important;
+  transform:none !important;
+
+  font-size:.72em !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+
+  opacity:.72;
+}
+
+.comparison-add-button:hover,
+.comparison-add-button:active,
+.comparison-present-button:hover,
+.comparison-present-button:active{
+  opacity:1;
+  text-shadow:0 0 8px var(--shadow-color);
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.comparison-present-button{
+  background:var(--shadow-color) !important;
+  color:var(--page-bg) !important;
+  border-color:var(--shadow-color) !important;
+}
+
+.comparison-actions{
+  align-items:center;
+}
+
+@media(max-width:699px){
+  .comparison-panel{
+    height:100dvh !important;
+    bottom:-112dvh !important;
+    padding:14px 10px 20px !important;
+    padding-top:0 !important;
+    overflow:hidden !important;
+  }
+
+  .comparison-panel.open{
+    bottom:0 !important;
+  }
+
+  #comparisonPanelContent{
+    height:calc(100dvh - 42px);
+    overflow:auto;
+    padding-bottom:12px;
+  }
+
+  .comparison-grid.comparison-grid-az{
+    grid-template-columns:repeat(var(--comparison-count), minmax(255px, 72vw)) !important;
+    gap:10px !important;
+    align-items:start !important;
+  }
+
+  .comparison-grid.comparison-grid-az .comparison-card{
+    min-width:255px;
+  }
+
+  .comparison-panel .point-header{
+    margin-bottom:8px !important;
+  }
+}
+
+@media(max-width:699px) and (orientation:landscape){
+  .comparison-grid.comparison-grid-az{
+    grid-template-columns:repeat(var(--comparison-count), minmax(260px, 31vw)) !important;
+  }
+}
+</style>
+
+<script>
+/* === Comparaison de A à Z : ajout automatique et panneau horizontal === */
+(function(){
+  const MAX_COMPARISON_SLOTS = 26;
+  const SLOT_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+  function slotsEmpty(){
+    return Array.from({length:MAX_COMPARISON_SLOTS}, () => "");
+  }
+
+  function validPoint(point){
+    point = String(point || "").trim();
+    return point && typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point]
+      ? point
+      : point;
+  }
+
+  window.comparisonSlotLabel = function(slotIndex){
+    const index = Number(slotIndex);
+    return SLOT_LETTERS[index] || "";
+  };
+
+  window.getComparisonPoints = function(){
+    try{
+      const parsed = JSON.parse(
+        localStorage.getItem(MTC_COMPARISON_POINTS_KEY) || "[]"
+      );
+
+      const slots = slotsEmpty();
+
+      if(Array.isArray(parsed)){
+        parsed.slice(0, MAX_COMPARISON_SLOTS).forEach((point, index) => {
+          slots[index] = point ? String(point) : "";
+        });
+      }
+
+      return slots;
+    }catch(error){
+      return slotsEmpty();
+    }
+  };
+
+  window.saveComparisonPoints = function(points){
+    const slots = slotsEmpty();
+
+    if(Array.isArray(points)){
+      points.slice(0, MAX_COMPARISON_SLOTS).forEach((point, index) => {
+        slots[index] = point ? String(point) : "";
+      });
+    }
+
+    localStorage.setItem(
+      MTC_COMPARISON_POINTS_KEY,
+      JSON.stringify(slots)
+    );
+
+    updateComparisonButtonLabel();
+    renderComparisonPanelIfOpen();
+    renderReviewBasketPanelIfOpen();
+  };
+
+  function filledComparisonSlots(){
+    return getComparisonPoints()
+      .map((point, index) => ({point, index, label:comparisonSlotLabel(index)}))
+      .filter(slot => !!slot.point);
+  }
+
+  function firstFreeComparisonSlot(slots){
+    return slots.findIndex(point => !point);
+  }
+
+  function comparisonSlotIndexOf(point, slots){
+    return slots.findIndex(saved => saved === point);
+  }
+
+  window.updateComparisonButtonLabel = function(){
+    const button = document.getElementById("comparisonButton");
+    if(!button) return;
+
+    const count = filledComparisonSlots().length;
+
+    button.textContent = count > 0
+      ? `A–Z (${count}/26)`
+      : "A–Z";
+
+    button.title = "Comparer plusieurs points, de A à Z";
+    button.setAttribute("aria-label", button.title);
+  };
+
+  window.addPointToComparison = function(point){
+    point = validPoint(point);
+    if(!point) return;
+
+    const slots = getComparisonPoints();
+    const alreadyIndex = comparisonSlotIndexOf(point, slots);
+
+    if(alreadyIndex >= 0){
+      if(filledComparisonSlots().length >= 2){
+        openComparisonPanel();
+      }
+      if(typeof message !== "undefined" && message){
+        message.textContent = `${formatPointCode(point)} est déjà en comparaison (${comparisonSlotLabel(alreadyIndex)}).`;
+      }
+      return;
+    }
+
+    const index = firstFreeComparisonSlot(slots);
+
+    if(index < 0){
+      if(typeof message !== "undefined" && message){
+        message.textContent = "La comparaison est pleine : A à Z sont déjà occupés.";
+      }
+      openComparisonPanel();
+      return;
+    }
+
+    slots[index] = point;
+    saveComparisonPoints(slots);
+
+    const filledCount = slots.filter(Boolean).length;
+
+    if(filledCount >= 2){
+      openComparisonPanel();
+    }else if(typeof message !== "undefined" && message){
+      message.textContent = `${formatPointCode(point)} placé en comparaison (${comparisonSlotLabel(index)}). Ajoute un deuxième point.`;
+    }
+  };
+
+  window.setComparisonPoint = function(point, slotIndex){
+    point = validPoint(point);
+    if(!point) return;
+
+    if(slotIndex === undefined || slotIndex === null || slotIndex === ""){
+      addPointToComparison(point);
+      return;
+    }
+
+    const index = Math.max(
+      0,
+      Math.min(MAX_COMPARISON_SLOTS - 1, Number(slotIndex) || 0)
+    );
+
+    const slots = getComparisonPoints();
+    const alreadyIndex = comparisonSlotIndexOf(point, slots);
+
+    if(alreadyIndex >= 0 && alreadyIndex !== index){
+      slots[alreadyIndex] = "";
+    }
+
+    slots[index] = point;
+    saveComparisonPoints(slots);
+
+    if(slots.filter(Boolean).length >= 2){
+      openComparisonPanel();
+    }else if(typeof message !== "undefined" && message){
+      message.textContent = `${formatPointCode(point)} placé en comparaison (${comparisonSlotLabel(index)}). Ajoute un deuxième point.`;
+    }
+  };
+
+  window.clearComparisonPoint = function(slotIndex){
+    const slots = getComparisonPoints();
+    const index = Math.max(
+      0,
+      Math.min(MAX_COMPARISON_SLOTS - 1, Number(slotIndex) || 0)
+    );
+
+    slots[index] = "";
+    saveComparisonPoints(slots);
+  };
+
+  window.comparisonValueBlock = function(title, value){
+    const clean = flattenSearchText(value || "").trim();
+
+    if(!clean) return "";
+
+    return `
+      <div class="comparison-field">
+        <span class="comparison-field-title">${escapeHtml(title)}</span>
+        <div class="comparison-field-value">${escapeHtml(clean)}</div>
+      </div>
+    `;
+  };
+
+  window.comparisonCardHtml = function(slotIndex, point){
+    if(!point) return "";
+
+    const details = POINT_DETAILS[point] || {};
+    const notes = getEditablePointNote(point, details.notes || "");
+    const label = comparisonSlotLabel(slotIndex);
+
+    return `
+      <div class="comparison-card" data-comparison-slot="${escapeAttribute(label)}">
+        <div class="search-result-title">
+          <span class="comparison-slot-label">${escapeHtml(label)}</span>
+          ${searchPointTitle(point)}
+        </div>
+        <div class="search-result-meta">${escapeHtml(searchPointMeta(point))}</div>
+
+        <div class="comparison-actions">
+          <button type="button" onclick="openPointPanelDirect('${escapeAttribute(point)}')">Ouvrir la fiche</button>
+          <button type="button" onclick="clearComparisonPoint(${slotIndex})">Retirer</button>
+        </div>
+
+        ${comparisonValueBlock("Catégories", pointCategoryNames(point).join(" · "))}
+        ${comparisonValueBlock("Correspondances", details.correspondances)}
+        ${comparisonValueBlock("Fonctions", details.actions || details.fonctions)}
+        ${comparisonValueBlock("Indications", details.indications)}
+        ${comparisonValueBlock("Notes", notes)}
+      </div>
+    `;
+  };
+
+  window.renderComparisonPanel = function(){
+    const content = document.getElementById("comparisonPanelContent");
+    if(!content) return;
+
+    const filled = filledComparisonSlots();
+    const count = Math.max(filled.length, 2);
+
+    if(!filled.length){
+      content.innerHTML = `
+        <div class="point-header">
+          <span class="point-code">Comparaison</span>
+        </div>
+        <p class="stats-small">Aucun point n’est encore placé en comparaison. Ajoute des points depuis le panier.</p>
+      `;
+      return;
+    }
+
+    content.innerHTML = `
+      <div class="point-header">
+        <span class="point-code">Comparaison A–Z</span>
+      </div>
+
+      <p class="stats-intro">
+        Les points restent alignés en colonnes. Sur téléphone, le panneau s’étend horizontalement : fais glisser vers la gauche ou la droite pour comparer les mêmes champs.
+      </p>
+
+      <div class="comparison-grid comparison-grid-az" style="--comparison-count:${count}">
+        ${filled.map(slot => comparisonCardHtml(slot.index, slot.point)).join("")}
+      </div>
+    `;
+  };
+
+  window.openComparisonPanel = function(){
+    const panel = document.getElementById("comparisonPanel");
+    if(!panel) return;
+
+    const filled = filledComparisonSlots();
+    if(filled.length < 2){
+      if(typeof message !== "undefined" && message){
+        message.textContent = "Ajoute au moins deux points pour ouvrir la comparaison.";
+      }
+      openReviewBasketPanel();
+      return;
+    }
+
+    closeAllBottomPanels("comparisonPanel");
+    renderComparisonPanel();
+    panel.classList.add("open");
+  };
+
+  window.toggleComparisonPanel = function(){
+    const panel = document.getElementById("comparisonPanel");
+    if(!panel) return;
+
+    if(panel.classList.contains("open")){
+      closeComparisonPanel();
+    }else{
+      openComparisonPanel();
+    }
+  };
+
+  window.renderComparisonPanelIfOpen = function(){
+    const panel = document.getElementById("comparisonPanel");
+    if(panel && panel.classList.contains("open")){
+      renderComparisonPanel();
+    }
+  };
+
+  function comparisonBasketButtonHtml(point){
+    const slots = getComparisonPoints();
+    const index = comparisonSlotIndexOf(point, slots);
+
+    if(index >= 0){
+      const label = comparisonSlotLabel(index);
+      return `
+        <button
+          type="button"
+          class="comparison-present-button"
+          onclick="openComparisonPanel()"
+          title="Déjà en comparaison : ${escapeAttribute(label)}"
+          aria-label="Déjà en comparaison : ${escapeAttribute(label)}"
+        >${escapeHtml(label)}</button>
+      `;
+    }
+
+    return `
+      <button
+        type="button"
+        class="comparison-add-button"
+        onclick="addPointToComparison('${escapeAttribute(point)}')"
+        title="Ajouter à la comparaison"
+        aria-label="Ajouter à la comparaison"
+      >+</button>
+    `;
+  }
+
+  window.basketListHtml = function(){
+    const basket = getReviewBasket();
+
+    if(!basket.length){
+      return `<p class="stats-small">Ton panier est vide. Ajoute des points depuis la recherche, le Cheatsheet, une fiche point ou une catégorie validée.</p>`;
+    }
+
+    return `
+      <p class="stats-small">Clique sur un point pour ouvrir sa fiche. Le bouton + l’ajoute à la comparaison, automatiquement de A jusqu’à Z.</p>
+
+      <ul class="basket-list review-basket-grid">
+        ${basket.map(point => `
+          <li class="basket-list-item review-basket-item" title="${escapeAttribute(searchPointTitle(point))}">
+            <div
+              class="compact-point-row review-basket-row"
+              onclick="openPointPanelDirect('${escapeAttribute(point)}')"
+              role="button"
+              tabindex="0"
+              onkeydown="openBasketLineWithKeyboard(event,'${escapeAttribute(point)}')"
+            >
+              <span class="compact-point-code review-basket-code">
+                ${compactPointLabel(point)}
+              </span>
+
+              <span class="compact-point-tools basket-item-buttons review-basket-tools" onclick="event.stopPropagation()">
+                ${comparisonBasketButtonHtml(point)}
+
+                <button
+                  type="button"
+                  class="basket-remove-button"
+                  onclick="removePointFromReviewBasket('${escapeAttribute(point)}')"
+                  title="Retirer du panier"
+                >×</button>
+              </span>
+            </div>
+          </li>
+        `).join("")}
+      </ul>
+    `;
+  };
+
+  window.renderReviewBasketPanel = function(){
+    const content = document.getElementById("reviewBasketPanelContent");
+    if(!content) return;
+
+    content.innerHTML = `
+      <div class="point-header">
+        <span class="point-code">Panier de révision</span>
+      </div>
+
+      <p class="stats-intro">
+        Mets ici les points que tu veux revoir plus tard. Le panier reste enregistré dans ce navigateur, même après une mise à jour du jeu.
+      </p>
+
+      <div class="search-actions">
+        <button type="button" onclick="clearReviewBasket()">Vider le panier</button>
+        <button type="button" onclick="openAdvancedSearchFromBasket()">Ouvrir la recherche</button>
+      </div>
+
+      <div id="reviewBasketContent">${basketListHtml()}</div>
+    `;
+
+    updateBasketButtons();
+  };
+
+  const oldRenderStatsPanelIfOpen = window.renderStatsPanelIfOpen;
+  window.renderStatsPanelIfOpen = function(){
+    if(typeof oldRenderStatsPanelIfOpen === "function"){
+      oldRenderStatsPanelIfOpen.apply(this, arguments);
+    }
+    updateComparisonButtonLabel();
+  };
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", updateComparisonButtonLabel);
+  }else{
+    updateComparisonButtonLabel();
+  }
+})();
+</script>
+
+
+<script>
+/* === Patch : bouton A|B + pas d’ouverture auto depuis Recherche === */
+(function(){
+  const MAX_COMPARISON_SLOTS_PATCH = 26;
+
+  function comparisonSlotsPatch(){
+    if(typeof getComparisonPoints === "function"){
+      const slots = getComparisonPoints();
+      while(slots.length < MAX_COMPARISON_SLOTS_PATCH) slots.push("");
+      return slots.slice(0, MAX_COMPARISON_SLOTS_PATCH);
+    }
+    return Array.from({length:MAX_COMPARISON_SLOTS_PATCH}, () => "");
+  }
+
+  function firstFreeSlotPatch(slots){
+    return slots.findIndex(point => !point);
+  }
+
+  function slotIndexOfPatch(point, slots){
+    return slots.findIndex(saved => saved === point);
+  }
+
+  function slotLabelPatch(index){
+    return typeof comparisonSlotLabel === "function"
+      ? comparisonSlotLabel(index)
+      : "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[index] || "";
+  }
+
+  function pointLabelPatch(point){
+    return typeof formatPointCode === "function" ? formatPointCode(point) : String(point);
+  }
+
+  function isAdvancedSearchOpenPatch(){
+    const panel = document.getElementById("advancedSearchPanel");
+    return !!(panel && panel.classList.contains("open"));
+  }
+
+  function maybeOpenComparisonPatch(shouldOpen){
+    if(shouldOpen && typeof openComparisonPanel === "function"){
+      openComparisonPanel();
+    }
+  }
+
+  window.updateComparisonButtonLabel = function(){
+    const button = document.getElementById("comparisonButton");
+    if(!button) return;
+
+    button.textContent = "A|B";
+    button.title = "Comparer les points";
+    button.setAttribute("aria-label", "Comparer les points");
+  };
+
+  window.addPointToComparison = function(point, options){
+    point = String(point || "").trim();
+    if(!point) return;
+
+    const opts = options || {};
+    const suppressAutoOpen = opts.autoOpen === false || isAdvancedSearchOpenPatch();
+
+    const slots = comparisonSlotsPatch();
+    const alreadyIndex = slotIndexOfPatch(point, slots);
+
+    if(alreadyIndex >= 0){
+      const enoughToCompare = slots.filter(Boolean).length >= 2;
+      maybeOpenComparisonPatch(enoughToCompare && !suppressAutoOpen);
+
+      if(typeof message !== "undefined" && message){
+        message.textContent = `${pointLabelPatch(point)} est déjà en comparaison (${slotLabelPatch(alreadyIndex)}).`;
+      }
+      return;
+    }
+
+    const index = firstFreeSlotPatch(slots);
+
+    if(index < 0){
+      if(typeof message !== "undefined" && message){
+        message.textContent = "La comparaison est pleine : A à Z sont déjà occupés.";
+      }
+      maybeOpenComparisonPatch(!suppressAutoOpen);
+      return;
+    }
+
+    slots[index] = point;
+
+    if(typeof saveComparisonPoints === "function"){
+      saveComparisonPoints(slots);
+    }
+
+    const filledCount = slots.filter(Boolean).length;
+
+    if(filledCount >= 2 && !suppressAutoOpen){
+      openComparisonPanel();
+    }else if(typeof message !== "undefined" && message){
+      message.textContent = `${pointLabelPatch(point)} placé en comparaison (${slotLabelPatch(index)}).`;
+    }
+  };
+
+  window.setComparisonPoint = function(point, slotIndex, options){
+    point = String(point || "").trim();
+    if(!point) return;
+
+    if(slotIndex === undefined || slotIndex === null || slotIndex === ""){
+      addPointToComparison(point, options);
+      return;
+    }
+
+    const opts = options || {};
+    const suppressAutoOpen = opts.autoOpen === false || isAdvancedSearchOpenPatch();
+
+    const index = Math.max(
+      0,
+      Math.min(MAX_COMPARISON_SLOTS_PATCH - 1, Number(slotIndex) || 0)
+    );
+
+    const slots = comparisonSlotsPatch();
+    const alreadyIndex = slotIndexOfPatch(point, slots);
+
+    if(alreadyIndex >= 0 && alreadyIndex !== index){
+      slots[alreadyIndex] = "";
+    }
+
+    slots[index] = point;
+
+    if(typeof saveComparisonPoints === "function"){
+      saveComparisonPoints(slots);
+    }
+
+    const filledCount = slots.filter(Boolean).length;
+
+    if(filledCount >= 2 && !suppressAutoOpen){
+      openComparisonPanel();
+      if(typeof showProgressHintSoon === "function"){
+        showProgressHintSoon(
+          "comparison_ready",
+          "#comparisonPanel",
+          "Comparaison",
+          "Les points sont côte à côte pour comparer rapidement leurs catégories, correspondances, fonctions, indications et notes.",
+          {position:"aboveBottom"},
+          420
+        );
+      }
+    }else if(typeof message !== "undefined" && message){
+      message.textContent = `${pointLabelPatch(point)} placé en comparaison (${slotLabelPatch(index)}).`;
+    }
+  };
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", updateComparisonButtonLabel);
+  }else{
+    updateComparisonButtonLabel();
+  }
+})();
+</script>
+
+
+
+<script id="mtc-final-comparison-all-fields-patch">
+/* === Patch final : comparaison = tous les champs de fiche + phrase tuto plurielle === */
+(function(){
+  const SLOT_LETTERS_FINAL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  function esc(value){
+    if(typeof escapeHtml === "function") return escapeHtml(value);
+    return String(value ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+
+  function attr(value){
+    if(typeof escapeAttribute === "function") return escapeAttribute(value);
+    return esc(value);
+  }
+
+  function cleanField(value){
+    if(value === null || value === undefined) return "";
+    const text = String(value).trim();
+    if(!text || text === "Aucune" || text === "(Aucune)") return "";
+    return text;
+  }
+
+  function textWithBreaks(value){
+    return esc(cleanField(value)).replace(/\n/g, "<br>");
+  }
+
+  function slotLabel(index){
+    if(typeof comparisonSlotLabel === "function") return comparisonSlotLabel(index);
+    return SLOT_LETTERS_FINAL[Number(index) || 0] || "";
+  }
+
+  function filledSlots(){
+    const slots = typeof getComparisonPoints === "function" ? getComparisonPoints() : [];
+    return slots
+      .map((point, index) => ({point, index, label:slotLabel(index)}))
+      .filter(slot => !!slot.point);
+  }
+
+  function comparisonSectionHtml(title, value, options){
+    const clean = cleanField(value);
+    if(!clean) return "";
+
+    const opts = options || {};
+    const linkClass = opts.linkPoints ? " js-point-ref-content" : "";
+
+    return `
+      <div class="comparison-field">
+        <span class="comparison-field-title">${esc(title)}</span>
+        <div class="comparison-field-value${linkClass}">${textWithBreaks(clean)}</div>
+      </div>
+    `;
+  }
+
+  function comparisonSectionsForPoint(point, details){
+    const customNotes = typeof getEditablePointNote === "function"
+      ? getEditablePointNote(point, details.notes || "")
+      : (details.notes || "");
+
+    const sections = [
+      ["Localisation", details.localisation],
+      ["Méthode de localisation", details.methode_localisation],
+      ["Méthode de travail", details.methode_travail],
+      ["Catégories du point", details.categories_du_point],
+      ["Catégories de jeu", typeof pointCategoryNames === "function" ? pointCategoryNames(point).join(" · ") : ""],
+      ["Correspondances", details.correspondances],
+      ["Actions", details.actions || details.fonctions],
+      ["Indications", details.indications],
+      ["Associations", details.associations, {linkPoints:true}],
+      ["Notes", customNotes, {linkPoints:true}]
+    ];
+
+    const alreadyUsed = new Set([
+      "point", "pinyin", "hanzi", "nom_francais", "nom_complet",
+      "localisation", "methode_localisation", "methode_travail",
+      "categories_du_point", "correspondances", "actions", "fonctions",
+      "indications", "associations", "notes",
+      "canal", "_source_sheet", "_source_row"
+    ]);
+
+    Object.keys(details || {}).forEach(key => {
+      if(alreadyUsed.has(key)) return;
+      const value = details[key];
+      if(!cleanField(value)) return;
+      const title = typeof displayLabel === "function"
+        ? displayLabel(key)
+        : key.replace(/_/g, " ");
+      sections.push([title, value]);
+    });
+
+    return sections;
+  }
+
+  window.comparisonCardHtml = function(slotIndex, point){
+    if(!point) return "";
+
+    const details = (typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point])
+      ? POINT_DETAILS[point]
+      : {};
+
+    const label = slotLabel(slotIndex);
+    const title = typeof searchPointTitle === "function"
+      ? searchPointTitle(point)
+      : (typeof formatPointCode === "function" ? formatPointCode(point) : String(point));
+    const meta = typeof searchPointMeta === "function" ? searchPointMeta(point) : "";
+
+    const fieldsHtml = comparisonSectionsForPoint(point, details)
+      .map(([sectionTitle, value, options]) => comparisonSectionHtml(sectionTitle, value, options))
+      .join("");
+
+    return `
+      <div class="comparison-card" data-comparison-slot="${attr(label)}">
+        <div class="search-result-title">
+          <span class="comparison-slot-label">${esc(label)}</span>
+          ${title}
+        </div>
+        <div class="search-result-meta">${esc(meta)}</div>
+
+        <div class="comparison-actions">
+          <button type="button" onclick="openPointPanelDirect('${attr(point)}')">Ouvrir la fiche</button>
+          <button type="button" onclick="clearComparisonPoint(${Number(slotIndex) || 0})">Retirer</button>
+        </div>
+
+        ${fieldsHtml || `<p class="comparison-empty">Aucune fiche détaillée trouvée pour ce point.</p>`}
+      </div>
+    `;
+  };
+
+  window.renderComparisonPanel = function(){
+    const content = document.getElementById("comparisonPanelContent");
+    if(!content) return;
+
+    const filled = filledSlots();
+    const count = Math.max(filled.length, 2);
+
+    if(!filled.length){
+      content.innerHTML = `
+        <div class="point-header">
+          <span class="point-code">Comparaison</span>
+        </div>
+        <p class="stats-small">Aucun point n’est encore placé en comparaison. Ajoute des points depuis le panier.</p>
+      `;
+      return;
+    }
+
+    content.innerHTML = `
+      <div class="point-header">
+        <span class="point-code">Comparaison A–Z</span>
+      </div>
+
+      <p class="stats-intro">
+        Les points restent alignés en colonnes. Le panneau affiche les champs de la fiche : localisation, méthodes, catégories, correspondances, actions, indications, associations et notes.
+      </p>
+
+      <div class="comparison-grid comparison-grid-az" style="--comparison-count:${count}">
+        ${filled.map(slot => comparisonCardHtml(slot.index, slot.point)).join("")}
+      </div>
+    `;
+
+    if(typeof enhancePointReferencesInPanel === "function"){
+      enhancePointReferencesInPanel(content);
+    }
+  };
+
+  if(typeof updateComparisonButtonLabel === "function"){
+    updateComparisonButtonLabel();
+  }
+
+  if(typeof renderComparisonPanelIfOpen === "function"){
+    renderComparisonPanelIfOpen();
+  }
+})();
+</script>
+
+
+<script id="mtc-final-no-auto-open-from-basket-patch">
+/* === Patch final : ajout comparaison depuis panier sans ouverture automatique === */
+(function(){
+  function isReviewBasketOpen(){
+    const panel = document.getElementById("reviewBasketPanel");
+    return !!(panel && panel.classList.contains("open"));
+  }
+
+  function messageText(text){
+    if(typeof message !== "undefined" && message){
+      message.textContent = text;
+    }
+  }
+
+  const previousAddPointToComparison = window.addPointToComparison;
+  if(typeof previousAddPointToComparison === "function"){
+    window.addPointToComparison = function(point, options){
+      const opts = Object.assign({}, options || {});
+
+      /* Quand l’ajout vient du panier, on ajoute silencieusement :
+         le panneau Comparaison ne s’ouvre plus tout seul. */
+      if(isReviewBasketOpen()){
+        opts.autoOpen = false;
+      }
+
+      const result = previousAddPointToComparison.call(this, point, opts);
+
+      if(isReviewBasketOpen()){
+        const label = typeof formatPointCode === "function" ? formatPointCode(point) : String(point || "");
+        messageText(`${label} ajouté à la comparaison. Ouvre A|B quand tu veux comparer.`);
+      }
+
+      return result;
+    };
+  }
+
+  const previousSetComparisonPoint = window.setComparisonPoint;
+  if(typeof previousSetComparisonPoint === "function"){
+    window.setComparisonPoint = function(point, slotIndex, options){
+      const opts = Object.assign({}, options || {});
+
+      if(isReviewBasketOpen()){
+        opts.autoOpen = false;
+      }
+
+      return previousSetComparisonPoint.call(this, point, slotIndex, opts);
+    };
+  }
+
+  if(typeof renderReviewBasketPanelIfOpen === "function"){
+    renderReviewBasketPanelIfOpen();
+  }
+})();
+</script>
+
+
+
+<script id="mtc-final-true-comparison-slot-message-patch">
+/* === Patch final : le message affiche toujours le vrai slot A-Z === */
+(function(){
+  const MAX_SLOTS = 26;
+  const SLOT_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  function isPanelOpen(id){
+    const panel = document.getElementById(id);
+    return !!(panel && panel.classList.contains("open"));
+  }
+
+  function shouldSuppressAutoOpen(options){
+    const opts = options || {};
+    return opts.autoOpen === false
+      || isPanelOpen("advancedSearchPanel")
+      || isPanelOpen("reviewBasketPanel");
+  }
+
+  function slots(){
+    let current = [];
+
+    if(typeof getComparisonPoints === "function"){
+      current = getComparisonPoints() || [];
+    }else{
+      try{
+        current = JSON.parse(localStorage.getItem("connections_mtc_comparison_points_v1") || "[]") || [];
+      }catch(error){
+        current = [];
+      }
+    }
+
+    current = Array.isArray(current) ? current.slice(0, MAX_SLOTS) : [];
+    while(current.length < MAX_SLOTS) current.push("");
+    return current.map(point => point ? String(point) : "");
+  }
+
+  function saveSlots(nextSlots){
+    const cleanSlots = Array.isArray(nextSlots)
+      ? nextSlots.slice(0, MAX_SLOTS).map(point => point ? String(point) : "")
+      : [];
+
+    while(cleanSlots.length < MAX_SLOTS) cleanSlots.push("");
+
+    if(typeof saveComparisonPoints === "function"){
+      saveComparisonPoints(cleanSlots);
+    }else{
+      localStorage.setItem("connections_mtc_comparison_points_v1", JSON.stringify(cleanSlots));
+      if(typeof updateComparisonButtonLabel === "function") updateComparisonButtonLabel();
+      if(typeof renderComparisonPanelIfOpen === "function") renderComparisonPanelIfOpen();
+      if(typeof renderReviewBasketPanelIfOpen === "function") renderReviewBasketPanelIfOpen();
+    }
+  }
+
+  function slotLabel(index){
+    const number = Number(index);
+    if(typeof comparisonSlotLabel === "function") return comparisonSlotLabel(number);
+    return SLOT_LETTERS[number] || "";
+  }
+
+  function pointLabel(point){
+    if(typeof formatPointCode === "function") return formatPointCode(point);
+    return String(point || "");
+  }
+
+  function messageText(text){
+    if(typeof message !== "undefined" && message){
+      message.textContent = text;
+    }
+  }
+
+  function indexOfPoint(point, currentSlots){
+    return currentSlots.findIndex(saved => saved === point);
+  }
+
+  function firstFreeSlot(currentSlots){
+    return currentSlots.findIndex(saved => !saved);
+  }
+
+  function countFilled(currentSlots){
+    return currentSlots.filter(Boolean).length;
+  }
+
+  function messageForPlaced(point, index){
+    return `${pointLabel(point)} placé en comparaison (${slotLabel(index)}).`;
+  }
+
+  function messageForAlreadyPlaced(point, index){
+    return `${pointLabel(point)} est déjà en comparaison (${slotLabel(index)}).`;
+  }
+
+  function maybeOpenComparison(currentSlots, suppressAutoOpen){
+    if(!suppressAutoOpen && countFilled(currentSlots) >= 2 && typeof openComparisonPanel === "function"){
+      openComparisonPanel();
+    }
+  }
+
+  window.addPointToComparison = function(point, options){
+    point = String(point || "").trim();
+    if(!point) return null;
+
+    const suppressAutoOpen = shouldSuppressAutoOpen(options);
+    let currentSlots = slots();
+    let actualIndex = indexOfPoint(point, currentSlots);
+
+    if(actualIndex >= 0){
+      maybeOpenComparison(currentSlots, suppressAutoOpen);
+      messageText(messageForAlreadyPlaced(point, actualIndex));
+      return { point, slotIndex: actualIndex, slotLabel: slotLabel(actualIndex), alreadyPresent: true };
+    }
+
+    const freeIndex = firstFreeSlot(currentSlots);
+    if(freeIndex < 0){
+      messageText("La comparaison est pleine : A à Z sont déjà occupés.");
+      maybeOpenComparison(currentSlots, suppressAutoOpen);
+      return null;
+    }
+
+    currentSlots[freeIndex] = point;
+    saveSlots(currentSlots);
+
+    /* On relit le stockage après saveComparisonPoints, car certaines fonctions
+       peuvent normaliser/réordonner les slots. Le message utilise donc le vrai slot. */
+    currentSlots = slots();
+    actualIndex = indexOfPoint(point, currentSlots);
+    if(actualIndex < 0) actualIndex = freeIndex;
+
+    maybeOpenComparison(currentSlots, suppressAutoOpen);
+    messageText(messageForPlaced(point, actualIndex));
+
+    return { point, slotIndex: actualIndex, slotLabel: slotLabel(actualIndex), alreadyPresent: false };
+  };
+
+  window.setComparisonPoint = function(point, slotIndex, options){
+    point = String(point || "").trim();
+    if(!point) return null;
+
+    if(slotIndex === undefined || slotIndex === null || slotIndex === ""){
+      return addPointToComparison(point, options);
+    }
+
+    const suppressAutoOpen = shouldSuppressAutoOpen(options);
+    const requestedIndex = Math.max(0, Math.min(MAX_SLOTS - 1, Number(slotIndex) || 0));
+
+    let currentSlots = slots();
+    const oldIndex = indexOfPoint(point, currentSlots);
+
+    if(oldIndex >= 0 && oldIndex !== requestedIndex){
+      currentSlots[oldIndex] = "";
+    }
+
+    currentSlots[requestedIndex] = point;
+    saveSlots(currentSlots);
+
+    currentSlots = slots();
+    let actualIndex = indexOfPoint(point, currentSlots);
+    if(actualIndex < 0) actualIndex = requestedIndex;
+
+    maybeOpenComparison(currentSlots, suppressAutoOpen);
+    messageText(messageForPlaced(point, actualIndex));
+
+    return { point, slotIndex: actualIndex, slotLabel: slotLabel(actualIndex), requestedSlotIndex: requestedIndex };
+  };
+
+  if(typeof renderReviewBasketPanelIfOpen === "function"){
+    renderReviewBasketPanelIfOpen();
+  }
+})();
+</script>
+
+
+<!-- === Correctif mobile : clic/tap sur la goutte = message “Me soutenir” === -->
+<style>
+  #supportCoffeeButton,
+  #supportCoffeeButton.support-blooddrop-moving{
+    touch-action:manipulation !important;
+    -webkit-tap-highlight-color:transparent !important;
+    cursor:pointer !important;
+    pointer-events:auto !important;
+  }
+
+  #supportCoffeeButton.support-blooddrop-moving{
+    z-index:9600 !important;
+  }
+</style>
+
+<script>
+(function(){
+  "use strict";
+
+  const TAP_GUARD_MS = 650;
+  let lastSupportCoffeeTapAt = 0;
+  let lastSupportCoffeePointerDown = null;
+
+  function getSupportCoffeeButtonFromEvent(event){
+    if(!event) return document.getElementById("supportCoffeeButton");
+
+    const target = event.target;
+
+    if(target && typeof target.closest === "function"){
+      const button = target.closest("#supportCoffeeButton");
+      if(button) return button;
+    }
+
+    return document.getElementById("supportCoffeeButton");
+  }
+
+  function preventSupportCoffeeEvent(event){
+    if(!event) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if(typeof event.stopImmediatePropagation === "function"){
+      event.stopImmediatePropagation();
+    }
+  }
+
+  function pointerMovedTooMuch(event){
+    if(!event || !lastSupportCoffeePointerDown) return false;
+
+    const dx = Math.abs((event.clientX || 0) - lastSupportCoffeePointerDown.x);
+    const dy = Math.abs((event.clientY || 0) - lastSupportCoffeePointerDown.y);
+
+    return dx > 14 || dy > 14;
+  }
+
+  function triggerSupportCoffeeMessageFromTap(event){
+    const button = getSupportCoffeeButtonFromEvent(event);
+    if(!button) return false;
+
+    if(event && event.type === "pointerup" && pointerMovedTooMuch(event)){
+      return false;
+    }
+
+    const now = Date.now();
+    if(now - lastSupportCoffeeTapAt < TAP_GUARD_MS){
+      preventSupportCoffeeEvent(event);
+      return false;
+    }
+
+    lastSupportCoffeeTapAt = now;
+    preventSupportCoffeeEvent(event);
+
+    if(typeof handleSupportCoffeeButtonClick === "function"){
+      return handleSupportCoffeeButtonClick(event, button);
+    }
+
+    if(typeof showSupportCoffeeReminder === "function"){
+      try{
+        localStorage.setItem("mtc_support_coffee_return_eligible", "1");
+      }catch(error){}
+      showSupportCoffeeReminder();
+    }
+
+    return false;
+  }
+
+  function suppressSyntheticClickAfterTap(event){
+    const button = getSupportCoffeeButtonFromEvent(event);
+    if(!button) return;
+
+    const now = Date.now();
+    if(now - lastSupportCoffeeTapAt < TAP_GUARD_MS){
+      preventSupportCoffeeEvent(event);
+    }
+  }
+
+  function setupMobileSupportCoffeeTap(){
+    const button = document.getElementById("supportCoffeeButton");
+    if(!button || button.dataset.mobileSupportTapReady === "1") return;
+
+    button.dataset.mobileSupportTapReady = "1";
+
+    button.addEventListener("pointerdown", event=>{
+      lastSupportCoffeePointerDown = {
+        x:event.clientX || 0,
+        y:event.clientY || 0
+      };
+    }, {capture:true, passive:true});
+
+    button.addEventListener("pointerup", event=>{
+      if(window.matchMedia && !window.matchMedia("(pointer: coarse), (max-width: 699px)").matches){
+        return;
+      }
+      triggerSupportCoffeeMessageFromTap(event);
+    }, {capture:true});
+
+    /* Fallback iOS ancien : certains WebViews déclenchent touchend sans pointerup. */
+    button.addEventListener("touchend", event=>{
+      if(window.PointerEvent) return;
+      triggerSupportCoffeeMessageFromTap(event);
+    }, {capture:true});
+
+    button.addEventListener("click", suppressSyntheticClickAfterTap, {capture:true});
+  }
+
+  document.addEventListener("DOMContentLoaded", setupMobileSupportCoffeeTap);
+
+  if(document.readyState !== "loading"){
+    setupMobileSupportCoffeeTap();
+  }
+
+  /* La goutte peut être déplacée dans body pendant la chute : on garde aussi
+     un filet de sécurité en délégation, utile sur mobile. */
+  document.addEventListener("pointerup", event=>{
+    if(window.matchMedia && !window.matchMedia("(pointer: coarse), (max-width: 699px)").matches){
+      return;
+    }
+
+    const target = event.target;
+    if(!target || typeof target.closest !== "function") return;
+
+    if(target.closest("#supportCoffeeButton")){
+      triggerSupportCoffeeMessageFromTap(event);
+    }
+  }, {capture:true});
+})();
+</script>
+
+
+
+<script>
+/* === Patch cheatsheet : Les 8 merveilleux vaisseaux — points d'intersection/trajet === */
+(function(){
+  "use strict";
+
+  const EXTRAORDINARY_VESSEL_CHEATSHEET_POINTS = {
+    ChongMai: {
+      title: "Chōng mài",
+      points: [
+        "RM1","RM2","RM7","RM24",
+        "E1","E30","E36","E37","E39","E42",
+        "Rt1","Rt4","Rt12",
+        "Rn1","Rn3","Rn6","Rn10","Rn11","Rn12","Rn13","Rn14","Rn15","Rn16","Rn17","Rn18","Rn19","Rn20","Rn21","Rn22","Rn23","Rn24","Rn25","Rn26","Rn27",
+        "VB26",
+        "DM1","DM4",
+        "V11","V17","V40",
+        "F1","F3"
+      ]
+    },
+    RenMai: {
+      title: "Rèn mài",
+      points: [
+        "P7","Rn6",
+        "RM1","RM3","RM4","RM5","RM7","RM8","RM12","RM15","RM16","RM17","RM24",
+        "E1","E4","Rt4","DM1","DM26","DM28"
+      ]
+    },
+    DuMai: {
+      title: "Dū mài",
+      points: [
+        "IG3","GI4","TF5",
+        "V1","V2","V11","V12","V16","V23","V35",
+        "RM1","RM24",
+        "DM1","DM12","DM14","DM16","DM20","DM28",
+        "E1","E4","VB20"
+      ]
+    },
+    YinWeiMai: {
+      title: "Yīn wéi mài",
+      points: [
+        "EC6","Rn9","Rt4","Rt12","Rt13","Rt15","Rt16","F14","RM17","RM22","RM23"
+      ]
+    },
+    YangWeiMai: {
+      title: "Yáng wéi mài",
+      points: [
+        "TF5","V63","VB35","VB21","E8","VB13","VB14","VB15","VB16","VB17","VB18","VB19","VB20","DM16","DM15",
+        "GI14","IG10","TF13","TF15","VB23","VB24"
+      ]
+    },
+    YinQiaoMai: {
+      title: "Yīn qiāo mài",
+      points: [
+        "Rn2","Rn6","Rn8","P7","E9","E12","V1","C5"
+      ]
+    },
+    YangQiaoMai: {
+      title: "Yáng qiāo mài",
+      points: [
+        "V62","V61","V59","VB29","IG10","GI15","GI16","V1","E1","E2","E3","E4","VB20","IG3"
+      ]
+    },
+    DaiMai: {
+      title: "Dài mài",
+      points: [
+        "VB26","VB27","VB28","VB41","F13","RM8","Rn16","E25","Rt15","V23","V52","DM4","Rn23"
+      ]
+    }
+  };
+
+  function uniquePoints(points){
+    const seen = new Set();
+    return (points || []).filter(point=>{
+      const code = String(point || "").trim();
+      if(!code || seen.has(code)) return false;
+      seen.add(code);
+      return true;
+    });
+  }
+
+  function pointSortKey(point){
+    const order = ["P","GI","E","Rt","C","IG","V","Rn","EC","TF","VB","F","RM","DM"];
+    const match = String(point).match(/^([A-Za-z]+)(\d+)$/);
+    if(!match) return [99, String(point)];
+    const canalIndex = order.indexOf(match[1]);
+    return [canalIndex < 0 ? 99 : canalIndex, Number(match[2])];
+  }
+
+  function sortedUniquePoints(points){
+    return uniquePoints(points).sort((a,b)=>{
+      const ka = pointSortKey(a);
+      const kb = pointSortKey(b);
+      if(ka[0] !== kb[0]) return ka[0] - kb[0];
+      if(ka[1] !== kb[1]) return ka[1] - kb[1];
+      return String(a).localeCompare(String(b), "fr");
+    });
+  }
+
+  function addEightVesselCheatsheetStyles(){
+    if(document.getElementById("eightVesselCheatsheetStyle")) return;
+    const style = document.createElement("style");
+    style.id = "eightVesselCheatsheetStyle";
+    style.textContent = `
+      .cheatsheet-vessel-subsection{
+        margin:3px 0 5px;
+        padding:0;
+        border-top:1px solid rgba(0,0,0,.08);
+      }
+
+      .cheatsheet-vessel-subsection summary{
+        cursor:pointer;
+        padding:5px 0 3px;
+        font-weight:800;
+        opacity:.92;
+      }
+
+      .cheatsheet-vessel-points{
+        padding:1px 0 5px 8px;
+      }
+
+      .cheatsheet-vessel-note{
+        margin:0 0 7px;
+        font-family:var(--ui-font-family);
+        font-size:.76em;
+        line-height:1.25;
+        opacity:.62;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function overrideRenderCheatsheetPanelWithEightVessels(){
+    if(typeof window.renderCheatsheetPanel !== "function") return;
+
+    window.renderCheatsheetPanel = function(){
+      addEightVesselCheatsheetStyles();
+
+      function flattenLocal(value){
+        if(!value) return [];
+        if(Array.isArray(value)) return value.flatMap(flattenLocal);
+        if(typeof value === "object") return Object.values(value).flatMap(flattenLocal);
+        return [String(value)];
+      }
+
+      function pointFullName(point){
+        const code = String(point).trim();
+        const d = (typeof POINT_DETAILS !== "undefined" && POINT_DETAILS[code]) ? POINT_DETAILS[code] : {};
+        return `
+          ${typeof basketButtonHtml === "function" ? basketButtonHtml(code, "cheatsheet-basket-button", true) : ""}
+          <button
+            type="button"
+            class="cheatsheet-point-link"
+            onclick="openPointPanelDirect('${typeof escapeAttribute === "function" ? escapeAttribute(code) : code}')"
+          >
+            ${typeof formatPointCode === "function" ? formatPointCode(code) : code}
+          </button>
+          ${d.pinyin || ""}
+          ${d.hanzi || ""}
+          ${d.nom_francais || d.nom_complet || ""}
+        `;
+      }
+
+      function line(labelText, value){
+        const points = flattenLocal(value);
+        if(points.length === 0) return "";
+        return `
+          <div class="cheatsheet-line">
+            <strong>${labelText}</strong> : ${points.map(pointFullName).join(", ")}
+          </div>
+        `;
+      }
+
+      function simplePointLines(value){
+        return flattenLocal(value).map(point => `
+          <div class="cheatsheet-line">
+            ${pointFullName(point)}
+          </div>
+        `);
+      }
+
+      function section(title, rows){
+        const cleanRows = rows.filter(Boolean);
+        if(cleanRows.length === 0) return "";
+        return `
+          <details class="cheatsheet-section">
+            <summary>${title}</summary>
+            <div>${cleanRows.join("")}</div>
+          </details>
+        `;
+      }
+
+      function label(key){
+        return (typeof LABEL_NAMES !== "undefined" && LABEL_NAMES[key]) ||
+               (typeof displayLabel === "function" ? displayLabel(key) : key);
+      }
+
+      function vesselSubsection(vessel){
+        const points = sortedUniquePoints(vessel.points);
+        return `
+          <details class="cheatsheet-vessel-subsection">
+            <summary>${vessel.title}</summary>
+            <div class="cheatsheet-vessel-points">
+              ${simplePointLines(points).join("")}
+            </div>
+          </details>
+        `;
+      }
+
+      const canalOrder = [
+        "IG","V","TF","VB","GI","E",
+        "P","Rt","C","Rn","EC","F",
+        "RM","DM"
+      ];
+
+      let html = `
+        <div class="point-header">
+          <span class="point-code">Cheatsheet</span>
+        </div>
+      `;
+
+      Object.entries(RAW_DATA.Categories_de_points || {}).forEach(([key,value])=>{
+        const title = DISPLAY_NAMES[key] || key;
+        if([
+          "Points_Jing_Puits",
+          "Points_Ying_Jaillissement",
+          "Points_Shu_Riviere",
+          "Points_Jing_Fleuve",
+          "Points_He_Reunion",
+          "Points_Yuan_Source",
+          "Points_Xi_Crevasse",
+          "Points_Luo_Liaison"
+        ].includes(key)){
+          html += section(
+            title,
+            canalOrder.map(canal =>
+              line(
+                labelForCanalOrVessel(canal),
+                flattenLocal(value).filter(p => canalOfPoint(p) === canal)
+              )
+            )
+          );
+        }else{
+          html += section(title, simplePointLines(value));
+        }
+      });
+
+      [
+        "Points_d_ouverture_des_merveilleux_vaisseaux",
+        "Points_Hui_Reunion",
+        "Points_generaux",
+        "Les_4_mers"
+      ].forEach(sectionKey=>{
+        const data = RAW_DATA[sectionKey];
+        if(!data) return;
+        html += section(
+          DISPLAY_NAMES[sectionKey] || sectionKey,
+          Object.entries(data).map(([labelKey,points]) =>
+            line(label(labelKey), points)
+          )
+        );
+
+        if(sectionKey === "Points_d_ouverture_des_merveilleux_vaisseaux"){
+          html += `
+            <details class="cheatsheet-section" data-cheatsheet-only="eight-vessels">
+              <summary>Les 8 merveilleux vaisseaux</summary>
+              <div>
+                <p class="cheatsheet-vessel-note">Points d’intersection / de trajet listés uniquement ici, sans les ajouter aux catégories du jeu.</p>
+                ${Object.values(EXTRAORDINARY_VESSEL_CHEATSHEET_POINTS).map(vesselSubsection).join("")}
+              </div>
+            </details>
+          `;
+        }
+      });
+
+      [
+        "Points_fenetre_du_ciel",
+        "Points_pour_faire_revenir_le_Yang",
+        "Points_fantomes_de_Sun_Si_Miao"
+      ].forEach(sectionKey=>{
+        const data = RAW_DATA[sectionKey];
+        if(!data) return;
+        html += section(
+          DISPLAY_NAMES[sectionKey] || sectionKey,
+          simplePointLines(data)
+        );
+      });
+
+      if(typeof POINT_DETAILS !== "undefined"){
+        function isRegularPointCode(code){
+          if(typeof mtcRegularPointCode === "function") return mtcRegularPointCode(code);
+          return /^(P|GI|E|Rt|C|IG|V|Rn|EC|TF|VB|F|RM|DM)\d+$/.test(String(code));
+        }
+
+        function extraordinarySortLabel(point){
+          const d = POINT_DETAILS[point] || {};
+          return String(d.pinyin || d.nom_francais || d.nom_complet || point)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g,"")
+            .toLowerCase();
+        }
+
+        const extraordinaryPoints = Object.keys(POINT_DETAILS)
+          .filter(point => !isRegularPointCode(point))
+          .sort((a,b) => extraordinarySortLabel(a).localeCompare(extraordinarySortLabel(b), "fr"));
+
+        html += section("Points extraordinaires", simplePointLines(extraordinaryPoints));
+      }
+
+      cheatsheetPanelContent.innerHTML = html;
+      if(typeof updateBasketButtons === "function") updateBasketButtons();
+    };
+  }
+
+  overrideRenderCheatsheetPanelWithEightVessels();
+  document.addEventListener("DOMContentLoaded", overrideRenderCheatsheetPanelWithEightVessels);
+})();
+</script>
+
+
+
+<!-- === Correctif Stats : affichage plus clair + durées aberrantes ignorées === -->
+<style>
+.stats-time-note{
+  margin:8px 0 0 !important;
+  font-family:var(--ui-font-family) !important;
+  font-size:.76em !important;
+  line-height:1.3 !important;
+  opacity:.66 !important;
+}
+</style>
+<script>
+(function(){
+  const TIMER_KEY = "__mtcCategorySolveStarts";
+  const MIN_VALID_SOLVE_MS = 2500;
+  const MAX_VALID_SOLVE_MS = 10 * 60 * 1000;
+
+  function nowMs(){
+    return (
+      window.performance &&
+      typeof performance.now === "function"
+    )
+      ? performance.now()
+      : Date.now();
+  }
+
+  function clamp01(value){
+    return Math.max(0, Math.min(1, Number(value) || 0));
+  }
+
+  function validSolveMs(ms){
+    const value = Number(ms);
+    return Number.isFinite(value) &&
+      value >= MIN_VALID_SOLVE_MS &&
+      value <= MAX_VALID_SOLVE_MS
+        ? value
+        : null;
+  }
+
+  function usableAverageSolveMs(saved){
+    if(!saved) return null;
+    return validSolveMs(saved.avgSolveMs) ||
+      validSolveMs(saved.bestSolveMs) ||
+      validSolveMs(saved.lastSolveMs) ||
+      null;
+  }
+
+  function mergeUniquePoints(oldPoints, newPoints){
+    return [
+      ...new Set([
+        ...(Array.isArray(oldPoints) ? oldPoints : []),
+        ...(Array.isArray(newPoints) ? newPoints : [])
+      ].map(String))
+    ];
+  }
+
+  function timeDifficultyFromMs(ms){
+    const value = validSolveMs(ms);
+
+    if(value == null){
+      return null;
+    }
+
+    const minMs = 12000;
+    const maxMs = 180000;
+
+    const normalized =
+      (Math.log(value) - Math.log(minMs)) /
+      (Math.log(maxMs) - Math.log(minMs));
+
+    return clamp01(normalized);
+  }
+
+  function unknownTimeDifficulty(row){
+    if(row && row.solved > 0) return 0.48;
+    if(row && row.seen > 0) return 0.82;
+    return 0.68;
+  }
+
+  function formatDuration(ms){
+    const value = validSolveMs(ms);
+
+    if(value == null){
+      return "—";
+    }
+
+    const totalSeconds = Math.max(1, Math.round(value / 1000));
+
+    if(totalSeconds < 60){
+      return totalSeconds + "s";
+    }
+
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${minutes}m${String(seconds).padStart(2,"0")}`;
+  }
+
+  function shortPercent(value){
+    return Math.round(clamp01(value) * 100) + "%";
+  }
+
+  function easeLabel(ease){
+    const value = clamp01(ease);
+    if(value >= 0.72) return "facile";
+    if(value >= 0.42) return "moyen";
+    return "difficile";
+  }
+
+  function difficultyLabel(difficulty){
+    const value = clamp01(difficulty);
+    if(value < 0.34) return "facile";
+    if(value < 0.67) return "moyen";
+    return "difficile";
+  }
+
+  function statsHelp(text){
+    return `
+      <span class="stats-help-wrap">
+        <button type="button" class="stats-help" aria-label="${escapeAttribute(text)}">?</button>
+        <span class="stats-help-text">${escapeHtml(text)}</span>
+      </span>
+    `;
+  }
+
+  function statsRankRowHtml(row, meta, barValue){
+    return `
+      <li class="stats-rank-row">
+        <span class="stats-rank-name" title="${escapeAttribute(row.name)}">
+          ${escapeHtml(row.name)}
+        </span>
+        <span class="stats-rank-meta">${escapeHtml(meta)}</span>
+        <span class="stats-bar" aria-hidden="true">
+          <span class="stats-bar-fill" style="width:${Math.round(clamp01(barValue) * 100)}%"></span>
+        </span>
+      </li>
+    `;
+  }
+
+  function statsRankListHtml(rows, metaFn, barFn, emptyText = "—"){
+    if(!rows.length){
+      return `<div class="stats-rank-meta">${escapeHtml(emptyText)}</div>`;
+    }
+
+    return `
+      <ol class="stats-rank-list">
+        ${rows.map(row => statsRankRowHtml(row, metaFn(row), barFn(row))).join("")}
+      </ol>
+    `;
+  }
+
+  function statsBucketHtml(label, rows){
+    const names = rows
+      .slice(0,5)
+      .map(row => row.name)
+      .join(" · ");
+
+    return `
+      <div class="stats-bucket">
+        <div class="stats-bucket-head">
+          <span>${escapeHtml(label)}</span>
+          <span>${rows.length}</span>
+        </div>
+        <div class="stats-bucket-items">
+          ${escapeHtml(names || "—")}
+        </div>
+      </div>
+    `;
+  }
+
+  function normalizePracticeModeForStats(mode){
+    return ({
+      weak:"hard",
+      strong:"easy",
+      balanced:"balanced",
+      easy:"easy",
+      hard:"hard"
+    })[mode] || "balanced";
+  }
+
+  function recommendedRowsForMode(rows, mode){
+    const cleanMode = normalizePracticeModeForStats(mode);
+
+    return [...rows]
+      .sort((a,b)=>{
+        if(cleanMode === "easy"){
+          return a.difficulty - b.difficulty || b.coverage - a.coverage;
+        }
+
+        if(cleanMode === "hard"){
+          return b.difficulty - a.difficulty || a.coverage - b.coverage;
+        }
+
+        const aScore =
+          Math.abs(a.difficulty - 0.5) - (1 - a.coverage) * 0.18;
+        const bScore =
+          Math.abs(b.difficulty - 0.5) - (1 - b.coverage) * 0.18;
+
+        return aScore - bScore;
+      })
+      .slice(0,8);
+  }
+
+  window.recordStatsCategorySolved = function(group){
+    if(!group || gameOver) return;
+
+    const stats = loadMtcStats();
+    const cat = ensureCategoryStats(stats, group.key, group.name);
+    const now = new Date().toISOString();
+
+    cat.solved++;
+    cat.lastSolved = now;
+
+    cat.foundPoints = mergeUniquePoints(cat.foundPoints, group.points || []);
+    cat.seenPoints = mergeUniquePoints(cat.seenPoints, group.points || []);
+
+    const key = canonicalAssociationKey(group.key);
+    const timers = window[TIMER_KEY] || {};
+    const startedAt = timers[key];
+
+    if(Number.isFinite(startedAt)){
+      const rawSolveMs = Math.max(0, nowMs() - startedAt);
+      const solveMs = validSolveMs(rawSolveMs);
+
+      if(solveMs != null){
+        cat.lastSolveMs = solveMs;
+        cat.bestSolveMs =
+          validSolveMs(cat.bestSolveMs) != null
+            ? Math.min(Number(cat.bestSolveMs), solveMs)
+            : solveMs;
+
+        cat.solveTimeCount = Number(cat.solveTimeCount || 0) + 1;
+
+        const currentAverage = validSolveMs(cat.avgSolveMs);
+        cat.avgSolveMs =
+          currentAverage != null
+            ? currentAverage * 0.7 + solveMs * 0.3
+            : solveMs;
+      }else{
+        cat.ignoredSolveTimeCount = Number(cat.ignoredSolveTimeCount || 0) + 1;
+        cat.lastIgnoredSolveMs = rawSolveMs;
+      }
+
+      delete timers[key];
+    }
+
+    const totalPoints = mtcCategoryTotalPoints(group).length;
+    const isNowComplete =
+      totalPoints > 0 &&
+      cat.seenPoints.length >= totalPoints;
+
+    if(isNowComplete && !Number(cat.allPointsFound || 0)){
+      cat.allPointsFound = 1;
+      cat.lastAllPointsFound = now;
+    }
+
+    saveMtcStats(stats);
+    renderStatsPanelIfOpen();
+  };
+
+  window.categoryStatsRowFromCat = function(stats, cat){
+    const saved = ensureCategoryStats(
+      stats,
+      cat.key,
+      cat.name || DISPLAY_NAMES[cat.key] || displayLabel(cat.key)
+    );
+
+    const totalPoints = mtcCategoryTotalPoints(cat).length;
+
+    const seenPointsCount =
+      Array.isArray(saved.seenPoints)
+        ? saved.seenPoints.length
+        : 0;
+
+    const foundPointsCount =
+      Array.isArray(saved.foundPoints)
+        ? saved.foundPoints.length
+        : 0;
+
+    const coverage =
+      totalPoints > 0
+        ? clamp01(seenPointsCount / totalPoints)
+        : 0;
+
+    const avgSolveMs = usableAverageSolveMs(saved);
+    const timeDifficulty = timeDifficultyFromMs(avgSolveMs);
+
+    const effectiveTimeDifficulty =
+      timeDifficulty == null
+        ? unknownTimeDifficulty(saved)
+        : timeDifficulty;
+
+    const difficulty =
+      clamp01((1 - coverage) * 0.52 + effectiveTimeDifficulty * 0.48);
+
+    const ease =
+      timeDifficulty == null
+        ? null
+        : clamp01(1 - timeDifficulty);
+
+    const allPointsComplete =
+      totalPoints > 0 &&
+      seenPointsCount >= totalPoints;
+
+    return {
+      key:cat.key,
+      name:saved.name,
+      seen:saved.seen || 0,
+      solved:saved.solved || 0,
+      allPointsFound:allPointsComplete ? 1 : 0,
+      allPointsComplete,
+      foundPointsCount,
+      seenPointsCount,
+      totalPoints,
+      coverage,
+      avgSolveMs,
+      lastSolveMs:validSolveMs(saved.lastSolveMs),
+      bestSolveMs:validSolveMs(saved.bestSolveMs),
+      solveTimeCount:Number(saved.solveTimeCount || 0),
+      ignoredSolveTimeCount:Number(saved.ignoredSolveTimeCount || 0),
+      timeDifficulty:effectiveTimeDifficulty,
+      ease,
+      difficulty,
+      mastery:clamp01(1 - difficulty),
+      hints:saved.hints || 0
+    };
+  };
+
+  window.categoryMasteryScore = function(row){
+    return row ? clamp01(1 - Number(row.difficulty || 0)) : 0;
+  };
+
+  window.getAllStatsRows = function(stats){
+    if(!pool || !pool.length){
+      pool = buildPool();
+    }
+
+    const rows = pool.map(cat => categoryStatsRowFromCat(stats, cat));
+
+    Object.entries(stats.categories || {}).forEach(([key,value])=>{
+      const canonicalKey = canonicalAssociationKey(key);
+
+      if(rows.some(row => canonicalAssociationKey(row.key) === canonicalKey)){
+        return;
+      }
+
+      rows.push(
+        categoryStatsRowFromCat(
+          stats,
+          {
+            key:canonicalKey,
+            name:value.name || DISPLAY_NAMES[canonicalKey] || displayLabel(canonicalKey),
+            points:mtcCategoryTotalPoints(canonicalKey)
+          }
+        )
+      );
+    });
+
+    return rows.map(row => ({
+      ...row,
+      mastery:categoryMasteryScore(row)
+    }));
+  };
+
+  window.categoryPracticeWeight = function(cat){
+    const mode = getAutoPracticeMode();
+    const stats = loadMtcStats();
+    const row = categoryStatsRowFromCat(stats, cat);
+
+    let weight = MTC_IMPORTANT_CATEGORY_KEYS.includes(canonicalAssociationKey(cat.key))
+      ? 2
+      : 1;
+
+    if(mode === "easy"){
+      weight += Math.round((1 - row.difficulty) * 9);
+      if(row.coverage > 0.25) weight += 1;
+    }else if(mode === "hard"){
+      weight += Math.round(row.difficulty * 10);
+      if(row.coverage < 1) weight += 2;
+    }else{
+      const middlePriority =
+        1 - Math.abs(row.difficulty - 0.5) * 2;
+
+      weight += Math.round(clamp01(middlePriority) * 5);
+      weight += Math.round((1 - row.coverage) * 3);
+    }
+
+    return Math.max(1, Math.min(14, weight));
+  };
+
+  window.recommendedStatsRows = function(rows){
+    return recommendedRowsForMode(rows, getAutoPracticeMode());
+  };
+
+  window.renderStatsPanel = function(){
+    const panelContent = document.getElementById("statsPanelContent");
+    if(!panelContent) return;
+
+    const stats = loadMtcStats();
+    const rows = getAllStatsRows(stats);
+    const playedRows = rows.filter(row => row.seen > 0);
+    const timedRows = playedRows.filter(row => row.avgSolveMs != null && row.ease != null);
+
+    const winRate =
+      stats.gamesFinished > 0
+        ? stats.wins / stats.gamesFinished
+        : 0;
+
+    const easeRows = [...timedRows]
+      .sort((a,b)=>
+        b.ease - a.ease ||
+        a.avgSolveMs - b.avgSolveMs
+      )
+      .slice(0,12);
+
+    const coverageRows = [...rows]
+      .sort((a,b)=>
+        a.coverage - b.coverage ||
+        b.difficulty - a.difficulty
+      )
+      .slice(0,8);
+
+    const completeRows = rows
+      .filter(row => row.totalPoints > 0 && row.coverage >= 1)
+      .sort((a,b)=>a.name.localeCompare(b.name));
+
+    const partialRows = rows
+      .filter(row => row.coverage > 0 && row.coverage < 1)
+      .sort((a,b)=>a.coverage - b.coverage);
+
+    const emptyRows = rows
+      .filter(row => row.coverage <= 0)
+      .sort((a,b)=>a.name.localeCompare(b.name));
+
+    const recommended = recommendedRowsForMode(rows, getAutoPracticeMode());
+
+    const ignoredCount = Object.values(stats.categories || {})
+      .reduce((sum,cat)=>sum + Number(cat.ignoredSolveTimeCount || 0),0);
+
+    panelContent.innerHTML = `
+      <div class="point-header">
+        <span class="point-code">Stats</span>
+      </div>
+
+      <div class="stats-quickbar">
+        <span class="stats-pill">Parties ${stats.gamesStarted}</span>
+        <span class="stats-pill">Victoires ${stats.wins}</span>
+        <span class="stats-pill">Réussite ${shortPercent(winRate)}</span>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stats-card">
+          <h3>
+            Facilité · facile → difficile
+            ${statsHelp("Trié du plus rapide au plus lent. Le temps est le temps moyen entre le premier clic dans une catégorie et sa validation. Les durées trop longues, par exemple si la partie reste ouverte puis reprise beaucoup plus tard, sont ignorées.")}
+          </h3>
+          ${statsRankListHtml(
+            easeRows,
+            row => `${formatDuration(row.avgSolveMs)} · ${easeLabel(row.ease)}`,
+            row => row.ease,
+            "Pas encore de catégorie chronométrée."
+          )}
+        </div>
+
+        <div class="stats-card">
+          <h3>
+            Couverture
+            ${statsHelp("Nombre de points déjà vus dans les grilles, rapporté au nombre total de points de la catégorie. Les catégories les moins couvertes apparaissent d’abord.")}
+          </h3>
+          ${statsRankListHtml(
+            coverageRows,
+            row => row.totalPoints > 0
+              ? `${row.seenPointsCount}/${row.totalPoints} points vus`
+              : "—",
+            row => row.coverage,
+            "Aucune catégorie disponible."
+          )}
+        </div>
+
+        <div class="stats-card">
+          <h3>
+            Statut
+            ${statsHelp("Complète : tous les points de la catégorie ont été vus. Partielle : seulement une partie. À commencer : aucun point vu pour l’instant.")}
+          </h3>
+          <div class="stats-bucket-list">
+            ${statsBucketHtml("Complètes", completeRows)}
+            ${statsBucketHtml("Partielles", partialRows)}
+            ${statsBucketHtml("À commencer", emptyRows)}
+          </div>
+        </div>
+
+        <div class="stats-card">
+          <h3>
+            À réviser
+            ${statsHelp("Liste calculée avec le mode Auto choisi, en combinant la difficulté estimée et la couverture réelle des points.")}
+          </h3>
+          ${statsRankListHtml(
+            recommended,
+            row => row.totalPoints > 0
+              ? `${difficultyLabel(row.difficulty)} · ${row.seenPointsCount}/${row.totalPoints} vus`
+              : difficultyLabel(row.difficulty),
+            row => row.difficulty,
+            "Rien à proposer."
+          )}
+        </div>
+      </div>
+    `;
+
+    if(typeof updatePracticeModeSwitch === "function"){
+      updatePracticeModeSwitch();
+    }
+  };
+})();
+</script>
+
+
+<style>
+/* === Correctif : bulles d'aide du panneau Recherche = style tuto === */
+#advancedSearchPanel .search-help-wrap,
+#advancedSearchPanel .intersection-help-wrap{
+  position:relative !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  z-index:30 !important;
+}
+
+#advancedSearchPanel .search-help,
+#advancedSearchPanel .search-help-button,
+#advancedSearchPanel .intersection-help-button{
+  width:16px !important;
+  height:16px !important;
+  min-width:16px !important;
+  min-height:16px !important;
+  padding:0 !important;
+  margin:0 !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border:none !important;
+  border-radius:50% !important;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:.78em !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+
+  opacity:.7 !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+#advancedSearchPanel .search-help:hover,
+#advancedSearchPanel .search-help:focus,
+#advancedSearchPanel .search-help-button:hover,
+#advancedSearchPanel .search-help-button:focus,
+#advancedSearchPanel .intersection-help-button:hover,
+#advancedSearchPanel .intersection-help-button:focus{
+  opacity:1 !important;
+  text-shadow:0 0 8px var(--shadow-color) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+#advancedSearchPanel .search-help-text,
+#advancedSearchPanel .search-help-tooltip,
+#advancedSearchPanel .intersection-help-text{
+  position:absolute !important;
+
+  left:50% !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:calc(100% + 10px) !important;
+
+  transform:translateX(-50%) !important;
+
+  display:none !important;
+  box-sizing:border-box !important;
+
+  width:min(320px, calc(100vw - 32px)) !important;
+  max-height:min(60vh,260px) !important;
+  overflow-y:auto !important;
+
+  padding:14px !important;
+
+  background:var(--page-bg) !important;
+  color:var(--text-color) !important;
+
+  border:none !important;
+  border-radius:22px !important;
+
+  box-shadow:0 8px 24px var(--shadow-color) !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:.92em !important;
+  font-weight:600 !important;
+  line-height:1.32 !important;
+
+  text-align:left !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  white-space:normal !important;
+
+  opacity:1 !important;
+  z-index:16000 !important;
+}
+
+#advancedSearchPanel .search-help-text::after,
+#advancedSearchPanel .search-help-tooltip::after,
+#advancedSearchPanel .intersection-help-text::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-9px;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-top:10px solid var(--page-bg);
+}
+
+#advancedSearchPanel .search-help-wrap:hover .search-help-text,
+#advancedSearchPanel .search-help-wrap:focus-within .search-help-text,
+#advancedSearchPanel .search-help-wrap:hover .search-help-tooltip,
+#advancedSearchPanel .search-help-wrap:focus-within .search-help-tooltip,
+#advancedSearchPanel .intersection-help-wrap:hover .intersection-help-text,
+#advancedSearchPanel .intersection-help-wrap:focus-within .intersection-help-text{
+  display:block !important;
+}
+
+@media(max-width:520px){
+  #advancedSearchPanel .search-help-text,
+  #advancedSearchPanel .search-help-tooltip,
+  #advancedSearchPanel .intersection-help-text{
+    width:min(300px, calc(100vw - 24px)) !important;
+    max-height:min(54vh,230px) !important;
+    padding:11px 12px !important;
+    font-size:.84em !important;
+    line-height:1.3 !important;
+  }
+}
+</style>
+
+
+
+<style>
+/* === Correctif final : bulles Recherche harmonisées + hors du cadre === */
+#advancedSearchPanel{
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+/* On désactive les anciennes bulles internes pour éviter qu'elles soient coupées par le panneau. */
+#advancedSearchPanel .search-help-text,
+#advancedSearchPanel .search-help-tooltip,
+#advancedSearchPanel .intersection-help-text{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+
+#advancedSearchPanel .search-help-wrap,
+#advancedSearchPanel .intersection-help-wrap{
+  position:relative !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:18px !important;
+  height:18px !important;
+  min-width:18px !important;
+  min-height:18px !important;
+  flex:0 0 18px !important;
+  margin-left:2px !important;
+  vertical-align:middle !important;
+  overflow:visible !important;
+}
+
+#advancedSearchPanel .search-help,
+#advancedSearchPanel .search-help-button,
+#advancedSearchPanel .intersection-help-button{
+  width:18px !important;
+  height:18px !important;
+  min-width:18px !important;
+  min-height:18px !important;
+  max-width:18px !important;
+  max-height:18px !important;
+  padding:0 !important;
+  margin:0 !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border:none !important;
+  border-radius:50% !important;
+  background:transparent !important;
+  color:var(--shadow-color) !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  line-height:18px !important;
+  text-align:center !important;
+  text-transform:none !important;
+  letter-spacing:0 !important;
+
+  opacity:1 !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  transform:none !important;
+}
+
+#advancedSearchPanel .search-help:hover,
+#advancedSearchPanel .search-help:focus,
+#advancedSearchPanel .search-help-button:hover,
+#advancedSearchPanel .search-help-button:focus,
+#advancedSearchPanel .intersection-help-button:hover,
+#advancedSearchPanel .intersection-help-button:focus{
+  opacity:1 !important;
+  text-shadow:0 0 8px var(--shadow-color) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.search-floating-help-tooltip{
+  position:fixed !important;
+  left:0;
+  top:0;
+  box-sizing:border-box !important;
+
+  width:min(320px, calc(100vw - 32px)) !important;
+  max-height:min(60vh,260px) !important;
+  overflow-y:auto !important;
+
+  padding:14px !important;
+
+  background:var(--page-bg) !important;
+  color:var(--text-color) !important;
+
+  border:none !important;
+  border-radius:22px !important;
+  box-shadow:0 8px 24px var(--shadow-color) !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:calc(var(--ui-font-size) * .92) !important;
+  font-weight:600 !important;
+  line-height:1.32 !important;
+
+  text-align:left !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  white-space:normal !important;
+
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  z-index:30000 !important;
+
+  transition:opacity .12s ease, visibility .12s ease !important;
+}
+
+.search-floating-help-tooltip.visible{
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+.search-floating-help-tooltip::after{
+  content:"";
+  position:absolute;
+  left:var(--search-help-arrow-left,50%);
+  bottom:-9px;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-top:10px solid var(--page-bg);
+}
+
+@media(max-width:520px){
+  .search-floating-help-tooltip{
+    width:min(300px, calc(100vw - 24px)) !important;
+    max-height:min(54vh,230px) !important;
+    padding:11px 12px !important;
+    font-size:calc(var(--ui-font-size) * .84) !important;
+    line-height:1.3 !important;
+  }
+}
+
+/* Recherche / Catégorie / Canal : même ligne, même largeur, même hauteur. */
+@media(min-width:700px){
+  #advancedSearchPanel .search-controls{
+    display:grid !important;
+    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    gap:8px 10px !important;
+    align-items:end !important;
+  }
+
+  #advancedSearchPanel .search-keyword-control,
+  #advancedSearchPanel .search-controls > .search-control:nth-of-type(2),
+  #advancedSearchPanel .search-controls > .search-control:nth-of-type(3){
+    grid-column:auto !important;
+    min-width:0 !important;
+  }
+
+  #advancedSearchPanel .search-scope-options,
+  #advancedSearchPanel .search-correspondence-control{
+    grid-column:1 / -1 !important;
+  }
+}
+
+#advancedSearchPanel .search-control{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  min-width:0 !important;
+}
+
+#advancedSearchPanel .search-control-label{
+  min-height:20px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:4px !important;
+}
+
+#advancedSearchPanel .search-control input[type="search"],
+#advancedSearchPanel .search-control select{
+  width:100% !important;
+  height:32px !important;
+  min-height:32px !important;
+  max-height:32px !important;
+  padding:5px 10px !important;
+  box-sizing:border-box !important;
+  font-family:var(--ui-font-family) !important;
+  font-size:.86em !important;
+  line-height:1.1 !important;
+}
+</style>
+
+<script>
+/* === Bulles d'aide Recherche flottantes : hors du panneau, non coupées === */
+(function(){
+  function ready(fn){
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
+    else fn();
+  }
+
+  ready(function(){
+    let floating = document.getElementById("searchFloatingHelpTooltip");
+    if(!floating){
+      floating = document.createElement("div");
+      floating.id = "searchFloatingHelpTooltip";
+      floating.className = "search-floating-help-tooltip";
+      floating.setAttribute("role", "tooltip");
+      document.body.appendChild(floating);
+    }
+
+    let hideTimer = null;
+
+    function getText(wrap){
+      const internal = wrap.querySelector(".search-help-text, .search-help-tooltip, .intersection-help-text");
+      return internal ? internal.textContent.trim() : "";
+    }
+
+    function clamp(value, min, max){
+      return Math.max(min, Math.min(value, max));
+    }
+
+    function showFromWrap(wrap){
+      const text = getText(wrap);
+      if(!text) return;
+
+      clearTimeout(hideTimer);
+      floating.textContent = text;
+      floating.classList.add("visible");
+
+      // Forcer une mesure propre après insertion du texte.
+      const tooltipRect = floating.getBoundingClientRect();
+      const panel = document.getElementById("advancedSearchPanel");
+      const panelRect = panel ? panel.getBoundingClientRect() : {top: window.innerHeight * .25};
+      const anchorRect = wrap.getBoundingClientRect();
+
+      const margin = 12;
+      const desiredLeft = anchorRect.left + (anchorRect.width / 2) - (tooltipRect.width / 2);
+      const left = clamp(desiredLeft, margin, window.innerWidth - tooltipRect.width - margin);
+
+      // La bulle est dessinée au-dessus du cadre du panneau Recherche.
+      let top = panelRect.top - tooltipRect.height - 12;
+      if(top < margin) top = margin;
+
+      const arrowLeft = clamp(
+        anchorRect.left + (anchorRect.width / 2) - left,
+        18,
+        tooltipRect.width - 18
+      );
+
+      floating.style.left = left + "px";
+      floating.style.top = top + "px";
+      floating.style.setProperty("--search-help-arrow-left", arrowLeft + "px");
+    }
+
+    function hideSoon(){
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function(){
+        floating.classList.remove("visible");
+      }, 90);
+    }
+
+    document.addEventListener("mouseenter", function(event){
+      const wrap = event.target.closest && event.target.closest("#advancedSearchPanel .search-help-wrap, #advancedSearchPanel .intersection-help-wrap");
+      if(wrap) showFromWrap(wrap);
+    }, true);
+
+    document.addEventListener("mouseleave", function(event){
+      const wrap = event.target.closest && event.target.closest("#advancedSearchPanel .search-help-wrap, #advancedSearchPanel .intersection-help-wrap");
+      if(wrap) hideSoon();
+    }, true);
+
+    document.addEventListener("focusin", function(event){
+      const wrap = event.target.closest && event.target.closest("#advancedSearchPanel .search-help-wrap, #advancedSearchPanel .intersection-help-wrap");
+      if(wrap) showFromWrap(wrap);
+    });
+
+    document.addEventListener("focusout", function(event){
+      const wrap = event.target.closest && event.target.closest("#advancedSearchPanel .search-help-wrap, #advancedSearchPanel .intersection-help-wrap");
+      if(wrap) hideSoon();
+    });
+
+    document.addEventListener("click", function(event){
+      const wrap = event.target.closest && event.target.closest("#advancedSearchPanel .search-help-wrap, #advancedSearchPanel .intersection-help-wrap");
+      if(wrap){
+        event.preventDefault();
+        event.stopPropagation();
+        if(floating.classList.contains("visible")) floating.classList.remove("visible");
+        else showFromWrap(wrap);
+      }else if(!event.target.closest || !event.target.closest("#searchFloatingHelpTooltip")){
+        floating.classList.remove("visible");
+      }
+    }, true);
+
+    window.addEventListener("resize", function(){
+      floating.classList.remove("visible");
+    });
+    document.addEventListener("scroll", function(){
+      floating.classList.remove("visible");
+    }, true);
+  });
 })();
 </script>
 
