@@ -25422,8 +25422,6 @@ function correspondenceChecklistHtml(selected = []){
           html += `
             <details class="cheatsheet-section" data-cheatsheet-only="eight-vessels">
               <summary>Les 8 merveilleux vaisseaux</summary>
-              <div>
-                <p class="cheatsheet-vessel-note">Points d’intersection / de trajet listés uniquement ici, sans les ajouter aux catégories du jeu.</p>
                 ${Object.values(EXTRAORDINARY_VESSEL_CHEATSHEET_POINTS).map(vesselSubsection).join("")}
               </div>
             </details>
