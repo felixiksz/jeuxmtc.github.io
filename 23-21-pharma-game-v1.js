@@ -625,13 +625,17 @@
         || herb.esprit
         || ""
       ).trim();
+      if(esprit){
+        // Le champ Esprit reste une infobulle CSS, pas du texte injecté dans la tuile.
+        // Cela évite qu'il s'affiche dans la tuile après GAME OVER / révélation des solutions.
+        item.dataset.espritTooltip = esprit;
+      }
 
       item.innerHTML = `
         <span class="pharma-solved-chinese-name">${escapeHtml(getHerbLabel(herb))}</span>
         ${commonName ? `<small class="pharma-solved-common-name">${escapeHtml(commonName)}</small>` : ""}
         ${tropism ? `<small class="pharma-solved-tropism">${escapeHtml(tropism)}</small>` : ""}
         ${toxicity ? `<small class="pharma-solved-toxicity">${escapeHtml(toxicity)}</small>` : ""}
-        ${esprit ? `<span class="pharma-solved-esprit-tooltip">${escapeHtml(esprit)}</span>` : ""}
       `;
       points.appendChild(item);
     });
