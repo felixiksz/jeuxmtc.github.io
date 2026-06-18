@@ -1,0 +1,229 @@
+/* === Choix de matière : Acupuncture / Pharmacopée chinoise === */
+.study-domain-overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  background:var(--page-bg);
+  color:var(--text-color);
+  z-index:40000;
+}
+
+html[data-study-domain="none"] .study-domain-overlay,
+html[data-study-domain="choosing"] .study-domain-overlay{
+  display:flex;
+}
+
+.study-domain-card{
+  width:min(460px, calc(100vw - 32px));
+  text-align:center;
+  padding:22px;
+  background:transparent;
+  color:var(--text-color);
+  border:none;
+  box-shadow:none;
+}
+
+.study-domain-card h1{
+  margin:0 0 22px;
+  font-family:"Libre Baskerville", serif;
+  font-size:clamp(1.5rem, 5vw, 2.15rem);
+  line-height:1.25;
+  font-weight:700;
+}
+
+.study-domain-actions{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.study-domain-actions button{
+  min-width:170px;
+}
+
+body{
+  position:relative;
+}
+
+/* Le switch matière vit maintenant dans la même rangée que
+   Nouvelle partie / Affichage / Aide. Les boutons restent centrés,
+   le switch est poussé à droite dans ce même bloc. */
+.topbar-main-row{
+  position:relative !important;
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:visible !important;
+}
+
+.topbar-main-buttons{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+}
+
+.study-domain-topline{
+  position:absolute;
+  top:50%;
+  right:0;
+  transform:translateY(-50%);
+
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+
+  width:auto;
+  min-height:0;
+  margin:0;
+
+  pointer-events:none;
+  z-index:1200;
+}
+
+.study-domain-switch{
+  opacity:.36;
+  gap:5px;
+  pointer-events:auto;
+  margin:0;
+}
+
+.study-domain-switch span{
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+
+.study-domain-switch:hover,
+.study-domain-switch:focus-within,
+.study-domain-switch:active{
+  opacity:.82;
+}
+
+html[data-study-domain="none"] .study-domain-topline,
+html[data-study-domain="choosing"] .study-domain-topline{
+  visibility:hidden !important;
+}
+
+.pharmacology-placeholder{
+  display:none;
+  min-height:72vh;
+  align-items:center;
+  justify-content:center;
+  padding:34px 18px;
+  text-align:center;
+}
+
+html[data-study-domain="pharmacology"] .pharmacology-placeholder{
+  display:flex;
+}
+
+.pharmacology-placeholder-inner{
+  width:min(520px, calc(100vw - 32px));
+  margin:auto;
+}
+
+.pharmacology-placeholder p{
+  margin:8px 0;
+  font-family:var(--ui-font-family);
+  font-weight:700;
+  line-height:1.35;
+}
+
+.pharmacology-placeholder-note{
+  opacity:.62;
+  font-size:.86em;
+}
+
+html[data-study-domain="pharmacology"] #manualControls,
+html[data-study-domain="pharmacology"] #message,
+html[data-study-domain="pharmacology"] #hint,
+html[data-study-domain="pharmacology"] #solved,
+html[data-study-domain="pharmacology"] #grid,
+html[data-study-domain="pharmacology"] .bottom-actions,
+html[data-study-domain="pharmacology"] #footerTitle,
+html[data-study-domain="pharmacology"] .cheatsheet-panel,
+html[data-study-domain="pharmacology"] .advanced-search-panel,
+html[data-study-domain="pharmacology"] .review-basket-panel,
+html[data-study-domain="pharmacology"] .comparison-panel,
+html[data-study-domain="pharmacology"] .stats-panel,
+html[data-study-domain="pharmacology"] .point-panel,
+html[data-study-domain="pharmacology"] .association-overlay,
+html[data-study-domain="pharmacology"] .category-postit,
+html[data-study-domain="pharmacology"] .association-postit{
+  display:none !important;
+}
+
+html[data-study-domain="pharmacology"] .topbar{
+  display:flex !important;
+}
+
+/* En pharmacopée, la topbar garde exactement la même structure que l'acupuncture.
+   Le changement de matière reste donc discret : aucun bouton du haut ne bouge. */
+html[data-study-domain="pharmacology"] .topbar-row,
+html[data-study-domain="pharmacology"] .practice-row{
+  display:flex !important;
+}
+
+@media(max-width:520px){
+  .study-domain-overlay{
+    padding:14px;
+  }
+
+  .study-domain-actions{
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .study-domain-actions button{
+    width:min(260px, 100%);
+  }
+
+  /* Mobile : même bloc que la première rangée, mais le switch est
+     légèrement rangé sur le côté et se dévoile au survol/focus/toucher. */
+  .topbar-main-row{
+    overflow:visible !important;
+  }
+
+  .topbar-main-buttons{
+    gap:4px !important;
+  }
+
+  .study-domain-topline{
+    top:50%;
+    right:-64px;
+    transform:translateY(-50%);
+    z-index:12000;
+
+    padding:2px 6px 2px 8px;
+    border-radius:999px 0 0 999px;
+
+    transition:
+      right .22s ease,
+      opacity .22s ease;
+  }
+
+  .study-domain-topline:hover,
+  .study-domain-topline:focus-within,
+  .study-domain-topline.is-open{
+    right:0;
+  }
+
+  .study-domain-switch{
+    font-size:.72em !important;
+    gap:4px !important;
+    opacity:.28;
+  }
+
+  .study-domain-topline:hover .study-domain-switch,
+  .study-domain-topline:focus-within .study-domain-switch,
+  .study-domain-topline.is-open .study-domain-switch{
+    opacity:.82;
+  }
+}

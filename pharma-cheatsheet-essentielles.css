@@ -1,0 +1,284 @@
+/* === PHARMA Bucket 5 : Cheatsheet par classes + choix manuel des SM essentielles === */
+html[data-study-domain="pharmacology"] .cheatsheet-panel{
+  display:block !important;
+}
+
+html[data-study-domain="pharmacology"] .cheatsheet-panel .point-header{
+  padding-right:0;
+}
+
+.pharma-cheatsheet-essential-toggle{
+  position:absolute;
+  top:10px;
+  left:-116px;
+  z-index:32;
+
+  padding:5px 9px !important;
+  border:none !important;
+  border-radius:999px !important;
+
+  background:var(--page-bg) !important;
+  color:var(--text-color) !important;
+
+  font-family:var(--ui-font-family) !important;
+  font-size:.72em !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.035em !important;
+
+  opacity:.18;
+  box-shadow:0 0 7px var(--shadow-color) !important;
+  transform:none !important;
+
+  transition:left .32s ease, opacity .22s ease, box-shadow .18s ease;
+}
+
+.cheatsheet-panel:hover .pharma-cheatsheet-essential-toggle,
+.cheatsheet-panel:focus-within .pharma-cheatsheet-essential-toggle,
+.pharma-cheatsheet-essential-toggle.is-active{
+  left:12px;
+  opacity:.9;
+}
+
+.pharma-cheatsheet-essential-toggle:hover,
+.pharma-cheatsheet-essential-toggle:focus{
+  opacity:1;
+  box-shadow:0 0 12px var(--shadow-color) !important;
+}
+
+.pharma-cheatsheet-line{
+  display:flex;
+  align-items:flex-start;
+  gap:4px;
+  padding:2px 0 !important;
+  line-height:1.18 !important;
+}
+
+.pharma-essential-checkbox-wrap{
+  display:none !important;
+  flex:0 0 auto;
+  width:17px;
+  height:17px;
+  padding:0 !important;
+  margin:0 1px 0 0 !important;
+  border:none !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.cheatsheet-panel.pharma-essential-edit-mode .pharma-essential-checkbox-wrap{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+}
+
+.pharma-essential-checkbox{
+  width:13px;
+  height:13px;
+  margin:0;
+  accent-color:var(--shadow-color);
+  cursor:pointer;
+}
+
+.pharma-cheatsheet-herb-link{
+  padding:0 !important;
+  margin:0 !important;
+  border:none !important;
+  background:transparent !important;
+  color:inherit !important;
+  box-shadow:none !important;
+  transform:none !important;
+  cursor:pointer;
+
+  font-family:inherit !important;
+  font-size:inherit !important;
+  font-weight:800 !important;
+  line-height:1.18 !important;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  text-align:left !important;
+}
+
+.pharma-cheatsheet-herb-link:hover,
+.pharma-cheatsheet-herb-link:focus{
+  text-decoration:underline;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.pharma-cheatsheet-separator,
+.pharma-cheatsheet-common{
+  line-height:1.18;
+}
+
+.pharma-cheatsheet-common{
+  opacity:.72;
+}
+
+.pharma-cheatsheet-section summary{
+  display:flex;
+  align-items:baseline;
+  gap:0;
+}
+
+.pharma-cheatsheet-class-code{
+  flex:0 0 auto;
+  min-width:2.35em;
+  margin-right:4px;
+  font-family:var(--ui-font-family);
+  font-weight:900;
+  color:var(--shadow-color);
+  letter-spacing:.03em;
+}
+
+.pharma-cheatsheet-class-separator{
+  margin-right:4px;
+  opacity:.55;
+}
+
+.pharma-cheatsheet-class-name{
+  min-width:0;
+}
+
+.pharma-cheatsheet-line.is-essential .pharma-cheatsheet-herb-link{
+  text-shadow:0 0 2px var(--shadow-color);
+}
+
+.pharma-cheatsheet-line.is-essential .pharma-cheatsheet-common{
+  text-shadow:none;
+}
+
+@media(max-width:520px){
+  .pharma-cheatsheet-essential-toggle{
+    left:-104px;
+    top:8px;
+    font-size:.66em !important;
+    padding:5px 8px !important;
+    opacity:.14;
+  }
+
+  .cheatsheet-panel:hover .pharma-cheatsheet-essential-toggle,
+  .cheatsheet-panel:focus-within .pharma-cheatsheet-essential-toggle,
+  .pharma-cheatsheet-essential-toggle.is-active{
+    left:9px;
+  }
+}
+
+/* === Bucket 5C : restaurer la footbar en mode PHARMA ===
+   Les anciens CSS du launcher cachaient #footerTitle en pharmacopée.
+   On le réaffiche ici pour retrouver le bouton Cheatsheet dans la footbar. */
+html[data-study-domain="pharmacology"] #footerTitle{
+  display:flex !important;
+}
+
+html[data-study-domain="pharmacology"] #footerMainTools,
+html[data-study-domain="pharmacology"] .footer-main-tools,
+html[data-study-domain="pharmacology"] .footer-icon-tools{
+  display:inline-flex !important;
+}
+
+/* On garde la ligne Astuce / vies cachée pour l'instant en PHARMA :
+   le bouton Cheatsheet est déplacé dans #footerMainTools comme en ACU. */
+html[data-study-domain="pharmacology"] .bottom-actions{
+  display:none !important;
+}
+
+
+/* === Bucket 6B : cocher une classe entière comme essentielle === */
+.pharma-essential-class-checkbox-wrap{
+  display:none !important;
+  flex:0 0 auto;
+  width:17px;
+  height:17px;
+  padding:0 !important;
+  margin:0 4px 0 0 !important;
+  border:none !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transform:none !important;
+}
+
+.cheatsheet-panel.pharma-essential-edit-mode .pharma-essential-class-checkbox-wrap{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+}
+
+.pharma-essential-class-checkbox{
+  width:13px;
+  height:13px;
+  margin:0;
+  accent-color:var(--shadow-color);
+  cursor:pointer;
+}
+
+.cheatsheet-panel.pharma-essential-edit-mode .pharma-cheatsheet-section summary{
+  align-items:center;
+}
+
+
+/* === Bucket 6C : le panneau reste ouvert pendant l’édition + flèches de classes === */
+.pharma-cheatsheet-section > summary{
+  list-style:none !important;
+  cursor:pointer;
+}
+
+.pharma-cheatsheet-section > summary::-webkit-details-marker{
+  display:none !important;
+}
+
+.pharma-cheatsheet-section > summary::before{
+  content:"▸";
+  flex:0 0 auto;
+  width:1.05em;
+  margin-right:3px;
+  color:var(--shadow-color);
+  font-family:var(--ui-font-family);
+  font-weight:900;
+  line-height:1;
+  opacity:.72;
+  transform:translateY(.05em);
+}
+
+.pharma-cheatsheet-section[open] > summary::before{
+  content:"▾";
+}
+
+.pharma-essential-checkbox-wrap,
+.pharma-essential-class-checkbox-wrap,
+.pharma-essential-checkbox,
+.pharma-essential-class-checkbox{
+  touch-action:manipulation;
+}
+
+/* === Bucket 7N : bouton “Substances essentielles” à 70 %, 100 % au survol === */
+html[data-study-domain="pharmacology"] .cheatsheet-panel.open .pharma-cheatsheet-essential-toggle,
+html[data-study-domain="pharmacology"] .cheatsheet-panel:hover .pharma-cheatsheet-essential-toggle,
+html[data-study-domain="pharmacology"] .cheatsheet-panel:focus-within .pharma-cheatsheet-essential-toggle{
+  left:12px !important;
+  opacity:.7 !important;
+}
+
+html[data-study-domain="pharmacology"] .pharma-cheatsheet-essential-toggle:hover,
+html[data-study-domain="pharmacology"] .pharma-cheatsheet-essential-toggle:focus,
+html[data-study-domain="pharmacology"] .pharma-cheatsheet-essential-toggle.is-active{
+  opacity:1 !important;
+}
+
+/* === Bucket 8B : ne plus cacher vies / astuces en PHARMA === */
+html[data-study-domain="pharmacology"] .bottom-actions{
+  display:flex !important;
+}
+
+html[data-study-domain="pharmacology"] #jokerBubble{
+  display:flex !important;
+}
+
+html[data-study-domain="pharmacology"] #lifeDisplay,
+html[data-study-domain="pharmacology"] #cheatDisplay,
+html[data-study-domain="pharmacology"] #hintButton{
+  display:inline-flex !important;
+}
