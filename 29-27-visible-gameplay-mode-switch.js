@@ -50,8 +50,70 @@
     return "Mode normal";
   }
 
+
+  function ensureVisibleGameplayModeSwitch(){
+    let wrap = document.getElementById("gameplayModeTopline");
+    let review = document.getElementById("gameplayModeReviewBtn");
+    let exam = document.getElementById("gameplayModeExamBtn");
+
+    if(wrap && review && exam) return wrap;
+
+    const bottomActions = document.querySelector(".bottom-actions");
+    const jokerBubble = document.getElementById("jokerBubble");
+    const host = bottomActions || jokerBubble;
+    if(!host) return null;
+
+    if(!wrap){
+      wrap = document.createElement("div");
+      wrap.id = "gameplayModeTopline";
+      wrap.className = "gameplay-mode-topline";
+      wrap.hidden = true;
+      wrap.setAttribute("aria-label", "Mode de jeu : Mode normal");
+
+      const switchWrap = document.createElement("div");
+      switchWrap.className = "gameplay-mode-switch";
+      switchWrap.setAttribute("role", "group");
+      switchWrap.setAttribute("aria-label", "Choix du mode de jeu");
+
+      review = document.createElement("button");
+      review.id = "gameplayModeReviewBtn";
+      review.type = "button";
+      review.className = "gameplay-mode-icon gameplay-mode-review";
+      review.textContent = "🕊️";
+      review.setAttribute("aria-label", "Révision douce");
+      review.setAttribute("aria-pressed", "false");
+      review.addEventListener("click", function(){ toggleVisibleGameplayMode("review"); });
+
+      exam = document.createElement("button");
+      exam.id = "gameplayModeExamBtn";
+      exam.type = "button";
+      exam.className = "gameplay-mode-icon gameplay-mode-exam";
+      exam.textContent = "🦖";
+      exam.setAttribute("aria-label", "Mode examen");
+      exam.setAttribute("aria-pressed", "false");
+      exam.addEventListener("click", function(){ toggleVisibleGameplayMode("exam"); });
+
+      switchWrap.appendChild(review);
+      switchWrap.appendChild(exam);
+      wrap.appendChild(switchWrap);
+    }
+
+    if(bottomActions){
+      if(wrap.parentElement !== bottomActions){
+        bottomActions.appendChild(wrap);
+      }else if(jokerBubble && jokerBubble.nextSibling !== wrap){
+        bottomActions.insertBefore(wrap, jokerBubble.nextSibling);
+      }
+    }else if(jokerBubble && wrap.parentElement !== jokerBubble){
+      jokerBubble.appendChild(wrap);
+    }
+
+    return wrap;
+  }
+
   function updateVisibleGameplayModeSwitch(){
     const domain = activeDomain();
+    ensureVisibleGameplayModeSwitch();
     const wrap = document.getElementById("gameplayModeTopline");
     const review = document.getElementById("gameplayModeReviewBtn");
     const exam = document.getElementById("gameplayModeExamBtn");
@@ -94,6 +156,7 @@
   function init(){
     wrapSetter("setMtcGameplayMode");
     wrapSetter("setPharmaGameplayMode");
+    ensureVisibleGameplayModeSwitch();
     updateVisibleGameplayModeSwitch();
   }
 
