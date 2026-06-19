@@ -227,3 +227,80 @@ html[data-study-domain="pharmacology"] .practice-row{
     opacity:.82;
   }
 }
+
+
+/* === Correctif stable : menu ACU / PHARMA natif, sans ancien switch mobile === */
+.study-domain-topline{
+  position:static !important;
+  inset:auto !important;
+  transform:none !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  pointer-events:auto !important;
+  opacity:1 !important;
+  overflow:visible !important;
+  z-index:12000 !important;
+}
+.study-domain-switch{
+  display:none !important;
+}
+.study-domain-select{
+  box-sizing:border-box !important;
+  appearance:auto !important;
+  -webkit-appearance:menulist !important;
+  display:block !important;
+  width:auto !important;
+  min-width:74px !important;
+  max-width:92px !important;
+  min-height:30px !important;
+  margin:0 !important;
+  padding:3px 4px !important;
+  border:1px solid color-mix(in srgb, currentColor 28%, transparent) !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:var(--text-color) !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  filter:none !important;
+  font:inherit !important;
+  font-family:var(--ui-font-family) !important;
+  font-size:.88em !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  text-transform:uppercase !important;
+}
+@media(max-width:520px), (pointer:coarse){
+  html, body{
+    max-width:100% !important;
+    overflow-x:hidden !important;
+  }
+  .topbar,
+  .topbar-row,
+  .topbar-main-row{
+    box-sizing:border-box !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .topbar-main-row{
+    justify-content:center !important;
+    gap:4px !important;
+    padding-left:6px !important;
+    padding-right:6px !important;
+  }
+  .topbar-main-buttons{
+    gap:4px !important;
+  }
+  .study-domain-select{
+    min-width:70px !important;
+    max-width:82px !important;
+    min-height:28px !important;
+    padding:2px 3px !important;
+    font-size:.78em !important;
+  }
+}
