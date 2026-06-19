@@ -81,6 +81,10 @@
         detail:{ domain }
       }));
     }catch(error){}
+
+    document.querySelectorAll(".study-domain-topline.is-open").forEach(element => {
+      element.classList.remove("is-open");
+    });
   }
 
   function toggleStudyDomain(){
@@ -131,12 +135,22 @@
 
     if(switchTopline){
       switchTopline.addEventListener("pointerenter", () => {
-        switchTopline.classList.add("is-open");
+        if(!isMobileDomainSwitch()) switchTopline.classList.add("is-open");
       });
 
       switchTopline.addEventListener("pointerleave", () => {
         switchTopline.classList.remove("is-open");
       });
+
+      document.addEventListener("pointerdown", event => {
+        if(
+          isMobileDomainSwitch() &&
+          switchTopline.classList.contains("is-open") &&
+          !switchTopline.contains(event.target)
+        ){
+          switchTopline.classList.remove("is-open");
+        }
+      }, { passive:true });
     }
 
     if(switchWrap){
