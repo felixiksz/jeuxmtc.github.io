@@ -350,3 +350,69 @@
     font-size:.72em !important;
   }
 }
+
+/* === Correction finale : colombe / dinosaure discrets, sans contour, actif en couleur ===
+   Ces règles ciblent les vrais boutons injectés :
+   #gameplayModeReviewBtn et #gameplayModeExamBtn. */
+.gameplay-mode-topline .gameplay-mode-switch,
+#jokerBubble .gameplay-mode-topline .gameplay-mode-switch,
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-switch{
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.gameplay-mode-topline .gameplay-mode-icon,
+#jokerBubble .gameplay-mode-topline .gameplay-mode-icon,
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-icon,
+#gameplayModeReviewBtn,
+#gameplayModeExamBtn{
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  color:inherit !important;
+  filter:grayscale(1) saturate(0) contrast(1.02) !important;
+  opacity:.52 !important;
+  transform:none !important;
+}
+
+.gameplay-mode-topline .gameplay-mode-icon:hover,
+.gameplay-mode-topline .gameplay-mode-icon:focus-visible,
+#jokerBubble .gameplay-mode-topline .gameplay-mode-icon:hover,
+#jokerBubble .gameplay-mode-topline .gameplay-mode-icon:focus-visible,
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-icon:hover,
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-icon:focus-visible,
+#gameplayModeReviewBtn:hover,
+#gameplayModeReviewBtn:focus-visible,
+#gameplayModeExamBtn:hover,
+#gameplayModeExamBtn:focus-visible{
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  opacity:.76 !important;
+}
+
+.gameplay-mode-topline .gameplay-mode-icon.active,
+.gameplay-mode-topline .gameplay-mode-icon[aria-pressed="true"],
+#jokerBubble .gameplay-mode-topline .gameplay-mode-icon.active,
+#jokerBubble .gameplay-mode-topline .gameplay-mode-icon[aria-pressed="true"],
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-icon.active,
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-icon[aria-pressed="true"],
+#gameplayModeReviewBtn.active,
+#gameplayModeReviewBtn[aria-pressed="true"],
+#gameplayModeExamBtn.active,
+#gameplayModeExamBtn[aria-pressed="true"]{
+  filter:none !important;
+  opacity:1 !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  transform:none !important;
+}
