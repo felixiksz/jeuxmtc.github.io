@@ -1,0 +1,352 @@
+/* === Bucket 8 correctifs visuels : switch mobile, stats ACU, comparaison ACU, export/import, colombe-dino === */
+@media(max-width:520px), (pointer:coarse){
+  .study-domain-topline{
+    right:0 !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+  }
+  .study-domain-switch{
+    opacity:.82 !important;
+    touch-action:manipulation;
+  }
+}
+
+/* Toggle colombe / dinosaure : fond commun invisible au repos.
+   Les sélecteurs sont volontairement larges pour couvrir les versions précédentes du bouton. */
+.dove-dino-toggle,
+.dino-dove-toggle,
+.review-mode-toggle,
+.revision-mode-toggle,
+.gentle-dino-toggle,
+.gentle-mode-toggle,
+#reviewModeToggle,
+#revisionModeToggle,
+#gentleDinoToggle{
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  outline:none !important;
+}
+
+.dove-dino-toggle .emoji,
+.dino-dove-toggle .emoji,
+.review-mode-toggle .emoji,
+.revision-mode-toggle .emoji,
+.gentle-dino-toggle .emoji,
+.gentle-mode-toggle .emoji,
+#reviewModeToggle .emoji,
+#revisionModeToggle .emoji,
+#gentleDinoToggle .emoji{
+  filter:grayscale(1) saturate(0) contrast(1.05);
+  opacity:.82;
+  transition:filter .16s ease, opacity .16s ease, transform .16s ease;
+}
+
+.dove-dino-toggle:hover .emoji,
+.dove-dino-toggle:active .emoji,
+.dove-dino-toggle.is-active .emoji,
+.dino-dove-toggle:hover .emoji,
+.dino-dove-toggle:active .emoji,
+.dino-dove-toggle.is-active .emoji,
+.review-mode-toggle:hover .emoji,
+.review-mode-toggle:active .emoji,
+.review-mode-toggle.is-active .emoji,
+.revision-mode-toggle:hover .emoji,
+.revision-mode-toggle:active .emoji,
+.revision-mode-toggle.is-active .emoji,
+.gentle-dino-toggle:hover .emoji,
+.gentle-dino-toggle:active .emoji,
+.gentle-dino-toggle.is-active .emoji,
+.gentle-mode-toggle:hover .emoji,
+.gentle-mode-toggle:active .emoji,
+.gentle-mode-toggle.is-active .emoji,
+#reviewModeToggle:hover .emoji,
+#reviewModeToggle:active .emoji,
+#reviewModeToggle.is-active .emoji,
+#revisionModeToggle:hover .emoji,
+#revisionModeToggle:active .emoji,
+#revisionModeToggle.is-active .emoji,
+#gentleDinoToggle:hover .emoji,
+#gentleDinoToggle:active .emoji,
+#gentleDinoToggle.is-active .emoji{
+  filter:none;
+  opacity:1;
+}
+
+.acu-stats-summary.pharma-stats-summary{
+  margin-top:10px;
+}
+
+.acu-stats-percent-list .stats-meta{
+  display:block;
+  margin-top:2px;
+}
+
+.acu-comparison-matrix{
+  --comparison-count:2;
+  display:grid;
+  grid-template-columns:minmax(110px, 150px) repeat(var(--comparison-count), minmax(250px, 1fr));
+  gap:0;
+  width:100%;
+  overflow:auto;
+  padding-bottom:12px;
+  border-top:1px solid rgba(0,0,0,.12);
+  border-left:1px solid rgba(0,0,0,.08);
+}
+
+.acu-comparison-corner,
+.acu-comparison-row-label,
+.acu-comparison-herb-header,
+.acu-comparison-cell{
+  border-right:1px solid rgba(0,0,0,.08);
+  border-bottom:1px solid rgba(0,0,0,.10);
+  background:rgba(255,255,255,.03);
+}
+
+.acu-comparison-corner,
+.acu-comparison-row-label{
+  position:sticky;
+  left:0;
+  z-index:2;
+  background:var(--page-bg);
+}
+
+.acu-comparison-corner,
+.acu-comparison-herb-header{
+  position:sticky;
+  top:0;
+  z-index:3;
+  background:var(--page-bg);
+}
+
+.acu-comparison-corner{
+  z-index:4;
+}
+
+.acu-comparison-row-label{
+  padding:8px 9px;
+  font-family:var(--ui-font-family);
+  font-size:.78em;
+  font-weight:800;
+  line-height:1.15;
+  opacity:.72;
+}
+
+.acu-comparison-herb-header{
+  min-width:250px;
+  padding:8px 10px;
+}
+
+.acu-comparison-herb-header .search-result-title{
+  font-size:1em;
+  line-height:1.18;
+}
+
+.acu-comparison-herb-header .search-result-meta{
+  margin-top:2px;
+  font-size:.76em;
+}
+
+.acu-comparison-cell{
+  min-width:250px;
+  padding:8px 10px;
+  white-space:pre-line;
+  line-height:1.28;
+  font-size:.9em;
+}
+
+.acu-comparison-cell:nth-child(odd),
+.acu-comparison-row-label:nth-child(odd){
+  background:rgba(0,0,0,.015);
+}
+
+@media(max-width:699px){
+  .acu-comparison-matrix{
+    grid-template-columns:minmax(92px, 112px) repeat(var(--comparison-count), minmax(235px, 72vw));
+  }
+  .acu-comparison-cell,
+  .acu-comparison-herb-header{
+    min-width:235px;
+  }
+  .acu-comparison-row-label{
+    font-size:.72em;
+    padding:7px 7px;
+  }
+}
+
+/* === Correction mobile : bouton ACU/PHARMA en menu vertical après le plein écran ===
+   Sur mobile, le choix ACU/PHARMA reste dans la première ligne, juste après
+   le bouton plein écran. Il est rangé vers le haut et descend au toucher.
+   Le déclencheur affiche seulement le mode actif : ACU ou PHARMA.
+   Ajustement : texte fermé aligné avec la ligne du menu et même taille que les boutons. */
+@media(max-width:520px), (pointer:coarse){
+  .topbar-main-row{
+    align-items:center !important;
+    justify-content:center !important;
+    flex-wrap:nowrap !important;
+    overflow:visible !important;
+    gap:4px !important;
+  }
+
+  .topbar-main-buttons{
+    order:1 !important;
+    flex:0 1 auto !important;
+    justify-content:center !important;
+    gap:4px !important;
+  }
+
+  #fullscreenToggleButton{
+    order:2 !important;
+    flex:0 0 auto !important;
+  }
+
+  .study-domain-topline{
+    --domain-trigger-width:58px;
+    --domain-trigger-height:22px;
+
+    order:3 !important;
+    position:relative !important;
+    top:auto !important;
+    right:auto !important;
+    left:auto !important;
+    transform:none !important;
+    align-self:center !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    width:var(--domain-trigger-width) !important;
+    min-width:var(--domain-trigger-width) !important;
+    height:var(--domain-trigger-height) !important;
+    min-height:var(--domain-trigger-height) !important;
+    flex:0 0 var(--domain-trigger-width) !important;
+
+    margin:0 !important;
+    padding:0 !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    overflow:hidden !important;
+    z-index:12000 !important;
+  }
+
+  .study-domain-topline:hover,
+  .study-domain-topline:focus-within,
+  .study-domain-topline.is-open{
+    overflow:visible !important;
+  }
+
+  .study-domain-switch{
+    position:absolute !important;
+    top:0 !important;
+    right:0 !important;
+
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:3px !important;
+
+    width:var(--domain-trigger-width) !important;
+    min-width:var(--domain-trigger-width) !important;
+    margin:0 !important;
+    padding:5px 2px 0 !important;
+
+    font-size:.82em !important;
+    line-height:1.1 !important;
+    opacity:.92 !important;
+    touch-action:manipulation;
+
+    border-radius:0 0 999px 999px !important;
+    background:var(--page-bg) !important;
+    color:var(--text-color) !important;
+    box-shadow:none !important;
+    text-shadow:none !important;
+    filter:none !important;
+
+    transform:translateY(calc(-100% + var(--domain-trigger-height))) !important;
+    transition:transform .24s ease, opacity .2s ease, filter .2s ease !important;
+  }
+
+  .study-domain-switch::after{
+    content:"ACU";
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+
+    width:var(--domain-trigger-width);
+    height:var(--domain-trigger-height);
+    margin-top:4px;
+    padding:0 4px;
+
+    font-size:1em !important;
+    font-weight:700;
+    letter-spacing:.02em;
+    line-height:1;
+    opacity:.74;
+    border-radius:0 0 999px 999px;
+    box-shadow:none !important;
+    text-shadow:none !important;
+    filter:none !important;
+  }
+
+  [data-study-domain="pharmacology"] .study-domain-switch::after{
+    content:"PHARMA";
+    font-size:1em !important;
+    letter-spacing:-.02em;
+  }
+
+  [data-study-domain="acupuncture"] .study-domain-switch::after{
+    content:"ACU";
+  }
+
+  .study-domain-topline:hover .study-domain-switch,
+  .study-domain-topline:focus-within .study-domain-switch,
+  .study-domain-topline.is-open .study-domain-switch{
+    transform:translateY(0) !important;
+    opacity:1 !important;
+  }
+
+  .study-domain-topline:hover .study-domain-switch::after,
+  .study-domain-topline:focus-within .study-domain-switch::after,
+  .study-domain-topline.is-open .study-domain-switch::after{
+    opacity:1;
+  }
+
+  .study-domain-switch span{
+    writing-mode:horizontal-tb !important;
+    text-align:center !important;
+    font-size:1em !important;
+    letter-spacing:.03em !important;
+  }
+
+  .study-domain-switch .switch{
+    width:24px !important;
+    height:14px !important;
+    transform:rotate(90deg);
+    margin:3px 0 !important;
+  }
+
+  .study-domain-switch .slider::before{
+    width:8px !important;
+    height:8px !important;
+    left:3px !important;
+    top:3px !important;
+  }
+
+  .study-domain-switch .switch input:checked + .slider::before{
+    transform:translateX(10px) !important;
+  }
+}
+
+@media(max-width:430px){
+  .study-domain-topline{
+    --domain-trigger-width:54px;
+    --domain-trigger-height:21px;
+  }
+
+  .study-domain-switch{
+    font-size:.72em !important;
+  }
+}
