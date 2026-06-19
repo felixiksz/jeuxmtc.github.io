@@ -6675,3 +6675,13 @@ function normalizeOldPointDetails(){
 }
 
 normalizeOldPointDetails();
+
+/* Flat-root compatibility: expose ACU point fiches to later correction files.
+   Top-level `const POINT_DETAILS` is not always available via `window.POINT_DETAILS`,
+   especially across browser implementations and cached script contexts. */
+try{
+  if(typeof window !== "undefined" && typeof POINT_DETAILS !== "undefined"){
+    window.POINT_DETAILS = POINT_DETAILS;
+  }
+}catch(error){}
+
