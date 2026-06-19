@@ -103,6 +103,20 @@
     chooseDomain(isPharmacology ? "pharmacology" : "acupuncture");
   }
 
+  function getCurrentDomain(){
+    const currentDomain =
+      document.documentElement.getAttribute("data-study-domain") ||
+      window.MTC_STUDY_DOMAIN ||
+      safeGetStoredDomain() ||
+      "acupuncture";
+
+    return VALID_DOMAINS.includes(currentDomain) ? currentDomain : "acupuncture";
+  }
+
+  function chooseOppositeDomain(){
+    chooseDomain(getCurrentDomain() === "pharmacology" ? "acupuncture" : "pharmacology");
+  }
+
   function showDomainChooser(){
     closeOpenPanelsWhenChangingDomain();
     setDocumentDomain("choosing");
@@ -130,7 +144,27 @@
     const switchTopline = switchWrap ? switchWrap.closest(".study-domain-topline") : null;
 
     function isMobileDomainSwitch(){
-      return window.matchMedia && window.matchMedia("(max-width:520px)").matches;
+      return window.matchMedia && window.matchMedia("(max-width:520px), (pointer:coarse)").matches;
+    }
+
+    function getMobileDomainChoiceFromTarget(target){
+      let element = target;
+
+      while(element && element !== switchWrap){
+        if(
+          element.parentElement === switchWrap &&
+          element.tagName === "SPAN" &&
+          !element.classList.contains("slider")
+        ){
+          const text = (element.textContent || "").trim().toLowerCase();
+          if(text.includes("pharma")) return "pharmacology";
+          if(text.includes("acu")) return "acupuncture";
+        }
+
+        element = element.parentElement;
+      }
+
+      return null;
     }
 
     if(switchTopline){
@@ -154,6 +188,31 @@
     }
 
     if(switchWrap){
+      /*
+        Brave/Chrome mobile peuvent déclencher à la fois le label du checkbox
+        et le gestionnaire du conteneur. On intercepte donc le clic mobile en
+        phase capture, puis on choisit le domaine une seule fois.
+      */
+      switchWrap.addEventListener("click", event => {
+        if(!switchTopline || !isMobileDomainSwitch()) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if(!switchTopline.classList.contains("is-open")){
+          switchTopline.classList.add("is-open");
+          return;
+        }
+
+        const chosenDomain = getMobileDomainChoiceFromTarget(event.target);
+
+        if(chosenDomain){
+          chooseDomain(chosenDomain);
+        }else{
+          chooseOppositeDomain();
+        }
+      }, true);
+
       switchWrap.addEventListener("click", event => {
         if(
           switchTopline &&
@@ -168,6 +227,7 @@
 
         if(event.target && event.target.id === "studyDomainToggle") return;
         if(event.target && event.target.classList && event.target.classList.contains("slider")) return;
+        if(event.target && event.target.closest && event.target.closest("label.switch")) return;
 
         const toggle = document.getElementById("studyDomainToggle");
         if(toggle){
