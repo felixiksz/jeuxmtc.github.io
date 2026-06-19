@@ -316,9 +316,21 @@
 
   .study-domain-switch span{
     writing-mode:horizontal-tb !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    box-sizing:border-box !important;
+    width:100% !important;
+    min-height:24px !important;
+    padding:2px 3px !important;
     text-align:center !important;
     font-size:1em !important;
     letter-spacing:.03em !important;
+    cursor:pointer !important;
+    touch-action:manipulation !important;
+    pointer-events:auto !important;
+    user-select:none !important;
+    -webkit-user-select:none !important;
   }
 
   .study-domain-switch .switch{
@@ -326,6 +338,7 @@
     height:14px !important;
     transform:rotate(90deg);
     margin:3px 0 !important;
+    pointer-events:none !important;
   }
 
   .study-domain-switch .slider::before{
