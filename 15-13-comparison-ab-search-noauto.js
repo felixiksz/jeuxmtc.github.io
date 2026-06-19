@@ -61,7 +61,22 @@
     `;
   }
 
+  function acuPointDetails(point){
+    try{
+      if(typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point]){
+        return POINT_DETAILS[point];
+      }
+    }catch(error){}
+
+    if(typeof window !== "undefined" && window.POINT_DETAILS && window.POINT_DETAILS[point]){
+      return window.POINT_DETAILS[point];
+    }
+
+    return {};
+  }
+
   function comparisonSectionsForPoint(point, details){
+    details = details || {};
     const customNotes = typeof getEditablePointNote === "function"
       ? getEditablePointNote(point, details.notes || "")
       : (details.notes || "");
@@ -71,7 +86,6 @@
       ["Méthode de localisation", details.methode_localisation],
       ["Méthode de travail", details.methode_travail],
       ["Catégories du point", details.categories_du_point],
-      ["Catégories de jeu", typeof pointCategoryNames === "function" ? pointCategoryNames(point).join(" · ") : ""],
       ["Correspondances", details.correspondances],
       ["Actions", details.actions || details.fonctions],
       ["Indications", details.indications],
@@ -103,9 +117,7 @@
   window.comparisonCardHtml = function(slotIndex, point){
     if(!point) return "";
 
-    const details = (typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point])
-      ? POINT_DETAILS[point]
-      : {};
+    const details = acuPointDetails(point);
 
     const label = slotLabel(slotIndex);
     const title = typeof searchPointTitle === "function"
