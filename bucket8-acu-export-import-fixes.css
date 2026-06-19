@@ -416,3 +416,422 @@
   text-shadow:none !important;
   transform:none !important;
 }
+
+
+/* === Comparaison ACU : grille horizontale lisible, champs alignés === */
+#comparisonPanelContent .acu-comparison-intro{
+  max-width:980px;
+  margin:6px 0 12px !important;
+  opacity:.78;
+}
+
+#comparisonPanelContent .acu-comparison-scroll{
+  width:100%;
+  max-width:100%;
+  overflow:auto;
+  padding:0 0 14px;
+  border-radius:18px;
+  -webkit-overflow-scrolling:touch;
+}
+
+#comparisonPanelContent .acu-comparison-matrix{
+  --comparison-count:2;
+  display:grid !important;
+  grid-template-columns:minmax(132px, 168px) repeat(var(--comparison-count), minmax(270px, 1fr)) !important;
+  gap:0 !important;
+  width:max-content;
+  min-width:100%;
+  overflow:visible !important;
+  padding:0 !important;
+  border:1px solid rgba(0,0,0,.10) !important;
+  border-radius:18px;
+  background:rgba(255,255,255,.16);
+}
+
+#comparisonPanelContent .acu-comparison-corner,
+#comparisonPanelContent .acu-comparison-row-label,
+#comparisonPanelContent .acu-comparison-point-header,
+#comparisonPanelContent .acu-comparison-cell{
+  border-right:1px solid rgba(0,0,0,.08) !important;
+  border-bottom:1px solid rgba(0,0,0,.08) !important;
+  box-sizing:border-box;
+}
+
+#comparisonPanelContent .acu-comparison-corner,
+#comparisonPanelContent .acu-comparison-row-label{
+  position:sticky !important;
+  left:0 !important;
+  z-index:4 !important;
+  background:color-mix(in srgb, var(--page-bg) 94%, white 6%) !important;
+}
+
+#comparisonPanelContent .acu-comparison-corner,
+#comparisonPanelContent .acu-comparison-point-header{
+  position:sticky !important;
+  top:0 !important;
+  z-index:5 !important;
+  background:color-mix(in srgb, var(--page-bg) 92%, white 8%) !important;
+  backdrop-filter:blur(10px);
+}
+
+#comparisonPanelContent .acu-comparison-corner{
+  z-index:8 !important;
+  display:flex;
+  align-items:center;
+  padding:12px 12px;
+  font-family:var(--ui-font-family);
+  font-size:.78em;
+  font-weight:900;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  opacity:.62;
+}
+
+#comparisonPanelContent .acu-comparison-row-label{
+  display:flex;
+  align-items:flex-start;
+  min-height:48px;
+  padding:12px 12px !important;
+  font-family:var(--ui-font-family);
+  font-size:.82em !important;
+  font-weight:900 !important;
+  line-height:1.15 !important;
+  opacity:.78 !important;
+}
+
+#comparisonPanelContent .acu-comparison-point-header{
+  min-width:270px !important;
+  padding:11px 12px 10px !important;
+}
+
+#comparisonPanelContent .acu-comparison-point-header .search-result-title{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  font-size:1em !important;
+  line-height:1.2 !important;
+}
+
+#comparisonPanelContent .acu-comparison-point-header .search-result-meta{
+  margin-top:3px !important;
+  font-size:.76em !important;
+  opacity:.72;
+}
+
+#comparisonPanelContent .acu-comparison-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px !important;
+}
+
+#comparisonPanelContent .acu-comparison-actions button{
+  min-height:24px !important;
+  padding:4px 8px !important;
+  border-radius:999px !important;
+  font-size:.72em !important;
+  line-height:1 !important;
+}
+
+#comparisonPanelContent .acu-comparison-cell{
+  min-width:270px !important;
+  min-height:48px;
+  padding:12px 13px !important;
+  white-space:normal !important;
+  line-height:1.42 !important;
+  font-size:.91em !important;
+  background:rgba(255,255,255,.06) !important;
+}
+
+#comparisonPanelContent .acu-comparison-cell-empty{
+  color:currentColor;
+  opacity:.26;
+  text-align:center;
+}
+
+#comparisonPanelContent .acu-comparison-matrix > .acu-comparison-row-label:nth-child(2n),
+#comparisonPanelContent .acu-comparison-matrix > .acu-comparison-row-label:nth-child(2n) ~ .acu-comparison-cell{
+  background:rgba(0,0,0,.018) !important;
+}
+
+#comparisonPanelContent .comparison-slot-label{
+  flex:0 0 auto;
+  border-color:currentColor !important;
+  box-shadow:none !important;
+}
+
+@media(max-width:699px){
+  #comparisonPanelContent .acu-comparison-intro{
+    margin:4px 0 10px !important;
+    font-size:.86em;
+  }
+
+  #comparisonPanelContent .acu-comparison-scroll{
+    border-radius:14px;
+  }
+
+  #comparisonPanelContent .acu-comparison-matrix{
+    grid-template-columns:minmax(98px, 116px) repeat(var(--comparison-count), minmax(235px, 74vw)) !important;
+    border-radius:14px;
+  }
+
+  #comparisonPanelContent .acu-comparison-corner,
+  #comparisonPanelContent .acu-comparison-row-label{
+    padding:9px 8px !important;
+    font-size:.72em !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-point-header,
+  #comparisonPanelContent .acu-comparison-cell{
+    min-width:235px !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-point-header{
+    padding:9px 10px !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-cell{
+    padding:10px 10px !important;
+    font-size:.86em !important;
+    line-height:1.36 !important;
+  }
+}
+
+@supports not (background:color-mix(in srgb, white 50%, black 50%)){
+  #comparisonPanelContent .acu-comparison-corner,
+  #comparisonPanelContent .acu-comparison-row-label,
+  #comparisonPanelContent .acu-comparison-point-header{
+    background:var(--page-bg) !important;
+  }
+}
+
+/* === Correction comparaison ACU : colonnes fixes et texte long lisible ===
+   Empêche une phrase longue d'élargir la colonne d'un point sur tout l'écran. */
+.acu-comparison-matrix{
+  --acu-compare-label-col:128px;
+  --acu-compare-point-col:280px;
+  grid-template-columns:var(--acu-compare-label-col) repeat(var(--comparison-count), var(--acu-compare-point-col)) !important;
+  overflow-x:auto !important;
+  overflow-y:visible;
+  max-width:100%;
+}
+
+.acu-comparison-corner,
+.acu-comparison-row-label{
+  width:var(--acu-compare-label-col) !important;
+  min-width:var(--acu-compare-label-col) !important;
+  max-width:var(--acu-compare-label-col) !important;
+  box-sizing:border-box;
+}
+
+.acu-comparison-herb-header,
+.acu-comparison-cell{
+  width:var(--acu-compare-point-col) !important;
+  min-width:var(--acu-compare-point-col) !important;
+  max-width:var(--acu-compare-point-col) !important;
+  box-sizing:border-box;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  hyphens:auto;
+}
+
+@media(max-width:699px){
+  .acu-comparison-matrix{
+    --acu-compare-label-col:96px;
+    --acu-compare-point-col:235px;
+    grid-template-columns:var(--acu-compare-label-col) repeat(var(--comparison-count), var(--acu-compare-point-col)) !important;
+  }
+
+  .acu-comparison-corner,
+  .acu-comparison-row-label{
+    width:var(--acu-compare-label-col) !important;
+    min-width:var(--acu-compare-label-col) !important;
+    max-width:var(--acu-compare-label-col) !important;
+  }
+
+  .acu-comparison-herb-header,
+  .acu-comparison-cell{
+    width:var(--acu-compare-point-col) !important;
+    min-width:var(--acu-compare-point-col) !important;
+    max-width:var(--acu-compare-point-col) !important;
+  }
+}
+
+/* === Comparaison ACU : colonnes collées, fond stable, en-tête compact ===
+   Supprime l'impression de colonnes vides et clarifie la lecture du tableau. */
+#comparisonPanelContent .acu-comparison-scroll{
+  padding:0 0 10px !important;
+  border-radius:12px !important;
+}
+
+#comparisonPanelContent .acu-comparison-matrix{
+  --acu-compare-label-col:128px;
+  --acu-compare-point-col:280px;
+  grid-template-columns:var(--acu-compare-label-col) repeat(var(--comparison-count), var(--acu-compare-point-col)) !important;
+  gap:0 !important;
+  column-gap:0 !important;
+  row-gap:0 !important;
+  width:max-content !important;
+  min-width:0 !important;
+  max-width:none !important;
+  padding:0 !important;
+  border:1px solid rgba(0,0,0,.14) !important;
+  border-radius:12px !important;
+  background:transparent !important;
+  overflow:visible !important;
+}
+
+#comparisonPanelContent .acu-comparison-matrix > *{
+  margin:0 !important;
+  box-sizing:border-box !important;
+}
+
+#comparisonPanelContent .acu-comparison-corner,
+#comparisonPanelContent .acu-comparison-row-label,
+#comparisonPanelContent .acu-comparison-point-header,
+#comparisonPanelContent .acu-comparison-herb-header,
+#comparisonPanelContent .acu-comparison-cell{
+  border-right:1px solid rgba(0,0,0,.12) !important;
+  border-bottom:1px solid rgba(0,0,0,.12) !important;
+  box-shadow:none !important;
+}
+
+#comparisonPanelContent .acu-comparison-cell,
+#comparisonPanelContent .acu-comparison-matrix > .acu-comparison-cell:nth-child(n){
+  background:rgba(255,255,255,.045) !important;
+}
+
+#comparisonPanelContent .acu-comparison-row-label,
+#comparisonPanelContent .acu-comparison-matrix > .acu-comparison-row-label:nth-child(n){
+  background:color-mix(in srgb, var(--page-bg) 92%, white 8%) !important;
+}
+
+#comparisonPanelContent .acu-comparison-corner,
+#comparisonPanelContent .acu-comparison-point-header,
+#comparisonPanelContent .acu-comparison-herb-header{
+  background:color-mix(in srgb, var(--page-bg) 88%, white 12%) !important;
+}
+
+/* Neutralise les anciennes règles de fonds alternés qui donnaient une impression de colonnes colorées. */
+#comparisonPanelContent .acu-comparison-cell:nth-child(odd),
+#comparisonPanelContent .acu-comparison-row-label:nth-child(odd),
+#comparisonPanelContent .acu-comparison-matrix > .acu-comparison-row-label:nth-child(2n),
+#comparisonPanelContent .acu-comparison-matrix > .acu-comparison-row-label:nth-child(2n) ~ .acu-comparison-cell{
+  box-shadow:none !important;
+}
+
+#comparisonPanelContent .acu-comparison-corner,
+#comparisonPanelContent .acu-comparison-row-label{
+  width:var(--acu-compare-label-col) !important;
+  min-width:var(--acu-compare-label-col) !important;
+  max-width:var(--acu-compare-label-col) !important;
+}
+
+#comparisonPanelContent .acu-comparison-point-header,
+#comparisonPanelContent .acu-comparison-herb-header,
+#comparisonPanelContent .acu-comparison-cell{
+  width:var(--acu-compare-point-col) !important;
+  min-width:var(--acu-compare-point-col) !important;
+  max-width:var(--acu-compare-point-col) !important;
+}
+
+#comparisonPanelContent .acu-comparison-panel-header{
+  margin:0 0 4px !important;
+  padding:0 !important;
+  min-height:0 !important;
+}
+
+#comparisonPanelContent .acu-comparison-intro{
+  display:none !important;
+}
+
+#comparisonPanelContent .acu-comparison-corner{
+  min-height:0 !important;
+  padding:8px 9px !important;
+}
+
+#comparisonPanelContent .acu-comparison-point-header,
+#comparisonPanelContent .acu-comparison-herb-header{
+  min-height:0 !important;
+  padding:7px 9px 6px !important;
+}
+
+#comparisonPanelContent .acu-comparison-point-header .search-result-title,
+#comparisonPanelContent .acu-comparison-herb-header .search-result-title{
+  margin:0 !important;
+}
+
+#comparisonPanelContent .acu-comparison-point-header .search-result-meta,
+#comparisonPanelContent .acu-comparison-herb-header .search-result-meta{
+  margin-top:1px !important;
+  line-height:1.1 !important;
+}
+
+#comparisonPanelContent .acu-comparison-actions{
+  margin-top:4px !important;
+  gap:4px !important;
+}
+
+#comparisonPanelContent .acu-comparison-actions button{
+  min-height:20px !important;
+  padding:3px 7px !important;
+  line-height:1 !important;
+}
+
+#comparisonPanelContent .acu-comparison-row-label,
+#comparisonPanelContent .acu-comparison-cell{
+  min-height:40px !important;
+  padding:9px 10px !important;
+}
+
+@media(max-width:699px){
+  #comparisonPanelContent .acu-comparison-matrix{
+    --acu-compare-label-col:96px;
+    --acu-compare-point-col:235px;
+    grid-template-columns:var(--acu-compare-label-col) repeat(var(--comparison-count), var(--acu-compare-point-col)) !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-corner,
+  #comparisonPanelContent .acu-comparison-row-label{
+    width:var(--acu-compare-label-col) !important;
+    min-width:var(--acu-compare-label-col) !important;
+    max-width:var(--acu-compare-label-col) !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-point-header,
+  #comparisonPanelContent .acu-comparison-herb-header,
+  #comparisonPanelContent .acu-comparison-cell{
+    width:var(--acu-compare-point-col) !important;
+    min-width:var(--acu-compare-point-col) !important;
+    max-width:var(--acu-compare-point-col) !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-point-header,
+  #comparisonPanelContent .acu-comparison-herb-header{
+    padding:6px 8px 5px !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-actions{
+    margin-top:3px !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-row-label,
+  #comparisonPanelContent .acu-comparison-cell{
+    min-height:36px !important;
+    padding:8px 8px !important;
+  }
+}
+
+@supports not (background:color-mix(in srgb, white 50%, black 50%)){
+  #comparisonPanelContent .acu-comparison-row-label,
+  #comparisonPanelContent .acu-comparison-corner,
+  #comparisonPanelContent .acu-comparison-point-header,
+  #comparisonPanelContent .acu-comparison-herb-header{
+    background:var(--page-bg) !important;
+  }
+
+  #comparisonPanelContent .acu-comparison-cell{
+    background:rgba(255,255,255,.045) !important;
+  }
+}
