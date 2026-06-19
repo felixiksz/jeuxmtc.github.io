@@ -9,8 +9,8 @@
 <meta content="acupuncture, points acupuncture, médecine chinoise, MTC, médecine traditionnelle chinoise, canaux, canaux, points d'acupuncture, révision acupuncture, jeu acupuncture, quiz MTC, Connections MTC, points shu antiques, points yuan source, points luo liaison, points xi crevasse, points mu, points shu du dos, merveilleux vaisseaux, huit canaux extraordinaires, qi jing ba mai, zang fu, étudiant acupuncture, école acupuncture, apprentissage MTC" name="keywords"/>
 <meta content="Connections MTC" name="author"/>
 <meta content="index, follow" name="robots"/>
-<meta content="Jeu acupuncture MTC – points, canaux et merveilleux vaisseaux" property="og:title"/>
-<meta content="Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées." property="og:description"/>
+<meta content="Jeu de révision acupuncture et pharmacopée" property="og:title"/>
+<meta content="Jeu interactif gratuit pour réviser les points d’acupuncture et la pharmacopée en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, substances médicinales et fiches détaillées." property="og:description"/>
 <meta content="website" property="og:type"/>
 <meta content="summary" name="twitter:card"/>
 <meta content="Jeu de révision acupuncture et pharmacopée" name="twitter:title"/>
@@ -122,14 +122,10 @@
 <button onclick="startTour()">? Aide</button>
 </div>
 <div class="study-domain-topline" aria-label="Choix rapide de matière">
-  <div aria-label="Basculer entre acupuncture et pharmacopée" class="mode-switch study-domain-switch" id="studyDomainSwitch" title="Basculer entre acupuncture et pharmacopée">
-    <span>ACU</span>
-    <label class="switch">
-      <input id="studyDomainToggle" onchange="toggleStudyDomainFromControl(this.checked)" type="checkbox"/>
-      <span class="slider"></span>
-    </label>
-    <span>PHARMA</span>
-  </div>
+  <select aria-label="Choisir la matière" class="study-domain-select" id="studyDomainSelect" title="Choisir ACU ou PHARMA">
+    <option value="acupuncture">ACU</option>
+    <option value="pharmacology">PHARMA</option>
+  </select>
 </div>
 </div>
 <div class="topbar-row practice-row">
