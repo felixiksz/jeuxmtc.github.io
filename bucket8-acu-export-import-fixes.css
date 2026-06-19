@@ -1,4 +1,16 @@
 /* === Bucket 8 correctifs visuels : switch mobile, stats ACU, comparaison ACU, export/import, colombe-dino === */
+@media(max-width:520px), (pointer:coarse){
+  .study-domain-topline{
+    right:0 !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+  }
+  .study-domain-switch{
+    opacity:.82 !important;
+    touch-action:manipulation;
+  }
+}
+
 /* Toggle colombe / dinosaure : fond commun invisible au repos.
    Les sélecteurs sont volontairement larges pour couvrir les versions précédentes du bouton. */
 .dove-dino-toggle,
@@ -162,9 +174,11 @@
   }
 }
 
-/* === Correction mobile propre : bouton ACU/PHARMA vertical après plein écran ===
-   Mobile : un seul mécanisme. Le switch natif est masqué, le menu s’ouvre au toucher,
-   puis ACU et PHARMA sont deux choix directs. Aucun bouton superposé. */
+/* === Correction mobile : bouton ACU/PHARMA en menu vertical après le plein écran ===
+   Sur mobile, le choix ACU/PHARMA reste dans la première ligne, juste après
+   le bouton plein écran. Il est rangé vers le haut et descend au toucher.
+   Le déclencheur affiche seulement le mode actif : ACU ou PHARMA.
+   Ajustement : texte fermé aligné avec la ligne du menu et même taille que les boutons. */
 @media(max-width:520px), (pointer:coarse){
   .topbar-main-row{
     align-items:center !important;
@@ -188,8 +202,7 @@
 
   .study-domain-topline{
     --domain-trigger-width:58px;
-    --domain-trigger-height:24px;
-    --domain-option-height:26px;
+    --domain-trigger-height:22px;
 
     order:3 !important;
     position:relative !important;
@@ -217,6 +230,8 @@
     z-index:12000 !important;
   }
 
+  .study-domain-topline:hover,
+  .study-domain-topline:focus-within,
   .study-domain-topline.is-open{
     overflow:visible !important;
   }
@@ -225,106 +240,92 @@
     position:absolute !important;
     top:0 !important;
     right:0 !important;
-    left:auto !important;
 
     display:flex !important;
     flex-direction:column !important;
-    align-items:stretch !important;
+    align-items:center !important;
     justify-content:flex-start !important;
-    gap:0 !important;
+    gap:3px !important;
 
     width:var(--domain-trigger-width) !important;
     min-width:var(--domain-trigger-width) !important;
     margin:0 !important;
-    padding:0 !important;
+    padding:5px 2px 0 !important;
 
-    font-size:inherit !important;
-    line-height:1 !important;
+    font-size:.82em !important;
+    line-height:1.1 !important;
     opacity:.92 !important;
-    touch-action:manipulation !important;
+    touch-action:manipulation;
 
-    border:0 !important;
-    border-radius:0 0 12px 12px !important;
+    border-radius:0 0 999px 999px !important;
     background:var(--page-bg) !important;
     color:var(--text-color) !important;
     box-shadow:none !important;
     text-shadow:none !important;
     filter:none !important;
 
-    transform:translateY(calc(-2 * var(--domain-option-height))) !important;
-    transition:transform .22s ease, opacity .16s ease !important;
+    transform:translateY(calc(-100% + var(--domain-trigger-height))) !important;
+    transition:transform .24s ease, opacity .2s ease, filter .2s ease !important;
   }
 
+  .study-domain-switch::after{
+    content:"ACU";
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+
+    width:var(--domain-trigger-width);
+    height:var(--domain-trigger-height);
+    margin-top:4px;
+    padding:0 4px;
+
+    font-size:1em !important;
+    font-weight:700;
+    letter-spacing:.02em;
+    line-height:1;
+    opacity:.74;
+    border-radius:0 0 999px 999px;
+    box-shadow:none !important;
+    text-shadow:none !important;
+    filter:none !important;
+  }
+
+  [data-study-domain="pharmacology"] .study-domain-switch::after{
+    content:"PHARMA";
+    font-size:1em !important;
+    letter-spacing:-.02em;
+  }
+
+  [data-study-domain="acupuncture"] .study-domain-switch::after{
+    content:"ACU";
+  }
+
+  .study-domain-topline:hover .study-domain-switch,
+  .study-domain-topline:focus-within .study-domain-switch,
   .study-domain-topline.is-open .study-domain-switch{
     transform:translateY(0) !important;
     opacity:1 !important;
   }
 
-  .study-domain-switch::after{
-    content:"ACU";
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    box-sizing:border-box !important;
-
-    width:var(--domain-trigger-width) !important;
-    height:var(--domain-trigger-height) !important;
-    min-height:var(--domain-trigger-height) !important;
-    padding:0 4px !important;
-
-    font-size:1em !important;
-    font-weight:700 !important;
-    letter-spacing:.02em !important;
-    line-height:1 !important;
-    opacity:.72 !important;
-    border:0 !important;
-    border-radius:0 0 12px 12px !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    text-shadow:none !important;
-    filter:none !important;
-    pointer-events:none !important;
+  .study-domain-topline:hover .study-domain-switch::after,
+  .study-domain-topline:focus-within .study-domain-switch::after,
+  .study-domain-topline.is-open .study-domain-switch::after{
+    opacity:1;
   }
 
-  html[data-study-domain="pharmacology"] .study-domain-switch::after,
-  body[data-study-domain="pharmacology"] .study-domain-switch::after{
-    content:"PHARMA";
-    letter-spacing:-.02em !important;
-  }
-
-  html[data-study-domain="acupuncture"] .study-domain-switch::after,
-  body[data-study-domain="acupuncture"] .study-domain-switch::after{
-    content:"ACU";
-  }
-
-  .study-domain-switch span[data-mobile-domain-choice]{
+  .study-domain-switch span{
     writing-mode:horizontal-tb !important;
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
     box-sizing:border-box !important;
-
     width:100% !important;
-    height:var(--domain-option-height) !important;
-    min-height:var(--domain-option-height) !important;
-    padding:0 4px !important;
-    margin:0 !important;
-
+    min-height:24px !important;
+    padding:2px 3px !important;
     text-align:center !important;
     font-size:1em !important;
-    font-weight:700 !important;
-    line-height:1 !important;
-    letter-spacing:.02em !important;
-    color:var(--text-color) !important;
-    opacity:.62 !important;
-
-    border:0 !important;
-    border-radius:0 !important;
-    background:transparent !important;
-    box-shadow:none !important;
-    text-shadow:none !important;
-    filter:none !important;
-
+    letter-spacing:.03em !important;
     cursor:pointer !important;
     touch-action:manipulation !important;
     pointer-events:auto !important;
@@ -332,30 +333,34 @@
     -webkit-user-select:none !important;
   }
 
-  .study-domain-switch span[data-mobile-domain-choice].is-active,
-  .study-domain-switch span[data-mobile-domain-choice][aria-pressed="true"]{
-    opacity:1 !important;
-  }
-
-  .study-domain-switch span[data-mobile-domain-choice]:active{
-    opacity:1 !important;
-  }
-
   .study-domain-switch .switch{
-    display:none !important;
+    width:24px !important;
+    height:14px !important;
+    transform:rotate(90deg);
+    margin:3px 0 !important;
     pointer-events:none !important;
+  }
+
+  .study-domain-switch .slider::before{
+    width:8px !important;
+    height:8px !important;
+    left:3px !important;
+    top:3px !important;
+  }
+
+  .study-domain-switch .switch input:checked + .slider::before{
+    transform:translateX(10px) !important;
   }
 }
 
 @media(max-width:430px){
   .study-domain-topline{
     --domain-trigger-width:54px;
-    --domain-trigger-height:23px;
-    --domain-option-height:25px;
+    --domain-trigger-height:21px;
   }
 
   .study-domain-switch{
-    font-size:.78em !important;
+    font-size:.72em !important;
   }
 }
 
@@ -841,5 +846,174 @@
 
   #comparisonPanelContent .acu-comparison-cell{
     background:rgba(255,255,255,.045) !important;
+  }
+}
+
+/* === Correctif propre : ACU / PHARMA en menu déroulant natif ===
+   Remplace les anciens comportements mobiles du switch par un seul contrôle fiable. */
+.topbar-main-row{
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-wrap:wrap !important;
+  gap:4px 6px !important;
+  width:100% !important;
+  max-width:100% !important;
+  overflow:visible !important;
+}
+
+.topbar-main-buttons{
+  order:1 !important;
+  flex:0 1 auto !important;
+}
+
+#fullscreenToggleButton{
+  order:2 !important;
+  flex:0 0 auto !important;
+}
+
+.study-domain-topline{
+  order:3 !important;
+  position:relative !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  left:auto !important;
+  transform:none !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:auto !important;
+  min-width:0 !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+  overflow:visible !important;
+  z-index:12000 !important;
+}
+
+.study-domain-select{
+  appearance:auto !important;
+  -webkit-appearance:menulist !important;
+  box-sizing:border-box !important;
+  display:block !important;
+  width:auto !important;
+  min-width:74px !important;
+  max-width:90px !important;
+  min-height:30px !important;
+  margin:0 !important;
+  padding:3px 4px !important;
+  border:1px solid color-mix(in srgb, currentColor 28%, transparent) !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:var(--text-color) !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  filter:none !important;
+  font:inherit !important;
+  font-family:var(--ui-font-family) !important;
+  font-size:.88em !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  letter-spacing:.01em !important;
+  text-transform:uppercase !important;
+  cursor:pointer !important;
+}
+
+.study-domain-select:focus-visible{
+  outline:2px solid color-mix(in srgb, currentColor 42%, transparent) !important;
+  outline-offset:2px !important;
+}
+
+@media(max-width:520px), (pointer:coarse){
+  html,
+  body{
+    max-width:100% !important;
+    overflow-x:hidden !important;
+  }
+
+  .topbar,
+  .topbar-main-row,
+  .topbar-row{
+    box-sizing:border-box !important;
+    max-width:100% !important;
+  }
+
+  .topbar-main-row{
+    padding-left:6px !important;
+    padding-right:6px !important;
+    column-gap:4px !important;
+  }
+
+  .topbar-main-buttons{
+    gap:4px !important;
+  }
+
+  .study-domain-select{
+    min-width:70px !important;
+    max-width:82px !important;
+    min-height:28px !important;
+    padding:2px 3px !important;
+    font-size:.78em !important;
+  }
+}
+
+/* Ancien switch mobile neutralisé au cas où un vieux HTML resterait en cache. */
+@media(max-width:520px), (pointer:coarse){
+  .study-domain-switch{
+    position:relative !important;
+    top:auto !important;
+    right:auto !important;
+    transform:none !important;
+    flex-direction:row !important;
+    overflow:visible !important;
+  }
+
+  .study-domain-switch::after{
+    content:none !important;
+    display:none !important;
+  }
+}
+
+/* === Restauration plein écran vertical des panneaux latéraux ===
+   Fiche détaillée et cheatsheet doivent couvrir toute la hauteur visible. */
+.point-panel,
+.point-panel.open,
+.cheatsheet-panel,
+.cheatsheet-panel.open{
+  position:fixed !important;
+  top:0 !important;
+  bottom:auto !important;
+  height:100dvh !important;
+  min-height:100dvh !important;
+  max-height:100dvh !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch !important;
+  box-sizing:border-box !important;
+}
+
+@supports not (height:100dvh){
+  .point-panel,
+  .point-panel.open,
+  .cheatsheet-panel,
+  .cheatsheet-panel.open{
+    height:100vh !important;
+    min-height:100vh !important;
+    max-height:100vh !important;
+  }
+}
+
+@media(max-width:699px){
+  .point-panel,
+  .point-panel.open,
+  .cheatsheet-panel,
+  .cheatsheet-panel.open{
+    width:100vw !important;
+    max-width:100vw !important;
   }
 }
