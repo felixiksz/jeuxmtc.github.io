@@ -9,8 +9,8 @@
 <meta content="acupuncture, points acupuncture, médecine chinoise, MTC, médecine traditionnelle chinoise, canaux, canaux, points d'acupuncture, révision acupuncture, jeu acupuncture, quiz MTC, Connections MTC, points shu antiques, points yuan source, points luo liaison, points xi crevasse, points mu, points shu du dos, merveilleux vaisseaux, huit canaux extraordinaires, qi jing ba mai, zang fu, étudiant acupuncture, école acupuncture, apprentissage MTC" name="keywords"/>
 <meta content="Connections MTC" name="author"/>
 <meta content="index, follow" name="robots"/>
-<meta content="Jeu de révision acupuncture et pharmacopée" property="og:title"/>
-<meta content="Jeu interactif gratuit pour réviser les points d’acupuncture et la pharmacopée en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, substances médicinales et fiches détaillées." property="og:description"/>
+<meta content="Jeu acupuncture MTC – points, canaux et merveilleux vaisseaux" property="og:title"/>
+<meta content="Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées." property="og:description"/>
 <meta content="website" property="og:type"/>
 <meta content="summary" name="twitter:card"/>
 <meta content="Jeu de révision acupuncture et pharmacopée" name="twitter:title"/>
@@ -122,7 +122,7 @@
 <button onclick="startTour()">? Aide</button>
 </div>
 <div class="study-domain-topline" aria-label="Choix rapide de matière">
-  <select aria-label="Choisir la matière" class="study-domain-select" id="studyDomainSelect" title="Choisir ACU ou PHARMA">
+  <select aria-label="Choisir la matière" class="study-domain-select" id="studyDomainSelect" title="Choisir ACU ou PHARMA" onchange="if(window.chooseStudyDomain) window.chooseStudyDomain(this.value)" oninput="if(window.chooseStudyDomain) window.chooseStudyDomain(this.value)">
     <option value="acupuncture">ACU</option>
     <option value="pharmacology">PHARMA</option>
   </select>
