@@ -73,6 +73,137 @@
     return out;
   }
 
+
+  const STATUS_IMPORT_KEY = "mtc_personal_data_status_imported_at";
+  const STATUS_MODIFIED_KEY = "mtc_personal_data_status_modified_at";
+  const STATUS_EXPORTED_KEY = "mtc_personal_data_status_exported_at";
+  const STATUS_TOUCHED_KEY = "mtc_personal_data_status_visible";
+  let personalDataImportInProgress = false;
+
+  function personalDataPrefixes(){
+    return [
+      ACU_NOTE_PREFIX,
+      ACU_ESPRIT_PREFIX,
+      ACU_ASSOC_PREFIX,
+      ACU_VS_PREFIX,
+      PHARMA_ESPRIT_PREFIX,
+      PHARMA_NOTE_PREFIX,
+      PHARMA_ASSOC_PREFIX,
+      PHARMA_FORMULES_PREFIX,
+      PHARMA_VS_PREFIX,
+      PHARMA_PRECAUTION_PREFIX,
+      PHARMA_IMAGE_PREFIX
+    ];
+  }
+
+  function isPersonalDataStorageKey(key){
+    const clean = String(key || "");
+    if(!clean || clean.startsWith("mtc_personal_data_status_")) return false;
+    return personalDataPrefixes().some(prefix => clean.startsWith(prefix));
+  }
+
+  function formatStatusDateTime(value){
+    if(!value) return "—";
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return "—";
+    const pad = number => String(number).padStart(2, "0");
+    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function ensurePersonalDataStatusBox(){
+    let box = document.getElementById("mtcPersonalDataStatus");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "mtcPersonalDataStatus";
+      box.setAttribute("aria-live", "polite");
+      box.setAttribute("aria-label", "Statut import et modification des notes");
+      document.body.appendChild(box);
+    }
+    return box;
+  }
+
+  function refreshPersonalDataStatusBox(){
+    if(!document.body) return;
+    let visible = "";
+    let importedAt = "";
+    let modifiedAt = "";
+    try{
+      visible = localStorage.getItem(STATUS_TOUCHED_KEY) || "";
+      importedAt = localStorage.getItem(STATUS_IMPORT_KEY) || "";
+      modifiedAt = localStorage.getItem(STATUS_MODIFIED_KEY) || "";
+    }catch(error){}
+
+    const existing = document.getElementById("mtcPersonalDataStatus");
+    if(!visible && !importedAt && !modifiedAt){
+      if(existing) existing.classList.remove("visible");
+      return;
+    }
+
+    const box = ensurePersonalDataStatusBox();
+    box.textContent = `import : ${formatStatusDateTime(importedAt)}, modifié : ${formatStatusDateTime(modifiedAt)}`;
+    box.classList.add("visible");
+  }
+
+  function markPersonalDataStatus(kind, options){
+    const now = new Date().toISOString();
+    const opts = options || {};
+    try{
+      localStorage.setItem(STATUS_TOUCHED_KEY, "1");
+      if(kind === "import"){
+        localStorage.setItem(STATUS_IMPORT_KEY, now);
+        if(opts.markModified !== false) localStorage.setItem(STATUS_MODIFIED_KEY, now);
+      }else if(kind === "export"){
+        localStorage.setItem(STATUS_EXPORTED_KEY, now);
+      }else if(kind === "modified"){
+        localStorage.setItem(STATUS_MODIFIED_KEY, now);
+      }
+    }catch(error){}
+    refreshPersonalDataStatusBox();
+  }
+
+  function initPersonalDataStatusBox(){
+    if(document.readyState === "loading"){
+      document.addEventListener("DOMContentLoaded", refreshPersonalDataStatusBox, {once:true});
+    }else{
+      refreshPersonalDataStatusBox();
+    }
+  }
+
+  function initPersonalDataModificationWatch(){
+    if(window.__mtcPersonalDataModificationWatchReady) return;
+    window.__mtcPersonalDataModificationWatchReady = true;
+
+    try{
+      const originalSetItem = Storage.prototype.setItem;
+      if(originalSetItem && !originalSetItem.__mtcPersonalDataStatusPatched){
+        const patched = function(key, value){
+          const result = originalSetItem.apply(this, arguments);
+          try{
+            if(this === window.localStorage && !personalDataImportInProgress && isPersonalDataStorageKey(key)){
+              markPersonalDataStatus("modified");
+            }
+          }catch(error){}
+          return result;
+        };
+        patched.__mtcPersonalDataStatusPatched = true;
+        Storage.prototype.setItem = patched;
+      }
+    }catch(error){}
+
+    document.addEventListener("mtc-personal-data-modified", () => {
+      if(!personalDataImportInProgress) markPersonalDataStatus("modified");
+    });
+    document.addEventListener("mtc-personal-data-imported", () => {
+      markPersonalDataStatus("import");
+    });
+    document.addEventListener("mtc-personal-data-exported", () => {
+      markPersonalDataStatus("export");
+    });
+  }
+
+  initPersonalDataStatusBox();
+  initPersonalDataModificationWatch();
+
   function normalizeImportKey(value){
     return String(value || "")
       .normalize("NFD")
@@ -256,6 +387,8 @@
     };
 
     downloadJson(payload, "connections-mtc-notes-images.json");
+    markPersonalDataStatus("export");
+    document.dispatchEvent(new CustomEvent("mtc-personal-data-exported", {detail:{exportedAt:payload.exportedAt}}));
 
     const message = document.getElementById("message");
     if(message){
@@ -271,6 +404,7 @@
     reader.onload = () => {
       const message = document.getElementById("message");
       try{
+        personalDataImportInProgress = true;
         const parsed = JSON.parse(String(reader.result || "{}"));
         let count = 0;
 
@@ -301,6 +435,8 @@
           count += setPrefixedValues(PHARMA_IMAGE_PREFIX, pharma.images || pharma.image);
         }
 
+        personalDataImportInProgress = false;
+        markPersonalDataStatus("import");
         if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
         if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
         if(typeof window.refreshCurrentPointPanel === "function") window.refreshCurrentPointPanel();
@@ -313,9 +449,11 @@
             : "Import terminé, mais aucun élément compatible n’a été trouvé.";
         }
       }catch(error){
+        personalDataImportInProgress = false;
         console.error(error);
         if(message) message.textContent = "Import impossible : fichier de notes/images invalide.";
       }finally{
+        personalDataImportInProgress = false;
         if(input) input.value = "";
       }
     };
