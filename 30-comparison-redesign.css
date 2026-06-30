@@ -1698,3 +1698,95 @@
     margin-bottom:1px !important;
   }
 }
+
+/* === Correctif cheatsheet ACU/PHARMA : fermeture mobile visible + couche au-dessus du statut ===
+   Le statut import/export est volontairement très haut en z-index ; le cheatsheet
+   doit passer au-dessus quand il est ouvert, sur ordinateur comme sur mobile. */
+.cheatsheet-panel,
+.cheatsheet-panel.open{
+  z-index:1000200 !important;
+}
+.cheatsheet-toggle{
+  z-index:1000201 !important;
+}
+
+@media(max-width:699px), (pointer:coarse){
+  .cheatsheet-panel.open{
+    left:0 !important;
+    right:auto !important;
+    width:100vw !important;
+    max-width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    max-height:100dvh !important;
+    /* Espace réservé à droite pour la barre verticale de fermeture. */
+    padding:18px 50px 18px 14px !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    box-sizing:border-box !important;
+  }
+
+  @supports not (height:100dvh){
+    .cheatsheet-panel.open{
+      height:100vh !important;
+      min-height:100vh !important;
+      max-height:100vh !important;
+    }
+  }
+
+  .cheatsheet-panel.open .cheatsheet-toggle{
+    position:fixed !important;
+    left:auto !important;
+    right:0 !important;
+    top:0 !important;
+    bottom:0 !important;
+    width:38px !important;
+    min-width:38px !important;
+    max-width:38px !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    max-height:100dvh !important;
+    padding:0 !important;
+    margin:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    writing-mode:horizontal-tb !important;
+    transform:none !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:color-mix(in srgb, var(--page-bg, #fff) 38%, transparent) !important;
+    color:var(--text-color) !important;
+    opacity:.42 !important;
+    -webkit-backdrop-filter:blur(8px) saturate(1.02) !important;
+    backdrop-filter:blur(8px) saturate(1.02) !important;
+    box-shadow:none !important;
+    pointer-events:auto !important;
+    touch-action:manipulation !important;
+    z-index:1000202 !important;
+  }
+
+  @supports not (height:100dvh){
+    .cheatsheet-panel.open .cheatsheet-toggle{
+      height:100vh !important;
+      min-height:100vh !important;
+      max-height:100vh !important;
+    }
+  }
+
+  .cheatsheet-panel.open .cheatsheet-toggle:hover,
+  .cheatsheet-panel.open .cheatsheet-toggle:focus,
+  .cheatsheet-panel.open .cheatsheet-toggle:active{
+    opacity:.72 !important;
+    background:color-mix(in srgb, var(--page-bg, #fff) 54%, transparent) !important;
+    box-shadow:none !important;
+    transform:none !important;
+  }
+
+  html[data-study-domain="pharmacology"] .pharma-cheatsheet-line,
+  html[data-study-domain="pharmacology"] .pharma-cheatsheet-herb-row,
+  .cheatsheet-line{
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+}
