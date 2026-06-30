@@ -6,6 +6,7 @@
   const ACU_ESPRIT_PREFIX = "mtc_point_esprit_";
   const ACU_ASSOC_PREFIX = "mtc_point_associations_";
   const ACU_VS_PREFIX = "mtc_point_vs_";
+  const ACU_PRECAUTION_PREFIX = "mtc_point_precaution_";
   const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
   const PHARMA_NOTE_PREFIX = "mtc_pharma_herb_notes_";
   const PHARMA_ASSOC_PREFIX = "mtc_pharma_herb_associations_";
@@ -86,6 +87,7 @@
       ACU_ESPRIT_PREFIX,
       ACU_ASSOC_PREFIX,
       ACU_VS_PREFIX,
+      ACU_PRECAUTION_PREFIX,
       PHARMA_ESPRIT_PREFIX,
       PHARMA_NOTE_PREFIX,
       PHARMA_ASSOC_PREFIX,
@@ -126,21 +128,23 @@
     if(!document.body) return;
     let visible = "";
     let importedAt = "";
+    let exportedAt = "";
     let modifiedAt = "";
     try{
       visible = localStorage.getItem(STATUS_TOUCHED_KEY) || "";
       importedAt = localStorage.getItem(STATUS_IMPORT_KEY) || "";
+      exportedAt = localStorage.getItem(STATUS_EXPORTED_KEY) || "";
       modifiedAt = localStorage.getItem(STATUS_MODIFIED_KEY) || "";
     }catch(error){}
 
     const existing = document.getElementById("mtcPersonalDataStatus");
-    if(!visible && !importedAt && !modifiedAt){
+    if(!visible && !importedAt && !exportedAt && !modifiedAt){
       if(existing) existing.classList.remove("visible");
       return;
     }
 
     const box = ensurePersonalDataStatusBox();
-    box.textContent = `import : ${formatStatusDateTime(importedAt)}, modifié : ${formatStatusDateTime(modifiedAt)}`;
+    box.textContent = `export : ${formatStatusDateTime(exportedAt)}, import : ${formatStatusDateTime(importedAt)}, modifié : ${formatStatusDateTime(modifiedAt)}`;
     box.classList.add("visible");
   }
 
@@ -373,7 +377,8 @@
         notes:acuNotes,
         esprits:safeLocalStorageEntries(ACU_ESPRIT_PREFIX),
         associations:safeLocalStorageEntries(ACU_ASSOC_PREFIX),
-        vs:safeLocalStorageEntries(ACU_VS_PREFIX)
+        vs:safeLocalStorageEntries(ACU_VS_PREFIX),
+        precautions:safeLocalStorageEntries(ACU_PRECAUTION_PREFIX)
       },
       pharmacology:{
         esprits:safeLocalStorageEntries(PHARMA_ESPRIT_PREFIX),
@@ -422,6 +427,7 @@
           count += setPrefixedValues(ACU_ESPRIT_PREFIX, parsed.acupuncture.esprits || parsed.acupuncture.esprit);
           count += setPrefixedValues(ACU_ASSOC_PREFIX, parsed.acupuncture.associations || parsed.acupuncture.association);
           count += setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison);
+          count += setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution);
         }
 
         if(parsed.pharmacology || parsed.pharma || parsed.herbs){
@@ -737,7 +743,7 @@
             {
               selector:"#importNotesButton",
               title:"Import",
-              text:"Ce bouton réimporte le fichier d’export : notes/esprits/associations/VS ACU, Esprits, notes, associations, VS, formules, précautions PHARMA et images locales. C’est utile pour changer de navigateur, d’ordinateur ou restaurer une sauvegarde.",
+              text:"Ce bouton réimporte le fichier d’export : notes/esprits/associations/VS/précautions ACU, Esprits, notes, associations, VS, formules, précautions PHARMA et images locales. C’est utile pour changer de navigateur, d’ordinateur ou restaurer une sauvegarde.",
               fallback:() => document.querySelector("#footerTitle"),
               position:"aboveBottom"
             }
@@ -761,11 +767,11 @@
     const exportButton = document.getElementById("exportNotesButton");
     const importButton = document.getElementById("importNotesButton");
     if(exportButton){
-      exportButton.title = "Exporter notes/esprits/associations/VS ACU, esprits/notes/associations/VS/formules/précautions PHARMA et images locales";
+      exportButton.title = "Exporter notes/esprits/associations/VS/précautions ACU, esprits/notes/associations/VS/formules/précautions PHARMA et images locales";
       exportButton.setAttribute("aria-label", "Exporter notes et images locales");
     }
     if(importButton){
-      importButton.title = "Importer notes/esprits/associations/VS ACU, esprits/notes/associations/VS/formules/précautions PHARMA et images locales";
+      importButton.title = "Importer notes/esprits/associations/VS/précautions ACU, esprits/notes/associations/VS/formules/précautions PHARMA et images locales";
       importButton.setAttribute("aria-label", "Importer notes et images locales");
     }
   });
