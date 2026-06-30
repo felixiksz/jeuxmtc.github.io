@@ -1,24 +1,23 @@
-/* === Bucket 8 correctifs : mobile ACU/PHARMA, stats ACU %, comparaison ACU, export/import notes+images === */
+/* === Bucket 8L : ACU image + synthèse locale, stats ACU lisibles === */
 (function(){
   "use strict";
 
-  const ACU_NOTE_PREFIX = "mtc_point_note_";
-  const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
-  const PHARMA_NOTE_PREFIX = "mtc_pharma_herb_notes_";
-  const PHARMA_IMAGE_PREFIX = "mtc_pharma_herb_image_";
+  const ACU_SYNTH_STORAGE_PREFIX = "mtc_acu_point_synthese_";
+  const ACU_IMAGE_STORAGE_PREFIX = "mtc_acu_point_image_";
+  const ACU_ASSOC_STORAGE_PREFIX = "mtc_point_associations_";
+  const ACU_VS_STORAGE_PREFIX = "mtc_point_vs_";
+  const ACU_PRECAUTION_STORAGE_PREFIX = "mtc_point_precaution_";
 
-  const previous = {
-    renderStatsPanel: window.renderStatsPanel,
-    renderStatsPanelIfOpen: window.renderStatsPanelIfOpen,
-    renderComparisonPanel: window.renderComparisonPanel,
-    renderComparisonPanelIfOpen: window.renderComparisonPanelIfOpen,
-    exportPersonalNotes: window.exportPersonalNotes,
-    importPersonalNotesFromFile: window.importPersonalNotesFromFile,
-    startTour: window.startTour
-  };
+  function currentDomain(){
+    return document.documentElement.getAttribute("data-study-domain") || "acupuncture";
+  }
 
-  function isPharma(){
-    return document.documentElement.getAttribute("data-study-domain") === "pharmacology";
+  function isAcuDomain(){
+    return currentDomain() !== "pharmacology";
+  }
+
+  function byId(id){
+    return document.getElementById(id);
   }
 
   function esc(value){
@@ -35,6 +34,368 @@
     if(typeof window.escapeAttribute === "function") return window.escapeAttribute(value);
     return esc(value).replace(/`/g,"&#096;");
   }
+
+  function safeFormatPointCode(point){
+    if(typeof window.formatPointCode === "function") return window.formatPointCode(point);
+    return String(point || "");
+  }
+
+  function safeColorizePinyin(value){
+    if(typeof window.colorizePinyin === "function") return window.colorizePinyin(value || "");
+    return esc(value || "");
+  }
+
+  function safeBasketButton(point){
+    if(typeof window.basketButtonHtml === "function"){
+      return window.basketButtonHtml(point, "point-header-basket-button", true);
+    }
+    return "";
+  }
+
+  function storageGet(prefix, id){
+    try{
+      const value = localStorage.getItem(prefix + String(id || ""));
+      return value === null ? null : value;
+    }catch(error){
+      return null;
+    }
+  }
+
+  function storageSet(prefix, id, value){
+    try{
+      localStorage.setItem(prefix + String(id || ""), String(value ?? ""));
+    }catch(error){
+      const message = byId("message");
+      if(message) message.textContent = "Impossible d’enregistrer localement pour l’instant.";
+    }
+  }
+
+  function getPointSynthese(point, details){
+    const stored = storageGet(ACU_SYNTH_STORAGE_PREFIX, point);
+    return stored !== null ? stored : (details?.synthese || details?.synthèse || "");
+  }
+
+  function getPointAssociations(point, details){
+    const stored = storageGet(ACU_ASSOC_STORAGE_PREFIX, point);
+    return stored !== null ? stored : (details?.associations || "");
+  }
+
+  function getPointVs(point, details){
+    const stored = storageGet(ACU_VS_STORAGE_PREFIX, point);
+    return stored !== null ? stored : (details?.vs || details?.comparaison || "");
+  }
+
+  function getPointPrecaution(point, details){
+    const stored = storageGet(ACU_PRECAUTION_STORAGE_PREFIX, point);
+    return stored !== null ? stored : (details?.precaution || details?.precautions || "");
+  }
+
+  function getPointImage(point){
+    return storageGet(ACU_IMAGE_STORAGE_PREFIX, point) || "";
+  }
+
+  function setPointImage(point, value){
+    storageSet(ACU_IMAGE_STORAGE_PREFIX, point, value || "");
+  }
+
+  function mtcRegularPointCode(point){
+    return /^(P|GI|E|Rt|C|IG|V|Rn|EC|TF|VB|F|RM|DM)\s*\d+$/i.test(String(point || ""));
+  }
+
+  function pointHeaderHtml(point, details){
+    details = details || {};
+
+    const pinyin = details.pinyin || "";
+    const hanzi = details.hanzi || "";
+    const nomFrancais = details.nom_francais || details.nom_complet || "";
+    const showCode = mtcRegularPointCode(point);
+
+    const pieces = [
+      showCode ? `<span class="point-code">${safeFormatPointCode(point)}</span>` : "",
+      pinyin ? `<span class="point-pinyin-inline">${safeColorizePinyin(pinyin)}</span>` : "",
+      hanzi ? `<span class="point-hanzi-inline">${esc(hanzi)}</span>` : "",
+      nomFrancais ? `<span class="point-fr-inline">${esc(nomFrancais)}</span>` : ""
+    ].filter(Boolean);
+
+    return `
+      <div class="point-header acu-point-header">
+        ${pieces.length ? pieces.join(`<span class="point-separator">·</span>`) : `<span class="point-code">${safeFormatPointCode(point)}</span>`}
+        ${safeBasketButton(point)}
+      </div>
+    `;
+  }
+
+
+  function pointDetailsMap(){
+    try{
+      if(typeof POINT_DETAILS !== "undefined") return POINT_DETAILS || {};
+    }catch(error){}
+    return window.POINT_DETAILS || {};
+  }
+
+  function sectionsForPoint(details){
+    details = details || {};
+    return [
+      ["Localisation", details.localisation],
+      ["Méthode de localisation", details.methode_localisation],
+      ["Méthode de travail", details.methode_travail],
+      ["Catégories du point", details.categories_du_point],
+      ["Correspondances", details.correspondances],
+      ["Actions", details.actions],
+      ["Indications", details.indications],
+      ["Associations", details.associations],
+      ["Notes", details.notes]
+    ];
+  }
+
+  function renderImageBlock(point, details){
+    const image = getPointImage(point);
+    const hasImage = Boolean(image);
+    const label = details?.pinyin || details?.nom_francais || point;
+
+    return `
+      <section class="acu-image-block ${hasImage ? "has-image" : "is-empty"}" data-acu-image-block="${attr(point)}">
+        <div class="acu-image-title">Image locale</div>
+        <div class="acu-image-preview">
+          ${hasImage ? `<img src="${attr(image)}" alt="Image locale de ${attr(label)}">` : `<span class="acu-image-empty">Aucune image locale</span>`}
+        </div>
+        <div class="acu-image-actions">
+          <label class="acu-image-upload">
+            <span>${hasImage ? "Modifier l’image" : "Choisir une image"}</span>
+            <input type="file" accept="image/*" data-acu-image-input="${attr(point)}">
+          </label>
+          <button type="button" data-acu-image-remove="${attr(point)}" ${hasImage ? "" : "disabled"}>Supprimer</button>
+        </div>
+        <p class="acu-image-note">Image enregistrée localement dans ce navigateur.</p>
+      </section>
+    `;
+  }
+
+  function renderSyntheseBlock(point, details){
+    return `
+      <section class="acu-editable-block acu-editable-synthese">
+        <div class="acu-editable-title">Synthèse</div>
+        <textarea
+          class="acu-editable-textarea"
+          data-acu-edit-field="synthese"
+          data-acu-point="${attr(point)}"
+          placeholder="Résumé court du point, à ta façon…">${esc(getPointSynthese(point, details))}</textarea>
+      </section>
+    `;
+  }
+
+  function renderAcuTextEditableBlock({title, value, placeholder, field, point}){
+    return `
+      <section class="acu-editable-block acu-editable-${attr(field)}">
+        <div class="acu-editable-title">${esc(title)}</div>
+        <textarea
+          class="acu-editable-textarea"
+          data-acu-edit-field="${attr(field)}"
+          data-acu-point="${attr(point)}"
+          placeholder="${attr(placeholder || "")}">${esc(value || "")}</textarea>
+      </section>
+    `;
+  }
+
+  function defaultAcuAssociationText(point){
+    return point ? `${point} + ` : "";
+  }
+
+  function defaultAcuVsText(point){
+    return point ? `${point} vs ` : "";
+  }
+
+  function linkifyAcuAssist(value){
+    if(typeof window.mtcLinkifiedAcuAssistHtml === "function") return window.mtcLinkifiedAcuAssistHtml(value || "");
+    return esc(value || "").replace(/\n/g,"<br>");
+  }
+
+  function renderAcuAssistedBlock({title, value, placeholder, field, point}){
+    const clean = String(value || "").trim();
+    const shown = !clean && field === "associations" ? defaultAcuAssociationText(point) : (!clean && field === "vs" ? defaultAcuVsText(point) : clean);
+    return `
+      <section class="acu-editable-block acu-editable-${attr(field)} acu-assisted-editable-block">
+        <div class="acu-editable-title">${esc(title)}</div>
+        <div class="mtc-assisted-edit-wrap">
+          <div
+            class="acu-comparison-editable acu-comparison-editable-${attr(field)} mtc-assisted-link-editable"
+            contenteditable="false"
+            role="textbox"
+            aria-multiline="true"
+            spellcheck="false"
+            data-acu-compare-edit="${attr(field)}"
+            data-acu-point-id="${attr(point)}"
+            data-acu-link-assist="1"
+            data-assist-editing="0"
+            data-placeholder="${attr(placeholder || "")}">${linkifyAcuAssist(shown)}</div>
+          <button type="button" class="mtc-assisted-edit-pencil" data-assisted-edit-trigger="1" title="Modifier" aria-label="Modifier ce champ">✎</button>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderExtraAcuEditableBlocks(point, details){
+    return `
+      ${renderAcuTextEditableBlock({title:"Précaution", value:getPointPrecaution(point, details), placeholder:"Précautions personnelles…", field:"precaution", point})}
+      ${renderAcuAssistedBlock({title:"Associations", value:getPointAssociations(point, details), placeholder:"Associations de points…", field:"associations", point})}
+      ${renderAcuAssistedBlock({title:"VS.", value:getPointVs(point, details), placeholder:"Comparaisons entre points…", field:"vs", point})}
+    `;
+  }
+
+  function resizeImageFileToDataUrl(file, callback){
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onload = () => {
+        const maxSize = 900;
+        const ratio = Math.min(1, maxSize / Math.max(img.width || 1, img.height || 1));
+        const width = Math.max(1, Math.round((img.width || 1) * ratio));
+        const height = Math.max(1, Math.round((img.height || 1) * ratio));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        callback(canvas.toDataURL("image/jpeg", 0.82));
+      };
+
+      img.onerror = () => callback(String(reader.result || ""));
+      img.src = String(reader.result || "");
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  function bindAcuPanelEditors(point){
+    document.querySelectorAll("[data-acu-image-input]").forEach(input => {
+      input.addEventListener("change", () => {
+        const file = input.files && input.files[0];
+        if(!file) return;
+
+        resizeImageFileToDataUrl(file, dataUrl => {
+          setPointImage(point, dataUrl);
+          openPointPanelDirect(point);
+          document.dispatchEvent(new CustomEvent("acu-point-edited", {detail:{point, field:"image"}}));
+        });
+      });
+    });
+
+    document.querySelectorAll("[data-acu-image-remove]").forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        setPointImage(point, "");
+        openPointPanelDirect(point);
+        document.dispatchEvent(new CustomEvent("acu-point-edited", {detail:{point, field:"image"}}));
+      });
+    });
+
+    document.querySelectorAll("[data-acu-edit-field='synthese']").forEach(textarea => {
+      textarea.addEventListener("input", () => {
+        storageSet(ACU_SYNTH_STORAGE_PREFIX, point, textarea.value);
+        document.dispatchEvent(new CustomEvent("acu-point-edited", {detail:{point, field:"synthese"}}));
+      });
+    });
+
+    document.querySelectorAll("[data-acu-edit-field='precaution']").forEach(textarea => {
+      textarea.addEventListener("input", () => {
+        storageSet(ACU_PRECAUTION_STORAGE_PREFIX, point, textarea.value);
+        document.dispatchEvent(new CustomEvent("acu-point-edited", {detail:{point, field:"precaution"}}));
+      });
+    });
+  }
+
+  function setPanelContent(point, details, missing){
+    const panel = byId("pointPanel");
+    const toggle = byId("panelToggle");
+    const content = byId("pointPanelContent");
+    if(!panel || !content) return;
+
+    const sectionsHtml = details && typeof window.renderPointInfoSections === "function"
+      ? window.renderPointInfoSections(sectionsForPoint(details), point)
+      : "";
+
+    content.innerHTML = `
+      ${renderImageBlock(point, details || {})}
+      ${pointHeaderHtml(point, details || {})}
+      ${renderSyntheseBlock(point, details || {})}
+      ${renderExtraAcuEditableBlocks(point, details || {})}
+      ${missing ? `<p>Aucune fiche trouvée pour ce point.</p>` : sectionsHtml}
+    `;
+
+    panel.classList.remove("pharma-herb-panel");
+    panel.setAttribute("data-panel-kind", "acu-point");
+    panel.classList.add("available", "open", "acu-point-panel");
+
+    if(toggle) toggle.innerHTML = "&gt;";
+    document.body.classList.add("panel-open");
+
+    bindAcuPanelEditors(point);
+    if(typeof window.updateBasketButtons === "function") window.updateBasketButtons();
+  }
+
+  function solvedPoint(point){
+    try{
+      return Array.isArray(solution) && solution.some(group => group && group.solved && Array.isArray(group.points) && group.points.includes(point));
+    }catch(error){
+      return false;
+    }
+  }
+
+  function openAcuPointPanel(point, requireSolved){
+    if(!isAcuDomain()) return;
+    try{ currentPointPanelPoint = point; }catch(error){}
+
+    if(requireSolved && !solvedPoint(point)) return;
+
+    const details = pointDetailsMap()[point];
+    setPanelContent(point, details, !details);
+
+    if(requireSolved && typeof window.showProgressHintSoon === "function"){
+      window.showProgressHintSoon(
+        "point_basket_button_plus",
+        ".point-header-basket-button",
+        "Panier de révision",
+        "En cliquant sur +, tu mets ce point de côté pour le retrouver dans ton panier de révision.",
+        {},
+        360
+      );
+
+      window.showProgressHintSoon(
+        "point_notes",
+        ".point-note-edit-button",
+        "Notes perso",
+        "En cliquant sur le crayon, tu peux ajouter tes remarques sur ce point. Elles restent dans ton navigateur.",
+        {},
+        760
+      );
+    }
+  }
+
+  window.getAcuPointImage = function(point){ return getPointImage(point); };
+  window.getAcuPointSynthese = function(point){
+    return getPointSynthese(point, pointDetailsMap()[point] || {});
+  };
+
+  window.openPointPanel = function(point){
+    if(!isAcuDomain()) return;
+    return openAcuPointPanel(point, true);
+  };
+
+  window.openPointPanelDirect = function(point){
+    if(!isAcuDomain()) return;
+    return openAcuPointPanel(point, false);
+  };
+
+  /* ---------- Stats ACU plus lisibles, sans changer les clés localStorage ---------- */
+
+  const previousStats = {
+    renderStatsPanel: window.renderStatsPanel,
+    renderStatsPanelIfOpen: window.renderStatsPanelIfOpen,
+    openStatsPanel: window.openStatsPanel,
+    toggleStatsPanel: window.toggleStatsPanel
+  };
 
   function clamp01(value){
     return Math.max(0, Math.min(1, Number(value) || 0));
@@ -53,426 +414,152 @@
     return `${minutes}m${String(seconds).padStart(2,"0")}`;
   }
 
-  function safeLocalStorageEntries(prefix){
-    const out = {};
-    try{
-      for(let index = 0; index < localStorage.length; index++){
-        const key = localStorage.key(index);
-        if(key && key.startsWith(prefix)){
-          out[key.slice(prefix.length)] = localStorage.getItem(key) || "";
-        }
-      }
-    }catch(error){}
-    return out;
-  }
-
-  function setPrefixedValues(prefix, values){
-    if(!values || typeof values !== "object") return 0;
-    let count = 0;
-    Object.entries(values).forEach(([id, value]) => {
-      try{
-        localStorage.setItem(prefix + id, String(value ?? ""));
-        count++;
-      }catch(error){}
-    });
-    return count;
-  }
-
-  function downloadJson(payload, filename){
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 600);
-  }
-
-  window.exportPersonalNotes = function(){
-    const payload = {
-      app:"Connections MTC",
-      type:"personal-data",
-      version:2,
-      exportedAt:new Date().toISOString(),
-      acupuncture:{
-        notes:safeLocalStorageEntries(ACU_NOTE_PREFIX)
-      },
-      pharmacology:{
-        esprits:safeLocalStorageEntries(PHARMA_ESPRIT_PREFIX),
-        notes:safeLocalStorageEntries(PHARMA_NOTE_PREFIX),
-        images:safeLocalStorageEntries(PHARMA_IMAGE_PREFIX)
-      },
-      legacy:{
-        notes:safeLocalStorageEntries(ACU_NOTE_PREFIX)
-      }
-    };
-
-    downloadJson(payload, "connections-mtc-notes-images.json");
-
-    const message = document.getElementById("message");
-    if(message){
-      message.textContent = "Export créé : notes ACU, esprits/notes PHARMA et images locales PHARMA.";
-    }
-  };
-
-  window.importPersonalNotesFromFile = function(input){
-    const file = input && input.files && input.files[0];
-    if(!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const message = document.getElementById("message");
-      try{
-        const parsed = JSON.parse(String(reader.result || "{}"));
-        let count = 0;
-
-        // Ancien format : { notes:{...} } ou directement {...}
-        if(parsed.type === "personal-notes" || parsed.notes){
-          count += setPrefixedValues(ACU_NOTE_PREFIX, parsed.notes || parsed);
-        }else if(parsed && !parsed.acupuncture && !parsed.pharmacology && typeof parsed === "object"){
-          count += setPrefixedValues(ACU_NOTE_PREFIX, parsed);
-        }
-
-        if(parsed.acupuncture && parsed.acupuncture.notes){
-          count += setPrefixedValues(ACU_NOTE_PREFIX, parsed.acupuncture.notes);
-        }
-
-        if(parsed.pharmacology){
-          count += setPrefixedValues(PHARMA_ESPRIT_PREFIX, parsed.pharmacology.esprits);
-          count += setPrefixedValues(PHARMA_NOTE_PREFIX, parsed.pharmacology.notes);
-          count += setPrefixedValues(PHARMA_IMAGE_PREFIX, parsed.pharmacology.images);
-        }
-
-        if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
-        if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
-        document.dispatchEvent(new CustomEvent("pharma-herb-edited", {detail:{field:"import"}}));
-
-        if(message){
-          message.textContent = count
-            ? `Import terminé : ${count} élément(s) récupéré(s), notes et images comprises.`
-            : "Import terminé, mais aucun élément compatible n’a été trouvé.";
-        }
-      }catch(error){
-        console.error(error);
-        if(message) message.textContent = "Import impossible : fichier de notes/images invalide.";
-      }finally{
-        if(input) input.value = "";
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  function initMobileDomainSwitchFix(){
-    const wrap = document.getElementById("studyDomainSwitch");
-    const toggle = document.getElementById("studyDomainToggle");
-    if(!wrap || !toggle || wrap.dataset.mobileFixReady === "1") return;
-    wrap.dataset.mobileFixReady = "1";
-
-    function isMobileLike(){
-      return Boolean(
-        (window.matchMedia && window.matchMedia("(max-width:520px)").matches) ||
-        (window.matchMedia && window.matchMedia("(pointer:coarse)").matches)
-      );
-    }
-
-    wrap.addEventListener("click", event => {
-      if(!isMobileLike()) return;
-      event.preventDefault();
-      event.stopPropagation();
-      if(typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
-
-      const next = !toggle.checked;
-      toggle.checked = next;
-      if(typeof window.toggleStudyDomainFromControl === "function"){
-        window.toggleStudyDomainFromControl(next);
-      }
-    }, true);
-  }
-
-  function acuStatsRows(){
-    if(typeof window.loadMtcStats !== "function" || typeof window.getAllStatsRows !== "function") return null;
-    const stats = window.loadMtcStats();
-    const rows = window.getAllStatsRows(stats);
-    return {stats, rows};
-  }
-
-  function acuStatsList(rows, formatter, empty="—"){
+  function statsList(rows, empty, formatter){
     if(!rows.length) return `<p class="stats-small">${esc(empty)}</p>`;
-    return `<ul class="stats-list acu-stats-percent-list">${rows.map(row => `<li>${formatter(row)}</li>`).join("")}</ul>`;
+    return `<ul class="stats-list acu-stats-list">${rows.map(row => `<li>${formatter(row)}</li>`).join("")}</ul>`;
   }
 
-  function acuStatsRowLine(row){
-    const success = row.seen ? row.solved / row.seen : 0;
-    return `
-      <strong>${esc(row.name)}</strong>
-      <span class="stats-meta">
-        réussite ${row.solved || 0}/${row.seen || 0} · ${percent(success)} · couverture ${row.totalPoints ? `${row.seenPointsCount}/${row.totalPoints} · ${percent(row.coverage)}` : "—"} · maîtrise ${percent(row.mastery || 0)}
-      </span>
-    `;
+  function modeLabel(){
+    if(typeof window.getAutoPracticeMode === "function" && typeof window.autoPracticeModeLabel === "function"){
+      return window.autoPracticeModeLabel(window.getAutoPracticeMode());
+    }
+    return "Mixte";
   }
 
-  function renderAcuStatsPanelWithPercentages(){
-    const content = document.getElementById("statsPanelContent");
-    const data = acuStatsRows();
-    if(!content || !data){
-      if(typeof previous.renderStatsPanel === "function") return previous.renderStatsPanel.apply(this, arguments);
+  function modeButtons(){
+    const mode = typeof window.getAutoPracticeMode === "function" ? window.getAutoPracticeMode() : "balanced";
+    const button = (value, label) => `<button onclick="setAutoPracticeMode('${value}')" data-practice-mode="${value}" class="${mode === value ? "active" : ""}">${label}</button>`;
+    return `<div class="stats-mode-buttons acu-stats-mode-buttons">${button("easy", "Facile")}${button("balanced", "Mixte")}${button("hard", "Difficile")}</div>`;
+  }
+
+  function renderAcuStatsPanel(){
+    const content = byId("statsPanelContent");
+    if(!content) return;
+
+    const stats = typeof window.loadMtcStats === "function" ? window.loadMtcStats() : (typeof loadMtcStats === "function" ? loadMtcStats() : null);
+    if(!stats){
+      content.innerHTML = `<div class="point-header"><span class="point-code">Stats ACU</span></div><p class="stats-small">Statistiques indisponibles.</p>`;
       return;
     }
 
-    const {stats, rows} = data;
-    const played = rows.filter(row => row.seen > 0);
-    const finished = Number(stats.gamesFinished || 0);
-    const winRate = finished ? Number(stats.wins || 0) / finished : 0;
-    const totalSeen = rows.reduce((sum,row) => sum + (row.totalPoints || 0), 0);
-    const totalCovered = rows.reduce((sum,row) => sum + (row.seenPointsCount || 0), 0);
-    const globalCoverage = totalSeen ? totalCovered / totalSeen : 0;
-    const avgMastery = played.length
-      ? played.reduce((sum,row) => sum + Number(row.mastery || 0), 0) / played.length
-      : 0;
-    const avgTimeRows = played.filter(row => Number(row.avgSolveMs) > 0);
-    const avgTime = avgTimeRows.length
-      ? avgTimeRows.reduce((sum,row) => sum + Number(row.avgSolveMs || 0), 0) / avgTimeRows.length
-      : 0;
+    const rows = typeof window.getAllStatsRows === "function" ? window.getAllStatsRows(stats) : [];
+    const playedRows = rows.filter(row => (row.seen || 0) > 0);
+    const solvedRows = rows.filter(row => (row.solved || 0) > 0);
+    const finished = stats.gamesFinished || 0;
+    const winRate = finished ? (stats.wins || 0) / finished : 0;
+    const categoriesSeen = playedRows.length;
+    const completeRows = rows.filter(row => (row.totalPoints || 0) > 0 && (row.coverage || 0) >= 1);
+    const avgCategoryMsValues = solvedRows.map(row => Number(row.avgSolveMs)).filter(value => value > 0);
+    const avgCategoryMs = avgCategoryMsValues.length
+      ? avgCategoryMsValues.reduce((sum, value) => sum + value, 0) / avgCategoryMsValues.length
+      : null;
+    const hasRepresentativeStats = finished >= 10;
 
-    const toReview = [...rows]
-      .sort((a,b) => (a.mastery || 0) - (b.mastery || 0) || (a.coverage || 0) - (b.coverage || 0))
-      .slice(0,8);
-    const best = [...played]
-      .sort((a,b) => (b.mastery || 0) - (a.mastery || 0) || (b.coverage || 0) - (a.coverage || 0))
-      .slice(0,8);
-    const coverage = [...rows]
-      .sort((a,b) => (a.coverage || 0) - (b.coverage || 0))
-      .slice(0,8);
-    const slow = [...avgTimeRows]
-      .sort((a,b) => Number(b.avgSolveMs || 0) - Number(a.avgSolveMs || 0))
+    const toReview = [...rows].sort((a,b) => {
+      const aUnseen = (a.seen || 0) ? 0 : 1;
+      const bUnseen = (b.seen || 0) ? 0 : 1;
+      if(aUnseen !== bUnseen) return bUnseen - aUnseen;
+      return (b.difficulty || 0) - (a.difficulty || 0) || (a.coverage || 0) - (b.coverage || 0);
+    }).slice(0,8);
+
+    const best = [...solvedRows]
+      .sort((a,b) => (b.mastery || 0) - (a.mastery || 0) || (b.solved || 0) - (a.solved || 0))
       .slice(0,8);
 
-    const mode = typeof window.getAutoPracticeMode === "function" ? window.getAutoPracticeMode() : "balanced";
-    const modeLabel = typeof window.autoPracticeModeLabel === "function" ? window.autoPracticeModeLabel(mode) : "Mixte";
+    const mostWorked = [...playedRows]
+      .sort((a,b) => (b.seen || 0) - (a.seen || 0) || (b.solved || 0) - (a.solved || 0))
+      .slice(0,8);
+
+    const lowCoverage = [...rows]
+      .sort((a,b) => (a.coverage || 0) - (b.coverage || 0) || (b.difficulty || 0) - (a.difficulty || 0))
+      .slice(0,8);
+
+    const rowLine = row => `
+      <strong>${esc(row.name || row.key || "—")}</strong>
+      <span class="stats-meta">vue ${row.seen || 0} · réussie ${row.solved || 0} · couverture ${row.totalPoints ? `${row.seenPointsCount || 0}/${row.totalPoints}` : "—"} · maîtrise ${percent(row.mastery || 0)}</span>
+    `;
 
     content.innerHTML = `
       <div class="point-header"><span class="point-code">Stats ACU</span></div>
-      <p class="stats-intro">Les statistiques ACU affichent maintenant les mêmes repères que PHARMA : réussite, couverture et maîtrise en pourcentages.</p>
+      <p class="stats-intro">Ces statistiques ACU restent enregistrées localement dans ce navigateur et sont séparées des stats PHARMA.</p>
 
-      <div class="pharma-stats-summary acu-stats-summary">
-        <div><strong>${Number(stats.gamesStarted || 0)}</strong><span>parties lancées</span></div>
+      <div class="acu-stats-summary">
         <div><strong>${finished}</strong><span>parties terminées</span></div>
-        <div><strong>${Number(stats.wins || 0)}</strong><span>victoires</span></div>
+        <div><strong>${stats.wins || 0}</strong><span>victoires</span></div>
         <div><strong>${percent(winRate)}</strong><span>réussite</span></div>
-        <div><strong>${percent(globalCoverage)}</strong><span>couverture</span></div>
-        <div><strong>${percent(avgMastery)}</strong><span>maîtrise moyenne</span></div>
-        <div><strong>${formatDuration(avgTime)}</strong><span>temps moyen</span></div>
-        <div><strong>${Number(stats.totalMistakes || 0)}</strong><span>erreurs</span></div>
+        <div><strong>${categoriesSeen}</strong><span>catégories vues</span></div>
+        <div><strong>${completeRows.length}</strong><span>catégories complètes</span></div>
+        <div><strong>${formatDuration(avgCategoryMs)}</strong><span>temps moyen/catégorie</span></div>
+        <div><strong>${stats.totalMistakes || 0}</strong><span>erreurs</span></div>
+        <div><strong>${stats.totalHintsUsed || 0}</strong><span>astuces</span></div>
+        <div><strong>${esc(modeLabel())}</strong><span>mode auto</span></div>
       </div>
 
-      <div class="stats-card">
-        <h3>Mode Auto</h3>
-        <p class="stats-small">Mode actuel : ${esc(modeLabel)}. Le mode Auto peut s’appuyer sur la couverture et la maîtrise pour doser les prochaines grilles.</p>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stats-card"><h3>À réviser</h3>${acuStatsList(toReview, acuStatsRowLine, "Rien à proposer.")}</div>
-        <div class="stats-card"><h3>Meilleures maîtrises</h3>${acuStatsList(best, acuStatsRowLine, "Pas encore assez de données.")}</div>
-        <div class="stats-card"><h3>Couverture faible</h3>${acuStatsList(coverage, acuStatsRowLine, "Aucune catégorie disponible.")}</div>
-        <div class="stats-card"><h3>Plus lent</h3>${acuStatsList(slow, row => `
-          <strong>${esc(row.name)}</strong>
-          <span class="stats-meta">temps moyen ${formatDuration(row.avgSolveMs)} · maîtrise ${percent(row.mastery || 0)} · couverture ${percent(row.coverage || 0)}</span>
-        `, "Pas encore de temps mesuré.")}</div>
-      </div>
-    `;
-  }
-
-  function cleanField(value){
-    const text = String(value ?? "").trim();
-    if(!text || text === "Aucune" || text === "(Aucune)") return "";
-    return text;
-  }
-
-  function fieldValueHtml(value){
-    const clean = cleanField(value);
-    return clean ? esc(clean).replace(/\n/g,"<br>") : `<span class="comparison-empty">—</span>`;
-  }
-
-  function pointTitle(point){
-    return typeof window.searchPointTitle === "function"
-      ? window.searchPointTitle(point)
-      : (typeof window.formatPointCode === "function" ? window.formatPointCode(point) : String(point || ""));
-  }
-
-  function pointMeta(point){
-    return typeof window.searchPointMeta === "function" ? window.searchPointMeta(point) : "";
-  }
-
-  function comparisonSlots(){
-    const raw = typeof window.getComparisonPoints === "function" ? window.getComparisonPoints() : [];
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    return raw.map((point,index) => ({point,index,label:(typeof window.comparisonSlotLabel === "function" ? window.comparisonSlotLabel(index) : letters[index] || String(index + 1))}))
-      .filter(slot => !!slot.point);
-  }
-
-  function detailsForPoint(point){
-    /* Les données de fiche détaillée ACU sont la source unique du comparateur.
-       On ignore volontairement les catégories internes du jeu. */
-    try{
-      if(typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point]){
-        return POINT_DETAILS[point];
-      }
-    }catch(error){}
-
-    if(typeof window !== "undefined" && window.POINT_DETAILS && window.POINT_DETAILS[point]){
-      return window.POINT_DETAILS[point];
-    }
-
-    return {};
-  }
-
-  function notesForPoint(point, details){
-    if(typeof window.getEditablePointNote === "function") return window.getEditablePointNote(point, details.notes || "");
-    return details.notes || "";
-  }
-
-  function acuComparisonFieldRows(slots){
-    /* Même liste que la fiche détaillée ACU visible :
-       - en-tête : Point, Pinyin, Hanzi, Nom en français ;
-       - sections : Localisation, Méthodes, Catégories du point,
-         Correspondances, Actions, Indications, Associations, Notes.
-       On ne met plus le champ interne des catégories utilisées par le jeu. */
-    const rows = [
-      ["Point", slot => detailsForPoint(slot.point).point || slot.point],
-      ["Pinyin", slot => detailsForPoint(slot.point).pinyin],
-      ["Hanzi", slot => detailsForPoint(slot.point).hanzi],
-      ["Nom en français", slot => detailsForPoint(slot.point).nom_francais || detailsForPoint(slot.point).nom_complet],
-      ["Localisation", slot => detailsForPoint(slot.point).localisation],
-      ["Méthode de localisation", slot => detailsForPoint(slot.point).methode_localisation],
-      ["Méthode de travail", slot => detailsForPoint(slot.point).methode_travail],
-      ["Catégories du point", slot => detailsForPoint(slot.point).categories_du_point],
-      ["Correspondances", slot => detailsForPoint(slot.point).correspondances],
-      ["Actions", slot => detailsForPoint(slot.point).actions],
-      ["Indications", slot => detailsForPoint(slot.point).indications],
-      ["Associations", slot => detailsForPoint(slot.point).associations],
-      ["Notes", slot => notesForPoint(slot.point, detailsForPoint(slot.point))]
-    ];
-
-    return rows;
-  }
-
-  function renderAcuComparisonPanelMatrix(){
-    const content = document.getElementById("comparisonPanelContent");
-    if(!content) return;
-
-    const slots = comparisonSlots();
-    const count = Math.max(2, slots.length);
-
-    if(!slots.length){
-      content.innerHTML = `
-        <div class="point-header"><span class="point-code">Comparaison</span></div>
-        <p class="stats-small">Aucun point n’est encore placé en comparaison. Ajoute des points depuis le panier.</p>
-      `;
-      return;
-    }
-
-    const headers = slots.map(slot => `
-      <div class="acu-comparison-herb-header">
-        <div class="search-result-title"><span class="comparison-slot-label">${esc(slot.label)}</span>${pointTitle(slot.point)}</div>
-        <div class="search-result-meta">${esc(pointMeta(slot.point))}</div>
-        <div class="comparison-actions">
-          <button type="button" onclick="openPointPanelDirect('${attr(slot.point)}')">Fiche</button>
-          <button type="button" onclick="clearComparisonPoint(${Number(slot.index) || 0})">×</button>
+      ${hasRepresentativeStats ? `
+        <div class="stats-card acu-stats-mode-card">
+          <h3>Gameplay adaptatif</h3>
+          ${modeButtons()}
+          <p class="stats-small">Le mode Auto utilise les mêmes données déjà enregistrées : couverture réelle des points, catégories réussies, erreurs, astuces et temps moyen de résolution.</p>
         </div>
-      </div>
-    `).join("");
 
-    const rows = acuComparisonFieldRows(slots).map(([label, getter]) => `
-      <div class="acu-comparison-row-label">${esc(label)}</div>
-      ${slots.map(slot => `<div class="acu-comparison-cell">${fieldValueHtml(getter(slot))}</div>`).join("")}
-    `).join("");
-
-    content.innerHTML = `
-      <div class="point-header"><span class="point-code">Comparaison ACU A–Z</span></div>
-      <p class="stats-intro">Les champs de la fiche détaillée sont alignés horizontalement pour comparer plus facilement les points.</p>
-      <div class="acu-comparison-matrix" style="--comparison-count:${count}">
-        <div class="acu-comparison-corner"></div>
-        ${headers}
-        ${rows}
-      </div>
+        <div class="stats-grid">
+          <div class="stats-card"><h3>Catégories à retravailler</h3>${statsList(toReview, "Aucune donnée pour l’instant.", rowLine)}</div>
+          <div class="stats-card"><h3>Catégories les mieux réussies</h3>${statsList(best, "Pas encore assez de réussites.", rowLine)}</div>
+          <div class="stats-card"><h3>Catégories les plus révisées</h3>${statsList(mostWorked, "Aucune catégorie révisée.", rowLine)}</div>
+          <div class="stats-card"><h3>Couverture des points</h3>${statsList(lowCoverage, "Aucune catégorie disponible.", row => `
+            <strong>${esc(row.name || row.key || "—")}</strong><span class="stats-meta">${row.totalPoints ? `${row.seenPointsCount || 0}/${row.totalPoints}` : "—"} · ${percent(row.coverage || 0)}</span>
+          `)}</div>
+        </div>
+      ` : `
+        <div class="stats-card acu-stats-warmup">
+          <h3>Données en cours de stabilisation</h3>
+          <p class="stats-small">Les statistiques détaillées s’afficheront après 10 parties terminées, pour éviter de tirer des conclusions sur trop peu de grilles.</p>
+          <p class="stats-small">Encore ${Math.max(0, 10 - finished)} partie(s) terminée(s) avant l’analyse détaillée.</p>
+        </div>
+      `}
     `;
 
-    if(typeof window.enhancePointReferencesInPanel === "function"){
-      window.enhancePointReferencesInPanel(content);
-    }
+    if(typeof window.updatePracticeModeSwitch === "function") window.updatePracticeModeSwitch();
   }
+
+  window.renderAcuStatsPanel = renderAcuStatsPanel;
 
   window.renderStatsPanel = function(){
-    if(isPharma()) return previous.renderStatsPanel ? previous.renderStatsPanel.apply(this, arguments) : undefined;
-    return renderAcuStatsPanelWithPercentages();
+    if(!isAcuDomain() && typeof previousStats.renderStatsPanel === "function"){
+      return previousStats.renderStatsPanel.apply(this, arguments);
+    }
+    return renderAcuStatsPanel();
   };
 
   window.renderStatsPanelIfOpen = function(){
-    const panel = document.getElementById("statsPanel");
-    if(panel && panel.classList.contains("open")) return window.renderStatsPanel();
-  };
-
-  window.renderComparisonPanel = function(){
-    if(isPharma()) return previous.renderComparisonPanel ? previous.renderComparisonPanel.apply(this, arguments) : undefined;
-    return renderAcuComparisonPanelMatrix();
-  };
-
-  window.renderComparisonPanelIfOpen = function(){
-    const panel = document.getElementById("comparisonPanel");
-    if(panel && panel.classList.contains("open")) return window.renderComparisonPanel();
-  };
-
-  if(typeof previous.startTour === "function"){
-    window.startTour = function(){
-      const result = previous.startTour.apply(this, arguments);
-      try{
-        if(Array.isArray(tourSteps) && !tourSteps.some(step => step && step.selector === "#exportNotesButton")){
-          const insertAt = Math.max(0, tourSteps.findIndex(step => step && step.selector === "#suggestionMailButton"));
-          const steps = [
-            {
-              selector:"#exportNotesButton",
-              title:"Export",
-              text:"Ce bouton sauvegarde tes notes personnelles ACU, tes Esprits et notes PHARMA, ainsi que les images locales ajoutées aux fiches PHARMA. Le fichier reste sur ton appareil.",
-              fallback:() => document.querySelector("#footerTitle"),
-              position:"aboveBottom"
-            },
-            {
-              selector:"#importNotesButton",
-              title:"Import",
-              text:"Ce bouton réimporte le fichier d’export : notes ACU, Esprits, notes PHARMA et images locales. C’est utile pour changer de navigateur, d’ordinateur ou restaurer une sauvegarde.",
-              fallback:() => document.querySelector("#footerTitle"),
-              position:"aboveBottom"
-            }
-          ];
-          tourSteps.splice(insertAt >= 0 ? insertAt : tourSteps.length - 1, 0, ...steps);
-        }
-      }catch(error){
-        // Si le tour guidé change plus tard, on garde le tour original intact.
-      }
-      return result;
-    };
-  }
-
-  function ready(fn){
-    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
-    else fn();
-  }
-
-  ready(() => {
-    initMobileDomainSwitchFix();
-    const exportButton = document.getElementById("exportNotesButton");
-    const importButton = document.getElementById("importNotesButton");
-    if(exportButton){
-      exportButton.title = "Exporter notes ACU, esprits/notes PHARMA et images locales";
-      exportButton.setAttribute("aria-label", "Exporter notes et images locales");
+    const panel = byId("statsPanel");
+    if(!panel || !panel.classList.contains("open")) return;
+    if(!isAcuDomain() && typeof previousStats.renderStatsPanelIfOpen === "function"){
+      return previousStats.renderStatsPanelIfOpen.apply(this, arguments);
     }
-    if(importButton){
-      importButton.title = "Importer notes ACU, esprits/notes PHARMA et images locales";
-      importButton.setAttribute("aria-label", "Importer notes et images locales");
-    }
-  });
+    return renderAcuStatsPanel();
+  };
 
-  window.addEventListener("resize", initMobileDomainSwitchFix);
+  window.openStatsPanel = function(){
+    if(!isAcuDomain() && typeof previousStats.openStatsPanel === "function"){
+      return previousStats.openStatsPanel.apply(this, arguments);
+    }
+
+    const panel = byId("statsPanel");
+    if(!panel) return;
+    if(typeof window.closeAllBottomPanels === "function") window.closeAllBottomPanels("statsPanel");
+    renderAcuStatsPanel();
+    panel.classList.add("open");
+  };
+
+  window.toggleStatsPanel = function(){
+    if(!isAcuDomain() && typeof previousStats.toggleStatsPanel === "function"){
+      return previousStats.toggleStatsPanel.apply(this, arguments);
+    }
+
+    const panel = byId("statsPanel");
+    if(!panel) return;
+    if(panel.classList.contains("open")) panel.classList.remove("open");
+    else window.openStatsPanel();
+  };
 })();
