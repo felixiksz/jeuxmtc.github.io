@@ -1171,3 +1171,37 @@ html, body{
     animation:none !important;
   }
 }
+
+/* === Statut discret import/modification notes === */
+#mtcPersonalDataStatus{
+  position:fixed;
+  left:10px;
+  bottom:10px;
+  z-index:1900;
+  max-width:min(46vw, 420px);
+  padding:2px 4px;
+  font-size:10.5px;
+  line-height:1.25;
+  letter-spacing:.01em;
+  text-align:left;
+  color:color-mix(in srgb, var(--text-color, #111) 62%, transparent);
+  background:color-mix(in srgb, var(--page-bg, #fff) 42%, transparent);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(4px);
+  transition:opacity .18s ease, transform .18s ease;
+}
+#mtcPersonalDataStatus.visible{
+  opacity:.72;
+  transform:none;
+}
+@media(max-width:650px){
+  #mtcPersonalDataStatus{
+    left:7px;
+    bottom:6px;
+    max-width:62vw;
+    font-size:9.5px;
+  }
+}
