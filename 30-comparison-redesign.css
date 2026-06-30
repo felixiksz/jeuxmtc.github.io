@@ -1,0 +1,1547 @@
+/* === Redesign comparaison ACU/PHARMA : sticky header + repères visuels restaurés === */
+#comparisonPanelContent{
+  text-align:left !important;
+}
+
+#comparisonPanelContent .mtc-compare-panel-header{
+  margin:0 0 6px !important;
+  padding:0 !important;
+}
+
+#comparisonPanelContent .mtc-compare-scroll{
+  width:100% !important;
+  max-width:100% !important;
+  max-height:min(72vh, calc(100dvh - 118px)) !important;
+  overflow:auto !important;
+  padding:0 0 12px !important;
+  border:1px solid rgba(0,0,0,.16) !important;
+  border-radius:12px !important;
+  background:rgba(255,255,255,.025) !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+
+#comparisonPanelContent .mtc-compare-matrix{
+  --compare-label-col:188px;
+  --compare-point-col:292px;
+  display:grid !important;
+  grid-template-columns:var(--compare-label-col) repeat(var(--comparison-count), var(--compare-point-col)) !important;
+  gap:0 !important;
+  width:max-content !important;
+  min-width:0 !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  text-align:left !important;
+  font-family:var(--ui-font-family, Archivo, sans-serif) !important;
+  border-left:1px solid rgba(0,0,0,.13) !important;
+  border-top:1px solid rgba(0,0,0,.13) !important;
+}
+
+#comparisonPanelContent .mtc-compare-matrix > *{
+  box-sizing:border-box !important;
+  min-width:0 !important;
+  margin:0 !important;
+  border-right:1px solid rgba(0,0,0,.13) !important;
+  border-bottom:1px solid rgba(0,0,0,.13) !important;
+  color:var(--text-color) !important;
+  text-align:left !important;
+}
+
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-header{
+  position:sticky !important;
+  top:0 !important;
+  z-index:15 !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 88%, white 12%) !important;
+  box-shadow:0 1px 0 rgba(0,0,0,.18) !important;
+}
+
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-row-label{
+  position:sticky !important;
+  left:0 !important;
+  z-index:8 !important;
+  width:var(--compare-label-col) !important;
+  min-width:var(--compare-label-col) !important;
+  max-width:var(--compare-label-col) !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 92%, white 8%) !important;
+}
+
+#comparisonPanelContent .mtc-compare-corner{
+  z-index:20 !important;
+}
+
+#comparisonPanelContent .mtc-compare-header{
+  width:var(--compare-point-col) !important;
+  min-width:var(--compare-point-col) !important;
+  max-width:var(--compare-point-col) !important;
+  min-height:58px !important;
+  padding:6px 9px !important;
+  display:grid !important;
+  grid-template-columns:28px minmax(0, 1fr) !important;
+  gap:8px !important;
+  align-items:start !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label,
+#comparisonPanelContent .mtc-compare-cell{
+  padding:5px 9px !important;
+  font-size:.84rem !important;
+  line-height:1.18 !important;
+  overflow-wrap:anywhere !important;
+  white-space:normal !important;
+  hyphens:auto !important;
+  background:rgba(255,255,255,.035) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label{
+  font-weight:850 !important;
+  opacity:.86 !important;
+}
+
+#comparisonPanelContent .mtc-compare-cell{
+  width:var(--compare-point-col) !important;
+  min-width:var(--compare-point-col) !important;
+  max-width:var(--compare-point-col) !important;
+}
+
+/* alternance discrète pour suivre les lignes longues */
+#comparisonPanelContent .mtc-compare-row-odd{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 10%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-even{
+  background:rgba(255,255,255,.035) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-odd{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 10%, var(--page-bg, var(--bg-color, #fff)) 90%) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 92%, white 8%) !important;
+}
+
+#comparisonPanelContent .mtc-compare-name-button{
+  appearance:none !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:inherit !important;
+  padding:0 !important;
+  margin:0 !important;
+  text-align:left !important;
+  width:100% !important;
+  min-width:0 !important;
+  cursor:pointer !important;
+  font:inherit !important;
+  transform:none !important;
+}
+
+#comparisonPanelContent .mtc-compare-name-button:hover,
+#comparisonPanelContent .mtc-compare-name-button:focus-visible{
+  text-decoration:underline !important;
+  outline:none !important;
+}
+
+#comparisonPanelContent .mtc-compare-main-name{
+  display:block !important;
+  font-weight:900 !important;
+  line-height:1.16 !important;
+  overflow-wrap:anywhere !important;
+}
+
+#comparisonPanelContent .mtc-compare-sub-name{
+  display:block !important;
+  margin-top:3px !important;
+  font-size:.82em !important;
+  line-height:1.18 !important;
+  opacity:.76 !important;
+  overflow-wrap:anywhere !important;
+}
+
+/* La lettre A/B/C reste de même taille ; au survol elle devient la corbeille. */
+#comparisonPanelContent .mtc-compare-remove{
+  position:relative !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:26px !important;
+  min-width:26px !important;
+  max-width:26px !important;
+  height:26px !important;
+  min-height:26px !important;
+  max-height:26px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:var(--text-color) !important;
+  box-shadow:none !important;
+  text-shadow:none !important;
+  font-family:var(--ui-font-family, Archivo, sans-serif) !important;
+  font-size:.8rem !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  opacity:.70 !important;
+  cursor:pointer !important;
+  transform:none !important;
+}
+
+#comparisonPanelContent .mtc-compare-remove .mtc-compare-trash{
+  display:none !important;
+  font-size:.9rem !important;
+  line-height:1 !important;
+}
+
+#comparisonPanelContent .mtc-compare-remove:hover,
+#comparisonPanelContent .mtc-compare-remove:focus-visible{
+  opacity:1 !important;
+  outline:none !important;
+  background:color-mix(in srgb, var(--shadow-color, currentColor) 18%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-remove:hover .mtc-compare-slot-letter,
+#comparisonPanelContent .mtc-compare-remove:focus-visible .mtc-compare-slot-letter{
+  display:none !important;
+}
+
+#comparisonPanelContent .mtc-compare-remove:hover .mtc-compare-trash,
+#comparisonPanelContent .mtc-compare-remove:focus-visible .mtc-compare-trash{
+  display:inline !important;
+}
+
+#comparisonPanelContent .mtc-compare-action-label{
+  font-weight:760 !important;
+}
+
+#comparisonPanelContent .mtc-compare-action-label.is-unique,
+#comparisonPanelContent .mtc-compare-action-label.is-distinct{
+  font-weight:900 !important;
+}
+
+#comparisonPanelContent .mtc-compare-x-cell{
+  text-align:center !important;
+  vertical-align:middle !important;
+}
+
+#comparisonPanelContent .mtc-compare-x-cell{
+  text-align:center !important;
+  vertical-align:middle !important;
+}
+
+#comparisonPanelContent .mtc-compare-x{
+  display:inline-block !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border:0 !important;
+  padding:0 .08em .02em !important;
+  font-weight:900 !important;
+  font-size:1.02em !important;
+  line-height:1 !important;
+  letter-spacing:.01em !important;
+  opacity:.38 !important;
+}
+
+#comparisonPanelContent .mtc-compare-x.is-distinct{
+  opacity:.86 !important;
+  color:color-mix(in srgb, var(--shadow-color, #4d7) 64%, var(--text-color) 36%) !important;
+  text-decoration:underline !important;
+  text-decoration-thickness:2px !important;
+  text-underline-offset:.16em !important;
+}
+
+#comparisonPanelContent .mtc-compare-x.is-unique{
+  opacity:1 !important;
+  color:var(--shadow-color, #4d7) !important;
+  font-weight:1000 !important;
+  text-decoration:underline !important;
+  text-decoration-thickness:3px !important;
+  text-underline-offset:.16em !important;
+  text-shadow:0 0 .45em color-mix(in srgb, currentColor 32%, transparent) !important;
+}
+
+/* PHARMA : nature = bande rouge/blanc/bleu très délavée sur toute la cellule. */
+#comparisonPanelContent .mtc-compare-row-nature.mtc-compare-cell{
+  padding:0 !important;
+}
+
+#comparisonPanelContent .mtc-nature-gradient-inner{
+  display:block !important;
+  min-height:100% !important;
+  padding:8px 10px !important;
+  background:linear-gradient(90deg,
+    rgba(255,72,55,var(--nature-hot-alpha, .015)) 0%,
+    rgba(255,255,255,var(--nature-neutral-alpha, .08)) 47%,
+    rgba(57,255,20,var(--nature-toxic-alpha, 0)) 66%,
+    rgba(55,112,255,var(--nature-cold-alpha, .015)) 100%) !important;
+}
+
+#comparisonPanelContent .pharma-token-chip{
+  display:inline-flex !important;
+  align-items:center !important;
+  margin:1px 5px 1px 0 !important;
+  font-weight:850 !important;
+  line-height:1.18 !important;
+  text-shadow:none !important;
+}
+
+#comparisonPanelContent .pharma-nature-token{
+  color:var(--text-color) !important;
+}
+#comparisonPanelContent .pharma-nature-token.is-toxic{
+  color:#39ff14 !important;
+  font-weight:900 !important;
+  text-shadow:0 0 .35em color-mix(in srgb, currentColor 24%, transparent) !important;
+}
+
+/* PHARMA : les lettres des tropismes gardent leurs couleurs. */
+#comparisonPanelContent .pharma-tropism-token.tropism-wood{ color:#2ebd67 !important; }
+#comparisonPanelContent .pharma-tropism-token.tropism-fire{ color:#ff4f4f !important; }
+#comparisonPanelContent .pharma-tropism-token.tropism-earth{ color:#e5a820 !important; }
+#comparisonPanelContent .pharma-tropism-token.tropism-metal{
+  color:#fff !important;
+  text-shadow:-1px 0 #111, 0 1px #111, 1px 0 #111, 0 -1px #111 !important;
+}
+#comparisonPanelContent .pharma-tropism-token.tropism-water{
+  color:#111 !important;
+  text-shadow:-1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff !important;
+}
+#comparisonPanelContent .pharma-tropism-token.tropism-axis{ color:var(--text-color) !important; }
+
+/* PHARMA : saveurs colorées, avec intensité selon légèrement / très / ++. */
+#comparisonPanelContent .pharma-flavor-token{
+  padding:1px 4px !important;
+  border-radius:7px !important;
+  background:color-mix(in srgb, currentColor 6%, transparent) !important;
+}
+#comparisonPanelContent .pharma-flavor-token.flavor-bitter{ color:#a200ff !important; }
+#comparisonPanelContent .pharma-flavor-token.flavor-pungent{ color:#F7611E !important; }
+#comparisonPanelContent .pharma-flavor-token.flavor-sweet{ color:#e8e800 !important; }
+#comparisonPanelContent .pharma-flavor-token.flavor-sour{ color:#39ff14 !important; }
+#comparisonPanelContent .pharma-flavor-token.flavor-salty{ color:#1167ff !important; }
+#comparisonPanelContent .pharma-flavor-token.flavor-other{ color:var(--text-color) !important; }
+#comparisonPanelContent .pharma-flavor-token.flavor-light{
+  opacity:.56 !important;
+  filter:saturate(.72) !important;
+}
+#comparisonPanelContent .pharma-flavor-token.flavor-normal{
+  opacity:.86 !important;
+  filter:saturate(1.05) !important;
+}
+#comparisonPanelContent .pharma-flavor-token.flavor-strong{
+  opacity:1 !important;
+  filter:saturate(1.75) contrast(1.08) !important;
+  text-shadow:0 0 .45em currentColor !important;
+}
+
+#comparisonPanelContent .pharma-toxicity-token{
+  opacity:.82 !important;
+  font-style:italic !important;
+}
+
+/* Esprit et Notes restent éditables dans la comparaison PHARMA. */
+#comparisonPanelContent .pharma-comparison-editable{
+  width:100% !important;
+  min-height:1.4em !important;
+  white-space:pre-wrap !important;
+  overflow-wrap:anywhere !important;
+  outline:none !important;
+  border-radius:10px !important;
+  padding:3px 4px !important;
+  cursor:text !important;
+}
+
+#comparisonPanelContent .pharma-comparison-editable:focus{
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--shadow-color) 45%, transparent) !important;
+  background:color-mix(in srgb, var(--bg-color, var(--page-bg, #fff)) 88%, var(--shadow-color)) !important;
+}
+
+#comparisonPanelContent .pharma-comparison-editable:empty::before{
+  content:attr(data-placeholder) !important;
+  opacity:.42 !important;
+}
+
+#comparisonPanelContent .pharma-comparison-editable-esprit{
+  font-size:1.08em !important;
+  line-height:1.22 !important;
+  font-weight:850 !important;
+  color:var(--text-color) !important;
+}
+
+#comparisonPanelContent .pharma-comparison-editable-notes{
+  font-size:.92em !important;
+  line-height:1.2 !important;
+}
+
+#comparisonPanelContent .pharma-esprit-cell{
+  line-height:1.22 !important;
+}
+
+
+/* Bouton discret pour vider tout le panneau de comparaison. */
+#comparisonPanelContent .mtc-compare-titlebar{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  margin:0 0 6px !important;
+}
+
+#comparisonPanelContent .mtc-compare-clear-all{
+  appearance:none !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:var(--text-color) !important;
+  opacity:.58 !important;
+  padding:3px 7px !important;
+  border-radius:999px !important;
+  font:inherit !important;
+  font-size:.78rem !important;
+  line-height:1.1 !important;
+  cursor:pointer !important;
+  white-space:nowrap !important;
+}
+
+#comparisonPanelContent .mtc-compare-clear-all:hover,
+#comparisonPanelContent .mtc-compare-clear-all:focus-visible{
+  opacity:1 !important;
+  background:color-mix(in srgb, var(--shadow-color, currentColor) 10%, transparent) !important;
+  outline:none !important;
+}
+
+@media(max-width:699px){
+  #comparisonPanelContent .mtc-compare-scroll{
+    border-radius:10px !important;
+    max-height:calc(100dvh - 104px) !important;
+  }
+
+  #comparisonPanelContent .mtc-compare-matrix{
+    --compare-label-col:118px;
+    --compare-point-col:218px;
+  }
+
+  #comparisonPanelContent .mtc-compare-header{
+    min-height:56px !important;
+    padding:5px 7px !important;
+    grid-template-columns:26px minmax(0, 1fr) !important;
+    gap:6px !important;
+  }
+
+  #comparisonPanelContent .mtc-compare-row-label,
+  #comparisonPanelContent .mtc-compare-cell,
+  #comparisonPanelContent .mtc-nature-gradient-inner{
+    padding:5px 7px !important;
+    font-size:.76rem !important;
+    line-height:1.16 !important;
+  }
+
+  #comparisonPanelContent .mtc-compare-remove{
+    width:24px !important;
+    min-width:24px !important;
+    max-width:24px !important;
+    height:24px !important;
+    min-height:24px !important;
+    max-height:24px !important;
+  }
+}
+
+/* Mobile cheatsheet PHARMA : le bouton fermer ne recouvre plus la liste, le + a sa colonne. */
+@media(max-width:699px), (pointer:coarse){
+  .cheatsheet-panel.open{
+    padding:48px 12px 18px 12px !important;
+  }
+
+  .cheatsheet-panel.open .cheatsheet-toggle{
+    left:12px !important;
+    right:auto !important;
+    top:10px !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:calc(100% - 24px) !important;
+    height:32px !important;
+    padding:4px 10px !important;
+    writing-mode:horizontal-tb !important;
+    transform:none !important;
+    border-radius:999px !important;
+    z-index:7 !important;
+  }
+
+  html[data-study-domain="pharmacology"] .pharma-cheatsheet-line,
+  html[data-study-domain="pharmacology"] .pharma-cheatsheet-herb-row{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 40px !important;
+    column-gap:8px !important;
+    align-items:center !important;
+  }
+
+  html[data-study-domain="pharmacology"] .pharma-cheatsheet-line .pharma-cheatsheet-name,
+  html[data-study-domain="pharmacology"] .pharma-cheatsheet-herb-row .pharma-cheatsheet-name{
+    min-width:0 !important;
+    overflow-wrap:anywhere !important;
+  }
+
+  html[data-study-domain="pharmacology"] .pharma-cheatsheet-basket-add,
+  html[data-study-domain="pharmacology"] .pharma-add-comparison-button{
+    justify-self:end !important;
+    min-width:32px !important;
+    width:32px !important;
+    max-width:32px !important;
+    min-height:32px !important;
+    padding:0 !important;
+    flex:0 0 32px !important;
+  }
+
+  html[data-study-domain="pharmacology"] .pharma-solved-point{
+    position:relative !important;
+    padding-right:34px !important;
+  }
+
+  html[data-study-domain="pharmacology"] .pharma-solved-info-button{
+    position:absolute !important;
+    top:5px !important;
+    right:5px !important;
+    width:25px !important;
+    height:25px !important;
+    min-width:25px !important;
+    min-height:25px !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:var(--text-color) !important;
+    opacity:.78 !important;
+    font-size:1rem !important;
+    z-index:3 !important;
+  }
+
+  html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after{
+    content:attr(data-esprit-tooltip) !important;
+    position:absolute !important;
+    left:8px !important;
+    right:8px !important;
+    top:34px !important;
+    z-index:4 !important;
+    padding:8px 10px !important;
+    border-radius:12px !important;
+    background:color-mix(in srgb, var(--bg-color, #fff) 92%, var(--shadow-color, #999)) !important;
+    color:var(--text-color) !important;
+    box-shadow:0 8px 24px rgba(0,0,0,.18) !important;
+    font-size:.86rem !important;
+    line-height:1.25 !important;
+    text-align:left !important;
+    white-space:normal !important;
+  }
+}
+
+/* === Finition discrète demandée : dégradés continus, X neutres, éditables carrés === */
+#comparisonPanelContent .mtc-compare-scroll{
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+}
+
+#comparisonPanelContent .mtc-compare-matrix{
+  border-left:0 !important;
+  border-top:0 !important;
+}
+
+#comparisonPanelContent .mtc-compare-matrix > *{
+  border-right:0 !important;
+  border-bottom:0 !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label,
+#comparisonPanelContent .mtc-compare-cell{
+  padding:4px 8px !important;
+  line-height:1.12 !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-odd{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 4%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-even{
+  background:rgba(255,255,255,.018) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-odd{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 4%, var(--page-bg, var(--bg-color, #fff)) 96%) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 96%, white 4%) !important;
+}
+
+#comparisonPanelContent .mtc-nature-gradient-inner{
+  padding:4px 8px !important;
+  background:var(--nature-gradient, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-nature-cell{
+  background:transparent !important;
+}
+
+#comparisonPanelContent .mtc-compare-x,
+#comparisonPanelContent .mtc-compare-x.is-distinct,
+#comparisonPanelContent .mtc-compare-x.is-unique{
+  color:var(--text-color) !important;
+  font-weight:400 !important;
+  font-size:1em !important;
+  opacity:.72 !important;
+  text-decoration:none !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  border:0 !important;
+  padding:0 !important;
+}
+
+#comparisonPanelContent .mtc-compare-action-label,
+#comparisonPanelContent .mtc-compare-action-label.is-distinct,
+#comparisonPanelContent .mtc-compare-action-label.is-unique{
+  font-weight:760 !important;
+}
+
+#comparisonPanelContent .pharma-comparison-editable{
+  border-radius:0 !important;
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent) !important;
+  padding:4px 5px !important;
+  box-shadow:none !important;
+}
+
+#comparisonPanelContent .pharma-comparison-editable:focus{
+  border-radius:0 !important;
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 14%, transparent) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--shadow-color, #7aa) 45%, transparent) !important;
+}
+
+#comparisonPanelContent .pharma-comparison-editable-esprit{
+  font-family:Baskerville, "Libre Baskerville", "Iowan Old Style", Georgia, serif !important;
+  font-weight:500 !important;
+  font-size:1.08em !important;
+  letter-spacing:.005em !important;
+}
+
+/* Les ampoules de synthèse PHARMA ne sont utiles que sur téléphone. */
+@media(min-width:700px) and (pointer:fine){
+  html[data-study-domain="pharmacology"] .pharma-solved-info-button{
+    display:none !important;
+  }
+}
+
+@media(max-width:699px){
+  #comparisonPanelContent .mtc-compare-row-label,
+  #comparisonPanelContent .mtc-compare-cell,
+  #comparisonPanelContent .mtc-nature-gradient-inner{
+    padding:4px 6px !important;
+    line-height:1.12 !important;
+  }
+}
+
+/* === Correctif comparateur : sticky robuste, esprit pleine ligne, dégradés fondus, nouveaux champs éditables === */
+.comparison-panel.open{
+  overflow:hidden !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+.comparison-panel.open #comparisonPanelContent{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+#comparisonPanelContent .mtc-compare-titlebar{
+  flex:0 0 auto !important;
+}
+#comparisonPanelContent .mtc-compare-scroll{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:auto !important;
+  overscroll-behavior:contain !important;
+}
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-header{
+  position:sticky !important;
+  top:0 !important;
+  z-index:80 !important;
+  transform:translateZ(0) !important;
+  will-change:transform !important;
+}
+#comparisonPanelContent .mtc-compare-corner{
+  z-index:90 !important;
+}
+
+/* La ligne Esprit garde le style éditable, mais le fond couvre toute la hauteur de la ligne. */
+#comparisonPanelContent .mtc-compare-row-esprit{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, var(--page-bg, var(--bg-color, #fff)) 92%) !important;
+}
+#comparisonPanelContent .mtc-compare-row-esprit .pharma-comparison-editable,
+#comparisonPanelContent .pharma-comparison-editable-esprit{
+  min-height:100% !important;
+  background:transparent !important;
+}
+
+/* Les lignes très visuelles sont centrées pour se lire comme des marqueurs. */
+#comparisonPanelContent .mtc-compare-row-nature,
+#comparisonPanelContent .mtc-compare-row-saveur,
+#comparisonPanelContent .mtc-compare-row-tropisme,
+#comparisonPanelContent .mtc-compare-row-posologie{
+  text-align:center !important;
+}
+#comparisonPanelContent .mtc-compare-row-nature .pharma-token-chip,
+#comparisonPanelContent .mtc-compare-row-saveur .pharma-token-chip,
+#comparisonPanelContent .mtc-compare-row-tropisme .pharma-token-chip,
+#comparisonPanelContent .mtc-compare-row-posologie .pharma-token-chip{
+  justify-content:center !important;
+}
+#comparisonPanelContent .mtc-nature-gradient-inner{
+  min-height:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-wrap:wrap !important;
+  gap:0 5px !important;
+}
+
+/* X neutres, sans hiérarchie visuelle forcée. */
+#comparisonPanelContent .mtc-compare-x,
+#comparisonPanelContent .mtc-compare-x.is-distinct,
+#comparisonPanelContent .mtc-compare-x.is-unique{
+  color:var(--text-color) !important;
+  font-weight:400 !important;
+  opacity:.70 !important;
+  text-decoration:none !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  border:0 !important;
+}
+
+/* Associations et formules : champs éditables carrés, cohérents avec Esprit/Notes. */
+#comparisonPanelContent .pharma-comparison-editable-associations,
+#comparisonPanelContent .pharma-comparison-editable-formules{
+  border-radius:0 !important;
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent) !important;
+  padding:4px 5px !important;
+  min-height:1.5em !important;
+}
+#comparisonPanelContent .pharma-comparison-editable-associations:focus,
+#comparisonPanelContent .pharma-comparison-editable-formules:focus{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 14%, transparent) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--shadow-color, #7aa) 45%, transparent) !important;
+}
+#comparisonPanelContent .pharma-association-link{
+  appearance:none !important;
+  border:0 !important;
+  border-bottom:1px solid currentColor !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:inherit !important;
+  padding:0 !important;
+  margin:0 !important;
+  font:inherit !important;
+  cursor:pointer !important;
+  text-decoration:none !important;
+  opacity:.92 !important;
+}
+#comparisonPanelContent .pharma-association-link:hover,
+#comparisonPanelContent .pharma-association-link:focus-visible{
+  opacity:1 !important;
+  outline:none !important;
+  color:color-mix(in srgb, var(--shadow-color, currentColor) 55%, var(--text-color) 45%) !important;
+}
+
+.pharma-association-suggest-box{
+  position:fixed !important;
+  z-index:99990 !important;
+  display:none !important;
+  min-width:220px !important;
+  max-width:min(360px, calc(100vw - 16px)) !important;
+  max-height:220px !important;
+  overflow:auto !important;
+  padding:4px !important;
+  background:color-mix(in srgb, var(--page-bg, #fff) 94%, var(--shadow-color, #999) 6%) !important;
+  color:var(--text-color) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.22) !important;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #999) 18%, transparent) !important;
+  font-family:var(--ui-font-family, Archivo, sans-serif) !important;
+}
+.pharma-association-suggest-box.open{
+  display:block !important;
+}
+.pharma-association-suggest-box button{
+  appearance:none !important;
+  display:block !important;
+  width:100% !important;
+  text-align:left !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  color:inherit !important;
+  padding:6px 7px !important;
+  box-shadow:none !important;
+  cursor:pointer !important;
+  font:inherit !important;
+}
+.pharma-association-suggest-box button:hover,
+.pharma-association-suggest-box button:focus-visible{
+  background:color-mix(in srgb, var(--shadow-color, #999) 12%, transparent) !important;
+  outline:none !important;
+}
+.pharma-association-suggest-box strong,
+.pharma-association-suggest-box span{
+  display:block !important;
+  line-height:1.18 !important;
+}
+.pharma-association-suggest-box span{
+  opacity:.68 !important;
+  font-size:.86em !important;
+  margin-top:2px !important;
+}
+
+/* === Correctif urgent : restaurer le scroll du panneau de comparaison ===
+   Le bloc sticky précédent transformait le panneau en flex avec overflow hidden.
+   Sur certains navigateurs/mobile, cela empêchait complètement le défilement.
+   On revient à un panneau stable : le panneau contient le tableau, et le scroll
+   se fait explicitement dans .mtc-compare-scroll. */
+.comparison-panel.open{
+  display:block !important;
+  overflow:hidden !important;
+}
+.comparison-panel.open #comparisonPanelContent{
+  display:block !important;
+  flex:none !important;
+  min-height:0 !important;
+  height:calc(100% - 34px) !important;
+  max-height:none !important;
+  overflow:hidden !important;
+}
+#comparisonPanelContent .mtc-compare-titlebar{
+  display:flex !important;
+  flex:0 0 auto !important;
+}
+#comparisonPanelContent .mtc-compare-scroll{
+  display:block !important;
+  flex:none !important;
+  height:calc(100% - 38px) !important;
+  min-height:160px !important;
+  max-height:none !important;
+  overflow:auto !important;
+  -webkit-overflow-scrolling:touch !important;
+  touch-action:pan-x pan-y !important;
+  overscroll-behavior:auto !important;
+}
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-header{
+  position:sticky !important;
+  top:0 !important;
+}
+@media(max-width:699px){
+  .comparison-panel.open{
+    height:100dvh !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+  }
+  .comparison-panel.open #comparisonPanelContent{
+    height:calc(100dvh - 44px) !important;
+    overflow:hidden !important;
+  }
+  #comparisonPanelContent .mtc-compare-scroll{
+    height:calc(100dvh - 96px) !important;
+    min-height:0 !important;
+    overflow:auto !important;
+  }
+}
+
+/* === Polish final comparateur : colonnes nature, glisser-déposer, ajout manuel, éditables ACU === */
+#comparisonPanelContent .mtc-compare-matrix > *{
+  border-right:0 !important;
+  border-bottom:0 !important;
+}
+#comparisonPanelContent .mtc-compare-matrix{
+  border-left:0 !important;
+  border-top:0 !important;
+  gap:0 !important;
+  position:relative !important;
+  overflow:visible !important;
+}
+
+/* La couleur de Nature devient une ambiance de colonne complète.
+   Les bords mélangent subtilement les colonnes voisines, donc pas de coupure nette. */
+#comparisonPanelContent .mtc-compare-header.has-column-gradient,
+#comparisonPanelContent .mtc-compare-cell.has-column-gradient{
+  --row-column-tint:rgba(255,255,255,.018);
+  background:
+    linear-gradient(0deg, var(--row-column-tint), var(--row-column-tint)),
+    var(--column-nature-gradient, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-row-odd.has-column-gradient{
+  --row-column-tint:color-mix(in srgb, var(--shadow-color, #7aa) 5%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-row-even.has-column-gradient{
+  --row-column-tint:rgba(255,255,255,.018) !important;
+}
+#comparisonPanelContent .mtc-compare-row-nature.has-column-gradient,
+#comparisonPanelContent .mtc-compare-nature-cell.has-column-gradient{
+  --row-column-tint:rgba(255,255,255,.01) !important;
+}
+#comparisonPanelContent .mtc-nature-gradient-inner{
+  background:transparent !important;
+}
+
+/* En-tête vraiment collant dans le scroll interne, même tout en bas. */
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-header{
+  position:sticky !important;
+  top:0 !important;
+  z-index:120 !important;
+  align-self:start !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 82%, white 18%) !important;
+  box-shadow:0 1px 0 color-mix(in srgb, var(--shadow-color, #999) 14%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-header.has-column-gradient{
+  background:
+    linear-gradient(0deg, rgba(255,255,255,.42), rgba(255,255,255,.42)),
+    var(--column-nature-gradient, color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 82%, white 18%)) !important;
+}
+#comparisonPanelContent .mtc-compare-corner{
+  z-index:130 !important;
+}
+
+/* Corbeille seule : pas de lettres A/B/C/D affichées. */
+#comparisonPanelContent .mtc-compare-remove{
+  width:24px !important;
+  min-width:24px !important;
+  height:24px !important;
+  min-height:24px !important;
+  border-radius:0 !important;
+  opacity:.52 !important;
+  font-size:.92rem !important;
+}
+#comparisonPanelContent .mtc-compare-remove .mtc-compare-slot-letter{
+  display:none !important;
+}
+#comparisonPanelContent .mtc-compare-remove .mtc-compare-trash,
+#comparisonPanelContent .mtc-compare-remove:hover .mtc-compare-trash,
+#comparisonPanelContent .mtc-compare-remove:focus-visible .mtc-compare-trash{
+  display:inline !important;
+}
+#comparisonPanelContent .mtc-compare-remove:hover,
+#comparisonPanelContent .mtc-compare-remove:focus-visible{
+  background:transparent !important;
+  opacity:.9 !important;
+}
+
+/* Colonnes déplaçables. */
+#comparisonPanelContent .mtc-compare-header[draggable="true"]{
+  cursor:grab !important;
+}
+#comparisonPanelContent .mtc-compare-header[draggable="true"]:active,
+#comparisonPanelContent .mtc-compare-header.is-dragging{
+  cursor:grabbing !important;
+  opacity:.72 !important;
+}
+#comparisonPanelContent .mtc-compare-header.is-drag-over{
+  box-shadow:inset 2px 0 0 color-mix(in srgb, var(--shadow-color, #666) 70%, transparent) !important;
+}
+
+/* X neutres, sans hiérarchie décorative. */
+#comparisonPanelContent .mtc-compare-x,
+#comparisonPanelContent .mtc-compare-x.is-common,
+#comparisonPanelContent .mtc-compare-x.is-distinct,
+#comparisonPanelContent .mtc-compare-x.is-unique{
+  color:var(--text-color) !important;
+  font-family:var(--ui-font-family, Archivo, sans-serif) !important;
+  font-weight:400 !important;
+  font-size:1em !important;
+  opacity:.72 !important;
+  text-decoration:none !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  border:0 !important;
+  padding:0 !important;
+}
+#comparisonPanelContent .mtc-compare-action-label,
+#comparisonPanelContent .mtc-compare-action-label.is-distinct,
+#comparisonPanelContent .mtc-compare-action-label.is-unique{
+  font-weight:760 !important;
+}
+
+/* Champ d’ajout manuel à droite. */
+#comparisonPanelContent .mtc-compare-add-header{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:5px !important;
+  justify-content:flex-start !important;
+  background:color-mix(in srgb, var(--shadow-color, #999) 5%, var(--page-bg, var(--bg-color, #fff)) 95%) !important;
+}
+#comparisonPanelContent .mtc-compare-add-label{
+  font-size:.76rem !important;
+  font-weight:850 !important;
+  opacity:.64 !important;
+  line-height:1 !important;
+}
+#comparisonPanelContent .mtc-compare-add-input{
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:color-mix(in srgb, var(--shadow-color, #999) 9%, transparent) !important;
+  color:var(--text-color) !important;
+  box-shadow:inset 0 -1px 0 color-mix(in srgb, var(--shadow-color, #999) 32%, transparent) !important;
+  padding:5px 6px !important;
+  font:inherit !important;
+  font-size:.82rem !important;
+}
+#comparisonPanelContent .mtc-compare-add-input:focus{
+  outline:none !important;
+  background:color-mix(in srgb, var(--shadow-color, #999) 14%, transparent) !important;
+  box-shadow:inset 0 -1px 0 color-mix(in srgb, var(--shadow-color, #999) 60%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-add-cell{
+  background:color-mix(in srgb, var(--shadow-color, #999) 3%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-empty-add{
+  display:grid !important;
+  gap:10px !important;
+  max-width:min(420px, 100%) !important;
+}
+#comparisonPanelContent .mtc-compare-empty-add .mtc-compare-add-header{
+  position:static !important;
+  width:min(340px, 100%) !important;
+  min-height:auto !important;
+  padding:8px !important;
+}
+
+/* Éditables ACU + PHARMA : style carré, signal visuel cohérent avec le site. */
+#comparisonPanelContent .acu-comparison-editable,
+#comparisonPanelContent .pharma-comparison-editable{
+  display:block !important;
+  width:100% !important;
+  min-height:1.45em !important;
+  box-sizing:border-box !important;
+  border-radius:0 !important;
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent) !important;
+  padding:4px 5px !important;
+  box-shadow:none !important;
+  white-space:pre-wrap !important;
+}
+#comparisonPanelContent .acu-comparison-editable:focus,
+#comparisonPanelContent .pharma-comparison-editable:focus{
+  outline:none !important;
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 14%, transparent) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--shadow-color, #7aa) 45%, transparent) !important;
+}
+#comparisonPanelContent .acu-comparison-editable:empty::before,
+#comparisonPanelContent .pharma-comparison-editable:empty::before{
+  content:attr(data-placeholder) !important;
+  opacity:.45 !important;
+}
+#comparisonPanelContent .mtc-compare-row-esprit,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, var(--page-bg, var(--bg-color, #fff)) 92%) !important;
+}
+#comparisonPanelContent .mtc-compare-row-esprit.has-column-gradient{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, var(--page-bg, var(--bg-color, #fff)) 92%) !important;
+}
+#comparisonPanelContent .acu-comparison-editable-esprit,
+#comparisonPanelContent .pharma-comparison-editable-esprit{
+  font-family:Baskerville, "Libre Baskerville", "Iowan Old Style", Georgia, serif !important;
+  font-size:1.06em !important;
+  font-weight:500 !important;
+  letter-spacing:.005em !important;
+}
+#comparisonPanelContent .acu-comparison-editable-notes,
+#comparisonPanelContent .pharma-comparison-editable-notes{
+  min-height:1.8em !important;
+}
+
+/* Lignes repères centrées. */
+#comparisonPanelContent .mtc-compare-row-nature,
+#comparisonPanelContent .mtc-compare-row-saveur,
+#comparisonPanelContent .mtc-compare-row-tropisme,
+#comparisonPanelContent .mtc-compare-row-posologie{
+  text-align:center !important;
+  align-content:center !important;
+}
+#comparisonPanelContent .mtc-compare-row-nature .pharma-token-chip,
+#comparisonPanelContent .mtc-compare-row-saveur .pharma-token-chip,
+#comparisonPanelContent .mtc-compare-row-tropisme .pharma-token-chip,
+#comparisonPanelContent .mtc-compare-row-posologie .pharma-token-chip{
+  justify-content:center !important;
+}
+
+/* Pas de sur-coloration de lignes : l’ambiance vient des colonnes + léger rythme horizontal. */
+#comparisonPanelContent .mtc-compare-row-odd:not(.has-column-gradient){
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 4%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-row-even:not(.has-column-gradient){
+  background:rgba(255,255,255,.014) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-odd{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 6%, var(--page-bg, var(--bg-color, #fff)) 94%) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 96%, white 4%) !important;
+}
+
+@media(max-width:699px){
+  #comparisonPanelContent .mtc-compare-matrix{
+    --compare-label-col:122px !important;
+    --compare-point-col:218px !important;
+  }
+  #comparisonPanelContent .mtc-compare-header{
+    min-height:54px !important;
+    grid-template-columns:22px minmax(0, 1fr) !important;
+    gap:6px !important;
+    padding:5px 6px !important;
+  }
+  #comparisonPanelContent .mtc-compare-add-header{
+    padding:5px 6px !important;
+  }
+}
+
+/* === Ajustements finaux comparateur : nouveaux champs, lisibilité, sticky flou === */
+#comparisonPanelContent .mtc-compare-titlebar .point-code,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-esprit,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-classe,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-nature,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-saveur,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-tropisme,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-posologie,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-precaution,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-associations,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-comparaison,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-formules,
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-notes{
+  text-transform:uppercase !important;
+  letter-spacing:.045em !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label{
+  text-align:right !important;
+  justify-content:flex-end !important;
+}
+
+/* L'en-tête est translucide et floute le contenu qui passe dessous. */
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-header{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 64%, transparent) !important;
+  -webkit-backdrop-filter:blur(9px) saturate(1.05) !important;
+  backdrop-filter:blur(9px) saturate(1.05) !important;
+  box-shadow:0 1px 0 color-mix(in srgb, var(--shadow-color, #999) 12%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-header.has-column-gradient{
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 58%, transparent), color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 58%, transparent)),
+    var(--column-nature-gradient, transparent) !important;
+  -webkit-backdrop-filter:blur(9px) saturate(1.05) !important;
+  backdrop-filter:blur(9px) saturate(1.05) !important;
+}
+
+/* Saveur douce : jaune fluo lisible sur fond coloré. */
+#comparisonPanelContent .pharma-flavor-token.flavor-sweet{
+  color:#F7F700 !important;
+  -webkit-text-stroke:.28px rgba(0,0,0,.72) !important;
+  text-shadow:
+    0 .45px 0 rgba(0,0,0,.42),
+    .45px 0 0 rgba(0,0,0,.30),
+    -.45px 0 0 rgba(0,0,0,.30) !important;
+}
+#comparisonPanelContent .pharma-flavor-token.flavor-light.flavor-sweet{
+  opacity:.70 !important;
+  -webkit-text-stroke:.18px rgba(0,0,0,.55) !important;
+}
+#comparisonPanelContent .pharma-flavor-token.flavor-strong.flavor-sweet{
+  opacity:1 !important;
+  -webkit-text-stroke:.36px rgba(0,0,0,.82) !important;
+}
+
+/* ACU : l'Esprit du point est signalé en bleu sur toute la hauteur de ligne. */
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-esprit,
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:color-mix(in srgb, #6aa9ff 18%, var(--page-bg, var(--bg-color, #fff)) 82%) !important;
+}
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-esprit .acu-comparison-editable,
+#comparisonPanelContent .mtc-compare-acu .acu-comparison-editable-esprit{
+  min-height:100% !important;
+  background:color-mix(in srgb, #6aa9ff 12%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-acu .acu-comparison-editable-esprit:focus{
+  background:color-mix(in srgb, #6aa9ff 18%, transparent) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, #2f76ff 45%, transparent) !important;
+}
+
+/* PHARMA : Esprit garde le style éditable carré sur toute la ligne. */
+#comparisonPanelContent .mtc-compare-pharma .mtc-compare-row-esprit,
+#comparisonPanelContent .mtc-compare-pharma .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, var(--page-bg, var(--bg-color, #fff)) 92%) !important;
+}
+
+/* Nouveaux champs éditables : même langage visuel que Associations/Formules. */
+#comparisonPanelContent .pharma-comparison-editable-vs,
+#comparisonPanelContent .pharma-comparison-editable-precaution{
+  border-radius:0 !important;
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent) !important;
+  padding:4px 5px !important;
+  min-height:1.5em !important;
+}
+#comparisonPanelContent .pharma-comparison-editable-vs:focus,
+#comparisonPanelContent .pharma-comparison-editable-precaution:focus{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 14%, transparent) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--shadow-color, #7aa) 45%, transparent) !important;
+}
+
+/* Les X restent vraiment neutres. */
+#comparisonPanelContent .mtc-compare-x,
+#comparisonPanelContent .mtc-compare-x.is-common,
+#comparisonPanelContent .mtc-compare-x.is-distinct,
+#comparisonPanelContent .mtc-compare-x.is-unique{
+  font-weight:400 !important;
+  text-decoration:none !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  border:0 !important;
+  color:var(--text-color) !important;
+}
+
+/* === Ajustements : assistance sans virgule, ACU manuel, première colonne floutée === */
+#comparisonPanelContent .acu-association-link,
+#comparisonPanelContent .pharma-association-link{
+  appearance:none !important;
+  border:0 !important;
+  border-bottom:1px solid currentColor !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:inherit !important;
+  padding:0 !important;
+  margin:0 !important;
+  font:inherit !important;
+  cursor:pointer !important;
+  text-decoration:none !important;
+  opacity:.92 !important;
+}
+#comparisonPanelContent .acu-association-link:hover,
+#comparisonPanelContent .acu-association-link:focus-visible,
+#comparisonPanelContent .pharma-association-link:hover,
+#comparisonPanelContent .pharma-association-link:focus-visible{
+  opacity:1 !important;
+  outline:none !important;
+  color:color-mix(in srgb, var(--shadow-color, currentColor) 55%, var(--text-color) 45%) !important;
+}
+
+#comparisonPanelContent .acu-comparison-editable-associations,
+#comparisonPanelContent .acu-comparison-editable-vs,
+#comparisonPanelContent .pharma-comparison-editable-associations,
+#comparisonPanelContent .pharma-comparison-editable-vs{
+  border-radius:0 !important;
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent) !important;
+  padding:4px 5px !important;
+  min-height:1.5em !important;
+}
+#comparisonPanelContent .acu-comparison-editable-associations:focus,
+#comparisonPanelContent .acu-comparison-editable-vs:focus,
+#comparisonPanelContent .pharma-comparison-editable-associations:focus,
+#comparisonPanelContent .pharma-comparison-editable-vs:focus{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 14%, transparent) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--shadow-color, #7aa) 45%, transparent) !important;
+}
+
+/* La première colonne aussi reste semi-opaque et floute ce qui passe dessous. */
+#comparisonPanelContent .mtc-compare-row-label{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 72%, transparent) !important;
+  -webkit-backdrop-filter:blur(9px) saturate(1.05) !important;
+  backdrop-filter:blur(9px) saturate(1.05) !important;
+  box-shadow:1px 0 0 color-mix(in srgb, var(--shadow-color, #999) 10%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-odd{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 7%, color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 72%, transparent) 93%) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 74%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:color-mix(in srgb, #6aa9ff 18%, color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 72%, transparent) 82%) !important;
+}
+#comparisonPanelContent .mtc-compare-pharma .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 10%, color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 72%, transparent) 90%) !important;
+}
+
+
+/* === Correctif : première colonne sticky floutée robuste + ACU ouvert === */
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-row-label{
+  position:sticky !important;
+  left:0 !important;
+  -webkit-backdrop-filter:blur(10px) saturate(1.06) !important;
+  backdrop-filter:blur(10px) saturate(1.06) !important;
+  background-clip:padding-box !important;
+  isolation:isolate !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label{
+  z-index:14 !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+  box-shadow:1px 0 0 color-mix(in srgb, var(--shadow-color, #999) 12%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-odd{
+  background:linear-gradient(0deg,
+    color-mix(in srgb, var(--shadow-color, #7aa) 7%, transparent),
+    color-mix(in srgb, var(--shadow-color, #7aa) 7%, transparent)
+  ), color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 70%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-corner{
+  z-index:35 !important;
+  top:0 !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 62%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-header{
+  z-index:30 !important;
+}
+
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:linear-gradient(0deg,
+    color-mix(in srgb, #6aa9ff 18%, transparent),
+    color-mix(in srgb, #6aa9ff 18%, transparent)
+  ), color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-pharma .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:linear-gradient(0deg,
+    color-mix(in srgb, var(--shadow-color, #7aa) 10%, transparent),
+    color-mix(in srgb, var(--shadow-color, #7aa) 10%, transparent)
+  ), color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+}
+
+/* === Correctif interrompu : toxicité cellule seulement + colonne Ajouter sobre === */
+/* La toxicité ne teinte plus toute la colonne : le JS limite maintenant
+   --column-nature-gradient aux natures. Ici, le vert fluo reste uniquement
+   dans la cellule NATURE de la substance concernée. */
+#comparisonPanelContent .mtc-nature-gradient-inner.is-toxic-cell{
+  /* Pas de voile vert : la cellule conserve exactement le même fond Nature que la colonne. */
+  background:transparent !important;
+}
+
+/* Le mot toxique reste lisible, mais ne transforme pas toute la colonne. */
+#comparisonPanelContent .pharma-toxicity-token{
+  color:#39ff14 !important;
+  font-weight:850 !important;
+  text-shadow:0 0 .22em rgba(57,255,20,.22) !important;
+}
+
+/* La colonne Ajouter se comporte visuellement comme une vraie colonne du tableau,
+   sans bande grise séparée. */
+#comparisonPanelContent .mtc-compare-add-header{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 64%, transparent) !important;
+  -webkit-backdrop-filter:blur(9px) saturate(1.05) !important;
+  backdrop-filter:blur(9px) saturate(1.05) !important;
+  box-shadow:0 1px 0 color-mix(in srgb, var(--shadow-color, #999) 12%, transparent) !important;
+  border:0 !important;
+  padding:6px 9px !important;
+}
+
+#comparisonPanelContent .mtc-compare-add-label{
+  text-transform:uppercase !important;
+  letter-spacing:.045em !important;
+  opacity:.72 !important;
+  font-size:.78rem !important;
+}
+
+#comparisonPanelContent .mtc-compare-add-input{
+  background:color-mix(in srgb, var(--shadow-color, #999) 7%, transparent) !important;
+  box-shadow:inset 0 -1px 0 color-mix(in srgb, var(--shadow-color, #999) 24%, transparent) !important;
+}
+
+#comparisonPanelContent .mtc-compare-add-cell{
+  background:rgba(255,255,255,.014) !important;
+}
+#comparisonPanelContent .mtc-compare-add-cell.mtc-compare-row-odd{
+  background:color-mix(in srgb, var(--shadow-color, #7aa) 4%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-add-cell.mtc-compare-row-even{
+  background:rgba(255,255,255,.014) !important;
+}
+
+@media(max-width:699px){
+  #comparisonPanelContent .mtc-compare-add-header{
+    padding:5px 6px !important;
+  }
+}
+
+/* === Correctif final : toxicité neutre, ACU bleu éditable, autocomplete strict, premières colonnes floutées === */
+/* PHARMA : la toxicité ne participe jamais au fond Nature/colonne. Elle reste une indication textuelle dans la cellule. */
+#comparisonPanelContent .mtc-nature-gradient-inner.is-toxic-cell{
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+#comparisonPanelContent .pharma-toxicity-token{
+  background:transparent !important;
+  color:#39ff14 !important;
+  font-weight:700 !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+}
+#comparisonPanelContent .pharma-nature-token.is-toxic{
+  display:none !important;
+}
+
+/* ACU : Esprit reprend le bleu discret des champs éditables du site. */
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-esprit,
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:rgba(0,0,255,.065) !important;
+  background:color-mix(in srgb, blue 6.5%, var(--page-bg, var(--bg-color, #fff)) 93.5%) !important;
+}
+#comparisonPanelContent .mtc-compare-acu .acu-comparison-editable-esprit{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+#comparisonPanelContent .mtc-compare-acu .acu-comparison-editable-esprit:focus{
+  background:rgba(0,0,255,.035) !important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,255,.28), 0 0 10px color-mix(in srgb, var(--shadow-color, #7aa) 22%, transparent) !important;
+}
+
+/* Première ligne ET première colonne : translucides + flou arrière-plan pour garder le texte lisible au scroll. */
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-row-label,
+#comparisonPanelContent .mtc-compare-header{
+  -webkit-backdrop-filter:blur(12px) saturate(1.08) !important;
+  backdrop-filter:blur(12px) saturate(1.08) !important;
+  background-clip:padding-box !important;
+  isolation:isolate !important;
+}
+#comparisonPanelContent .mtc-compare-row-label{
+  background:rgba(255,255,255,.68) !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+  z-index:60 !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-odd{
+  background:linear-gradient(0deg,
+    color-mix(in srgb, var(--shadow-color, #7aa) 5%, transparent),
+    color-mix(in srgb, var(--shadow-color, #7aa) 5%, transparent)
+  ), color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 70%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-corner{
+  background:rgba(255,255,255,.62) !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 62%, transparent) !important;
+  z-index:160 !important;
+}
+#comparisonPanelContent .mtc-compare-header{
+  background:rgba(255,255,255,.70) !important;
+  background:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 70%, transparent) !important;
+  z-index:150 !important;
+}
+#comparisonPanelContent .mtc-compare-header.has-column-gradient{
+  background:
+    linear-gradient(0deg, rgba(255,255,255,.34), rgba(255,255,255,.34)),
+    var(--column-nature-gradient, color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 70%, transparent)) !important;
+}
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:linear-gradient(0deg, rgba(0,0,255,.065), rgba(0,0,255,.065)),
+    color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+}
+#comparisonPanelContent .mtc-compare-pharma .mtc-compare-row-label.mtc-compare-row-esprit{
+  background:linear-gradient(0deg,
+    color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent),
+    color-mix(in srgb, var(--shadow-color, #7aa) 8%, transparent)
+  ), color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 68%, transparent) !important;
+}
+
+/* Colonne Ajouter : rester sobre, sans affecter le flou/sticky des autres colonnes. */
+#comparisonPanelContent .mtc-compare-add-header,
+#comparisonPanelContent .mtc-compare-add-cell{
+  background:rgba(255,255,255,.026) !important;
+}
+#comparisonPanelContent .mtc-compare-add-input{
+  width:100% !important;
+}
+
+
+/* === Correctif ciblé : première colonne vraiment floutée + autocomplete ACU strict ===
+   À placer en fin de fichier pour écraser les anciens fonds trop opaques. */
+#comparisonPanelContent .mtc-compare-corner,
+#comparisonPanelContent .mtc-compare-row-label{
+  position:sticky !important;
+  left:0 !important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.12) !important;
+  backdrop-filter:blur(16px) saturate(1.12) !important;
+  background-color:rgba(255,255,255,.52) !important;
+  background-image:none !important;
+  background-clip:padding-box !important;
+  isolation:isolate !important;
+  transform:translateZ(0) !important;
+  will-change:transform !important;
+  box-shadow:1px 0 0 rgba(0,0,0,.045) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label{
+  z-index:180 !important;
+  text-align:right !important;
+}
+
+#comparisonPanelContent .mtc-compare-corner{
+  top:0 !important;
+  z-index:260 !important;
+  background-color:rgba(255,255,255,.56) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-odd{
+  background-color:rgba(255,255,255,.50) !important;
+  background-image:linear-gradient(0deg,
+    color-mix(in srgb, var(--shadow-color, #7aa) 5%, transparent),
+    color-mix(in srgb, var(--shadow-color, #7aa) 5%, transparent)
+  ) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+  background-color:rgba(255,255,255,.54) !important;
+  background-image:none !important;
+}
+
+#comparisonPanelContent .mtc-compare-acu .mtc-compare-row-label.mtc-compare-row-esprit{
+  background-color:rgba(245,248,255,.54) !important;
+  background-image:linear-gradient(0deg, rgba(0,0,255,.065), rgba(0,0,255,.065)) !important;
+}
+
+#comparisonPanelContent .mtc-compare-pharma .mtc-compare-row-label.mtc-compare-row-esprit{
+  background-color:rgba(255,255,255,.52) !important;
+  background-image:linear-gradient(0deg,
+    color-mix(in srgb, var(--shadow-color, #7aa) 7%, transparent),
+    color-mix(in srgb, var(--shadow-color, #7aa) 7%, transparent)
+  ) !important;
+}
+
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  #comparisonPanelContent .mtc-compare-corner,
+  #comparisonPanelContent .mtc-compare-row-label{
+    background-color:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 52%, transparent) !important;
+  }
+  #comparisonPanelContent .mtc-compare-row-label.mtc-compare-row-even{
+    background-color:color-mix(in srgb, var(--page-bg, var(--bg-color, #fff)) 54%, transparent) !important;
+  }
+}
