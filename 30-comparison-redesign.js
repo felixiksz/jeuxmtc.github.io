@@ -15,6 +15,7 @@
   const ACU_NOTE_PREFIX = "mtc_point_note_";
   const ACU_ASSOC_PREFIX = "mtc_point_associations_";
   const ACU_VS_PREFIX = "mtc_point_vs_";
+  const ACU_PRECAUTION_PREFIX = "mtc_point_precaution_";
 
   function isPharma(){
     return document.documentElement.getAttribute("data-study-domain") === "pharmacology";
@@ -249,9 +250,9 @@
   }
 
   function compareTitlebarHtml(title){
+    // Titre supprimé pour gagner de la place ; on garde seulement l’action discrète “Vider”.
     return `
-      <div class="point-header mtc-compare-panel-header mtc-compare-titlebar">
-        <span class="point-code">${esc(title)}</span>
+      <div class="mtc-compare-panel-header mtc-compare-titlebar mtc-compare-titlebar-compact" aria-label="${attr(title || 'Comparaison')}">
         ${clearAllButtonHtml()}
       </div>
     `;
@@ -452,19 +453,26 @@
     const html = linkAssist
       ? linkedHerbTextHtml(shown)
       : (shown ? esc(shown).replace(/\n/g,"<br>") : "");
-    return `
+    const editable = `
       <div
-        class="pharma-comparison-editable pharma-comparison-editable-${attr(field)}"
-        contenteditable="true"
+        class="pharma-comparison-editable pharma-comparison-editable-${attr(field)} ${linkAssist ? 'mtc-assisted-link-editable' : ''}"
+        contenteditable="${linkAssist ? 'false' : 'true'}"
         role="textbox"
         aria-multiline="true"
         spellcheck="false"
         data-pharma-compare-edit="${attr(field)}"
         data-pharma-herb-id="${attr(herb?.id || "")}"
         data-raw-value="${attr(clean)}"
-        ${linkAssist ? 'data-pharma-link-assist="1"' : ''}
+        ${linkAssist ? 'data-pharma-link-assist="1" data-assist-editing="0"' : ''}
         data-placeholder="${attr(meta.placeholder)}"
         title="${attr(meta.title)}">${html}</div>
+    `;
+    if(!linkAssist) return editable;
+    return `
+      <div class="mtc-assisted-edit-wrap">
+        ${editable}
+        <button type="button" class="mtc-assisted-edit-pencil" data-assisted-edit-trigger="1" title="Modifier" aria-label="Modifier ce champ">✎</button>
+      </div>
     `;
   }
 
@@ -526,6 +534,10 @@
     );
   }
 
+
+  window.mtcLinkifiedPharmaAssistHtml = function(value){ return linkedHerbTextHtml(value); };
+  window.mtcLinkifiedAcuAssistHtml = function(value){ return linkedPointTextHtml(value); };
+
   function acuAddHeaderHtml(){
     return `
       <div class="mtc-compare-header acu-compare-header mtc-compare-row-head mtc-compare-add-header">
@@ -557,6 +569,10 @@
     return text(localStorageValue(ACU_VS_PREFIX, point, details?.vs || details?.comparaison || ""));
   }
 
+  function acuPrecaution(point, details){
+    return text(localStorageValue(ACU_PRECAUTION_PREFIX, point, details?.precaution || details?.precautions || ""));
+  }
+
   function acuNote(point, details){
     return typeof window.getEditablePointNote === "function"
       ? window.getEditablePointNote(point, details?.notes || "")
@@ -578,25 +594,33 @@
     const meta = {
       esprit:{placeholder:"Esprit du point…", title:"Modifier l’esprit de ce point"},
       notes:{placeholder:"Notes personnelles…", title:"Modifier les notes de ce point"},
+      precaution:{placeholder:"Précautions…", title:"Modifier les précautions de ce point"},
       associations:{placeholder:"Associations…", title:"Ajouter des associations de points avec assistance"},
       vs:{placeholder:"Comparaison…", title:"Noter les différences entre points avec assistance"}
     }[field] || {placeholder:"Écrire…", title:"Modifier"};
     const linkAssist = field === "associations" || field === "vs";
     const shown = !clean && field === "associations" ? defaultAcuAssociationText(point) : (!clean && field === "vs" ? defaultAcuVsText(point) : clean);
     const html = linkAssist ? linkedPointTextHtml(shown) : (shown ? esc(shown).replace(/\n/g,"<br>") : "");
-    return `
+    const editable = `
       <div
-        class="acu-comparison-editable acu-comparison-editable-${attr(field)}"
-        contenteditable="true"
+        class="acu-comparison-editable acu-comparison-editable-${attr(field)} ${linkAssist ? 'mtc-assisted-link-editable' : ''}"
+        contenteditable="${linkAssist ? 'false' : 'true'}"
         role="textbox"
         aria-multiline="true"
         spellcheck="false"
         data-acu-compare-edit="${attr(field)}"
         data-acu-point-id="${attr(point)}"
         data-raw-value="${attr(clean)}"
-        ${linkAssist ? 'data-acu-link-assist="1"' : ''}
+        ${linkAssist ? 'data-acu-link-assist="1" data-assist-editing="0"' : ''}
         data-placeholder="${attr(meta.placeholder)}"
         title="${attr(meta.title)}">${html}</div>
+    `;
+    if(!linkAssist) return editable;
+    return `
+      <div class="mtc-assisted-edit-wrap">
+        ${editable}
+        <button type="button" class="mtc-assisted-edit-pencil" data-assisted-edit-trigger="1" title="Modifier" aria-label="Modifier ce champ">✎</button>
+      </div>
     `;
   }
 
@@ -628,6 +652,7 @@
       ["Catégories du point", slot => getPointDetails(slot.id).categories_du_point, {}],
       ["Correspondances", slot => getPointDetails(slot.id).correspondances, {}],
       ["Indications", slot => getPointDetails(slot.id).indications, {}],
+      ["Précaution", slot => editableAcuCellHtml(slot.id, "precaution", acuPrecaution(slot.id, getPointDetails(slot.id))), {html:true, rowKind:"precaution", cellClass:"acu-precaution-cell"}],
       ["Associations", slot => editableAcuCellHtml(slot.id, "associations", acuAssociations(slot.id, getPointDetails(slot.id))), {html:true, rowKind:"associations", cellClass:"acu-associations-cell"}],
       ["VS.", slot => editableAcuCellHtml(slot.id, "vs", acuVs(slot.id, getPointDetails(slot.id))), {html:true, rowKind:"comparaison", cellClass:"acu-vs-cell"}]
     ];
@@ -691,7 +716,11 @@
       if(strong) return "rgba(255,38,28,.34)";
       return "rgba(255,48,38,.25)";
     }
-    if(key.includes("tiede") || key.includes("tiède")) return "rgba(255,57,44,.12)";
+    if(key.includes("tiede") || key.includes("tiède")){
+      if(light) return "rgba(255,57,44,.065)";
+      if(strong) return "rgba(255,47,35,.18)";
+      return "rgba(255,57,44,.12)";
+    }
     if(key.includes("neutre") || key.includes("equilibree") || key.includes("équilibrée") || key.includes("equilibre") || key.includes("équilibre")) return "rgba(255,255,255,.15)";
     if(key.includes("froide") || key.includes("froid")){
       if(light) return "rgba(25,92,255,.10)";
@@ -1069,6 +1098,7 @@
     if(field === "notes") setLocalStorageValue(ACU_NOTE_PREFIX, point, value);
     if(field === "associations") setLocalStorageValue(ACU_ASSOC_PREFIX, point, value);
     if(field === "vs") setLocalStorageValue(ACU_VS_PREFIX, point, value);
+    if(field === "precaution") setLocalStorageValue(ACU_PRECAUTION_PREFIX, point, value);
   }
 
   function addPointFromComparisonInput(input){
@@ -1445,8 +1475,26 @@
     return " ";
   }
 
+  function enableAssistedEditing(editable, moveCaretToEnd){
+    if(!editable) return;
+    editable.setAttribute("contenteditable", "true");
+    editable.dataset.assistEditing = "1";
+    editable.classList.add("is-editing");
+    plainifyLinkAssistEditable(editable, Boolean(moveCaretToEnd));
+  }
+
+  function disableAssistedEditing(editable, value){
+    if(!editable) return;
+    const raw = String(value != null ? value : editable.innerText || "").replace(/\u00a0/g, " ").trim();
+    linkifyLinkAssistEditable(editable, raw, false);
+    editable.setAttribute("contenteditable", "false");
+    editable.dataset.assistEditing = "0";
+    editable.classList.remove("is-editing");
+  }
+
   function insertSuggestionIntoEditable(editable, label, saveFn){
     if(!editable || !label) return;
+    enableAssistedEditing(editable, false);
     plainifyLinkAssistEditable(editable, false);
     const raw = String(editable.innerText || "");
     const range = currentAssistRange(raw, editable);
@@ -1455,14 +1503,9 @@
     const separator = separatorAfterSuggestion(editable);
     const next = (before + label + separator + after.replace(/^\s+/, "")).replace(/[ \t]{2,}/g, " ");
 
-    /*
-      Après une suggestion, on ré-affiche immédiatement les références sous forme
-      de liens. Le champ redevient automatiquement du texte simple dès qu'on
-      clique dans une zone non-lien pour continuer à écrire ou supprimer un mot.
-      Cela évite le bug du champ VS où les éléments ajoutés restaient tous en
-      texte non cliquable jusqu'au prochain rendu complet.
-    */
-    linkifyLinkAssistEditable(editable, next, true);
+    editable.textContent = next;
+    editable.dataset.assistPlainMode = "1";
+    setCaretAtEnd(editable);
     saveFn(editable);
     hideAssociationSuggestions();
   }
@@ -1477,6 +1520,27 @@
     insertSuggestionIntoEditable(editable, pointDisplayNameForLink(point) || point, saveAcuEditable);
   }
 
+  document.addEventListener("click", event => {
+    const trigger = event.target?.closest?.("[data-assisted-edit-trigger]");
+    if(!trigger) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const wrap = trigger.closest(".mtc-assisted-edit-wrap");
+    const editable = wrap?.querySelector?.("[data-pharma-link-assist='1'], [data-acu-link-assist='1']");
+    if(editable){
+      enableAssistedEditing(editable, true);
+      updateAssociationSuggestions(editable);
+    }
+  }, true);
+
+  document.addEventListener("focusin", event => {
+    const editable = event.target?.closest?.("[data-pharma-link-assist='1'], [data-acu-link-assist='1']");
+    if(editable && editable.dataset.assistEditing === "1"){
+      plainifyLinkAssistEditable(editable, true);
+      updateAssociationSuggestions(editable);
+    }
+  });
+
   document.addEventListener("input", event => {
     const pharmaAddInput = event.target?.closest?.("[data-pharma-compare-add-input]");
     const acuAddInput = event.target?.closest?.("[data-acu-compare-add-input]");
@@ -1487,27 +1551,19 @@
     const acuEditable = event.target?.closest?.("[data-acu-compare-edit]");
     if(acuEditable && !isPharma()){
       saveAcuEditable(acuEditable);
-      if(acuEditable.dataset.acuLinkAssist === "1") updateAssociationSuggestions(acuEditable);
+      if(acuEditable.dataset.acuLinkAssist === "1" && acuEditable.dataset.assistEditing === "1") updateAssociationSuggestions(acuEditable);
       return;
     }
     const editable = event.target?.closest?.("[data-pharma-compare-edit]");
     if(!editable || !isPharma()) return;
     savePharmaEditable(editable);
-    if(editable.dataset.pharmaLinkAssist === "1") updateAssociationSuggestions(editable);
-  });
-
-  document.addEventListener("focusin", event => {
-    const editable = event.target?.closest?.("[data-pharma-link-assist='1'], [data-acu-link-assist='1']");
-    if(editable){
-      plainifyLinkAssistEditable(editable, true);
-      updateAssociationSuggestions(editable);
-    }
+    if(editable.dataset.pharmaLinkAssist === "1" && editable.dataset.assistEditing === "1") updateAssociationSuggestions(editable);
   });
 
   document.addEventListener("mousedown", event => {
     const editable = event.target?.closest?.("[data-pharma-link-assist='1'], [data-acu-link-assist='1']");
-    if(!editable) return;
-    if(event.target?.closest?.("[data-pharma-ref-id], [data-acu-ref-id], .pharma-association-suggest-box")) return;
+    if(!editable || editable.dataset.assistEditing !== "1") return;
+    if(event.target?.closest?.("[data-pharma-ref-id], [data-acu-ref-id], .pharma-association-suggest-box, [data-assisted-edit-trigger]")) return;
     plainifyLinkAssistEditable(editable, false);
   }, true);
 
@@ -1517,8 +1573,8 @@
       saveAcuEditable(acuEditable);
       setTimeout(() => {
         if(!document.activeElement?.closest?.(".pharma-association-suggest-box")) hideAssociationSuggestions();
-        if(["associations", "vs"].includes(acuEditable.dataset.acuCompareEdit || "") && typeof window.renderComparisonPanelIfOpen === "function"){
-          window.renderComparisonPanelIfOpen();
+        if(["associations", "vs"].includes(acuEditable.dataset.acuCompareEdit || "")){
+          disableAssistedEditing(acuEditable);
         }
       }, 120);
       return;
@@ -1528,8 +1584,8 @@
     savePharmaEditable(editable);
     setTimeout(() => {
       if(!document.activeElement?.closest?.(".pharma-association-suggest-box")) hideAssociationSuggestions();
-      if(["associations", "vs", "formules"].includes(editable.dataset.pharmaCompareEdit || "") && typeof window.renderComparisonPanelIfOpen === "function"){
-        window.renderComparisonPanelIfOpen();
+      if(["associations", "vs"].includes(editable.dataset.pharmaCompareEdit || "")){
+        disableAssistedEditing(editable);
       }
     }, 120);
   });
