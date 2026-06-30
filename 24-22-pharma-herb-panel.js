@@ -6,6 +6,10 @@
 
   const ESPRIT_STORAGE_PREFIX = "mtc_pharma_herb_esprit_";
   const NOTES_STORAGE_PREFIX = "mtc_pharma_herb_notes_";
+  const ASSOCIATIONS_STORAGE_PREFIX = "mtc_pharma_herb_associations_";
+  const FORMULES_STORAGE_PREFIX = "mtc_pharma_herb_formules_";
+  const VS_STORAGE_PREFIX = "mtc_pharma_herb_vs_";
+  const PRECAUTION_STORAGE_PREFIX = "mtc_pharma_herb_precaution_";
   const IMAGE_STORAGE_PREFIX = "mtc_pharma_herb_image_";
 
   function isPharmaDomain(){
@@ -132,6 +136,26 @@
     return stored !== null ? stored : "";
   }
 
+  function getHerbAssociations(herb){
+    const stored = getStoredValue(ASSOCIATIONS_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.associations || herb.association || "");
+  }
+
+  function getHerbVs(herb){
+    const stored = getStoredValue(VS_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.vs || herb.comparaison || herb.compare || "");
+  }
+
+  function getHerbFormules(herb){
+    const stored = getStoredValue(FORMULES_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.formules || herb.formulas || "");
+  }
+
+  function getHerbPrecaution(herb){
+    const stored = getStoredValue(PRECAUTION_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.precaution || herb.precautions || "");
+  }
+
   function normalizeMultiline(value){
     return String(value || "").replace(/\r\n/g,"\n").replace(/\r/g,"\n").trim();
   }
@@ -241,6 +265,49 @@
     `;
   }
 
+  function herbAssistDisplayName(herb){
+    return String(herb?.pinyinSansTons || herb?.pinyin || herb?.code || herb?.id || "").trim();
+  }
+
+  function defaultAssociationText(herb){
+    const name = herbAssistDisplayName(herb);
+    return name ? `${name} + ` : "";
+  }
+
+  function defaultVsText(herb){
+    const name = herbAssistDisplayName(herb);
+    return name ? `${name} vs ` : "";
+  }
+
+  function linkifyHerbAssist(value){
+    if(typeof window.mtcLinkifiedPharmaAssistHtml === "function") return window.mtcLinkifiedPharmaAssistHtml(value || "");
+    return escapeHtml(value || "").replace(/\n/g,"<br>");
+  }
+
+  function renderAssistedEditableBlock({title, value, placeholder, field, herb}){
+    const clean = normalizeMultiline(value);
+    const shown = !clean && field === "associations" ? defaultAssociationText(herb) : (!clean && field === "vs" ? defaultVsText(herb) : clean);
+    return `
+      <section class="pharma-editable-block pharma-editable-${escapeAttribute(field)} pharma-assisted-editable-block">
+        <div class="pharma-editable-title">${escapeHtml(title)}</div>
+        <div class="mtc-assisted-edit-wrap">
+          <div
+            class="pharma-comparison-editable pharma-comparison-editable-${escapeAttribute(field)} mtc-assisted-link-editable"
+            contenteditable="false"
+            role="textbox"
+            aria-multiline="true"
+            spellcheck="false"
+            data-pharma-compare-edit="${escapeAttribute(field)}"
+            data-pharma-herb-id="${escapeAttribute(herb?.id || "")}"
+            data-pharma-link-assist="1"
+            data-assist-editing="0"
+            data-placeholder="${escapeAttribute(placeholder || "")}">${linkifyHerbAssist(shown)}</div>
+          <button type="button" class="mtc-assisted-edit-pencil" data-assisted-edit-trigger="1" title="Modifier" aria-label="Modifier ce champ">✎</button>
+        </div>
+      </section>
+    `;
+  }
+
   function bindEditors(herb){
     document.querySelectorAll("[data-pharma-image-input]").forEach(input => {
       input.addEventListener("change", () => {
@@ -278,6 +345,14 @@
 
         if(field === "notes"){
           setStoredValue(NOTES_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "formules"){
+          setStoredValue(FORMULES_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "precaution"){
+          setStoredValue(PRECAUTION_STORAGE_PREFIX, herb.id, textarea.value);
         }
 
         document.dispatchEvent(new CustomEvent("pharma-herb-edited", {
@@ -371,6 +446,36 @@
       })}
 
       ${sections.map(([title, value]) => renderInfoSection(title, value)).join("")}
+
+      ${renderEditableBlock({
+        title:"Précaution",
+        value:getHerbPrecaution(herb),
+        placeholder:"Précautions personnelles…",
+        field:"precaution"
+      })}
+
+      ${renderAssistedEditableBlock({
+        title:"Associations",
+        value:getHerbAssociations(herb),
+        placeholder:"Associations…",
+        field:"associations",
+        herb
+      })}
+
+      ${renderAssistedEditableBlock({
+        title:"VS.",
+        value:getHerbVs(herb),
+        placeholder:"Comparaisons…",
+        field:"vs",
+        herb
+      })}
+
+      ${renderEditableBlock({
+        title:"Formules",
+        value:getHerbFormules(herb),
+        placeholder:"Formules contenant cette substance…",
+        field:"formules"
+      })}
 
       ${renderEditableBlock({
         title:"Notes personnelles",
