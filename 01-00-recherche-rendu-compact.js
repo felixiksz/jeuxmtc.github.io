@@ -71,6 +71,8 @@
           <label><input type="checkbox" name="advancedSearchScope" value="functions" ${searchScopeChecked(currentFilters.scopes,"functions")} onchange="renderAdvancedSearchResults()"> fonctions</label>
           <label><input type="checkbox" name="advancedSearchScope" value="indications" ${searchScopeChecked(currentFilters.scopes,"indications")} onchange="renderAdvancedSearchResults()"> indications</label>
           <label><input type="checkbox" name="advancedSearchScope" value="notes" ${searchScopeChecked(currentFilters.scopes,"notes")} onchange="renderAdvancedSearchResults()"> notes</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="precautions" ${searchScopeChecked(currentFilters.scopes,"precautions")} onchange="renderAdvancedSearchResults()"> précautions</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="formules" ${searchScopeChecked(currentFilters.scopes,"formules")} onchange="renderAdvancedSearchResults()"> formules</label>
         </div>
 
         <div class="search-control search-correspondence-control">
