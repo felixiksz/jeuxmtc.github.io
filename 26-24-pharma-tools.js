@@ -10,7 +10,9 @@
   const SLOT_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const ESPRIT_STORAGE_PREFIX = "mtc_pharma_herb_esprit_";
   const NOTES_STORAGE_PREFIX = "mtc_pharma_herb_notes_";
-  const SEARCH_SCOPES = ["name", "class", "nature", "saveur", "toxicity", "tropism", "actions", "notes"];
+  const FORMULES_STORAGE_PREFIX = "mtc_pharma_herb_formules_";
+  const PRECAUTION_STORAGE_PREFIX = "mtc_pharma_herb_precaution_";
+  const SEARCH_SCOPES = ["name", "class", "nature", "saveur", "toxicity", "tropism", "actions", "notes", "precautions", "formules"];
   let pendingPharmaSearchFilterRequest = null;
 
   const previous = {
@@ -164,6 +166,18 @@
     if(!herb) return "";
     const stored = getStoredText(NOTES_STORAGE_PREFIX, herb.id);
     return stored !== null ? stored : "";
+  }
+
+  function getHerbSearchFormules(herb){
+    if(!herb) return "";
+    const stored = getStoredText(FORMULES_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.formules || herb.formulas || herb.formule || "");
+  }
+
+  function getHerbSearchPrecautions(herb){
+    if(!herb) return "";
+    const stored = getStoredText(PRECAUTION_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.precaution || herb.precautions || "");
   }
 
   function splitValues(value){
@@ -771,6 +785,8 @@
     if(scope === "tropism") return fieldTokenLabels("tropism", herb).join(" ");
     if(scope === "actions") return Array.isArray(herb?.actions) ? herb.actions.concat(herb.actions.flatMap(action => canonicalActionEntries(action).map(entry => entry.label))).join(" ") : "";
     if(scope === "notes") return [herb?.esprit || "", getHerbEsprit(herb), getHerbNotes(herb)].join(" ");
+    if(scope === "precautions") return getHerbSearchPrecautions(herb);
+    if(scope === "formules") return getHerbSearchFormules(herb);
     return "";
   }
 
@@ -832,7 +848,7 @@
       </div>
 
       <p class="stats-intro">
-        Recherche une substance médicinale par nom, classe, nature, saveur, toxicité, tropisme ou action.
+        Recherche une substance médicinale par nom, classe, nature, saveur, toxicité, tropisme, action, notes, précautions ou formules.
       </p>
 
       <div class="search-controls pharma-search-controls">
@@ -857,6 +873,8 @@
           ${scopeCheckboxHtml("tropism", "tropisme", filters.scopes)}
           ${scopeCheckboxHtml("actions", "actions", filters.scopes)}
           ${scopeCheckboxHtml("notes", "esprit/notes", filters.scopes)}
+          ${scopeCheckboxHtml("precautions", "précautions", filters.scopes)}
+          ${scopeCheckboxHtml("formules", "formules", filters.scopes)}
         </div>
 
         <label class="search-control">
