@@ -4,6 +4,8 @@
 
   const ACU_KEY = "connections_mtc_comparison_points_v1";
   const PHARMA_KEY = "mtc_pharma_comparison_slots_v1";
+  const ROW_ORDER_ACU_KEY = "mtc_compare_row_order_acu_v1";
+  const ROW_ORDER_PHARMA_KEY = "mtc_compare_row_order_pharma_v1";
   const SLOT_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
   const PHARMA_NOTES_PREFIX = "mtc_pharma_herb_notes_";
@@ -67,6 +69,16 @@
     const clean = cleanValue(value);
     if(!clean) return `<span class="mtc-compare-empty">—</span>`;
     return esc(clean).replace(/\n/g,"<br>");
+  }
+
+  function compareRowKey(label, opts){
+    const base = opts?.rowKey || opts?.rowKind || label || "ligne";
+    return String(base)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("fr-FR")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "ligne";
   }
 
   function slotLabel(index){
@@ -336,16 +348,18 @@
     const opts = options || {};
     const indexClass = (opts.rowIndex || 0) % 2 ? "mtc-compare-row-odd" : "mtc-compare-row-even";
     const rowKind = opts.rowKind ? `mtc-compare-row-${opts.rowKind}` : "";
+    const rowKey = compareRowKey(label, opts);
+    const dragTitle = "Glisser pour déplacer cette ligne";
     return `
-      <div class="mtc-compare-row-label ${indexClass} ${rowKind} ${opts.rowClass || ""}">${esc(label)}</div>
+      <div class="mtc-compare-row-label ${indexClass} ${rowKind} ${opts.rowClass || ""}" data-mtc-compare-row-key="${attr(rowKey)}" draggable="true" title="${attr(dragTitle)}">${esc(label)}</div>
       ${slots.map((slot, localIndex) => {
         const value = getter(slot, localIndex, slots);
         const html = opts.html ? String(value || `<span class="mtc-compare-empty">—</span>`) : displayValue(value);
         const columnStyle = opts.columnStyle ? (opts.columnStyle(slot, localIndex, slots) || "") : "";
         const gradientClass = columnStyle ? "has-column-gradient" : "";
-        return `<div class="mtc-compare-cell ${indexClass} ${rowKind} ${opts.cellClass || ""} ${gradientClass}" style="${attr(columnStyle)}">${html}</div>`;
+        return `<div class="mtc-compare-cell ${indexClass} ${rowKind} ${opts.cellClass || ""} ${gradientClass}" data-mtc-compare-row-key="${attr(rowKey)}" style="${attr(columnStyle)}">${html}</div>`;
       }).join("")}
-      ${opts.addEmptyColumn ? `<div class="mtc-compare-cell ${indexClass} ${rowKind} mtc-compare-add-cell"></div>` : ""}
+      ${opts.addEmptyColumn ? `<div class="mtc-compare-cell ${indexClass} ${rowKind} mtc-compare-add-cell" data-mtc-compare-row-key="${attr(rowKey)}"></div>` : ""}
     `;
   }
 
@@ -359,15 +373,16 @@
       const unique = count === 1;
       const indexClass = ((startIndex || 0) + i) % 2 ? "mtc-compare-row-odd" : "mtc-compare-row-even";
       const stateClass = unique ? "is-unique" : (distinct ? "is-distinct" : "is-common");
+      const rowKey = `fonction-${action.key}`;
       return `
-        <div class="mtc-compare-row-label mtc-compare-action-label ${indexClass} ${stateClass}">${esc(action.label)}</div>
+        <div class="mtc-compare-row-label mtc-compare-action-label ${indexClass} ${stateClass}" data-mtc-compare-row-key="${attr(rowKey)}" draggable="true" title="Glisser pour déplacer cette ligne">${esc(action.label)}</div>
         ${slots.map((slot, localIndex) => {
           const yes = hasAction(slot, action.key, actionGetter);
           const columnStyle = opts.columnStyle ? (opts.columnStyle(slot, localIndex, slots) || "") : "";
           const gradientClass = columnStyle ? "has-column-gradient" : "";
-          return `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} ${stateClass} ${gradientClass}" style="${attr(columnStyle)}">${yes ? `<span class="mtc-compare-x ${stateClass}">X</span>` : ""}</div>`;
+          return `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} ${stateClass} ${gradientClass}" data-mtc-compare-row-key="${attr(rowKey)}" style="${attr(columnStyle)}">${yes ? `<span class="mtc-compare-x ${stateClass}">X</span>` : ""}</div>`;
         }).join("")}
-        ${opts.addEmptyColumn ? `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} mtc-compare-add-cell"></div>` : ""}
+        ${opts.addEmptyColumn ? `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} mtc-compare-add-cell" data-mtc-compare-row-key="${attr(rowKey)}"></div>` : ""}
       `;
     }).join("");
   }
@@ -674,6 +689,8 @@
       </div>
     `;
 
+    applySavedComparisonRowOrder();
+
     if(typeof window.enhancePointReferencesInPanel === "function"){
       window.enhancePointReferencesInPanel(content);
     }
@@ -949,6 +966,7 @@
         </div>
       </div>
     `;
+    applySavedComparisonRowOrder();
   }
 
   window.clearComparisonPanelClean = function(event){
@@ -1155,9 +1173,72 @@
     return true;
   }
 
+  function cssEscape(value){
+    const textValue = String(value == null ? "" : value);
+    if(window.CSS && typeof window.CSS.escape === "function") return window.CSS.escape(textValue);
+    return textValue.replace(/[^a-zA-Z0-9_-]/g, ch => "\\" + ch);
+  }
+
   function compactIdsFromStorage(key){
     const raw = readJson(key, []);
     return (Array.isArray(raw) ? raw : []).map(item => String(item || "")).filter(Boolean);
+  }
+
+  function rowOrderStorageKey(){
+    return isPharma() ? ROW_ORDER_PHARMA_KEY : ROW_ORDER_ACU_KEY;
+  }
+
+  function getCurrentRowKeys(matrix){
+    if(!matrix) return [];
+    const keys = [];
+    matrix.querySelectorAll(":scope > .mtc-compare-row-label[data-mtc-compare-row-key]").forEach(label => {
+      const key = label.getAttribute("data-mtc-compare-row-key") || "";
+      if(key && !keys.includes(key)) keys.push(key);
+    });
+    return keys;
+  }
+
+  function saveCurrentRowOrder(matrix){
+    const keys = getCurrentRowKeys(matrix);
+    if(!keys.length) return;
+    try{ localStorage.setItem(rowOrderStorageKey(), JSON.stringify(keys)); }catch(error){}
+  }
+
+  function rowNodesForKey(matrix, key){
+    if(!matrix || !key) return [];
+    return Array.from(matrix.querySelectorAll(`:scope > [data-mtc-compare-row-key="${cssEscape(String(key))}"]`));
+  }
+
+  function applySavedComparisonRowOrder(){
+    const matrix = document.querySelector("#comparisonPanelContent .mtc-compare-matrix");
+    if(!matrix) return;
+    const current = getCurrentRowKeys(matrix);
+    if(!current.length) return;
+    const saved = readJson(rowOrderStorageKey(), []);
+    const order = Array.isArray(saved)
+      ? saved.map(item => String(item || "")).filter(key => current.includes(key))
+      : [];
+    current.forEach(key => { if(!order.includes(key)) order.push(key); });
+    if(!order.length) return;
+    const fragment = document.createDocumentFragment();
+    order.forEach(key => rowNodesForKey(matrix, key).forEach(node => fragment.appendChild(node)));
+    matrix.appendChild(fragment);
+  }
+
+  function moveComparisonRow(fromKey, toKey, beforeTarget){
+    const matrix = document.querySelector("#comparisonPanelContent .mtc-compare-matrix");
+    if(!matrix || !fromKey || !toKey || fromKey === toKey) return;
+    const keys = getCurrentRowKeys(matrix);
+    const from = keys.indexOf(fromKey);
+    const to = keys.indexOf(toKey);
+    if(from < 0 || to < 0) return;
+    const [moved] = keys.splice(from, 1);
+    let insertAt = keys.indexOf(toKey);
+    if(insertAt < 0) insertAt = keys.length;
+    if(!beforeTarget) insertAt += 1;
+    keys.splice(insertAt, 0, moved);
+    try{ localStorage.setItem(rowOrderStorageKey(), JSON.stringify(keys)); }catch(error){}
+    applySavedComparisonRowOrder();
   }
 
   function reorderComparisonIds(fromId, toId){
@@ -1175,6 +1256,17 @@
   }
 
   document.addEventListener("dragstart", event => {
+    const rowLabel = event.target?.closest?.(".mtc-compare-row-label[draggable='true'][data-mtc-compare-row-key]");
+    if(rowLabel){
+      rowLabel.classList.add("is-row-dragging");
+      try{
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("application/x-mtc-row-key", rowLabel.getAttribute("data-mtc-compare-row-key") || "");
+        event.dataTransfer.setData("text/plain", rowLabel.getAttribute("data-mtc-compare-row-key") || "");
+      }catch(error){}
+      return;
+    }
+
     const header = event.target?.closest?.(".mtc-compare-header[draggable='true'][data-compare-id]");
     if(!header) return;
     header.classList.add("is-dragging");
@@ -1186,9 +1278,21 @@
 
   document.addEventListener("dragend", event => {
     event.target?.closest?.(".mtc-compare-header")?.classList.remove("is-dragging");
+    event.target?.closest?.(".mtc-compare-row-label")?.classList.remove("is-row-dragging");
+    document.querySelectorAll(".mtc-compare-row-label.is-row-drag-over").forEach(node => node.classList.remove("is-row-drag-over", "is-row-drag-after"));
   });
 
   document.addEventListener("dragover", event => {
+    const rowLabel = event.target?.closest?.(".mtc-compare-row-label[data-mtc-compare-row-key]");
+    if(rowLabel){
+      event.preventDefault();
+      const rect = rowLabel.getBoundingClientRect();
+      const after = event.clientY > rect.top + rect.height / 2;
+      rowLabel.classList.add("is-row-drag-over");
+      rowLabel.classList.toggle("is-row-drag-after", after);
+      return;
+    }
+
     const header = event.target?.closest?.(".mtc-compare-header[draggable='true'][data-compare-id]");
     if(!header) return;
     event.preventDefault();
@@ -1197,9 +1301,22 @@
 
   document.addEventListener("dragleave", event => {
     event.target?.closest?.(".mtc-compare-header")?.classList.remove("is-drag-over");
+    event.target?.closest?.(".mtc-compare-row-label")?.classList.remove("is-row-drag-over", "is-row-drag-after");
   });
 
   document.addEventListener("drop", event => {
+    const rowLabel = event.target?.closest?.(".mtc-compare-row-label[data-mtc-compare-row-key]");
+    if(rowLabel){
+      event.preventDefault();
+      let fromKey = "";
+      try{ fromKey = event.dataTransfer.getData("application/x-mtc-row-key") || ""; }catch(error){}
+      const toKey = rowLabel.getAttribute("data-mtc-compare-row-key") || "";
+      const after = rowLabel.classList.contains("is-row-drag-after");
+      rowLabel.classList.remove("is-row-drag-over", "is-row-drag-after");
+      moveComparisonRow(fromKey, toKey, !after);
+      return;
+    }
+
     const header = event.target?.closest?.(".mtc-compare-header[draggable='true'][data-compare-id]");
     if(!header) return;
     event.preventDefault();
@@ -1625,6 +1742,24 @@
       else if(typeof window.openPointPanel === "function") window.openPointPanel(point);
     }
   });
+
+
+
+  let mtcComparisonCleanRerenderQueued = false;
+  function requestCleanComparisonRerender(){
+    if(mtcComparisonCleanRerenderQueued) return;
+    mtcComparisonCleanRerenderQueued = true;
+    setTimeout(() => {
+      mtcComparisonCleanRerenderQueued = false;
+      const panel = byId("comparisonPanel");
+      if(panel && panel.classList.contains("open")){
+        window.renderComparisonPanel();
+      }
+    }, 0);
+  }
+
+  document.addEventListener("pharma-herb-edited", requestCleanComparisonRerender);
+  document.addEventListener("acu-point-edited", requestCleanComparisonRerender);
 
   const previousStartTour = window.startTour;
   if(typeof previousStartTour === "function"){
