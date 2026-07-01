@@ -122,9 +122,15 @@
     const visible = domain === "acupuncture" || domain === "pharmacology";
     wrap.hidden = !visible;
     wrap.classList.toggle("is-hidden", !visible);
-    if(!visible) return;
+    if(!visible){
+      document.documentElement.removeAttribute("data-mtc-gameplay-mode");
+      document.documentElement.classList.remove("mtc-gameplay-exam-active");
+      return;
+    }
 
     const mode = currentModeForDomain(domain);
+    document.documentElement.setAttribute("data-mtc-gameplay-mode", mode);
+    document.documentElement.classList.toggle("mtc-gameplay-exam-active", mode === "exam");
     review.classList.toggle("active", mode === "review");
     exam.classList.toggle("active", mode === "exam");
     review.setAttribute("aria-pressed", mode === "review" ? "true" : "false");
