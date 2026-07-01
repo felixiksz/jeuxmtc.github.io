@@ -436,6 +436,8 @@ function renderAdvancedSearchPanel(){
         <label><input type="checkbox" name="advancedSearchScope" value="functions" ${searchScopeChecked(currentFilters.scopes,"functions")} onchange="renderAdvancedSearchResults()"> fonctions</label>
         <label><input type="checkbox" name="advancedSearchScope" value="indications" ${searchScopeChecked(currentFilters.scopes,"indications")} onchange="renderAdvancedSearchResults()"> indications</label>
         <label><input type="checkbox" name="advancedSearchScope" value="notes" ${searchScopeChecked(currentFilters.scopes,"notes")} onchange="renderAdvancedSearchResults()"> notes</label>
+        <label><input type="checkbox" name="advancedSearchScope" value="precautions" ${searchScopeChecked(currentFilters.scopes,"precautions")} onchange="renderAdvancedSearchResults()"> précautions</label>
+        <label><input type="checkbox" name="advancedSearchScope" value="formules" ${searchScopeChecked(currentFilters.scopes,"formules")} onchange="renderAdvancedSearchResults()"> formules</label>
       </div>
 
       <label class="search-control">
@@ -1685,7 +1687,7 @@ function pointCategoryNames(point){
     .map(cat => cat.name || DISPLAY_NAMES[cat.key] || displayLabel(cat.key));
 }
 
-const MTC_SEARCH_SCOPES = ["name", "functions", "indications", "notes"];
+const MTC_SEARCH_SCOPES = ["name", "functions", "indications", "notes", "precautions", "formules"];
 
 function pointNameSearchText(point){
   const details = POINT_DETAILS[point] || {};
@@ -1719,17 +1721,40 @@ function pointNotesSearchText(point){
   return getEditablePointNote(point, details.notes || "");
 }
 
+function pointLocalStorageText(prefix, point){
+  try{
+    const value = localStorage.getItem(prefix + String(point || ""));
+    return value === null ? "" : value;
+  }catch(error){
+    return "";
+  }
+}
+
+function pointPrecautionsSearchText(point){
+  const details = POINT_DETAILS[point] || {};
+  return pointLocalStorageText("mtc_point_precaution_", point) || details.precaution || details.precautions || "";
+}
+
+function pointFormulesSearchText(point){
+  const details = POINT_DETAILS[point] || {};
+  return pointLocalStorageText("mtc_point_formules_", point) || details.formules || details.formulas || details.formule || "";
+}
+
 function pointSearchTextForScope(point, scope){
   if(scope === "name") return pointNameSearchText(point);
   if(scope === "functions") return pointFunctionsSearchText(point);
   if(scope === "indications") return pointIndicationsSearchText(point);
   if(scope === "notes") return pointNotesSearchText(point);
+  if(scope === "precautions") return pointPrecautionsSearchText(point);
+  if(scope === "formules") return pointFormulesSearchText(point);
 
   return [
     pointNameSearchText(point),
     pointFunctionsSearchText(point),
     pointIndicationsSearchText(point),
     pointNotesSearchText(point),
+    pointPrecautionsSearchText(point),
+    pointFormulesSearchText(point),
     pointCategoryNames(point).join(" "),
     CANAL_LABELS[canalOfPoint(point)] || ""
   ].join(" ");
@@ -2101,6 +2126,8 @@ function renderAdvancedSearchPanel(){
         <label><input type="checkbox" name="advancedSearchScope" value="functions" ${searchScopeChecked(currentFilters.scopes,"functions")} onchange="renderAdvancedSearchResults()"> fonctions</label>
         <label><input type="checkbox" name="advancedSearchScope" value="indications" ${searchScopeChecked(currentFilters.scopes,"indications")} onchange="renderAdvancedSearchResults()"> indications</label>
         <label><input type="checkbox" name="advancedSearchScope" value="notes" ${searchScopeChecked(currentFilters.scopes,"notes")} onchange="renderAdvancedSearchResults()"> notes</label>
+        <label><input type="checkbox" name="advancedSearchScope" value="precautions" ${searchScopeChecked(currentFilters.scopes,"precautions")} onchange="renderAdvancedSearchResults()"> précautions</label>
+        <label><input type="checkbox" name="advancedSearchScope" value="formules" ${searchScopeChecked(currentFilters.scopes,"formules")} onchange="renderAdvancedSearchResults()"> formules</label>
       </div>
 
       <label class="search-control">
