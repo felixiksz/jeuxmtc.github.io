@@ -4,13 +4,22 @@
 (function(){
   "use strict";
 
+  const HANZI_STORAGE_PREFIX = "mtc_pharma_herb_hanzi_";
   const ESPRIT_STORAGE_PREFIX = "mtc_pharma_herb_esprit_";
   const NOTES_STORAGE_PREFIX = "mtc_pharma_herb_notes_";
   const ASSOCIATIONS_STORAGE_PREFIX = "mtc_pharma_herb_associations_";
   const FORMULES_STORAGE_PREFIX = "mtc_pharma_herb_formules_";
   const VS_STORAGE_PREFIX = "mtc_pharma_herb_vs_";
   const PRECAUTION_STORAGE_PREFIX = "mtc_pharma_herb_precaution_";
+  const SYNONYMES_STORAGE_PREFIX = "mtc_pharma_herb_synonymes_";
+  const SYNTHESE_STORAGE_PREFIX = "mtc_pharma_herb_synthese_";
+  const INGREDIENTS_STORAGE_PREFIX = "mtc_pharma_herb_ingredients_";
+  const RECHERCHES_MODERNES_STORAGE_PREFIX = "mtc_pharma_herb_recherches_modernes_";
+  const INDICATIONS_STORAGE_PREFIX = "mtc_pharma_herb_indications_";
+  const CONTRE_INDICATIONS_STORAGE_PREFIX = "mtc_pharma_herb_contre_indications_";
+  const PREPARATION_STORAGE_PREFIX = "mtc_pharma_herb_preparation_";
   const IMAGE_STORAGE_PREFIX = "mtc_pharma_herb_image_";
+  let currentOpenHerbId = "";
 
   function isPharmaDomain(){
     return document.documentElement.getAttribute("data-study-domain") === "pharmacology";
@@ -126,6 +135,12 @@
     }
   }
 
+  function getHerbHanzi(herb){
+    if(!herb) return "";
+    const stored = getStoredValue(HANZI_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.hanzi || "");
+  }
+
   function getHerbEsprit(herb){
     const stored = getStoredValue(ESPRIT_STORAGE_PREFIX, herb.id);
     return stored !== null ? stored : (herb.esprit || "");
@@ -154,6 +169,61 @@
   function getHerbPrecaution(herb){
     const stored = getStoredValue(PRECAUTION_STORAGE_PREFIX, herb.id);
     return stored !== null ? stored : (herb.precaution || herb.precautions || "");
+  }
+
+  function getHerbSynonymes(herb){
+    const stored = getStoredValue(SYNONYMES_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.synonymes || herb.synonyms || herb.noms_alternatifs || "");
+  }
+
+  function getHerbSynthese(herb){
+    const stored = getStoredValue(SYNTHESE_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.synthese || herb.synthèse || "");
+  }
+
+  function getHerbIngredients(herb){
+    const stored = getStoredValue(INGREDIENTS_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.ingredients || herb.ingrédients || "");
+  }
+
+  function getHerbRecherchesModernes(herb){
+    const stored = getStoredValue(RECHERCHES_MODERNES_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.recherches_modernes || herb.recherche_moderne || herb.modern_research || "");
+  }
+
+  function mergeStaticAndLocal(staticValue, localValue){
+    const staticText = normalizeMultiline(staticValue);
+    const localText = normalizeMultiline(localValue);
+    if(!staticText) return localText;
+    if(!localText) return staticText;
+    const normalize = value => String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("fr-FR")
+      .replace(/\s+/g, " ")
+      .trim();
+    const staticKey = normalize(staticText);
+    const localKey = normalize(localText);
+    if(staticKey === localKey || staticKey.includes(localKey)) return staticText;
+    if(localKey.includes(staticKey)) return localText;
+    return `${staticText}\n\n${localText}`;
+  }
+
+  function getMergedStoredOrStatic(prefix, herb, staticValue){
+    const stored = getStoredValue(prefix, herb.id);
+    return stored !== null ? mergeStaticAndLocal(staticValue, stored) : normalizeMultiline(staticValue);
+  }
+
+  function getHerbIndicationsLocales(herb){
+    return getMergedStoredOrStatic(INDICATIONS_STORAGE_PREFIX, herb, herb.indications || herb.indications_locales || herb.indications_complementaires || "");
+  }
+
+  function getHerbContreIndicationsLocales(herb){
+    return getMergedStoredOrStatic(CONTRE_INDICATIONS_STORAGE_PREFIX, herb, herb.contre_indications || herb.contraindications || herb.contre_indications_locales || herb.contraindications_locales || "");
+  }
+
+  function getHerbPreparationLocale(herb){
+    return getMergedStoredOrStatic(PREPARATION_STORAGE_PREFIX, herb, herb.preparation || herb.préparation || herb.preparation_locale || herb.preparation_complementaire || "");
   }
 
   function normalizeMultiline(value){
@@ -355,6 +425,34 @@
           setStoredValue(PRECAUTION_STORAGE_PREFIX, herb.id, textarea.value);
         }
 
+        if(field === "synonymes"){
+          setStoredValue(SYNONYMES_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "synthese"){
+          setStoredValue(SYNTHESE_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "ingredients"){
+          setStoredValue(INGREDIENTS_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "recherches_modernes"){
+          setStoredValue(RECHERCHES_MODERNES_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "indications"){
+          setStoredValue(INDICATIONS_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "contre_indications"){
+          setStoredValue(CONTRE_INDICATIONS_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
+        if(field === "preparation"){
+          setStoredValue(PREPARATION_STORAGE_PREFIX, herb.id, textarea.value);
+        }
+
         document.dispatchEvent(new CustomEvent("pharma-herb-edited", {
           detail:{herbId:herb.id, field}
         }));
@@ -385,6 +483,7 @@
 
   function openPharmaHerbPanel(herbId){
     if(!isPharmaDomain()) return;
+    currentOpenHerbId = String(herbId || "");
 
     const herb = getHerbById(herbId);
 
@@ -399,7 +498,7 @@
     }
 
     const pinyin = getHerbLabel(herb);
-    const hanzi = herb.hanzi || "";
+    const hanzi = getHerbHanzi(herb);
     const nom = herb.nom || "";
 
     const natureLabels = [getDisplayFieldLabels("nature", herb, herb.nature), getDisplayFieldLabels("toxicity", herb, "")]
@@ -413,10 +512,7 @@
       ["Saveur", getDisplayFieldLabels("saveur", herb, herb.saveur)],
       ["Tropisme", getDisplayFieldLabels("tropism", herb, herb.tropisme)],
       ["Posologie", herb.posologie],
-      ["Actions", herb.actions],
-      ["Indications", herb.indications],
-      ["Contre-indications", herb.contre_indications || herb.contraindications],
-      ["Préparation", herb.preparation]
+      ["Actions", herb.actions]
     ];
 
     const html = `
@@ -448,9 +544,23 @@
       ${sections.map(([title, value]) => renderInfoSection(title, value)).join("")}
 
       ${renderEditableBlock({
+        title:"Indications",
+        value:getHerbIndicationsLocales(herb),
+        placeholder:"Indications complémentaires ou scénarios cliniques…",
+        field:"indications"
+      })}
+
+      ${renderEditableBlock({
+        title:"Contre-indications",
+        value:getHerbContreIndicationsLocales(herb),
+        placeholder:"Contre-indications complémentaires…",
+        field:"contre_indications"
+      })}
+
+      ${renderEditableBlock({
         title:"Précaution",
         value:getHerbPrecaution(herb),
-        placeholder:"Précautions personnelles…",
+        placeholder:"Grossesse, vide de yin, chaleur, anticoagulants, usage prolongé…",
         field:"precaution"
       })}
 
@@ -478,15 +588,55 @@
       })}
 
       ${renderEditableBlock({
-        title:"Notes personnelles",
+        title:"Recherches modernes",
+        value:getHerbRecherchesModernes(herb),
+        placeholder:"Données modernes, effets étudiés, limites…",
+        field:"recherches_modernes"
+      })}
+
+      ${renderEditableBlock({
+        title:"Ingrédients",
+        value:getHerbIngredients(herb),
+        placeholder:"Ingrédients, partie utilisée, composants notables…",
+        field:"ingredients"
+      })}
+
+      ${renderEditableBlock({
+        title:"Préparation",
+        value:getHerbPreparationLocale(herb),
+        placeholder:"Préparation, décoction, poudres, ajout en fin de cuisson…",
+        field:"preparation"
+      })}
+
+      ${renderEditableBlock({
+        title:"Synonymes",
+        value:getHerbSynonymes(herb),
+        placeholder:"Nom latin, nom pharmaceutique, variantes de pinyin…",
+        field:"synonymes"
+      })}
+
+      ${renderEditableBlock({
+        title:"Notes",
         value:getHerbNotes(herb),
         placeholder:"Ajouter une note personnelle…",
         field:"notes"
+      })}
+
+      ${renderEditableBlock({
+        title:"Synthèse ZL",
+        value:getHerbSynthese(herb),
+        placeholder:"Synthése de l'École Zhōng Lì",
+        field:"synthese"
       })}
     `;
 
     openPanelWithContent(html, herb);
   }
+
+  window.getPharmaHerbHanzi = function(herbId){
+    const herb = getHerbById(herbId);
+    return herb ? getHerbHanzi(herb) : "";
+  };
 
   window.getPharmaHerbImage = function(herbId){
     const herb = getHerbById(herbId);
@@ -499,4 +649,8 @@
   };
 
   window.openPharmaHerbPanel = openPharmaHerbPanel;
+  window.refreshCurrentPharmaHerbPanel = function(){
+    if(!isPharmaDomain() || !currentOpenHerbId) return;
+    openPharmaHerbPanel(currentOpenHerbId);
+  };
 })();

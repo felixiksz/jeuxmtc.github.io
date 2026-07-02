@@ -7,12 +7,20 @@
   const ACU_ASSOC_PREFIX = "mtc_point_associations_";
   const ACU_VS_PREFIX = "mtc_point_vs_";
   const ACU_PRECAUTION_PREFIX = "mtc_point_precaution_";
+  const PHARMA_HANZI_PREFIX = "mtc_pharma_herb_hanzi_";
   const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
   const PHARMA_NOTE_PREFIX = "mtc_pharma_herb_notes_";
   const PHARMA_ASSOC_PREFIX = "mtc_pharma_herb_associations_";
   const PHARMA_FORMULES_PREFIX = "mtc_pharma_herb_formules_";
   const PHARMA_VS_PREFIX = "mtc_pharma_herb_vs_";
   const PHARMA_PRECAUTION_PREFIX = "mtc_pharma_herb_precaution_";
+  const PHARMA_SYNONYMES_PREFIX = "mtc_pharma_herb_synonymes_";
+  const PHARMA_SYNTHESE_PREFIX = "mtc_pharma_herb_synthese_";
+  const PHARMA_INGREDIENTS_PREFIX = "mtc_pharma_herb_ingredients_";
+  const PHARMA_RECHERCHES_MODERNES_PREFIX = "mtc_pharma_herb_recherches_modernes_";
+  const PHARMA_INDICATIONS_PREFIX = "mtc_pharma_herb_indications_";
+  const PHARMA_CONTRE_INDICATIONS_PREFIX = "mtc_pharma_herb_contre_indications_";
+  const PHARMA_PREPARATION_PREFIX = "mtc_pharma_herb_preparation_";
   const PHARMA_IMAGE_PREFIX = "mtc_pharma_herb_image_";
 
   const previous = {
@@ -88,12 +96,20 @@
       ACU_ASSOC_PREFIX,
       ACU_VS_PREFIX,
       ACU_PRECAUTION_PREFIX,
+      PHARMA_HANZI_PREFIX,
       PHARMA_ESPRIT_PREFIX,
       PHARMA_NOTE_PREFIX,
       PHARMA_ASSOC_PREFIX,
       PHARMA_FORMULES_PREFIX,
       PHARMA_VS_PREFIX,
       PHARMA_PRECAUTION_PREFIX,
+      PHARMA_SYNONYMES_PREFIX,
+      PHARMA_SYNTHESE_PREFIX,
+      PHARMA_INGREDIENTS_PREFIX,
+      PHARMA_RECHERCHES_MODERNES_PREFIX,
+      PHARMA_INDICATIONS_PREFIX,
+      PHARMA_CONTRE_INDICATIONS_PREFIX,
+      PHARMA_PREPARATION_PREFIX,
       PHARMA_IMAGE_PREFIX
     ];
   }
@@ -284,17 +300,100 @@
   function findImportHerb(label){
     const clean = String(label || "").trim();
     if(!clean) return null;
-    return pharmaHerbsForImport().find(herb => herbMatchesImportLabel(herb, clean)) || null;
+    const direct = pharmaHerbsForImport().find(herb => herbMatchesImportLabel(herb, clean));
+    if(direct) return direct;
+
+    // Tolérance utile pour les imports issus de tableaux :
+    // 芥子 doit pouvoir retrouver 白芥子, etc.
+    if(/[\u3400-\u9fff]/.test(clean)){
+      return pharmaHerbsForImport().find(herb => {
+        const hz = String((herb && herb.hanzi) || "").trim();
+        return hz && (hz === clean || hz.endsWith(clean) || clean.endsWith(hz));
+      }) || null;
+    }
+    return null;
   }
 
-  function setPrefixedValues(prefix, values){
+  function normalizeMergeText(value){
+    return String(value ?? "")
+      .replace(/\r\n/g,"\n")
+      .replace(/\r/g,"\n")
+      .replace(/\n{3,}/g,"\n\n")
+      .trim();
+  }
+
+  function normalizeMergeKey(value){
+    return normalizeMergeText(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("fr-FR")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isPlaceholderLocalValue(field, id, existing){
+    const clean = normalizeMergeText(existing);
+    if(!clean) return true;
+    const key = normalizeMergeKey(clean).replace(/\s+/g, "");
+    const herb = findImportHerb(id);
+    const aliases = [
+      id,
+      herb && herb.id,
+      herb && herb.code,
+      herb && herb.pinyin,
+      herb && herb.pinyinSansTons,
+      herb && herb.hanzi,
+      herb && herb.nom
+    ].filter(Boolean).map(value => normalizeMergeKey(value).replace(/\s+/g, ""));
+    if(field === "associations") return aliases.some(alias => key === alias + "+" || key === alias);
+    if(field === "vs") return aliases.some(alias => key === alias + "vs" || key === alias);
+    return false;
+  }
+
+  function mergeLocalValue(prefix, id, incoming, field, options){
+    const next = normalizeMergeText(incoming);
+    if(!next) return false;
+    const storageKey = prefix + id;
+    const shouldReplace = Boolean(options && options.replace);
+    let existing = "";
+    try{ existing = localStorage.getItem(storageKey) || ""; }catch(error){}
+    const current = normalizeMergeText(existing);
+    let merged = next;
+    if(shouldReplace){
+      try{
+        if(current === next) return false;
+        localStorage.setItem(storageKey, next);
+        return true;
+      }catch(error){
+        return false;
+      }
+    }
+    if(current && !isPlaceholderLocalValue(field, id, current)){
+      const currentKey = normalizeMergeKey(current);
+      const nextKey = normalizeMergeKey(next);
+      if(currentKey === nextKey || currentKey.includes(nextKey)) return false;
+      if(nextKey.includes(currentKey)) merged = next;
+      else merged = `${current}\n\n${next}`;
+    }
+    try{
+      localStorage.setItem(storageKey, merged);
+      return true;
+    }catch(error){
+      return false;
+    }
+  }
+
+  function setPrefixedValues(prefix, values, field, options){
     if(!values || typeof values !== "object") return 0;
     let count = 0;
-    Object.entries(values).forEach(([id, value]) => {
-      try{
-        localStorage.setItem(prefix + id, String(value ?? ""));
-        count++;
-      }catch(error){}
+    Object.entries(values).forEach(([rawId, value]) => {
+      // Solution robuste : dans les imports, on accepte l’ID interne (PT4),
+      // le pinyin (Gui Zhi / Guì zhī), le hanzi (桂枝) ou le nom affiché.
+      // Le stockage local, lui, reste toujours indexé par ID interne stable.
+      let id = String(rawId || "").trim();
+      const herb = findImportHerb(id);
+      if(herb && herb.id) id = herb.id;
+      if(mergeLocalValue(prefix, id, value, field || "", options || {})) count++;
     });
     return count;
   }
@@ -381,12 +480,20 @@
         precautions:safeLocalStorageEntries(ACU_PRECAUTION_PREFIX)
       },
       pharmacology:{
+        hanzi:safeLocalStorageEntries(PHARMA_HANZI_PREFIX),
         esprits:safeLocalStorageEntries(PHARMA_ESPRIT_PREFIX),
         notes:safeLocalStorageEntries(PHARMA_NOTE_PREFIX),
         associations:safeLocalStorageEntries(PHARMA_ASSOC_PREFIX),
         formules:safeLocalStorageEntries(PHARMA_FORMULES_PREFIX),
         vs:safeLocalStorageEntries(PHARMA_VS_PREFIX),
         precautions:safeLocalStorageEntries(PHARMA_PRECAUTION_PREFIX),
+        synonymes:safeLocalStorageEntries(PHARMA_SYNONYMES_PREFIX),
+        syntheses:safeLocalStorageEntries(PHARMA_SYNTHESE_PREFIX),
+        ingredients:safeLocalStorageEntries(PHARMA_INGREDIENTS_PREFIX),
+        recherches_modernes:safeLocalStorageEntries(PHARMA_RECHERCHES_MODERNES_PREFIX),
+        indications:safeLocalStorageEntries(PHARMA_INDICATIONS_PREFIX),
+        contre_indications:safeLocalStorageEntries(PHARMA_CONTRE_INDICATIONS_PREFIX),
+        preparations:safeLocalStorageEntries(PHARMA_PREPARATION_PREFIX),
         images:safeLocalStorageEntries(PHARMA_IMAGE_PREFIX)
       }
     };
@@ -400,6 +507,30 @@
       message.textContent = "Export créé : notes, esprits, associations, VS, formules, précautions et images locales.";
     }
   };
+
+
+  function importReplaceFieldSet(parsed, pharma){
+    const officialReplace = new Set(["hanzi", "ingredients", "recherches_modernes", "indications", "contre_indications", "preparation", "synthese"]);
+    const values = [];
+    function addList(list){
+      if(Array.isArray(list)) list.forEach(item => values.push(String(item || "")));
+    }
+    addList(parsed && (parsed.replaceFields || parsed._replaceFields || parsed.importReplaceFields));
+    addList(pharma && (pharma.replaceFields || pharma._replaceFields || pharma.importReplaceFields));
+    const mode = String((parsed && (parsed.importMode || parsed.mode || parsed._importMode)) || "").toLocaleLowerCase("fr-FR");
+    const replaceAllOfficial = mode.includes("replace-official-pharma-xlsx-fields") || values.some(value => value === "official_xlsx" || value === "official-pharma-xlsx");
+    const out = new Set();
+    if(replaceAllOfficial) officialReplace.forEach(field => out.add(field));
+    values.forEach(value => {
+      const clean = String(value || "").trim();
+      if(clean) out.add(clean);
+    });
+    return out;
+  }
+
+  function importFieldOptions(replaceSet, field){
+    return {replace: replaceSet && replaceSet.has(field)};
+  }
 
   window.importPersonalNotesFromFile = function(input){
     const file = input && input.files && input.files[0];
@@ -423,22 +554,31 @@
 
         // Compatibilité avec différents noms possibles venant d’anciens exports.
         if(parsed.acupuncture){
-          count += setPrefixedValues(ACU_NOTE_PREFIX, parsed.acupuncture.notes || parsed.acupuncture.note);
-          count += setPrefixedValues(ACU_ESPRIT_PREFIX, parsed.acupuncture.esprits || parsed.acupuncture.esprit);
-          count += setPrefixedValues(ACU_ASSOC_PREFIX, parsed.acupuncture.associations || parsed.acupuncture.association);
-          count += setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison);
-          count += setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution);
+          count += setPrefixedValues(ACU_NOTE_PREFIX, parsed.acupuncture.notes || parsed.acupuncture.note, "notes");
+          count += setPrefixedValues(ACU_ESPRIT_PREFIX, parsed.acupuncture.esprits || parsed.acupuncture.esprit, "esprit");
+          count += setPrefixedValues(ACU_ASSOC_PREFIX, parsed.acupuncture.associations || parsed.acupuncture.association, "associations");
+          count += setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison, "vs");
+          count += setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution, "precautions");
         }
 
         if(parsed.pharmacology || parsed.pharma || parsed.herbs){
           const pharma = parsed.pharmacology || parsed.pharma || parsed.herbs || {};
-          count += setPrefixedValues(PHARMA_ESPRIT_PREFIX, pharma.esprits || pharma.esprit);
-          count += setPrefixedValues(PHARMA_NOTE_PREFIX, pharma.notes || pharma.note);
-          count += setPrefixedValues(PHARMA_ASSOC_PREFIX, pharma.associations || pharma.association);
-          count += setPrefixedValues(PHARMA_FORMULES_PREFIX, pharma.formules || pharma.formulas || pharma.formule);
-          count += setPrefixedValues(PHARMA_VS_PREFIX, pharma.vs || pharma.comparaisons || pharma.comparison);
-          count += setPrefixedValues(PHARMA_PRECAUTION_PREFIX, pharma.precautions || pharma.precaution);
-          count += setPrefixedValues(PHARMA_IMAGE_PREFIX, pharma.images || pharma.image);
+          const replaceSet = importReplaceFieldSet(parsed, pharma);
+          count += setPrefixedValues(PHARMA_HANZI_PREFIX, pharma.hanzi || pharma.hanzis || pharma.caracteres || pharma.caractères, "hanzi", importFieldOptions(replaceSet, "hanzi"));
+          count += setPrefixedValues(PHARMA_ESPRIT_PREFIX, pharma.esprits || pharma.esprit, "esprit");
+          count += setPrefixedValues(PHARMA_NOTE_PREFIX, pharma.notes || pharma.note, "notes");
+          count += setPrefixedValues(PHARMA_ASSOC_PREFIX, pharma.associations || pharma.association, "associations");
+          count += setPrefixedValues(PHARMA_FORMULES_PREFIX, pharma.formules || pharma.formulas || pharma.formule, "formules");
+          count += setPrefixedValues(PHARMA_VS_PREFIX, pharma.vs || pharma.comparaisons || pharma.comparison, "vs");
+          count += setPrefixedValues(PHARMA_PRECAUTION_PREFIX, pharma.precautions || pharma.precaution, "precautions");
+          count += setPrefixedValues(PHARMA_SYNONYMES_PREFIX, pharma.synonymes || pharma.synonyms || pharma.noms_alternatifs, "synonymes");
+          count += setPrefixedValues(PHARMA_SYNTHESE_PREFIX, pharma.syntheses || pharma.synthèses || pharma.synthese || pharma.synthèse, "synthese", importFieldOptions(replaceSet, "synthese"));
+          count += setPrefixedValues(PHARMA_INGREDIENTS_PREFIX, pharma.ingredients || pharma.ingrédients, "ingredients", importFieldOptions(replaceSet, "ingredients"));
+          count += setPrefixedValues(PHARMA_RECHERCHES_MODERNES_PREFIX, pharma.recherches_modernes || pharma.recherche_moderne || pharma.modern_research, "recherches_modernes", importFieldOptions(replaceSet, "recherches_modernes"));
+          count += setPrefixedValues(PHARMA_INDICATIONS_PREFIX, pharma.indications || pharma.indications_locales || pharma.indications_complementaires, "indications", importFieldOptions(replaceSet, "indications"));
+          count += setPrefixedValues(PHARMA_CONTRE_INDICATIONS_PREFIX, pharma.contre_indications || pharma.contraindications || pharma.contre_indications_locales, "contre_indications", importFieldOptions(replaceSet, "contre_indications"));
+          count += setPrefixedValues(PHARMA_PREPARATION_PREFIX, pharma.preparations || pharma.préparations || pharma.preparation || pharma.préparation, "preparation", importFieldOptions(replaceSet, "preparation"));
+          count += setPrefixedValues(PHARMA_IMAGE_PREFIX, pharma.images || pharma.image, "images");
         }
 
         personalDataImportInProgress = false;
@@ -446,6 +586,7 @@
         if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
         if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
         if(typeof window.refreshCurrentPointPanel === "function") window.refreshCurrentPointPanel();
+        if(typeof window.refreshCurrentPharmaHerbPanel === "function") window.refreshCurrentPharmaHerbPanel();
         document.dispatchEvent(new CustomEvent("pharma-herb-edited", {detail:{field:"import"}}));
         document.dispatchEvent(new CustomEvent("mtc-personal-data-imported", {detail:{count}}));
 

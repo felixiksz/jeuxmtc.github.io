@@ -8,11 +8,19 @@
   const PHARMA_COMPARISON_KEY = "mtc_pharma_comparison_slots_v1";
   const MAX_COMPARISON_SLOTS = 26;
   const SLOT_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const HANZI_STORAGE_PREFIX = "mtc_pharma_herb_hanzi_";
   const ESPRIT_STORAGE_PREFIX = "mtc_pharma_herb_esprit_";
   const NOTES_STORAGE_PREFIX = "mtc_pharma_herb_notes_";
   const FORMULES_STORAGE_PREFIX = "mtc_pharma_herb_formules_";
   const PRECAUTION_STORAGE_PREFIX = "mtc_pharma_herb_precaution_";
-  const SEARCH_SCOPES = ["name", "class", "nature", "saveur", "toxicity", "tropism", "actions", "notes", "precautions", "formules"];
+  const SYNONYMES_STORAGE_PREFIX = "mtc_pharma_herb_synonymes_";
+  const SYNTHESE_STORAGE_PREFIX = "mtc_pharma_herb_synthese_";
+  const INGREDIENTS_STORAGE_PREFIX = "mtc_pharma_herb_ingredients_";
+  const RECHERCHES_MODERNES_STORAGE_PREFIX = "mtc_pharma_herb_recherches_modernes_";
+  const INDICATIONS_STORAGE_PREFIX = "mtc_pharma_herb_indications_";
+  const CONTRE_INDICATIONS_STORAGE_PREFIX = "mtc_pharma_herb_contre_indications_";
+  const PREPARATION_STORAGE_PREFIX = "mtc_pharma_herb_preparation_";
+  const SEARCH_SCOPES = ["name", "synonymes", "class", "nature", "saveur", "toxicity", "tropism", "actions", "indications", "contre_indications", "preparation", "notes", "synthese", "ingredients", "recherches_modernes", "precautions", "formules"];
   let pendingPharmaSearchFilterRequest = null;
 
   const previous = {
@@ -96,7 +104,7 @@
   }
 
   function herbTitle(herb){
-    return [herbLabel(herb), herb?.hanzi || "", herb?.nom || ""].filter(Boolean).join(" · ");
+    return [herbLabel(herb), getHerbHanzi(herb), herb?.nom || ""].filter(Boolean).join(" · ");
   }
 
   function herbMeta(herb){
@@ -156,6 +164,12 @@
     }
   }
 
+  function getHerbHanzi(herb){
+    if(!herb) return "";
+    const stored = getStoredText(HANZI_STORAGE_PREFIX, herb.id);
+    return stored !== null ? stored : (herb.hanzi || "");
+  }
+
   function getHerbEsprit(herb){
     if(!herb) return "";
     const stored = getStoredText(ESPRIT_STORAGE_PREFIX, herb.id);
@@ -177,7 +191,41 @@
   function getHerbSearchPrecautions(herb){
     if(!herb) return "";
     const stored = getStoredText(PRECAUTION_STORAGE_PREFIX, herb.id);
-    return stored !== null ? stored : (herb.precaution || herb.precautions || "");
+    return [herb.precaution || "", herb.precautions || "", stored !== null ? stored : ""].join(" ");
+  }
+
+  function getStoredOrStaticText(prefix, herb, staticValues){
+    if(!herb) return "";
+    const stored = getStoredText(prefix, herb.id);
+    return (Array.isArray(staticValues) ? staticValues : [staticValues]).concat(stored !== null ? [stored] : []).join(" ");
+  }
+
+  function getHerbSearchSynonymes(herb){
+    return getStoredOrStaticText(SYNONYMES_STORAGE_PREFIX, herb, [herb?.synonymes, herb?.synonyms, herb?.noms_alternatifs]);
+  }
+
+  function getHerbSearchSynthese(herb){
+    return getStoredOrStaticText(SYNTHESE_STORAGE_PREFIX, herb, [herb?.synthese, herb?.synthèse]);
+  }
+
+  function getHerbSearchIngredients(herb){
+    return getStoredOrStaticText(INGREDIENTS_STORAGE_PREFIX, herb, [herb?.ingredients, herb?.ingrédients]);
+  }
+
+  function getHerbSearchRecherchesModernes(herb){
+    return getStoredOrStaticText(RECHERCHES_MODERNES_STORAGE_PREFIX, herb, [herb?.recherches_modernes, herb?.recherche_moderne, herb?.modern_research]);
+  }
+
+  function getHerbSearchIndications(herb){
+    return getStoredOrStaticText(INDICATIONS_STORAGE_PREFIX, herb, [herb?.indications, herb?.indications_locales, herb?.indications_complementaires]);
+  }
+
+  function getHerbSearchContreIndications(herb){
+    return getStoredOrStaticText(CONTRE_INDICATIONS_STORAGE_PREFIX, herb, [herb?.contre_indications, herb?.contraindications, herb?.contre_indications_locales, herb?.contraindications_locales]);
+  }
+
+  function getHerbSearchPreparation(herb){
+    return getStoredOrStaticText(PREPARATION_STORAGE_PREFIX, herb, [herb?.preparation, herb?.préparation, herb?.preparation_locale, herb?.preparation_complementaire]);
   }
 
   function splitValues(value){
@@ -776,15 +824,22 @@
 
   function herbSearchTextForScope(herb, scope){
     if(scope === "name"){
-      return [herb?.id, herb?.code, herb?.pinyin, herb?.pinyinSansTons, herb?.hanzi, herb?.nom].join(" ");
+      return [herb?.id, herb?.code, herb?.pinyin, herb?.pinyinSansTons, getHerbHanzi(herb), herb?.hanzi, herb?.nom].join(" ");
     }
+    if(scope === "synonymes") return getHerbSearchSynonymes(herb);
     if(scope === "class") return [herb?.classCode, herb?.classe].join(" ");
     if(scope === "nature") return fieldTokenLabels("nature", herb).join(" ");
     if(scope === "saveur") return fieldTokenLabels("saveur", herb).join(" ");
     if(scope === "toxicity") return fieldTokenLabels("toxicity", herb).join(" ");
     if(scope === "tropism") return fieldTokenLabels("tropism", herb).join(" ");
     if(scope === "actions") return Array.isArray(herb?.actions) ? herb.actions.concat(herb.actions.flatMap(action => canonicalActionEntries(action).map(entry => entry.label))).join(" ") : "";
+    if(scope === "indications") return getHerbSearchIndications(herb);
+    if(scope === "contre_indications") return getHerbSearchContreIndications(herb);
+    if(scope === "preparation") return getHerbSearchPreparation(herb);
     if(scope === "notes") return [herb?.esprit || "", getHerbEsprit(herb), getHerbNotes(herb)].join(" ");
+    if(scope === "synthese") return getHerbSearchSynthese(herb);
+    if(scope === "ingredients") return getHerbSearchIngredients(herb);
+    if(scope === "recherches_modernes") return getHerbSearchRecherchesModernes(herb);
     if(scope === "precautions") return getHerbSearchPrecautions(herb);
     if(scope === "formules") return getHerbSearchFormules(herb);
     return "";
@@ -848,7 +903,7 @@
       </div>
 
       <p class="stats-intro">
-        Recherche une substance médicinale par nom, classe, nature, saveur, toxicité, tropisme, action, notes, précautions ou formules.
+        Recherche une substance médicinale par nom, synonymes, classe, nature, saveur, toxicité, tropisme, action, indications, notes, précautions, formules ou données locales.
       </p>
 
       <div class="search-controls pharma-search-controls">
@@ -866,13 +921,20 @@
         <div class="search-scope-options" aria-label="Champs de recherche PHARMA">
           <span>Rechercher dans :</span>
           ${scopeCheckboxHtml("name", "nom", filters.scopes)}
+          ${scopeCheckboxHtml("synonymes", "synonymes", filters.scopes)}
           ${scopeCheckboxHtml("class", "classe", filters.scopes)}
           ${scopeCheckboxHtml("nature", "nature", filters.scopes)}
           ${scopeCheckboxHtml("saveur", "saveur", filters.scopes)}
           ${scopeCheckboxHtml("toxicity", "toxicité", filters.scopes)}
           ${scopeCheckboxHtml("tropism", "tropisme", filters.scopes)}
           ${scopeCheckboxHtml("actions", "actions", filters.scopes)}
+          ${scopeCheckboxHtml("indications", "indications", filters.scopes)}
+          ${scopeCheckboxHtml("contre_indications", "contre-indications", filters.scopes)}
+          ${scopeCheckboxHtml("preparation", "préparation", filters.scopes)}
           ${scopeCheckboxHtml("notes", "esprit/notes", filters.scopes)}
+          ${scopeCheckboxHtml("synthese", "synthèse ZL", filters.scopes)}
+          ${scopeCheckboxHtml("ingredients", "ingrédients", filters.scopes)}
+          ${scopeCheckboxHtml("recherches_modernes", "recherches modernes", filters.scopes)}
           ${scopeCheckboxHtml("precautions", "précautions", filters.scopes)}
           ${scopeCheckboxHtml("formules", "formules", filters.scopes)}
         </div>

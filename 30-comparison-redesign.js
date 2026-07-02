@@ -5,14 +5,24 @@
   const ACU_KEY = "connections_mtc_comparison_points_v1";
   const PHARMA_KEY = "mtc_pharma_comparison_slots_v1";
   const ROW_ORDER_ACU_KEY = "mtc_compare_row_order_acu_v1";
-  const ROW_ORDER_PHARMA_KEY = "mtc_compare_row_order_pharma_v1";
+  const ROW_ORDER_PHARMA_KEY = "mtc_compare_row_order_pharma_v4";
+  const COLLAPSED_ROWS_ACU_KEY = "mtc_compare_collapsed_rows_acu_v1";
+  const COLLAPSED_ROWS_PHARMA_KEY = "mtc_compare_collapsed_rows_pharma_v1";
   const SLOT_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const PHARMA_HANZI_PREFIX = "mtc_pharma_herb_hanzi_";
   const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
   const PHARMA_NOTES_PREFIX = "mtc_pharma_herb_notes_";
   const PHARMA_ASSOC_PREFIX = "mtc_pharma_herb_associations_";
   const PHARMA_FORMULES_PREFIX = "mtc_pharma_herb_formules_";
   const PHARMA_VS_PREFIX = "mtc_pharma_herb_vs_";
   const PHARMA_PRECAUTION_PREFIX = "mtc_pharma_herb_precaution_";
+  const PHARMA_SYNONYMES_PREFIX = "mtc_pharma_herb_synonymes_";
+  const PHARMA_SYNTHESE_PREFIX = "mtc_pharma_herb_synthese_";
+  const PHARMA_INGREDIENTS_PREFIX = "mtc_pharma_herb_ingredients_";
+  const PHARMA_RECHERCHES_MODERNES_PREFIX = "mtc_pharma_herb_recherches_modernes_";
+  const PHARMA_INDICATIONS_PREFIX = "mtc_pharma_herb_indications_";
+  const PHARMA_CONTRE_INDICATIONS_PREFIX = "mtc_pharma_herb_contre_indications_";
+  const PHARMA_PREPARATION_PREFIX = "mtc_pharma_herb_preparation_";
   const ACU_ESPRIT_PREFIX = "mtc_point_esprit_";
   const ACU_NOTE_PREFIX = "mtc_point_note_";
   const ACU_ASSOC_PREFIX = "mtc_point_associations_";
@@ -81,6 +91,87 @@
       .replace(/^-+|-+$/g, "") || "ligne";
   }
 
+  function collapsedRowsStorageKey(){
+    return isPharma() ? COLLAPSED_ROWS_PHARMA_KEY : COLLAPSED_ROWS_ACU_KEY;
+  }
+
+  function collapsedRowKeys(){
+    const raw = readJson(collapsedRowsStorageKey(), []);
+    return Array.isArray(raw) ? raw.map(item => String(item || "")).filter(Boolean) : [];
+  }
+
+  function isComparisonRowCollapsed(rowKey){
+    return collapsedRowKeys().includes(String(rowKey || ""));
+  }
+
+  function setComparisonRowCollapsed(rowKey, collapsed){
+    const key = String(rowKey || "");
+    if(!key) return;
+    const rows = collapsedRowKeys();
+    const exists = rows.includes(key);
+    if(collapsed && !exists) rows.push(key);
+    if(!collapsed && exists) rows.splice(rows.indexOf(key), 1);
+    try{ localStorage.setItem(collapsedRowsStorageKey(), JSON.stringify(rows)); }catch(error){}
+  }
+
+  function comparisonScrollState(){
+    const content = byId("comparisonPanelContent");
+    const scroll = content?.querySelector?.(".mtc-compare-scroll");
+    if(!scroll) return null;
+    return {top: scroll.scrollTop || 0, left: scroll.scrollLeft || 0};
+  }
+
+  function restoreComparisonScrollState(state){
+    if(!state) return;
+    requestAnimationFrame(() => {
+      const content = byId("comparisonPanelContent");
+      const scroll = content?.querySelector?.(".mtc-compare-scroll");
+      if(!scroll) return;
+      scroll.scrollTop = state.top || 0;
+      scroll.scrollLeft = state.left || 0;
+    });
+  }
+
+  function applyComparisonRowCollapsedInDom(rowKey, collapsed){
+    const key = String(rowKey || "");
+    const content = byId("comparisonPanelContent");
+    if(!key || !content) return false;
+    let found = false;
+
+    content.querySelectorAll("[data-mtc-compare-row-key]").forEach(element => {
+      if(element.getAttribute("data-mtc-compare-row-key") !== key) return;
+      element.classList.toggle("is-compare-row-collapsed", !!collapsed);
+      found = true;
+    });
+
+    content.querySelectorAll("[data-mtc-compare-collapse-toggle]").forEach(button => {
+      if(button.getAttribute("data-mtc-compare-collapse-toggle") !== key) return;
+      button.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      button.textContent = collapsed ? "▸" : "▾";
+      found = true;
+    });
+
+    return found;
+  }
+
+  function toggleComparisonRowCollapsed(rowKey){
+    const key = String(rowKey || "");
+    if(!key) return;
+    const nextCollapsed = !isComparisonRowCollapsed(key);
+    const scrollState = comparisonScrollState();
+    setComparisonRowCollapsed(key, nextCollapsed);
+
+    // Ne pas reconstruire tout le panneau pour un simple repli/dépliage :
+    // sinon le navigateur remet parfois le tableau tout en haut, ce qui est très perturbant.
+    if(applyComparisonRowCollapsedInDom(key, nextCollapsed)){
+      restoreComparisonScrollState(scrollState);
+      return;
+    }
+
+    if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
+    restoreComparisonScrollState(scrollState);
+  }
+
   function slotLabel(index){
     if(typeof window.comparisonSlotLabel === "function") return window.comparisonSlotLabel(index);
     return SLOT_LETTERS[Number(index) || 0] || String((Number(index) || 0) + 1);
@@ -123,10 +214,18 @@
     return herbs.find(item => String(item.id) === String(id) || String(item.code) === String(id));
   }
 
+  function herbHanzi(herb){
+    if(!herb) return "";
+    if(typeof window.getPharmaHerbHanzi === "function"){
+      return text(window.getPharmaHerbHanzi(herb.id) || herb.hanzi || "");
+    }
+    return text(localStorageValue(PHARMA_HANZI_PREFIX, herb.id, herb.hanzi || ""));
+  }
+
   function herbTitle(herb){
     if(!herb) return "";
     const pinyin = text(herb.pinyin || herb.pinyinSansTons || herb.code);
-    const hanzi = text(herb.hanzi);
+    const hanzi = herbHanzi(herb);
     return [pinyin, hanzi].filter(Boolean).join(" ");
   }
 
@@ -143,6 +242,26 @@
       if(stored !== null) return stored;
     }catch(error){}
     return fallback || "";
+  }
+
+  function mergeStaticAndLocal(staticValue, localValue){
+    const staticText = text(staticValue);
+    const localText = text(localValue);
+    if(!staticText) return localText;
+    if(!localText) return staticText;
+    const staticKey = normalizeKey(staticText);
+    const localKey = normalizeKey(localText);
+    if(staticKey === localKey || staticKey.includes(localKey)) return staticText;
+    if(localKey.includes(staticKey)) return localText;
+    return `${staticText}\n\n${localText}`;
+  }
+
+  function localStorageMergedValue(prefix, id, staticValue){
+    try{
+      const stored = localStorage.getItem(prefix + id);
+      if(stored !== null) return mergeStaticAndLocal(staticValue, stored);
+    }catch(error){}
+    return text(staticValue || "");
   }
 
   function herbEsprit(herb){
@@ -176,6 +295,41 @@
   function herbPrecaution(herb){
     if(!herb) return "";
     return text(localStorageValue(PHARMA_PRECAUTION_PREFIX, herb.id, herb.precaution || herb.precautions || ""));
+  }
+
+  function herbSynonymes(herb){
+    if(!herb) return "";
+    return text(localStorageValue(PHARMA_SYNONYMES_PREFIX, herb.id, herb.synonymes || herb.synonyms || herb.noms_alternatifs || ""));
+  }
+
+  function herbSynthese(herb){
+    if(!herb) return "";
+    return text(localStorageValue(PHARMA_SYNTHESE_PREFIX, herb.id, herb.synthese || herb.synthèse || ""));
+  }
+
+  function herbIngredients(herb){
+    if(!herb) return "";
+    return text(localStorageValue(PHARMA_INGREDIENTS_PREFIX, herb.id, herb.ingredients || herb.ingrédients || ""));
+  }
+
+  function herbRecherchesModernes(herb){
+    if(!herb) return "";
+    return text(localStorageValue(PHARMA_RECHERCHES_MODERNES_PREFIX, herb.id, herb.recherches_modernes || herb.recherche_moderne || herb.modern_research || ""));
+  }
+
+  function herbIndicationsLocales(herb){
+    if(!herb) return "";
+    return localStorageMergedValue(PHARMA_INDICATIONS_PREFIX, herb.id, herb.indications || herb.indications_locales || herb.indications_complementaires || "");
+  }
+
+  function herbContreIndicationsLocales(herb){
+    if(!herb) return "";
+    return localStorageMergedValue(PHARMA_CONTRE_INDICATIONS_PREFIX, herb.id, herb.contre_indications || herb.contraindications || herb.contre_indications_locales || herb.contraindications_locales || "");
+  }
+
+  function herbPreparationLocale(herb){
+    if(!herb) return "";
+    return localStorageMergedValue(PHARMA_PREPARATION_PREFIX, herb.id, herb.preparation || herb.préparation || herb.preparation_locale || herb.preparation_complementaire || "");
   }
 
   function setLocalStorageValue(prefix, id, value){
@@ -349,17 +503,29 @@
     const indexClass = (opts.rowIndex || 0) % 2 ? "mtc-compare-row-odd" : "mtc-compare-row-even";
     const rowKind = opts.rowKind ? `mtc-compare-row-${opts.rowKind}` : "";
     const rowKey = compareRowKey(label, opts);
+    const collapsed = isComparisonRowCollapsed(rowKey);
+    const collapsedClass = collapsed ? "is-compare-row-collapsed" : "";
     const dragTitle = "Glisser pour déplacer cette ligne";
+    const labelHtml = `
+      <button
+        type="button"
+        class="mtc-compare-row-collapse-toggle"
+        data-mtc-compare-collapse-toggle="${attr(rowKey)}"
+        title="Replier/déplier cette ligne"
+        aria-label="Replier/déplier ${attr(label)}"
+        aria-expanded="${collapsed ? "false" : "true"}">${collapsed ? "▸" : "▾"}</button>
+      <span class="mtc-compare-row-label-text">${esc(label)}</span>
+    `;
     return `
-      <div class="mtc-compare-row-label ${indexClass} ${rowKind} ${opts.rowClass || ""}" data-mtc-compare-row-key="${attr(rowKey)}" draggable="true" title="${attr(dragTitle)}">${esc(label)}</div>
+      <div class="mtc-compare-row-label ${indexClass} ${rowKind} ${collapsedClass} ${opts.rowClass || ""}" data-mtc-compare-row-key="${attr(rowKey)}" draggable="true" title="${attr(dragTitle)}">${labelHtml}</div>
       ${slots.map((slot, localIndex) => {
         const value = getter(slot, localIndex, slots);
         const html = opts.html ? String(value || `<span class="mtc-compare-empty">—</span>`) : displayValue(value);
         const columnStyle = opts.columnStyle ? (opts.columnStyle(slot, localIndex, slots) || "") : "";
         const gradientClass = columnStyle ? "has-column-gradient" : "";
-        return `<div class="mtc-compare-cell ${indexClass} ${rowKind} ${opts.cellClass || ""} ${gradientClass}" data-mtc-compare-row-key="${attr(rowKey)}" style="${attr(columnStyle)}">${html}</div>`;
+        return `<div class="mtc-compare-cell ${indexClass} ${rowKind} ${opts.cellClass || ""} ${gradientClass} ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}" style="${attr(columnStyle)}"><div class="mtc-compare-cell-inner">${html}</div></div>`;
       }).join("")}
-      ${opts.addEmptyColumn ? `<div class="mtc-compare-cell ${indexClass} ${rowKind} mtc-compare-add-cell" data-mtc-compare-row-key="${attr(rowKey)}"></div>` : ""}
+      ${opts.addEmptyColumn ? `<div class="mtc-compare-cell ${indexClass} ${rowKind} mtc-compare-add-cell ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}"><div class="mtc-compare-cell-inner"></div></div>` : ""}
     `;
   }
 
@@ -374,22 +540,32 @@
       const indexClass = ((startIndex || 0) + i) % 2 ? "mtc-compare-row-odd" : "mtc-compare-row-even";
       const stateClass = unique ? "is-unique" : (distinct ? "is-distinct" : "is-common");
       const rowKey = `fonction-${action.key}`;
+      const collapsed = isComparisonRowCollapsed(rowKey);
+      const collapsedClass = collapsed ? "is-compare-row-collapsed" : "";
+      const toggleHtml = `
+        <button type="button"
+          class="mtc-compare-row-collapse-toggle"
+          data-mtc-compare-collapse-toggle="${attr(rowKey)}"
+          title="Replier / déplier cette ligne"
+          aria-label="Replier / déplier la ligne ${attr(action.label)}"
+          aria-expanded="${collapsed ? "false" : "true"}">${collapsed ? "▸" : "▾"}</button>
+      `;
       return `
-        <div class="mtc-compare-row-label mtc-compare-action-label ${indexClass} ${stateClass}" data-mtc-compare-row-key="${attr(rowKey)}" draggable="true" title="Glisser pour déplacer cette ligne">${esc(action.label)}</div>
+        <div class="mtc-compare-row-label mtc-compare-action-label ${indexClass} ${stateClass} ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}" draggable="true" title="Glisser pour déplacer cette ligne">${toggleHtml}<span class="mtc-compare-row-label-text">${esc(action.label)}</span></div>
         ${slots.map((slot, localIndex) => {
           const yes = hasAction(slot, action.key, actionGetter);
           const columnStyle = opts.columnStyle ? (opts.columnStyle(slot, localIndex, slots) || "") : "";
           const gradientClass = columnStyle ? "has-column-gradient" : "";
-          return `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} ${stateClass} ${gradientClass}" data-mtc-compare-row-key="${attr(rowKey)}" style="${attr(columnStyle)}">${yes ? `<span class="mtc-compare-x ${stateClass}">X</span>` : ""}</div>`;
+          return `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} ${stateClass} ${gradientClass} ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}" style="${attr(columnStyle)}">${yes ? `<span class="mtc-compare-x ${stateClass}">X</span>` : ""}</div>`;
         }).join("")}
-        ${opts.addEmptyColumn ? `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} mtc-compare-add-cell" data-mtc-compare-row-key="${attr(rowKey)}"></div>` : ""}
+        ${opts.addEmptyColumn ? `<div class="mtc-compare-cell mtc-compare-x-cell ${indexClass} mtc-compare-add-cell ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}"></div>` : ""}
       `;
     }).join("");
   }
 
   function herbSearchName(herb){
     if(!herb) return "";
-    return [herb.pinyinSansTons || herb.pinyin || herb.code, herb.hanzi, herb.nom]
+    return [herb.pinyinSansTons || herb.pinyin || herb.code, herbHanzi(herb), herb.hanzi, herb.nom]
       .map(text)
       .filter(Boolean)
       .join(" ");
@@ -404,7 +580,7 @@
     if(!key) return null;
     const herbs = Array.isArray(window.PHARMA_HERBS) ? window.PHARMA_HERBS : [];
     return herbs.find(herb => {
-      const aliases = [herb.id, herb.code, herb.pinyinSansTons, herb.pinyin, herb.hanzi, herb.nom, herbTitle(herb), herbSearchName(herb)]
+      const aliases = [herb.id, herb.code, herb.pinyinSansTons, herb.pinyin, herbHanzi(herb), herb.hanzi, herb.nom, herbTitle(herb), herbSearchName(herb)]
         .map(normalizeKey)
         .filter(Boolean);
       return aliases.includes(key);
@@ -461,7 +637,14 @@
       associations:{placeholder:"Associations…", title:"Ajouter des associations avec assistance"},
       vs:{placeholder:"Comparaison…", title:"Noter les différences entre substances avec assistance"},
       formules:{placeholder:"Formules…", title:"Noter les formules qui contiennent cette substance"},
-      precaution:{placeholder:"Précautions…", title:"Noter les précautions"}
+      precaution:{placeholder:"Précautions…", title:"Noter les précautions"},
+      synonymes:{placeholder:"Synonymes, noms latins, variantes…", title:"Modifier les synonymes"},
+      synthese:{placeholder:"Synthése de l'École Zhōng Lì", title:"Modifier la synthèse ZL"},
+      ingredients:{placeholder:"Ingrédients, partie utilisée, composants…", title:"Modifier les ingrédients"},
+      recherches_modernes:{placeholder:"Recherches modernes…", title:"Modifier les recherches modernes"},
+      indications:{placeholder:"Indications locales…", title:"Modifier les indications locales"},
+      contre_indications:{placeholder:"Contre-indications locales…", title:"Modifier les contre-indications locales"},
+      preparation:{placeholder:"Préparation locale…", title:"Modifier la préparation locale"}
     }[field] || {placeholder:"Écrire…", title:"Modifier"};
     const linkAssist = field === "associations" || field === "vs";
     const shown = !clean && field === "associations" ? defaultAssociationText(herb) : (!clean && field === "vs" ? defaultVsText(herb) : clean);
@@ -922,36 +1105,47 @@
     }
 
     let rowIndex = 0;
-    const baseRows = [
-      ["Esprit", slot => editablePharmaCellHtml(getHerb(slot.id), "esprit", herbEsprit(getHerb(slot.id))), {html:true, rowKind:"esprit", cellClass:"pharma-esprit-cell"}],
-      ["Classe", slot => herbClassLabel(getHerb(slot.id)), {rowKind:"classe"}],
-      ["Nature", (slot, localIndex, allSlots) => natureCellHtml(getHerb(slot.id), localIndex, allSlots), {html:true, rowKind:"nature", cellClass:"mtc-compare-nature-cell"}],
-      ["Saveur", slot => flavorTokensHtml(getHerb(slot.id)), {html:true, rowKind:"saveur", cellClass:"mtc-compare-flavor-cell"}],
-      ["Tropisme", slot => tropismTokensHtml(getHerb(slot.id)), {html:true, rowKind:"tropisme", cellClass:"mtc-compare-tropism-cell"}],
-      ["Posologie", slot => getHerb(slot.id)?.posologie, {rowKind:"posologie"}],
-      ["Précaution", slot => editablePharmaCellHtml(getHerb(slot.id), "precaution", herbPrecaution(getHerb(slot.id))), {html:true, rowKind:"precaution", cellClass:"pharma-precaution-cell"}],
-      ["Associations", slot => editablePharmaCellHtml(getHerb(slot.id), "associations", herbAssociations(getHerb(slot.id))), {html:true, rowKind:"associations", cellClass:"pharma-associations-cell"}],
+    const beforeFunctionRows = [
+      ["ESPRIT", slot => editablePharmaCellHtml(getHerb(slot.id), "esprit", herbEsprit(getHerb(slot.id))), {html:true, rowKind:"esprit", cellClass:"pharma-esprit-cell"}],
+      ["CLASSE", slot => herbClassLabel(getHerb(slot.id)), {rowKind:"classe"}],
+      ["NATURE", (slot, localIndex, allSlots) => natureCellHtml(getHerb(slot.id), localIndex, allSlots), {html:true, rowKind:"nature", cellClass:"mtc-compare-nature-cell"}],
+      ["SAVEUR", slot => flavorTokensHtml(getHerb(slot.id)), {html:true, rowKind:"saveur", cellClass:"mtc-compare-flavor-cell"}],
+      ["TROPISME", slot => tropismTokensHtml(getHerb(slot.id)), {html:true, rowKind:"tropisme", cellClass:"mtc-compare-tropism-cell"}],
+      ["POSOLOGIE", slot => getHerb(slot.id)?.posologie, {rowKind:"posologie"}],
+      ["Indications", slot => editablePharmaCellHtml(getHerb(slot.id), "indications", herbIndicationsLocales(getHerb(slot.id))), {html:true, rowKind:"indications", cellClass:"pharma-indications-cell"}],
+      ["Contre-indications", slot => editablePharmaCellHtml(getHerb(slot.id), "contre_indications", herbContreIndicationsLocales(getHerb(slot.id))), {html:true, rowKind:"contre-indications", cellClass:"pharma-contre-indications-cell"}],
+      ["PRÉCAUTION", slot => editablePharmaCellHtml(getHerb(slot.id), "precaution", herbPrecaution(getHerb(slot.id))), {html:true, rowKind:"precaution", cellClass:"pharma-precaution-cell"}],
+      ["ASSOCIATIONS", slot => editablePharmaCellHtml(getHerb(slot.id), "associations", herbAssociations(getHerb(slot.id))), {html:true, rowKind:"associations", cellClass:"pharma-associations-cell"}],
       ["VS.", slot => editablePharmaCellHtml(getHerb(slot.id), "vs", herbVs(getHerb(slot.id))), {html:true, rowKind:"comparaison", cellClass:"pharma-vs-cell"}],
-      ["Formules", slot => editablePharmaCellHtml(getHerb(slot.id), "formules", herbFormules(getHerb(slot.id))), {html:true, rowKind:"formules", cellClass:"pharma-formules-cell"}]
+      ["FORMULES", slot => editablePharmaCellHtml(getHerb(slot.id), "formules", herbFormules(getHerb(slot.id))), {html:true, rowKind:"formules", cellClass:"pharma-formules-cell"}],
+      ["Recherches modernes", slot => editablePharmaCellHtml(getHerb(slot.id), "recherches_modernes", herbRecherchesModernes(getHerb(slot.id))), {html:true, rowKind:"recherches-modernes", cellClass:"pharma-recherches-modernes-cell"}],
+      ["Ingrédients", slot => editablePharmaCellHtml(getHerb(slot.id), "ingredients", herbIngredients(getHerb(slot.id))), {html:true, rowKind:"ingredients", cellClass:"pharma-ingredients-cell"}],
+      ["Préparation", slot => editablePharmaCellHtml(getHerb(slot.id), "preparation", herbPreparationLocale(getHerb(slot.id))), {html:true, rowKind:"preparation", cellClass:"pharma-preparation-cell"}],
+      ["Synonymes", slot => editablePharmaCellHtml(getHerb(slot.id), "synonymes", herbSynonymes(getHerb(slot.id))), {html:true, rowKind:"synonymes", cellClass:"pharma-synonymes-cell"}]
     ];
 
-    const rowsHtml = baseRows.map(([label, getter, options]) => {
+    const afterFunctionRows = [
+      ["NOTES", slot => editablePharmaCellHtml(getHerb(slot.id), "notes", herbNotes(getHerb(slot.id))), {html:true, rowKind:"notes", cellClass:"pharma-notes-cell"}],
+      ["Synthèse ZL", slot => editablePharmaCellHtml(getHerb(slot.id), "synthese", herbSynthese(getHerb(slot.id))), {html:true, rowKind:"synthese", cellClass:"pharma-synthese-cell"}]
+    ];
+
+    const beforeRowsHtml = beforeFunctionRows.map(([label, getter, options]) => {
       const html = rowHtml(label, slots, getter, Object.assign({}, options, {rowIndex, columnStyle:columnNatureStyleForPharmaSlot, addEmptyColumn:true}));
       rowIndex += 1;
       return html;
     }).join("");
 
-    const actionsHtml = actionMatrixHtml(slots, slot => herbActions(getHerb(slot.id)), rowIndex, {columnStyle:columnNatureStyleForPharmaSlot, addEmptyColumn:true});
+    const functionRowsHtml = actionMatrixHtml(slots, slot => herbActions(getHerb(slot.id)), rowIndex, {columnStyle:columnNatureStyleForPharmaSlot, addEmptyColumn:true});
     rowIndex += unionActionRows(slots, slot => herbActions(getHerb(slot.id))).length;
 
-    const notesHtml = rowHtml("Notes", slots, slot => editablePharmaCellHtml(getHerb(slot.id), "notes", herbNotes(getHerb(slot.id))), {
-      html:true,
-      rowKind:"notes",
-      cellClass:"pharma-notes-cell",
-      rowIndex,
-      columnStyle:columnNatureStyleForPharmaSlot,
-      addEmptyColumn:true
-    });
+    const afterRowsHtml = afterFunctionRows.map(([label, getter, options]) => {
+      const html = rowHtml(label, slots, getter, Object.assign({}, options, {rowIndex, columnStyle:columnNatureStyleForPharmaSlot, addEmptyColumn:true}));
+      rowIndex += 1;
+      return html;
+    }).join("");
+
+    const rowsHtml = beforeRowsHtml + functionRowsHtml + afterRowsHtml;
+
 
     content.innerHTML = `
       ${compareTitlebarHtml("Comparaison PHARMA")}
@@ -961,8 +1155,6 @@
           ${slots.map((slot, localIndex) => pharmaHeaderHtml(slot, localIndex, slots)).join("")}
           ${pharmaAddHeaderHtml()}
           ${rowsHtml}
-          ${actionsHtml}
-          ${notesHtml}
         </div>
       </div>
     `;
@@ -1255,6 +1447,14 @@
     if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
   }
 
+  document.addEventListener("click", event => {
+    const button = event.target?.closest?.("[data-mtc-compare-collapse-toggle]");
+    if(!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    toggleComparisonRowCollapsed(button.getAttribute("data-mtc-compare-collapse-toggle") || "");
+  });
+
   document.addEventListener("dragstart", event => {
     const rowLabel = event.target?.closest?.(".mtc-compare-row-label[draggable='true'][data-mtc-compare-row-key]");
     if(rowLabel){
@@ -1360,6 +1560,13 @@
     if(field === "vs") setLocalStorageValue(PHARMA_VS_PREFIX, herbId, value);
     if(field === "formules") setLocalStorageValue(PHARMA_FORMULES_PREFIX, herbId, value);
     if(field === "precaution") setLocalStorageValue(PHARMA_PRECAUTION_PREFIX, herbId, value);
+    if(field === "synonymes") setLocalStorageValue(PHARMA_SYNONYMES_PREFIX, herbId, value);
+    if(field === "synthese") setLocalStorageValue(PHARMA_SYNTHESE_PREFIX, herbId, value);
+    if(field === "ingredients") setLocalStorageValue(PHARMA_INGREDIENTS_PREFIX, herbId, value);
+    if(field === "recherches_modernes") setLocalStorageValue(PHARMA_RECHERCHES_MODERNES_PREFIX, herbId, value);
+    if(field === "indications") setLocalStorageValue(PHARMA_INDICATIONS_PREFIX, herbId, value);
+    if(field === "contre_indications") setLocalStorageValue(PHARMA_CONTRE_INDICATIONS_PREFIX, herbId, value);
+    if(field === "preparation") setLocalStorageValue(PHARMA_PREPARATION_PREFIX, herbId, value);
   }
 
   function startsWithAnyAlias(aliases, key, compact){
