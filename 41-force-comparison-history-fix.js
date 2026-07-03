@@ -198,8 +198,8 @@
       @media(max-width:699px), (hover:none), (pointer:coarse){
         #mtcPersonalDataStatus,
         #mtcPersonalDataStatus.visible{
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 12px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
           left:50% !important;
           right:auto !important;
           top:auto !important;
