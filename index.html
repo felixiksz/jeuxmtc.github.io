@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées." name="description"/>
-<meta content="acupuncture, points acupuncture, médecine chinoise, MTC, médecine traditionnelle chinoise, canaux, canaux, points d'acupuncture, révision acupuncture, jeu acupuncture, quiz MTC, Connections MTC, points shu antiques, points yuan source, points luo liaison, points xi crevasse, points mu, points shu du dos, merveilleux vaisseaux, huit canaux extraordinaires, qi jing ba mai, zang fu, étudiant acupuncture, école acupuncture, apprentissage MTC" name="keywords"/>
+<meta content="Jeu interactif gratuit pour réviser l’acupuncture et la pharmacopée chinoise en MTC : points, canaux, catégories, correspondances, substances médicinales, classes, fiches détaillées et comparaisons." name="description"/>
+<meta content="acupuncture, pharmacopée chinoise, substances médicinales chinoises, herbes chinoises, médecine chinoise, MTC, médecine traditionnelle chinoise, canaux, méridiens, points d'acupuncture, révision acupuncture, révision pharmacopée, jeu MTC, quiz MTC, Connections MTC, points shu antiques, points de transport, points yuan source, points luo liaison, points xi crevasse, points mu, points shu du dos, merveilleux vaisseaux, huit canaux extraordinaires, qi jing ba mai, zang fu, étudiant acupuncture, école acupuncture, apprentissage MTC" name="keywords"/>
 <meta content="Connections MTC" name="author"/>
 <meta content="index, follow" name="robots"/>
-<meta content="Jeu acupuncture MTC – points, canaux et merveilleux vaisseaux" property="og:title"/>
-<meta content="Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées." property="og:description"/>
+<meta content="Jeu MTC – acupuncture et pharmacopée chinoise" property="og:title"/>
+<meta content="Jeu interactif gratuit pour réviser l’acupuncture et la pharmacopée chinoise en MTC : points, canaux, catégories, correspondances, substances médicinales, classes, fiches détaillées et comparaisons." property="og:description"/>
 <meta content="website" property="og:type"/>
 <meta content="summary" name="twitter:card"/>
-<meta content="Jeu de révision acupuncture et pharmacopée" name="twitter:title"/>
+<meta content="Jeu MTC acupuncture + pharmacopée" name="twitter:title"/>
 <meta content="Jeu interactif gratuit pour réviser les points d’acupuncture et les substances majeures de la pharmacopée chinoise." name="twitter:description"/>
 <!-- SEO invisible ajouté -->
-<meta content="Jeu acupuncture MTC" name="application-name"/>
+<meta content="Connections MTC" name="application-name"/>
 <meta content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" name="googlebot"/>
 <script type="application/ld+json">
 {
@@ -25,13 +24,13 @@
     "WebApplication",
     "LearningResource"
   ],
-  "name": "Jeu acupuncture MTC",
+  "name": "Connections MTC – acupuncture et pharmacopée",
   "alternateName": "Connections MTC",
   "applicationCategory": "EducationalApplication",
   "operatingSystem": "Web",
   "inLanguage": "fr",
   "isAccessibleForFree": true,
-  "description": "Jeu interactif gratuit pour réviser les points d’acupuncture en médecine traditionnelle chinoise : canaux, catégories de points, correspondances, merveilleux vaisseaux, associations et fiches détaillées.",
+  "description": "Jeu interactif gratuit pour réviser l’acupuncture et la pharmacopée chinoise en MTC : points, canaux, catégories, correspondances, substances médicinales, classes, fiches détaillées et comparaisons.",
   "learningResourceType": "jeu de révision",
   "educationalUse": [
     "révision",
@@ -41,12 +40,15 @@
   "teaches": [
     "points d’acupuncture",
     "méridiens de médecine chinoise",
-    "canaux d'acupuncture'",
+    "canaux d'acupuncture",
     "catégories de points",
+    "points de transport",
     "correspondances des points",
     "merveilleux vaisseaux",
     "qí jīng bā mài",
-    "associations cliniques en acupuncture"
+    "substances médicinales chinoises",
+    "classes de pharmacopée chinoise",
+    "associations cliniques en acupuncture et pharmacopée"
   ],
   "audience": {
     "@type": "EducationalAudience",
@@ -63,12 +65,15 @@
     "merveilleux vaisseaux",
     "qí jīng bā mài",
     "jeu de révision acupuncture",
-    "quiz MTC"
+    "quiz MTC",
+    "pharmacopée chinoise",
+    "substances médicinales chinoises",
+    "jeu de révision pharmacopée"
   ]
 }
 </script>
 <!-- /SEO invisible ajouté -->
-<title>Jeu acupuncture MTC – réviser les points, canaux et merveilleux vaisseaux</title>
+<title>Connections MTC – jeu acupuncture et pharmacopée chinoise</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
 
@@ -97,7 +102,11 @@
 <link href="pharma-cheatsheet-essentielles.css" rel="stylesheet"/>
 <link href="bucket8-acu-export-import-fixes.css" rel="stylesheet"/>
 <link href="30-comparison-redesign.css" rel="stylesheet"/>
-<link href="31-search-compare-select.css" rel="stylesheet"/></head>
+<link href="31-search-compare-select.css" rel="stylesheet"/>
+<link href="33-stable-hotfix.css" rel="stylesheet"/>
+<link href="34-targeted-requests.css" rel="stylesheet"/>
+<link href="37-fixed-detail-close-zone.css" rel="stylesheet"/>
+</head>
 <body>
 
 <div aria-label="Choix de matière" aria-modal="true" class="study-domain-overlay" id="studyDomainOverlay" role="dialog">
@@ -131,6 +140,7 @@
 </div>
 </div>
 <div class="topbar-row practice-row">
+<button type="button" id="mtcAudioModeToggle" class="mtc-audio-mode-toggle" aria-label="Mode audio" aria-pressed="false" title="Mode audio">🔊</button>
 <div class="mode-switch">
 <span>Auto</span>
 <label class="switch">
@@ -318,5 +328,8 @@
 <script src="31-search-compare-select.js"></script>
 <script src="audio-manifest.js"></script>
 <script src="32-audio-pronunciation.js"></script>
+<script src="33-stable-hotfix.js"></script>
+<script src="34-targeted-requests.js"></script>
+<script src="38-tutorial-user-texts.js"></script>
 </body>
 </html>

@@ -1,0 +1,27 @@
+{
+  "app": "Connections MTC",
+  "type": "personal-data",
+  "version": 6,
+  "mode": "import-local-additive-no-overwrite",
+  "mode_emploi": [
+    "Remplir les objets avec les IDs des substances: PT4, PT6, CSS1, etc.",
+    "A l'import, les données sont ajoutées à la suite si le champ existe déjà.",
+    "Les placeholders du type 'GUI ZHI +' ou 'GUI ZHI vs' peuvent être remplacés.",
+    "Les notes personnelles déjà présentes ne sont pas écrasées."
+  ],
+  "pharmacology": {
+    "synonymes": {},
+    "syntheses": {},
+    "ingredients": {},
+    "recherches_modernes": {},
+    "indications": {},
+    "contre_indications": {},
+    "preparations": {},
+    "precautions": {},
+    "formules": {},
+    "associations": {},
+    "vs": {},
+    "notes": {},
+    "esprits": {}
+  }
+}

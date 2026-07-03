@@ -263,29 +263,7 @@
   }
 
   function pharmaEndReviewHtml(){
-    const items = (run.reviewItems || []).filter(item => item.herbName || item.activeClass || item.clickedClass).slice(0,6);
-    if(!items.length) return "";
-    const seen = new Set();
-    const unique = items.filter(item => {
-      const key = [item.herbName, item.activeClass, item.clickedClass].join("|");
-      if(seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    }).slice(0,5);
-    return `
-      <details class="end-review-card experimental-review-card">
-        <summary>À revoir <span>${unique.length}</span></summary>
-        <ul>
-          ${unique.map(item => `
-            <li>
-              <strong>${esc(item.herbName || item.clickedClass || "Erreur")}</strong>
-              <span>${esc(item.clickedClass && item.activeClass ? item.clickedClass + " ↔ " + item.activeClass : item.clickedClass || item.activeClass || "à stabiliser")}</span>
-            </li>
-          `).join("")}
-        </ul>
-        <button type="button" onclick="startPharmaSoftReviewFromErrors()">Rejouer en révision douce</button>
-      </details>
-    `;
+    return "";
   }
 
   function startPharmaSoftReviewFromErrors(){
@@ -371,7 +349,7 @@
     // déjà validées/révélées restent consultables autour de la grille.
     message.innerHTML = `
       <div class="game-over-title pharma-end-title ${won ? "bravo-punch" : ""}">${won ? "BRAVO !" : "GAME OVER !"}</div>
-      <div class="game-over-subtitle pharma-end-subtitle">
+      <div class="game-over-subtitle pharma-end-subtitle mtc-final-detail-hint">
         ${won ? " " : "Tu peux maintenant aller dans les détails si tu veux :)"}
       </div>
       ${pharmaEndReviewHtml()}
