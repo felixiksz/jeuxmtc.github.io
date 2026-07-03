@@ -66,8 +66,8 @@
           left:50% !important;
           right:auto !important;
           top:auto !important;
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 12px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
           transform:translateX(-50%) !important;
           width:max-content !important;
           max-width:calc(100vw - 14px) !important;
