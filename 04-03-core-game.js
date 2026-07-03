@@ -3807,6 +3807,9 @@ let tourSteps = [];
 
 function startTour(){
   endTour(false);
+  document.body.classList.add("tour-active");
+  document.documentElement.classList.add("tour-active");
+  try{ window.scrollTo({ left:0, top:window.scrollY, behavior:"auto" }); }catch(error){}
 
   closeCheatsheetPanel();
   closePointPanel();
@@ -4031,9 +4034,17 @@ function showTourStep(){
   try{
     target.scrollIntoView({
       block:"center",
-      inline:"center",
+      inline:"nearest",
       behavior:"auto"
     });
+  }catch(error){}
+
+  try{
+    if(window.scrollX){
+      window.scrollTo({ left:0, top:window.scrollY, behavior:"auto" });
+    }
+    document.documentElement.scrollLeft = 0;
+    document.body.scrollLeft = 0;
   }catch(error){}
 
   box.innerHTML = `
@@ -4052,6 +4063,13 @@ function showTourStep(){
   requestAnimationFrame(()=>{
     const rect = target.getBoundingClientRect();
     positionTourBox(box, rect, step);
+    try{
+      if(window.innerWidth <= 520 && window.scrollX){
+        window.scrollTo({ left:0, top:window.scrollY, behavior:"auto" });
+      }
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollLeft = 0;
+    }catch(error){}
   });
 }
 
@@ -5192,7 +5210,8 @@ function previousTourStep(){
 }
 
 function endTour(save){
-  document.body.classList.remove("tour-disable-grid");
+  document.body.classList.remove("tour-disable-grid", "tour-active");
+  document.documentElement.classList.remove("tour-active");
 
   document
     .querySelectorAll(".tour-highlight")
