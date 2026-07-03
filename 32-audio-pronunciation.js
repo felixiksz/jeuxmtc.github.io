@@ -4,7 +4,7 @@
    Version stable :
    - bouton toujours présent quand un hanzi existe
    - manifest explicite audio-manifest.js si disponible
-   - candidates testées dans l'ordre : manifest réel, chinois direct, #Uxxxx
+   - candidates testées dans l'ordre : chinois direct, manifest, #Uxxxx
    - compatible fichiers GitHub chinois directs et fichiers zip #Uxxxx
    - volume 40 %
    ============================================================ */
@@ -19,7 +19,9 @@
   let currentButton = null;
 
   function normalizeHanzi(value){
-    return String(value || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+    const raw = String(value || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+    const cjk = raw.match(/[\u3400-\u9fff]+/g);
+    return cjk ? cjk.join("") : raw;
   }
 
   function containsCjk(value){
@@ -65,35 +67,77 @@
     return list;
   }
 
-  function candidateAudioFilenamesForHanzi(hanzi){
+  function fileIsInManifest(filename){
+    return manifestFiles.size > 0 && manifestFiles.has(String(filename || ""));
+  }
+
+  function manifestCandidatesForHanzi(hanzi){
     const clean = normalizeHanzi(hanzi);
-    const candidates = [];
-    if(!clean) return candidates;
+    const out = [];
+    if(!clean) return out;
 
+    // IMPORTANT : on garde aussi les entrées byHanzi non présentes dans manifest.files.
+    // Dans certains zips, les fichiers sont encodés en #Uxxxx, alors que sur GitHub
+    // l’utilisateur peut avoir téléversé les noms chinois directs. Filtrer trop tôt
+    // faisait échouer des fichiers pourtant présents, par exemple 厚朴_baidu_zh.mp3.
     const fromManifest = manifestByHanzi[clean];
-    if(Array.isArray(fromManifest)) fromManifest.forEach(item => addUnique(candidates, item));
-    else addUnique(candidates, fromManifest);
+    const listed = Array.isArray(fromManifest) ? fromManifest : (fromManifest ? [fromManifest] : []);
+    listed.forEach(item => addUnique(out, item));
 
-    generatedCandidates(clean).forEach(item => addUnique(candidates, item));
-
-    // File names listed in the manifest are actual names. If one starts with the exact hanzi
-    // or the exact #U form, add it near the end as another rescue path.
     const uStem = hanziToUStem(clean);
     manifestFiles.forEach(file => {
       if(file && (file.startsWith(clean + "_") || file.startsWith(uStem + "_"))){
-        addUnique(candidates, file);
+        addUnique(out, file);
       }
     });
+    return out;
+  }
 
-    return candidates;
+  function candidateAudioFilenamesForHanzi(hanzi){
+    const clean = normalizeHanzi(hanzi);
+    const out = [];
+    if(!clean) return out;
+
+    // Ordre choisi pour GitHub : chinois direct d’abord, puis manifest, puis #Uxxxx.
+    // Cela corrige le cas où le manifest du zip liste #U539a#U6734_baidu_zh.mp3,
+    // mais où le vrai fichier publié est audio/厚朴_baidu_zh.mp3.
+    generatedCandidates(clean).forEach(item => addUnique(out, item));
+    manifestCandidatesForHanzi(clean).forEach(item => addUnique(out, item));
+    return out;
   }
 
   function likelyManifestCandidate(hanzi){
+    const candidates = candidateAudioFilenamesForHanzi(hanzi);
+    return candidates[0] || "";
+  }
+
+  const audioResolveCache = new Map();
+
+  function testAudioFileExists(filename){
+    const url = audioUrl(filename);
+    if(typeof fetch !== "function") return Promise.resolve(false);
+    return fetch(url, {method:"HEAD", cache:"force-cache"})
+      .then(response => {
+        if(response && response.ok) return true;
+        if(response && (response.status === 405 || response.status === 403)) throw new Error("HEAD unsupported");
+        return false;
+      })
+      .catch(() => fetch(url, {method:"GET", headers:{Range:"bytes=0-1"}, cache:"force-cache"})
+        .then(response => Boolean(response && (response.ok || response.status === 206)))
+        .catch(() => false));
+  }
+
+  function resolveAudioFilenameForHanzi(hanzi){
     const clean = normalizeHanzi(hanzi);
-    const fromManifest = manifestByHanzi[clean];
-    if(Array.isArray(fromManifest) && fromManifest.length) return fromManifest[0];
-    if(typeof fromManifest === "string" && fromManifest) return fromManifest;
-    return "";
+    if(!clean) return Promise.resolve("");
+    if(audioResolveCache.has(clean)) return audioResolveCache.get(clean);
+    const candidates = candidateAudioFilenamesForHanzi(clean);
+    const promise = candidates.reduce((chain, filename) => chain.then(found => {
+      if(found) return found;
+      return testAudioFileExists(filename).then(ok => ok ? filename : "");
+    }), Promise.resolve(""));
+    audioResolveCache.set(clean, promise);
+    return promise;
   }
 
   function setButtonPlaying(button, isPlaying){
@@ -161,9 +205,20 @@
 
     function cleanup(){
       if(timeoutId) clearTimeout(timeoutId);
-      audio.removeEventListener("loadeddata", onReady);
-      audio.removeEventListener("canplay", onReady);
       audio.removeEventListener("error", onError);
+    }
+
+    function markSuccess(){
+      if(settled) return;
+      settled = true;
+      cleanup();
+      if(button){
+        button.disabled = false;
+        button.classList.remove("mtc-audio-loading", "mtc-audio-missing");
+        button.dataset.audioFile = filename;
+        button.title = "Écouter la prononciation";
+        setButtonPlaying(button, true);
+      }
     }
 
     function fail(){
@@ -176,39 +231,25 @@
 
     function onError(){ fail(); }
 
-    function onReady(){
-      if(settled) return;
-      settled = true;
-      cleanup();
-      const playPromise = audio.play();
-      if(playPromise && typeof playPromise.then === "function"){
-        playPromise.then(() => {
-          if(button){
-            button.disabled = false;
-            button.classList.remove("mtc-audio-loading", "mtc-audio-missing");
-            button.dataset.audioFile = filename;
-            button.title = "Écouter la prononciation";
-            setButtonPlaying(button, true);
-          }
-        }).catch(fail);
-      }else if(button){
-        button.disabled = false;
-        button.classList.remove("mtc-audio-loading", "mtc-audio-missing");
-        setButtonPlaying(button, true);
-      }
-    }
-
-    audio.addEventListener("loadeddata", onReady, {once:true});
-    audio.addEventListener("canplay", onReady, {once:true});
     audio.addEventListener("error", onError, {once:true});
     audio.addEventListener("ended", () => {
       setButtonPlaying(button, false);
       if(currentAudio === audio){ currentAudio = null; currentButton = null; }
     });
 
-    timeoutId = setTimeout(fail, 2500);
+    timeoutId = setTimeout(fail, 3000);
     audio.src = audioUrl(filename);
-    try{ audio.load(); }catch(error){ fail(); }
+
+    // Important : play() est appelé immédiatement dans le gestionnaire du clic.
+    // Attendre canplay avant play() peut faire perdre l’autorisation utilisateur
+    // dans certains navigateurs après un premier candidat introuvable.
+    let playPromise = null;
+    try{ playPromise = audio.play(); }catch(error){ fail(); return true; }
+    if(playPromise && typeof playPromise.then === "function"){
+      playPromise.then(markSuccess).catch(fail);
+    }else{
+      markSuccess();
+    }
     return true;
   }
 
@@ -224,11 +265,14 @@
       return true;
     }
 
-    const candidates = candidateAudioFilenamesForHanzi(clean);
+    let candidates = candidateAudioFilenamesForHanzi(clean);
     const remembered = button && button.dataset.audioFile;
     if(remembered && candidates.includes(remembered)){
       candidates.splice(candidates.indexOf(remembered), 1);
       candidates.unshift(remembered);
+    }
+    if(button && button.dataset.audioResolved === "1" && remembered){
+      candidates = [remembered];
     }
 
     return tryPlayCandidateList(candidates, 0, button, clean);
@@ -250,8 +294,20 @@
 
     if(clean && containsCjk(clean)){
       const known = likelyManifestCandidate(clean);
-      if(known) markAvailable(button, clean, known);
-      else markMissing(button, clean); // visible and still clickable: useful if a new file was added after manifest generation
+      markAvailable(button, clean, known || "");
+      button.dataset.audioResolved = "0";
+      if(!known) button.title = "Écouter la prononciation si le fichier audio existe";
+      resolveAudioFilenameForHanzi(clean).then(filename => {
+        if(!button.isConnected || button.dataset.audioHanzi !== clean) return;
+        if(filename){
+          button.dataset.audioResolved = "1";
+          markAvailable(button, clean, filename);
+        }else{
+          button.dataset.audioResolved = "0";
+          // On garde le bouton cliquable : un fichier peut être ajouté après le chargement ou être servi différemment.
+          button.title = "Audio non confirmé, clic pour tester";
+        }
+      });
     }else{
       markMissing(button, clean);
     }

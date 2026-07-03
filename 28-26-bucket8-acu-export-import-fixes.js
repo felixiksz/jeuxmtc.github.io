@@ -87,7 +87,10 @@
   const STATUS_MODIFIED_KEY = "mtc_personal_data_status_modified_at";
   const STATUS_EXPORTED_KEY = "mtc_personal_data_status_exported_at";
   const STATUS_TOUCHED_KEY = "mtc_personal_data_status_visible";
+  const IMPORT_HISTORY_KEY = "mtc_personal_data_import_history_v1";
+  const IMPORT_HISTORY_MAX = 8;
   let personalDataImportInProgress = false;
+  let lastImportCompatibleCount = 0;
 
   function personalDataPrefixes(){
     return [
@@ -120,6 +123,210 @@
     return personalDataPrefixes().some(prefix => clean.startsWith(prefix));
   }
 
+  function importHistoryPrefixes(){
+    // On garde l’historique léger : les images base64 peuvent saturer localStorage.
+    // Elles restent exportées dans les sauvegardes classiques, mais ne sont pas dupliquées dans la timeline.
+    return personalDataPrefixes().filter(prefix => prefix !== PHARMA_IMAGE_PREFIX);
+  }
+
+  function capturePersonalTextDataSnapshot(){
+    const data = {};
+    const prefixes = importHistoryPrefixes();
+    try{
+      for(let index = 0; index < localStorage.length; index++){
+        const key = localStorage.key(index);
+        if(key && prefixes.some(prefix => key.startsWith(prefix))){
+          data[key] = localStorage.getItem(key) || "";
+        }
+      }
+    }catch(error){}
+    return data;
+  }
+
+  function loadImportHistory(){
+    try{
+      const raw = localStorage.getItem(IMPORT_HISTORY_KEY) || "[]";
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.filter(item => item && item.data) : [];
+    }catch(error){
+      return [];
+    }
+  }
+
+  function saveImportHistory(history){
+    try{
+      localStorage.setItem(IMPORT_HISTORY_KEY, JSON.stringify((history || []).slice(0, IMPORT_HISTORY_MAX)));
+    }catch(error){
+      console.warn("Historique import trop volumineux : snapshot ignoré.", error);
+    }
+    renderImportHistoryTimeline();
+  }
+
+  function pushImportHistorySnapshot(label){
+    const data = capturePersonalTextDataSnapshot();
+    const hasData = Object.keys(data).length > 0;
+    const entry = {
+      id: "snap_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+      at: new Date().toISOString(),
+      label: label || "avant import",
+      data
+    };
+    const history = loadImportHistory();
+    history.unshift(entry);
+    saveImportHistory(history);
+    return hasData;
+  }
+
+  function restoreImportHistorySnapshot(snapshotId){
+    const history = loadImportHistory();
+    const entry = history.find(item => item && item.id === snapshotId);
+    if(!entry || !entry.data) return false;
+    const prefixes = importHistoryPrefixes();
+    try{
+      const toRemove = [];
+      for(let index = 0; index < localStorage.length; index++){
+        const key = localStorage.key(index);
+        if(key && prefixes.some(prefix => key.startsWith(prefix))) toRemove.push(key);
+      }
+      toRemove.forEach(key => localStorage.removeItem(key));
+      Object.entries(entry.data).forEach(([key, value]) => localStorage.setItem(key, String(value ?? "")));
+      markPersonalDataStatus("modified");
+      if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
+      if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
+      if(typeof window.refreshCurrentPointPanel === "function") window.refreshCurrentPointPanel();
+      if(typeof window.refreshCurrentPharmaHerbPanel === "function") window.refreshCurrentPharmaHerbPanel();
+      document.dispatchEvent(new CustomEvent("pharma-herb-edited", {detail:{field:"restore"}}));
+      renderImportHistoryTimeline();
+      const message = document.getElementById("message");
+      if(message) message.textContent = "Version locale restaurée depuis l’historique.";
+      return true;
+    }catch(error){
+      console.error(error);
+      const message = document.getElementById("message");
+      if(message) message.textContent = "Restauration impossible : stockage local inaccessible.";
+      return false;
+    }
+  }
+
+  function shortTimelineDate(value){
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return "?";
+    const pad = n => String(n).padStart(2, "0");
+    return `${pad(date.getDate())}/${pad(date.getMonth()+1)} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function ensureImportHistoryStyle(){
+    if(document.getElementById("mtcImportHistoryTimelineStyle")) return;
+    const style = document.createElement("style");
+    style.id = "mtcImportHistoryTimelineStyle";
+    style.textContent = `
+      /* Ligne statut à son emplacement fixe discret, mais sous les panneaux.
+         Les overlays recherche/comparaison/cheatsheet passent donc au-dessus et la masquent. */
+      #mtcPersonalDataStatus,#mtcPersonalDataStatus.visible{
+        position:fixed!important;
+        left:8px!important;
+        bottom:calc(env(safe-area-inset-bottom, 0px) + 18px)!important;
+        right:auto!important;top:auto!important;inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 18px) 8px!important;
+        z-index:18!important;
+        display:block!important;
+        box-sizing:border-box!important;
+        width:auto!important;
+        max-width:min(92vw, 680px)!important;
+        margin:0!important;
+        padding:2px 5px!important;
+        font-size:10px!important;
+        line-height:1.22!important;
+        white-space:normal!important;
+        overflow-wrap:anywhere!important;
+        pointer-events:none!important;
+        opacity:.64!important;
+        transform:none!important;
+        background:transparent!important;
+        box-shadow:none!important;
+        border:0!important;
+        color:color-mix(in srgb, var(--text-color, #111) 70%, transparent)!important;
+        -webkit-backdrop-filter:none!important;
+        backdrop-filter:none!important;
+      }
+      #mtcPersonalDataStatus .mtc-status-dates{display:inline!important;}
+      #mtcPersonalDataStatus .mtc-status-history-link{appearance:none;border:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;padding:0;margin-left:.35em;cursor:pointer;text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.18em;opacity:.78;pointer-events:auto!important;position:relative!important;z-index:1!important;}
+      #mtcPersonalDataStatus .mtc-status-history-link:hover,#mtcPersonalDataStatus .mtc-status-history-link:focus-visible{opacity:1;outline:none;}
+      #mtcPersonalDataStatus .mtc-status-history-popover{display:none;margin-top:.28rem;padding-top:.22rem;border-top:1px solid currentColor;opacity:.92;pointer-events:auto!important;}
+      #mtcPersonalDataStatus.history-open{z-index:24!important;}
+      #mtcPersonalDataStatus.history-open .mtc-status-history-popover{display:flex;align-items:center;gap:.34rem;flex-wrap:wrap;}
+      #mtcPersonalDataStatus .mtc-import-history-dot{appearance:none;border:0;background:transparent;color:inherit;width:.86rem;height:.86rem;border-radius:999px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;opacity:.66;position:relative;pointer-events:auto!important;}
+      #mtcPersonalDataStatus .mtc-import-history-dot::before{content:"";display:block;width:.42rem;height:.42rem;border-radius:999px;background:currentColor;box-shadow:0 0 0 2px rgba(0,0,0,.08);}
+      #mtcPersonalDataStatus .mtc-import-history-dot:hover,#mtcPersonalDataStatus .mtc-import-history-dot:focus-visible{opacity:1;outline:none;}
+      #mtcPersonalDataStatus .mtc-import-history-clear{appearance:none;border:0;background:transparent;color:inherit;opacity:.55;cursor:pointer;font:inherit;padding:0 .08rem;pointer-events:auto!important;text-decoration:underline;text-underline-offset:.18em;}
+      #mtcPersonalDataStatus .mtc-import-history-empty{opacity:.62;}
+      @media(max-width:650px){
+        #mtcPersonalDataStatus,#mtcPersonalDataStatus.visible{
+          left:7px!important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 42px)!important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 42px) 7px!important;
+          max-width:94vw!important;
+          font-size:9.2px!important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function importHistoryPopoverHtml(){
+    const history = loadImportHistory();
+    if(!history.length) return `<span class="mtc-import-history-empty">aucun historique</span>`;
+    const dots = history.slice().reverse().map(entry => `
+      <button
+        type="button"
+        class="mtc-import-history-dot"
+        data-import-history-restore="${attr(entry.id)}"
+        title="Restaurer la base locale : ${attr(shortTimelineDate(entry.at))} (${attr(entry.label || "avant import")})"
+        aria-label="Restaurer la base locale : ${attr(shortTimelineDate(entry.at))}"
+      ></button>
+    `).join("");
+    return `${dots}<button type="button" class="mtc-import-history-clear" data-import-history-clear="1" title="Vider l’historique des imports">effacer</button>`;
+  }
+
+  function renderImportHistoryTimeline(){
+    // Historique intégré dans la ligne discrète des dates : pas de pastille flottante en bas.
+    ensureImportHistoryStyle();
+    const box = document.getElementById("mtcPersonalDataStatus");
+    if(box && box.classList.contains("visible")) refreshPersonalDataStatusBox();
+  }
+
+  document.addEventListener("click", event => {
+    const restore = event.target && event.target.closest && event.target.closest("[data-import-history-restore]");
+    if(restore){
+      event.preventDefault();
+      event.stopPropagation();
+      const id = restore.getAttribute("data-import-history-restore") || "";
+      const history = loadImportHistory();
+      const entry = history.find(item => item && item.id === id);
+      const label = entry ? shortTimelineDate(entry.at) : "ce point";
+      if(confirm(`Restaurer la base locale à l’état du ${label} ?\n\nLes champs texte locaux actuels seront remplacés par ce snapshot. Les images locales ne sont pas modifiées.`)){
+        restoreImportHistorySnapshot(id);
+      }
+      return;
+    }
+    const clear = event.target && event.target.closest && event.target.closest("[data-import-history-clear]");
+    if(clear){
+      event.preventDefault();
+      event.stopPropagation();
+      if(confirm("Vider l’historique des imports ?")){
+        try{ localStorage.removeItem(IMPORT_HISTORY_KEY); }catch(error){}
+        renderImportHistoryTimeline();
+      }
+      return;
+    }
+    const toggle = event.target && event.target.closest && event.target.closest("[data-import-history-toggle]");
+    if(toggle){
+      event.preventDefault();
+      event.stopPropagation();
+      const box = document.getElementById("mtcPersonalDataStatus");
+      if(box) box.classList.toggle("history-open");
+    }
+  }, true);
+
   function formatStatusDateTime(value){
     if(!value) return "—";
     const date = new Date(value);
@@ -135,6 +342,10 @@
       box.id = "mtcPersonalDataStatus";
       box.setAttribute("aria-live", "polite");
       box.setAttribute("aria-label", "Statut import et modification des notes");
+    }
+    // La ligne reste attachée au body en position fixed basse.
+    // Son z-index bas la place sous les panneaux recherche/comparaison/cheatsheet.
+    if(box.parentElement !== document.body || box.nextElementSibling){
       document.body.appendChild(box);
     }
     return box;
@@ -160,7 +371,14 @@
     }
 
     const box = ensurePersonalDataStatusBox();
-    box.textContent = `export : ${formatStatusDateTime(exportedAt)}, import : ${formatStatusDateTime(importedAt)}, modifié : ${formatStatusDateTime(modifiedAt)}`;
+    const wasOpen = box.classList.contains("history-open");
+    const history = loadImportHistory();
+    box.innerHTML = `
+      <span class="mtc-status-dates">export : ${esc(formatStatusDateTime(exportedAt))}, import : ${esc(formatStatusDateTime(importedAt))}, modifié : ${esc(formatStatusDateTime(modifiedAt))}</span>
+      <button type="button" class="mtc-status-history-link" data-import-history-toggle="1">historique${history.length ? ` (${history.length})` : ""}</button>
+      <span class="mtc-status-history-popover" aria-label="Historique des imports">${importHistoryPopoverHtml()}</span>
+    `;
+    box.classList.toggle("history-open", wasOpen);
     box.classList.add("visible");
   }
 
@@ -223,6 +441,8 @@
 
   initPersonalDataStatusBox();
   initPersonalDataModificationWatch();
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", renderImportHistoryTimeline, {once:true});
+  else renderImportHistoryTimeline();
 
   function normalizeImportKey(value){
     return String(value || "")
@@ -350,6 +570,19 @@
     return false;
   }
 
+
+  function valueHasImportContent(value){
+    if(Array.isArray(value)) return value.some(valueHasImportContent);
+    if(value && typeof value === "object") return Object.values(value).some(valueHasImportContent);
+    return normalizeMergeText(value).length > 0;
+  }
+
+  function hasKnownImportTarget(rawId){
+    const id = String(rawId || "").trim();
+    if(!id) return false;
+    return Boolean(findImportHerb(id) || findImportPoint(id) || /^[A-Z]{1,4}\d+[A-Z]?$/i.test(id));
+  }
+
   function mergeLocalValue(prefix, id, incoming, field, options){
     const next = normalizeMergeText(incoming);
     if(!next) return false;
@@ -392,7 +625,10 @@
       // Le stockage local, lui, reste toujours indexé par ID interne stable.
       let id = String(rawId || "").trim();
       const herb = findImportHerb(id);
+      const point = findImportPoint(id);
       if(herb && herb.id) id = herb.id;
+      else if(point) id = point;
+      if(valueHasImportContent(value) && (herb || point || hasKnownImportTarget(rawId))) lastImportCompatibleCount++;
       if(mergeLocalValue(prefix, id, value, field || "", options || {})) count++;
     });
     return count;
@@ -509,8 +745,34 @@
   };
 
 
+  function normalizeImportFieldName(value){
+    const raw = String(value || "").trim().toLocaleLowerCase("fr-FR");
+    const clean = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s-]+/g, "_");
+    const aliases = {
+      hanzis:"hanzi",
+      caracteres:"hanzi",
+      caracteres_chinois:"hanzi",
+      ingredients:"ingredients",
+      ingredient:"ingredients",
+      recherches_modernes:"recherches_modernes",
+      recherche_moderne:"recherches_modernes",
+      modern_research:"recherches_modernes",
+      indications:"indications",
+      contre_indications:"contre_indications",
+      contraindications:"contre_indications",
+      contre_indication:"contre_indications",
+      preparation:"preparation",
+      preparations:"preparation",
+      synthese:"synthese",
+      syntheses:"synthese",
+      precautions:"precautions",
+      precaution:"precautions"
+    };
+    return aliases[clean] || clean;
+  }
+
   function importReplaceFieldSet(parsed, pharma){
-    const officialReplace = new Set(["hanzi", "ingredients", "recherches_modernes", "indications", "contre_indications", "preparation", "synthese"]);
+    const officialReplace = new Set(["hanzi", "ingredients", "recherches_modernes", "indications", "precautions", "contre_indications", "preparation", "synthese"]);
     const values = [];
     function addList(list){
       if(Array.isArray(list)) list.forEach(item => values.push(String(item || "")));
@@ -518,18 +780,19 @@
     addList(parsed && (parsed.replaceFields || parsed._replaceFields || parsed.importReplaceFields));
     addList(pharma && (pharma.replaceFields || pharma._replaceFields || pharma.importReplaceFields));
     const mode = String((parsed && (parsed.importMode || parsed.mode || parsed._importMode)) || "").toLocaleLowerCase("fr-FR");
-    const replaceAllOfficial = mode.includes("replace-official-pharma-xlsx-fields") || values.some(value => value === "official_xlsx" || value === "official-pharma-xlsx");
+    const replaceAllOfficial = mode.includes("replace-official-pharma-xlsx-fields") || values.some(value => normalizeImportFieldName(value) === "official_xlsx" || normalizeImportFieldName(value) === "official_pharma_xlsx");
     const out = new Set();
     if(replaceAllOfficial) officialReplace.forEach(field => out.add(field));
     values.forEach(value => {
-      const clean = String(value || "").trim();
+      const clean = normalizeImportFieldName(value);
       if(clean) out.add(clean);
     });
     return out;
   }
 
   function importFieldOptions(replaceSet, field){
-    return {replace: replaceSet && replaceSet.has(field)};
+    const clean = normalizeImportFieldName(field);
+    return {replace: replaceSet && replaceSet.has(clean)};
   }
 
   window.importPersonalNotesFromFile = function(input){
@@ -541,8 +804,10 @@
       const message = document.getElementById("message");
       try{
         personalDataImportInProgress = true;
+        lastImportCompatibleCount = 0;
         const parsed = JSON.parse(String(reader.result || "{}"));
         let count = 0;
+        pushImportHistorySnapshot("avant import");
 
         // Ancien format : {type:"personal-notes", notes:{...}}.
         // Les clés sont maintenant routées : point ACU => note ACU, substance PHARMA => note PHARMA.
@@ -561,8 +826,12 @@
           count += setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution, "precautions");
         }
 
-        if(parsed.pharmacology || parsed.pharma || parsed.herbs){
-          const pharma = parsed.pharmacology || parsed.pharma || parsed.herbs || {};
+        const looksLikeDirectPharmaImport = parsed && typeof parsed === "object" && (
+          parsed.hanzi || parsed.hanzis || parsed.ingredients || parsed.recherches_modernes || parsed.indications ||
+          parsed.associations || parsed.formules || parsed.precautions || parsed.contre_indications || parsed.preparations || parsed.syntheses || parsed.vs
+        );
+        if(parsed.pharmacology || parsed.pharma || parsed.herbs || looksLikeDirectPharmaImport){
+          const pharma = parsed.pharmacology || parsed.pharma || parsed.herbs || parsed || {};
           const replaceSet = importReplaceFieldSet(parsed, pharma);
           count += setPrefixedValues(PHARMA_HANZI_PREFIX, pharma.hanzi || pharma.hanzis || pharma.caracteres || pharma.caractères, "hanzi", importFieldOptions(replaceSet, "hanzi"));
           count += setPrefixedValues(PHARMA_ESPRIT_PREFIX, pharma.esprits || pharma.esprit, "esprit");
@@ -570,7 +839,7 @@
           count += setPrefixedValues(PHARMA_ASSOC_PREFIX, pharma.associations || pharma.association, "associations");
           count += setPrefixedValues(PHARMA_FORMULES_PREFIX, pharma.formules || pharma.formulas || pharma.formule, "formules");
           count += setPrefixedValues(PHARMA_VS_PREFIX, pharma.vs || pharma.comparaisons || pharma.comparison, "vs");
-          count += setPrefixedValues(PHARMA_PRECAUTION_PREFIX, pharma.precautions || pharma.precaution, "precautions");
+          count += setPrefixedValues(PHARMA_PRECAUTION_PREFIX, pharma.precautions || pharma.précautions || pharma.precaution || pharma.précaution, "precautions", importFieldOptions(replaceSet, "precautions"));
           count += setPrefixedValues(PHARMA_SYNONYMES_PREFIX, pharma.synonymes || pharma.synonyms || pharma.noms_alternatifs, "synonymes");
           count += setPrefixedValues(PHARMA_SYNTHESE_PREFIX, pharma.syntheses || pharma.synthèses || pharma.synthese || pharma.synthèse, "synthese", importFieldOptions(replaceSet, "synthese"));
           count += setPrefixedValues(PHARMA_INGREDIENTS_PREFIX, pharma.ingredients || pharma.ingrédients, "ingredients", importFieldOptions(replaceSet, "ingredients"));
@@ -591,9 +860,13 @@
         document.dispatchEvent(new CustomEvent("mtc-personal-data-imported", {detail:{count}}));
 
         if(message){
-          message.textContent = count
-            ? `Import terminé : ${count} élément(s) récupéré(s).`
-            : "Import terminé, mais aucun élément compatible n’a été trouvé.";
+          if(lastImportCompatibleCount){
+            message.textContent = count
+              ? `Import terminé : ${lastImportCompatibleCount} champ(s) compatible(s) lu(s), ${count} élément(s) modifié(s).`
+              : `Import terminé : ${lastImportCompatibleCount} champ(s) compatible(s) lu(s), base déjà à jour.`;
+          }else{
+            message.textContent = "Import terminé, mais aucun élément compatible n’a été trouvé.";
+          }
         }
       }catch(error){
         personalDataImportInProgress = false;

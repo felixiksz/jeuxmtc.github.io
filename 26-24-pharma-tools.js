@@ -191,13 +191,18 @@
   function getHerbSearchPrecautions(herb){
     if(!herb) return "";
     const stored = getStoredText(PRECAUTION_STORAGE_PREFIX, herb.id);
-    return [herb.precaution || "", herb.precautions || "", stored !== null ? stored : ""].join(" ");
+    // La recherche par champ doit correspondre au champ visible : si une donnée locale/importée existe,
+    // on ne recherche pas en plus dans l’ancienne valeur statique cachée.
+    return stored !== null ? stored : [herb.precaution || "", herb.precautions || ""].join(" ");
   }
 
   function getStoredOrStaticText(prefix, herb, staticValues){
     if(!herb) return "";
     const stored = getStoredText(prefix, herb.id);
-    return (Array.isArray(staticValues) ? staticValues : [staticValues]).concat(stored !== null ? [stored] : []).join(" ");
+    // Même logique pour les champs officiels importés : le filtre “uniquement ce champ” doit refléter
+    // ce qui est affiché dans la fiche/comparaison, pas un mélange invisible ancien + nouveau.
+    if(stored !== null) return stored;
+    return (Array.isArray(staticValues) ? staticValues : [staticValues]).join(" ");
   }
 
   function getHerbSearchSynonymes(herb){
