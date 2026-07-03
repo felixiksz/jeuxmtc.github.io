@@ -166,8 +166,10 @@
 
   function getHerbHanzi(herb){
     if(!herb) return "";
+    const official = String(herb.hanzi || "").trim();
+    if(official) return official;
     const stored = getStoredText(HANZI_STORAGE_PREFIX, herb.id);
-    return stored !== null ? stored : (herb.hanzi || "");
+    return stored !== null ? stored : "";
   }
 
   function getHerbEsprit(herb){

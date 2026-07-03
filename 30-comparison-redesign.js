@@ -335,10 +335,12 @@
 
   function herbHanzi(herb){
     if(!herb) return "";
+    const official = text(herb.hanzi || "");
+    if(official) return official;
     if(typeof window.getPharmaHerbHanzi === "function"){
-      return text(window.getPharmaHerbHanzi(herb.id) || herb.hanzi || "");
+      return text(window.getPharmaHerbHanzi(herb.id) || "");
     }
-    return text(localStorageValue(PHARMA_HANZI_PREFIX, herb.id, herb.hanzi || ""));
+    return text(localStorageValue(PHARMA_HANZI_PREFIX, herb.id, ""));
   }
 
   function herbTitle(herb){

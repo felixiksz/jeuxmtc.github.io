@@ -137,8 +137,13 @@
 
   function getHerbHanzi(herb){
     if(!herb) return "";
+    // Le hanzi est désormais une donnée globale officielle du jeu.
+    // On le lit donc en priorité depuis la base publiée, pour éviter
+    // qu’un ancien import local vide masque le hanzi officiel.
+    const official = String(herb.hanzi || "").trim();
+    if(official) return official;
     const stored = getStoredValue(HANZI_STORAGE_PREFIX, herb.id);
-    return stored !== null ? stored : (herb.hanzi || "");
+    return stored !== null ? stored : "";
   }
 
   function getHerbEsprit(herb){
