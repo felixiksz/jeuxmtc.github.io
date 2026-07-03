@@ -3115,29 +3115,7 @@ function mtcMistakeRecap(){
 }
 
 function mtcEndReviewHtml(){
-  const items = currentAcuRunErrors.slice(0,8);
-  if(!items.length) return "";
-  const seen = new Set();
-  const rows = items.filter(item => {
-    const key = [item.point, item.category, item.otherCategory].join("|");
-    if(seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  }).slice(0,5);
-  return `
-    <details class="end-review-card experimental-review-card">
-      <summary>À revoir <span>${rows.length}</span></summary>
-      <ul>
-        ${rows.map(item => `
-          <li>
-            <strong>${escapeHtml(item.point || item.category || "Erreur")}</strong>
-            <span>${escapeHtml(item.otherCategory ? "confusion possible avec : " + item.otherCategory : item.category || "à stabiliser")}</span>
-          </li>
-        `).join("")}
-      </ul>
-      <button type="button" onclick="startMtcSoftReviewFromErrors()">Rejouer en révision douce</button>
-    </details>
-  `;
+  return "";
 }
 
 function startMtcSoftReviewFromErrors(){
@@ -3775,7 +3753,7 @@ function showEndReviewScreen(mode){
       ${title}
     </div>
 
-    <div class="game-over-subtitle">
+    <div class="game-over-subtitle mtc-final-detail-hint">
       ${subtitle}
     </div>
 
@@ -5921,6 +5899,17 @@ function toggleTile(tile, point){
 
   if(!selected.includes(point)){
     selected.push(point);
+  }
+
+  // Feedback audio immédiat : seulement pour une tuile validement acceptée.
+  // Les incompatibilités et les désélections ne déclenchent pas de son.
+  if(typeof window.mtcAudioModePlayHanzi === "function"){
+    try{
+      const pointHanzi = window.POINT_DETAILS && window.POINT_DETAILS[String(point)]
+        ? window.POINT_DETAILS[String(point)].hanzi
+        : "";
+      if(pointHanzi) window.mtcAudioModePlayHanzi(pointHanzi);
+    }catch(error){}
   }
 
   const group = solution.find(g =>

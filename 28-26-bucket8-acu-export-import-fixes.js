@@ -444,6 +444,45 @@
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", renderImportHistoryTimeline, {once:true});
   else renderImportHistoryTimeline();
 
+  function yieldToImportUi(){
+    return new Promise(resolve => setTimeout(resolve, 0));
+  }
+
+  function ensureImportExportProgressBox(){
+    let box = document.getElementById("mtcImportExportProgress");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "mtcImportExportProgress";
+      box.setAttribute("aria-live", "polite");
+      box.innerHTML = '<span class="mtc-import-export-progress-label"></span><span class="mtc-import-export-progress-bar"><span></span></span>';
+      document.body.appendChild(box);
+    }
+    return box;
+  }
+
+  function setImportExportProgress(label, percent){
+    const box = ensureImportExportProgressBox();
+    const p = Math.max(0, Math.min(100, Number(percent) || 0));
+    const text = String(label || "TRAITEMENT").toUpperCase();
+    box.classList.add("visible");
+    const labelEl = box.querySelector(".mtc-import-export-progress-label");
+    const bar = box.querySelector(".mtc-import-export-progress-bar > span");
+    if(labelEl) labelEl.textContent = `${text} ${Math.round(p).toString().padStart(3, "0")}%`;
+    if(bar) bar.style.width = `${p}%`;
+  }
+
+  function hideImportExportProgress(delay){
+    const box = document.getElementById("mtcImportExportProgress");
+    if(!box) return;
+    setTimeout(() => box.classList.remove("visible"), delay == null ? 450 : delay);
+  }
+
+  async function applyImportChunk(label, progress, fn){
+    setImportExportProgress(label, progress);
+    await yieldToImportUi();
+    return fn();
+  }
+
   function normalizeImportKey(value){
     return String(value || "")
       .normalize("NFD")
@@ -700,8 +739,13 @@
   }
 
   window.exportPersonalNotes = function(){
-    const acuNotes = safeLocalStorageEntries(ACU_NOTE_PREFIX);
-    const payload = {
+    (async () => {
+      setImportExportProgress("EXPORT", 4);
+      await yieldToImportUi();
+      const acuNotes = safeLocalStorageEntries(ACU_NOTE_PREFIX);
+      setImportExportProgress("EXPORT", 35);
+      await yieldToImportUi();
+      const payload = {
       app:"Connections MTC",
       type:"personal-data",
       version:5,
@@ -734,14 +778,24 @@
       }
     };
 
-    downloadJson(payload, "connections-mtc-notes-images.json");
-    markPersonalDataStatus("export");
-    document.dispatchEvent(new CustomEvent("mtc-personal-data-exported", {detail:{exportedAt:payload.exportedAt}}));
+      setImportExportProgress("EXPORT", 78);
+      await yieldToImportUi();
+      downloadJson(payload, "connections-mtc-notes-images.json");
+      setImportExportProgress("EXPORT", 100);
+      markPersonalDataStatus("export");
+      document.dispatchEvent(new CustomEvent("mtc-personal-data-exported", {detail:{exportedAt:payload.exportedAt}}));
 
-    const message = document.getElementById("message");
-    if(message){
-      message.textContent = "Export créé : notes, esprits, associations, VS, formules, précautions et images locales.";
-    }
+      const message = document.getElementById("message");
+      if(message){
+        message.textContent = "Export créé : notes, esprits, associations, VS, formules, précautions et images locales.";
+      }
+      hideImportExportProgress();
+    })().catch(error => {
+      console.error(error);
+      hideImportExportProgress();
+      const message = document.getElementById("message");
+      if(message) message.textContent = "Export impossible.";
+    });
   };
 
 
@@ -800,30 +854,36 @@
     if(!file) return;
 
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const message = document.getElementById("message");
       try{
         personalDataImportInProgress = true;
         lastImportCompatibleCount = 0;
+        setImportExportProgress("IMPORT", 4);
+        await yieldToImportUi();
         const parsed = JSON.parse(String(reader.result || "{}"));
+        setImportExportProgress("IMPORT", 14);
+        await yieldToImportUi();
         let count = 0;
         pushImportHistorySnapshot("avant import");
+        setImportExportProgress("IMPORT", 22);
+        await yieldToImportUi();
 
         // Ancien format : {type:"personal-notes", notes:{...}}.
         // Les clés sont maintenant routées : point ACU => note ACU, substance PHARMA => note PHARMA.
         if(parsed.type === "personal-notes" || parsed.notes){
-          count += routeLegacyNotes(parsed.notes || parsed);
+          count += await applyImportChunk("IMPORT", 28, () => routeLegacyNotes(parsed.notes || parsed));
         }else if(parsed && !parsed.acupuncture && !parsed.pharmacology && typeof parsed === "object"){
-          count += routeLegacyNotes(parsed);
+          count += await applyImportChunk("IMPORT", 28, () => routeLegacyNotes(parsed));
         }
 
         // Compatibilité avec différents noms possibles venant d’anciens exports.
         if(parsed.acupuncture){
-          count += setPrefixedValues(ACU_NOTE_PREFIX, parsed.acupuncture.notes || parsed.acupuncture.note, "notes");
-          count += setPrefixedValues(ACU_ESPRIT_PREFIX, parsed.acupuncture.esprits || parsed.acupuncture.esprit, "esprit");
-          count += setPrefixedValues(ACU_ASSOC_PREFIX, parsed.acupuncture.associations || parsed.acupuncture.association, "associations");
-          count += setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison, "vs");
-          count += setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution, "precautions");
+          count += await applyImportChunk("IMPORT", 32, () => setPrefixedValues(ACU_NOTE_PREFIX, parsed.acupuncture.notes || parsed.acupuncture.note, "notes"));
+          count += await applyImportChunk("IMPORT", 35, () => setPrefixedValues(ACU_ESPRIT_PREFIX, parsed.acupuncture.esprits || parsed.acupuncture.esprit, "esprit"));
+          count += await applyImportChunk("IMPORT", 38, () => setPrefixedValues(ACU_ASSOC_PREFIX, parsed.acupuncture.associations || parsed.acupuncture.association, "associations"));
+          count += await applyImportChunk("IMPORT", 41, () => setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison, "vs"));
+          count += await applyImportChunk("IMPORT", 44, () => setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution, "precautions"));
         }
 
         const looksLikeDirectPharmaImport = parsed && typeof parsed === "object" && (
@@ -833,31 +893,38 @@
         if(parsed.pharmacology || parsed.pharma || parsed.herbs || looksLikeDirectPharmaImport){
           const pharma = parsed.pharmacology || parsed.pharma || parsed.herbs || parsed || {};
           const replaceSet = importReplaceFieldSet(parsed, pharma);
-          count += setPrefixedValues(PHARMA_HANZI_PREFIX, pharma.hanzi || pharma.hanzis || pharma.caracteres || pharma.caractères, "hanzi", importFieldOptions(replaceSet, "hanzi"));
-          count += setPrefixedValues(PHARMA_ESPRIT_PREFIX, pharma.esprits || pharma.esprit, "esprit");
-          count += setPrefixedValues(PHARMA_NOTE_PREFIX, pharma.notes || pharma.note, "notes");
-          count += setPrefixedValues(PHARMA_ASSOC_PREFIX, pharma.associations || pharma.association, "associations");
-          count += setPrefixedValues(PHARMA_FORMULES_PREFIX, pharma.formules || pharma.formulas || pharma.formule, "formules");
-          count += setPrefixedValues(PHARMA_VS_PREFIX, pharma.vs || pharma.comparaisons || pharma.comparison, "vs");
-          count += setPrefixedValues(PHARMA_PRECAUTION_PREFIX, pharma.precautions || pharma.précautions || pharma.precaution || pharma.précaution, "precautions", importFieldOptions(replaceSet, "precautions"));
-          count += setPrefixedValues(PHARMA_SYNONYMES_PREFIX, pharma.synonymes || pharma.synonyms || pharma.noms_alternatifs, "synonymes");
-          count += setPrefixedValues(PHARMA_SYNTHESE_PREFIX, pharma.syntheses || pharma.synthèses || pharma.synthese || pharma.synthèse, "synthese", importFieldOptions(replaceSet, "synthese"));
-          count += setPrefixedValues(PHARMA_INGREDIENTS_PREFIX, pharma.ingredients || pharma.ingrédients, "ingredients", importFieldOptions(replaceSet, "ingredients"));
-          count += setPrefixedValues(PHARMA_RECHERCHES_MODERNES_PREFIX, pharma.recherches_modernes || pharma.recherche_moderne || pharma.modern_research, "recherches_modernes", importFieldOptions(replaceSet, "recherches_modernes"));
-          count += setPrefixedValues(PHARMA_INDICATIONS_PREFIX, pharma.indications || pharma.indications_locales || pharma.indications_complementaires, "indications", importFieldOptions(replaceSet, "indications"));
-          count += setPrefixedValues(PHARMA_CONTRE_INDICATIONS_PREFIX, pharma.contre_indications || pharma.contraindications || pharma.contre_indications_locales, "contre_indications", importFieldOptions(replaceSet, "contre_indications"));
-          count += setPrefixedValues(PHARMA_PREPARATION_PREFIX, pharma.preparations || pharma.préparations || pharma.preparation || pharma.préparation, "preparation", importFieldOptions(replaceSet, "preparation"));
-          count += setPrefixedValues(PHARMA_IMAGE_PREFIX, pharma.images || pharma.image, "images");
+          count += await applyImportChunk("IMPORT", 48, () => setPrefixedValues(PHARMA_HANZI_PREFIX, pharma.hanzi || pharma.hanzis || pharma.caracteres || pharma.caractères, "hanzi", importFieldOptions(replaceSet, "hanzi")));
+          count += await applyImportChunk("IMPORT", 51, () => setPrefixedValues(PHARMA_ESPRIT_PREFIX, pharma.esprits || pharma.esprit, "esprit"));
+          count += await applyImportChunk("IMPORT", 54, () => setPrefixedValues(PHARMA_NOTE_PREFIX, pharma.notes || pharma.note, "notes"));
+          count += await applyImportChunk("IMPORT", 57, () => setPrefixedValues(PHARMA_ASSOC_PREFIX, pharma.associations || pharma.association, "associations"));
+          count += await applyImportChunk("IMPORT", 60, () => setPrefixedValues(PHARMA_FORMULES_PREFIX, pharma.formules || pharma.formulas || pharma.formule, "formules"));
+          count += await applyImportChunk("IMPORT", 63, () => setPrefixedValues(PHARMA_VS_PREFIX, pharma.vs || pharma.comparaisons || pharma.comparison, "vs"));
+          count += await applyImportChunk("IMPORT", 66, () => setPrefixedValues(PHARMA_PRECAUTION_PREFIX, pharma.precautions || pharma.précautions || pharma.precaution || pharma.précaution, "precautions", importFieldOptions(replaceSet, "precautions")));
+          count += await applyImportChunk("IMPORT", 69, () => setPrefixedValues(PHARMA_SYNONYMES_PREFIX, pharma.synonymes || pharma.synonyms || pharma.noms_alternatifs, "synonymes"));
+          count += await applyImportChunk("IMPORT", 72, () => setPrefixedValues(PHARMA_SYNTHESE_PREFIX, pharma.syntheses || pharma.synthèses || pharma.synthese || pharma.synthèse, "synthese", importFieldOptions(replaceSet, "synthese")));
+          count += await applyImportChunk("IMPORT", 75, () => setPrefixedValues(PHARMA_INGREDIENTS_PREFIX, pharma.ingredients || pharma.ingrédients, "ingredients", importFieldOptions(replaceSet, "ingredients")));
+          count += await applyImportChunk("IMPORT", 78, () => setPrefixedValues(PHARMA_RECHERCHES_MODERNES_PREFIX, pharma.recherches_modernes || pharma.recherche_moderne || pharma.modern_research, "recherches_modernes", importFieldOptions(replaceSet, "recherches_modernes")));
+          count += await applyImportChunk("IMPORT", 81, () => setPrefixedValues(PHARMA_INDICATIONS_PREFIX, pharma.indications || pharma.indications_locales || pharma.indications_complementaires, "indications", importFieldOptions(replaceSet, "indications")));
+          count += await applyImportChunk("IMPORT", 84, () => setPrefixedValues(PHARMA_CONTRE_INDICATIONS_PREFIX, pharma.contre_indications || pharma.contraindications || pharma.contre_indications_locales, "contre_indications", importFieldOptions(replaceSet, "contre_indications")));
+          count += await applyImportChunk("IMPORT", 87, () => setPrefixedValues(PHARMA_PREPARATION_PREFIX, pharma.preparations || pharma.préparations || pharma.preparation || pharma.préparation, "preparation", importFieldOptions(replaceSet, "preparation")));
+          count += await applyImportChunk("IMPORT", 90, () => setPrefixedValues(PHARMA_IMAGE_PREFIX, pharma.images || pharma.image, "images"));
         }
 
         personalDataImportInProgress = false;
+        setImportExportProgress("IMPORT", 96);
+        await yieldToImportUi();
         markPersonalDataStatus("import");
-        if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
-        if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
-        if(typeof window.refreshCurrentPointPanel === "function") window.refreshCurrentPointPanel();
-        if(typeof window.refreshCurrentPharmaHerbPanel === "function") window.refreshCurrentPharmaHerbPanel();
         document.dispatchEvent(new CustomEvent("pharma-herb-edited", {detail:{field:"import"}}));
         document.dispatchEvent(new CustomEvent("mtc-personal-data-imported", {detail:{count}}));
+        setImportExportProgress("IMPORT", 100);
+        const refreshAfterImport = () => {
+          if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
+          if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
+          if(typeof window.refreshCurrentPointPanel === "function") window.refreshCurrentPointPanel();
+          if(typeof window.refreshCurrentPharmaHerbPanel === "function") window.refreshCurrentPharmaHerbPanel();
+        };
+        if(window.requestIdleCallback) requestIdleCallback(refreshAfterImport, {timeout:500});
+        else setTimeout(refreshAfterImport, 40);
 
         if(message){
           if(lastImportCompatibleCount){
@@ -874,6 +941,7 @@
         if(message) message.textContent = "Import impossible : fichier de notes/images invalide.";
       }finally{
         personalDataImportInProgress = false;
+        hideImportExportProgress();
         if(input) input.value = "";
       }
     };

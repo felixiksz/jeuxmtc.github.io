@@ -1,0 +1,32 @@
+/* === Reprise version non-stable : zone de fermeture des fiches fixée à l'écran ===
+   Garde la tranche de fermeture/repli du panneau détail accessible même après scroll. */
+#pointPanel.open #panelToggle,
+.point-panel.open .panel-toggle{
+  position:fixed !important;
+  top:0 !important;
+  right:calc(min(340px, 86vw) - 34px) !important;
+  left:auto !important;
+  width:34px !important;
+  height:100dvh !important;
+  min-height:100dvh !important;
+  max-height:100dvh !important;
+  z-index:1000405 !important;
+  pointer-events:auto !important;
+}
+
+@supports not (height:100dvh){
+  #pointPanel.open #panelToggle,
+  .point-panel.open .panel-toggle{
+    height:100vh !important;
+    min-height:100vh !important;
+    max-height:100vh !important;
+  }
+}
+
+@media(max-width:699px), (pointer:coarse){
+  #pointPanel.open #panelToggle,
+  .point-panel.open .panel-toggle{
+    left:0 !important;
+    right:auto !important;
+  }
+}

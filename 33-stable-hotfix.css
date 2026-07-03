@@ -1,0 +1,84 @@
+/* === 33-stable-hotfix.css
+   Correctifs très ciblés sur la dernière version stable.
+   Objectif : éviter de modifier les gros fichiers du moteur. === */
+
+/* Historique import : cliquable, sans double soulignement. */
+#mtcPersonalDataStatus,
+#mtcPersonalDataStatus.visible{
+  pointer-events:auto !important;
+}
+#mtcPersonalDataStatus .mtc-status-history-link{
+  pointer-events:auto !important;
+  cursor:pointer !important;
+  text-decoration:underline !important;
+  text-decoration-thickness:.06em !important;
+  text-underline-offset:.18em !important;
+  border-bottom:0 !important;
+  box-shadow:none !important;
+  background-image:none !important;
+}
+#mtcPersonalDataStatus .mtc-status-history-popover,
+#mtcPersonalDataStatus .mtc-import-history-dot,
+#mtcPersonalDataStatus .mtc-import-history-clear{
+  pointer-events:auto !important;
+}
+#mtcPersonalDataStatus.history-open{
+  z-index:1000001 !important;
+}
+
+/* Les anciens réglages retirés ne doivent pas réapparaître. */
+#pharmaSolvedNatureColorToggle,
+#pharmaSolvedTropismToggle,
+#pharmaSolvedToxicityToggle,
+#pharmaSolvedNatureColorToggle + span,
+#pharmaSolvedTropismToggle + span,
+#pharmaSolvedToxicityToggle + span,
+#settingsPanel .pharma-solved-nature-setting,
+#settingsPanel .pharma-solved-tropism-setting,
+#settingsPanel .pharma-solved-toxicity-setting{
+  display:none !important;
+}
+
+/* Fiche détaillée : audio / panier / A|B alignés à droite. */
+#pointPanelContent .point-header{
+  display:flex !important;
+  align-items:baseline !important;
+  flex-wrap:wrap !important;
+  gap:.16em .34em !important;
+  padding-right:0 !important;
+}
+#pointPanelContent .point-header .mtc-header-actions{
+  margin-left:auto !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:.16rem !important;
+  flex:0 0 auto !important;
+}
+#pointPanelContent .point-header .mtc-header-actions .mtc-audio-button,
+#pointPanelContent .point-header .mtc-header-actions .point-header-basket-button,
+#pointPanelContent .point-header .mtc-header-actions .pharma-herb-panel-basket-add,
+#pointPanelContent .point-header .mtc-header-actions .mtc-header-compare-button{
+  position:static !important;
+  top:auto !important;
+  right:auto !important;
+  margin:0 !important;
+  flex:0 0 auto !important;
+}
+#pointPanelContent .point-header .mtc-header-compare-button{
+  min-width:28px !important;
+  min-height:22px !important;
+  padding:1px 6px !important;
+  font-size:.72em !important;
+}
+#pointPanelContent .point-header .mtc-header-compare-button.is-active{
+  opacity:1 !important;
+  background:var(--shadow-color) !important;
+  color:var(--page-bg) !important;
+  border-color:var(--shadow-color) !important;
+}
+
+/* Sur mobile, le contenu ESPRIT s’ouvre avec +, pas avec une ampoule. */
+html[data-study-domain="pharmacology"] .pharma-solved-info-button{
+  font-weight:900 !important;
+}

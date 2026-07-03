@@ -1,0 +1,125 @@
+/* === 34-targeted-requests.css : correctifs ciblés demandés === */
+
+/* ESPRIT : ordinateur = survol ; mobile/tactile = bouton +. */
+@media (hover:hover) and (pointer:fine){
+  html[data-study-domain="pharmacology"] .pharma-solved-info-button{
+    display:none !important;
+  }
+}
+@media (hover:none), (pointer:coarse), (max-width:699px){
+  html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]:not(.pharma-synthesis-open)::after{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+  }
+  html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    animation:none !important;
+  }
+  html[data-study-domain="pharmacology"] .pharma-solved-info-button{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+}
+
+/* Historique import : refermable + message court. */
+#mtcPersonalDataStatus.history-open{
+  z-index:1000002 !important;
+}
+#mtcPersonalDataStatus .mtc-status-history-popover{
+  align-items:center !important;
+}
+#mtcPersonalDataStatus .mtc-import-history-help{
+  opacity:.72 !important;
+  font-size:.86em !important;
+  margin-right:.22rem !important;
+}
+#mtcPersonalDataStatus .mtc-import-history-close{
+  appearance:none !important;
+  border:0 !important;
+  background:transparent !important;
+  color:inherit !important;
+  cursor:pointer !important;
+  font:inherit !important;
+  opacity:.64 !important;
+  padding:0 .08rem !important;
+  text-decoration:underline !important;
+  text-underline-offset:.18em !important;
+}
+#mtcPersonalDataStatus .mtc-import-history-close:hover,
+#mtcPersonalDataStatus .mtc-import-history-close:focus-visible{
+  opacity:1 !important;
+  outline:none !important;
+}
+
+/* Comparaison : les lignes sont déplaçables aussi au doigt/souris, pas seulement HTML5 drag desktop. */
+#comparisonPanelContent .mtc-compare-row-label[data-mtc-compare-row-key]{
+  cursor:grab !important;
+  touch-action:none !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.is-row-dragging,
+body.mtc-compare-touch-dragging #comparisonPanelContent .mtc-compare-row-label[data-mtc-compare-row-key]{
+  cursor:grabbing !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.is-row-dragging{
+  opacity:.65 !important;
+  filter:saturate(1.15) contrast(1.08) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.is-row-drag-over{
+  box-shadow:inset 0 3px 0 var(--shadow-color, currentColor) !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.is-row-drag-over.is-row-drag-after{
+  box-shadow:inset 0 -3px 0 var(--shadow-color, currentColor) !important;
+}
+
+/* Fiches : bouton audio disponible dans toutes les fiches. */
+#pointPanelContent .mtc-audio-button-34{
+  opacity:.82 !important;
+}
+#pointPanelContent .mtc-audio-button-34:hover,
+#pointPanelContent .mtc-audio-button-34:focus-visible{
+  opacity:1 !important;
+}
+
+
+/* ACU : secousse restaurée sur mauvaise tuile. */
+@keyframes mtcAcuShakeRestore34{
+  0%{ transform:translateX(0); }
+  16%{ transform:translateX(-9px); }
+  32%{ transform:translateX(9px); }
+  48%{ transform:translateX(-7px); }
+  64%{ transform:translateX(7px); }
+  82%{ transform:translateX(-3px); }
+  100%{ transform:translateX(0); }
+}
+html[data-study-domain="acupuncture"] .tile.mtc-acu-shake-restore{
+  animation:mtcAcuShakeRestore34 .38s ease both !important;
+}
+
+/* Comparaison : signal visuel de drag plus évident. */
+#comparisonPanelContent .mtc-compare-row-label[data-mtc-compare-row-key]::after{
+  content:"↕";
+  opacity:.38;
+  margin-left:.35rem;
+  font-size:.82em;
+}
+#comparisonPanelContent .mtc-compare-row-label.is-row-drag-over::after,
+#comparisonPanelContent .mtc-compare-row-label.is-row-dragging::after{
+  opacity:1;
+}
+
+
+/* Reprise depuis la bonne version : message final discret + module À revoir désactivé. */
+.game-over-subtitle.mtc-final-detail-hint,
+.pharma-end-subtitle.mtc-final-detail-hint{
+  font-size:clamp(.5rem, 1.1vw, .725rem) !important;
+  line-height:1.35 !important;
+}
+.end-review-card.experimental-review-card{
+  display:none !important;
+}

@@ -842,6 +842,14 @@
       pharmaState.selectedIds.push(herbId);
     }
 
+    // Feedback audio immédiat : on prononce uniquement la tuile réellement acceptée.
+    // Les erreurs et les désélections ne déclenchent rien.
+    if(typeof window.mtcAudioModePlayHanzi === "function"){
+      const herbForAudio = getHerbById(herbId);
+      const hanziForAudio = herbForAudio && (herbForAudio.hanzi || "");
+      if(hanziForAudio) window.mtcAudioModePlayHanzi(hanziForAudio);
+    }
+
     updatePharmaCounter();
 
     if(pharmaState.selectedIds.length === group.size){

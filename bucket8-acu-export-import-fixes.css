@@ -1356,3 +1356,105 @@ html[data-mtc-gameplay-mode="exam"] #cheatDisplay{
     font-size:9.2px !important;
   }
 }
+
+
+/* === Patch stabilité : bouton fermer toujours visible dans fiches et cheatsheet === */
+.point-panel.open .panel-close,
+.point-panel .panel-close{
+  position:sticky !important;
+  top:10px !important;
+  float:right !important;
+  z-index:5005 !important;
+  background:color-mix(in srgb, var(--page-bg, #fff) 92%, transparent) !important;
+  border-radius:999px !important;
+  pointer-events:auto !important;
+}
+.cheatsheet-panel.open .cheatsheet-toggle{
+  position:sticky !important;
+  top:10px !important;
+  z-index:5006 !important;
+  pointer-events:auto !important;
+}
+
+/* === Patch mobile : statut/historique moins gênant + progression import/export === */
+#mtcPersonalDataStatus{
+  left:auto !important;
+  right:calc(env(safe-area-inset-right, 0px) + 8px) !important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 22px) !important;
+  inset:auto calc(env(safe-area-inset-right, 0px) + 8px) calc(env(safe-area-inset-bottom, 0px) + 22px) auto !important;
+  max-width:min(62vw, 560px) !important;
+  text-align:right !important;
+  z-index:14 !important;
+}
+#mtcPersonalDataStatus.history-open{
+  z-index:26 !important;
+  max-width:min(86vw, 680px) !important;
+}
+#mtcPersonalDataStatus .mtc-status-history-link{
+  margin-left:.65em !important;
+  text-decoration:none !important;
+  border-bottom:1px dotted currentColor !important;
+  padding:0 .12em !important;
+}
+#mtcPersonalDataStatus .mtc-status-history-link:hover,
+#mtcPersonalDataStatus .mtc-status-history-link:focus-visible{
+  border-bottom-style:solid !important;
+}
+@media(max-width:700px){
+  #mtcPersonalDataStatus{
+    right:calc(env(safe-area-inset-right, 0px) + 7px) !important;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 50px) !important;
+    inset:auto calc(env(safe-area-inset-right, 0px) + 7px) calc(env(safe-area-inset-bottom, 0px) + 50px) auto !important;
+    max-width:58vw !important;
+    font-size:8.8px !important;
+  }
+  #mtcPersonalDataStatus.history-open{max-width:92vw !important;}
+}
+#mtcImportExportProgress{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 2px);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:1px 6px;
+  box-sizing:border-box;
+  font-family:ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size:9px;
+  line-height:1.15;
+  letter-spacing:.02em;
+  color:var(--text-color, #111);
+  background:color-mix(in srgb, var(--page-bg, #fff) 88%, transparent);
+  border-top:1px solid color-mix(in srgb, var(--text-color, #111) 18%, transparent);
+  opacity:0;
+  transform:translateY(110%);
+  pointer-events:none;
+  transition:opacity .12s ease, transform .12s ease;
+}
+#mtcImportExportProgress.visible{
+  opacity:.78;
+  transform:translateY(0);
+}
+#mtcImportExportProgress .mtc-import-export-progress-label{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+#mtcImportExportProgress .mtc-import-export-progress-bar{
+  position:relative;
+  display:block;
+  flex:1 1 auto;
+  height:7px;
+  min-width:80px;
+  border:1px solid currentColor;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+#mtcImportExportProgress .mtc-import-export-progress-bar > span{
+  display:block;
+  height:100%;
+  width:0;
+  background:currentColor;
+  transition:width .08s linear;
+}

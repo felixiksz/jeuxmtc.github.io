@@ -17,6 +17,8 @@
   const manifestByHanzi = manifest.byHanzi && typeof manifest.byHanzi === "object" ? manifest.byHanzi : {};
   let currentAudio = null;
   let currentButton = null;
+  let playbackSerial = 0;
+  const AUDIO_MODE_STORAGE_KEY = "mtc_audio_mode_enabled_v1";
 
   function normalizeHanzi(value){
     const raw = String(value || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
@@ -103,6 +105,20 @@
     // mais où le vrai fichier publié est audio/厚朴_baidu_zh.mp3.
     generatedCandidates(clean).forEach(item => addUnique(out, item));
     manifestCandidatesForHanzi(clean).forEach(item => addUnique(out, item));
+
+    // Alias audio globaux portés par la base PHARMA : utile quand le nom
+    // pédagogique a été corrigé sans renommer immédiatement tous les mp3.
+    try{
+      const herb = Array.isArray(window.PHARMA_HERBS)
+        ? window.PHARMA_HERBS.find(item => normalizeHanzi(item && item.hanzi) === clean)
+        : null;
+      const aliases = herb && Array.isArray(herb.audioAliases) ? herb.audioAliases : [];
+      aliases.forEach(alias => {
+        generatedCandidates(alias).forEach(item => addUnique(out, item));
+        manifestCandidatesForHanzi(alias).forEach(item => addUnique(out, item));
+      });
+    }catch(error){}
+
     return out;
   }
 
@@ -148,6 +164,8 @@
   }
 
   function stopCurrentAudio(){
+    // Invalide aussi les callbacks audio asynchrones anciens.
+    playbackSerial += 1;
     if(currentAudio){
       try{ currentAudio.pause(); currentAudio.currentTime = 0; }catch(error){}
     }
@@ -175,8 +193,16 @@
     button.setAttribute("aria-label", "Écouter la prononciation de " + hanzi);
   }
 
-  function tryPlayCandidateList(candidates, index, button, hanzi){
+  function tryPlayCandidateList(candidates, index, button, hanzi, serial){
+    if(!serial){
+      stopCurrentAudio();
+      serial = playbackSerial + 1;
+      playbackSerial = serial;
+    }
+    if(serial !== playbackSerial) return false;
+
     if(index >= candidates.length){
+      if(serial !== playbackSerial) return false;
       markMissing(button, hanzi);
       currentAudio = null;
       currentButton = null;
@@ -184,7 +210,6 @@
     }
 
     const filename = candidates[index];
-    stopCurrentAudio();
 
     const audio = new Audio();
     audio.preload = "auto";
@@ -209,7 +234,7 @@
     }
 
     function markSuccess(){
-      if(settled) return;
+      if(settled || serial !== playbackSerial) return;
       settled = true;
       cleanup();
       if(button){
@@ -222,17 +247,18 @@
     }
 
     function fail(){
-      if(settled) return;
+      if(settled || serial !== playbackSerial) return;
       settled = true;
       cleanup();
       try{ audio.pause(); }catch(error){}
-      tryPlayCandidateList(candidates, index + 1, button, hanzi);
+      tryPlayCandidateList(candidates, index + 1, button, hanzi, serial);
     }
 
     function onError(){ fail(); }
 
     audio.addEventListener("error", onError, {once:true});
     audio.addEventListener("ended", () => {
+      if(serial !== playbackSerial) return;
       setButtonPlaying(button, false);
       if(currentAudio === audio){ currentAudio = null; currentButton = null; }
     });
@@ -260,7 +286,10 @@
       return false;
     }
 
-    if(currentButton === button && currentAudio && !currentAudio.paused){
+    // Le comportement "recliquer = arrêter" ne concerne que le même bouton de fiche.
+    // En mode audio de jeu, button vaut null : un nouveau clic valide doit interrompre
+    // l’ancien son et jouer immédiatement le nouveau, pas simplement l’arrêter.
+    if(button && currentButton === button && currentAudio && !currentAudio.paused){
       stopCurrentAudio();
       return true;
     }
@@ -345,12 +374,122 @@
       .mtc-audio-button.mtc-audio-missing{color:#8a8a8a;opacity:.42;}
       .point-hanzi-inline + .mtc-audio-button{flex:0 0 auto;}
       .point-header .mtc-audio-button + .point-header-basket-button,.point-header .mtc-audio-button + .pharma-herb-panel-basket-add{margin-left:.35em;}
+      .mtc-audio-mode-toggle{appearance:none;border:0;background:transparent;color:var(--text-color);box-shadow:none;min-width:1.65em;width:1.65em;height:1.65em;margin:0 .32em 0 0;padding:0;display:inline-flex;align-items:center;justify-content:center;font-family:var(--ui-font-family);font-size:1.06em;line-height:1;cursor:pointer;opacity:.38;transform:none;text-decoration:none;transition:opacity .16s ease, transform .16s ease;}
+      .mtc-audio-mode-toggle:hover,.mtc-audio-mode-toggle:focus-visible{opacity:.72;outline:none;background:transparent;box-shadow:none;transform:translateY(-1px);text-decoration:none;}
+      .mtc-audio-mode-toggle.active{opacity:.9;font-weight:700;text-decoration:none;}
+      .mtc-audio-mode-toggle:active{transform:translateY(0) scale(.94);}
     `;
     document.head.appendChild(style);
   }
 
+
+  function isAudioModeEnabled(){
+    try{ return localStorage.getItem(AUDIO_MODE_STORAGE_KEY) === "1"; }
+    catch(error){ return false; }
+  }
+
+  function setAudioModeEnabled(enabled){
+    try{ localStorage.setItem(AUDIO_MODE_STORAGE_KEY, enabled ? "1" : "0"); }
+    catch(error){}
+    updateAudioModeButton();
+  }
+
+  function toggleAudioMode(){
+    setAudioModeEnabled(!isAudioModeEnabled());
+  }
+
+  function updateAudioModeButton(){
+    const button = document.getElementById("mtcAudioModeToggle");
+    if(!button) return;
+    // Même pictogramme que les boutons de prononciation des fiches.
+    if(button.textContent !== "🔊") button.textContent = "🔊";
+    const enabled = isAudioModeEnabled();
+    button.classList.toggle("active", enabled);
+    button.setAttribute("aria-pressed", enabled ? "true" : "false");
+    button.title = enabled
+      ? "Mode audio activé : prononciation après un choix valide"
+      : "Mode audio désactivé";
+  }
+
+  function hanziFromAcupuncturePoint(point){
+    try{
+      const details = window.POINT_DETAILS && window.POINT_DETAILS[String(point)];
+      return normalizeHanzi(details && details.hanzi);
+    }catch(error){ return ""; }
+  }
+
+  function getPharmaHerbById(id){
+    const cleanId = String(id || "");
+    return (Array.isArray(window.PHARMA_HERBS) ? window.PHARMA_HERBS : [])
+      .find(item => item && String(item.id || item.code || "") === cleanId) || null;
+  }
+
+  function hanziFromPharmaHerb(herb){
+    const resolvedHerb = typeof herb === "string" ? getPharmaHerbById(herb) : herb;
+    if(!resolvedHerb) return "";
+    try{
+      if(typeof window.getPharmaHerbHanzi === "function"){
+        const fromPanel = normalizeHanzi(window.getPharmaHerbHanzi(resolvedHerb.id || resolvedHerb.code));
+        if(fromPanel) return fromPanel;
+      }
+    }catch(error){}
+    return normalizeHanzi(resolvedHerb.hanzi || "");
+  }
+
+  function pickRandom(list){
+    const clean = (Array.isArray(list) ? list : []).map(normalizeHanzi).filter(Boolean);
+    if(!clean.length) return "";
+    return clean[Math.floor(Math.random() * clean.length)];
+  }
+
+  function playOneHanziForAudioMode(hanziList){
+    if(!isAudioModeEnabled()) return false;
+    const chosen = pickRandom(hanziList);
+    if(!chosen) return false;
+    return playAudioForHanzi(chosen, null);
+  }
+
+  function playAudioModeForHanzi(hanzi){
+    if(!isAudioModeEnabled()) return false;
+    const clean = normalizeHanzi(hanzi);
+    if(!clean) return false;
+    return playAudioForHanzi(clean, null);
+  }
+
+  function playAudioModeForAcupunctureGroup(group){
+    if(!group || !Array.isArray(group.points)) return false;
+    return playOneHanziForAudioMode(group.points.map(hanziFromAcupuncturePoint));
+  }
+
+  function playAudioModeForPharmaGroup(group){
+    if(!group) return false;
+    let herbs = [];
+    if(Array.isArray(group.herbs) && group.herbs.length){
+      herbs = group.herbs;
+    }else if(Array.isArray(group.herbIds) && group.herbIds.length){
+      herbs = group.herbIds.map(getPharmaHerbById).filter(Boolean);
+    }else if(Array.isArray(group.items) && group.items.length){
+      herbs = group.items;
+    }
+    return playOneHanziForAudioMode(herbs.map(hanziFromPharmaHerb));
+  }
+
+  function bootAudioModeButton(){
+    updateAudioModeButton();
+    const button = document.getElementById("mtcAudioModeToggle");
+    if(button && button.dataset.audioModeBound !== "1"){
+      button.dataset.audioModeBound = "1";
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleAudioMode();
+      });
+    }
+  }
+
   function bootAudioEnhancer(){
     injectAudioStyles();
+    bootAudioModeButton();
     enhancePointPanel();
     const content = document.getElementById("pointPanelContent");
     if(!content || content.dataset.mtcAudioObserver === "1") return;
@@ -363,8 +502,60 @@
   window.mtcAudioCandidatesForHanzi = candidateAudioFilenamesForHanzi;
   window.mtcAudioFilenameForHanzi = likelyManifestCandidate;
   window.playMtcAudioByHanzi = playAudioForHanzi;
+  window.isMtcAudioModeEnabled = isAudioModeEnabled;
+  window.toggleMtcAudioMode = toggleAudioMode;
+  window.updateMtcAudioModeButton = updateAudioModeButton;
+  window.mtcAudioModePlayHanzi = playAudioModeForHanzi;
+  window.mtcAudioModePlayAcupunctureGroup = playAudioModeForAcupunctureGroup;
+  window.mtcAudioModePlayPharmaGroup = playAudioModeForPharmaGroup;
   window.refreshMtcAudioButtons = enhancePointPanel;
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootAudioEnhancer, {once:true});
   else bootAudioEnhancer();
+})();
+
+
+/* === Patch UI final : cheatsheet toujours ouvert en haut === */
+(function(){
+  function resetCheatsheetScroll(){
+    const panel = document.getElementById("cheatsheetPanel");
+    const content = document.getElementById("cheatsheetPanelContent");
+    if(!panel || !panel.classList.contains("open")) return;
+    const reset = () => {
+      try{ panel.scrollTop = 0; }catch(error){}
+      try{ if(content) content.scrollTop = 0; }catch(error){}
+    };
+    reset();
+    requestAnimationFrame(reset);
+    setTimeout(reset, 60);
+  }
+
+  function wrapCheatsheetFunction(name){
+    const original = window[name];
+    if(typeof original !== "function" || original.__mtcScrollResetWrapped) return;
+    const wrapped = function(){
+      const result = original.apply(this, arguments);
+      resetCheatsheetScroll();
+      return result;
+    };
+    wrapped.__mtcScrollResetWrapped = true;
+    window[name] = wrapped;
+    try{
+      if(name === "openCheatsheetPanel" && typeof openCheatsheetPanel === "function") openCheatsheetPanel = wrapped;
+      if(name === "toggleCheatsheetPanel" && typeof toggleCheatsheetPanel === "function") toggleCheatsheetPanel = wrapped;
+    }catch(error){}
+  }
+
+  function initCheatsheetScrollReset(){
+    wrapCheatsheetFunction("openCheatsheetPanel");
+    wrapCheatsheetFunction("toggleCheatsheetPanel");
+    document.addEventListener("click", event => {
+      if(event.target?.closest?.("#cheatsheetButton, #cheatsheetToggle")){
+        setTimeout(resetCheatsheetScroll, 0);
+      }
+    }, true);
+  }
+
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", initCheatsheetScrollReset);
+  else initCheatsheetScrollReset();
 })();

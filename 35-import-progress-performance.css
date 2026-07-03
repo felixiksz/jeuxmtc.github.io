@@ -1,0 +1,66 @@
+/* === 35 import progress : barre terminal / MS-DOS import notes/images === */
+#mtcImportProgressDos{
+  position:fixed!important;
+  left:10px!important;
+  right:10px!important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 10px)!important;
+  z-index:2147483000!important;
+  box-sizing:border-box!important;
+  max-width:780px!important;
+  margin:0 auto!important;
+  padding:9px 11px!important;
+  border:1px solid #6dff6d!important;
+  background:#010501!important;
+  color:#72ff72!important;
+  font-family:"Courier New", Courier, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace!important;
+  font-size:12px!important;
+  line-height:1.24!important;
+  letter-spacing:.035em!important;
+  text-shadow:0 0 5px rgba(114,255,114,.45)!important;
+  box-shadow:0 0 0 1px rgba(114,255,114,.16), 0 0 18px rgba(114,255,114,.17), 0 12px 30px rgba(0,0,0,.38)!important;
+  pointer-events:none!important;
+}
+#mtcImportProgressDos[hidden]{display:none!important;}
+#mtcImportProgressDos::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(to bottom, rgba(114,255,114,.07) 0, rgba(114,255,114,.07) 1px, transparent 1px, transparent 3px);
+  opacity:.48;
+  pointer-events:none;
+}
+#mtcImportProgressDos .mtc-dos-line,
+#mtcImportProgressDos .mtc-dos-bar{
+  position:relative!important;
+  z-index:1!important;
+  display:block!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#mtcImportProgressDos .mtc-dos-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  margin-bottom:3px!important;
+}
+#mtcImportProgressDos .mtc-dos-prompt{font-weight:700!important;}
+#mtcImportProgressDos .mtc-dos-bar{
+  margin:3px 0 4px!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+}
+#mtcImportProgressDos .mtc-dos-status{opacity:.94!important;}
+#mtcImportProgressDos.is-complete{border-color:#a8ffa8!important;color:#a8ffa8!important;}
+#mtcImportProgressDos.is-error{border-color:#ff8b8b!important;color:#ff8b8b!important;text-shadow:0 0 5px rgba(255,139,139,.42)!important;box-shadow:0 0 0 1px rgba(255,139,139,.18), 0 0 18px rgba(255,139,139,.14), 0 12px 30px rgba(0,0,0,.38)!important;}
+@media(max-width:650px){
+  #mtcImportProgressDos{
+    left:7px!important;
+    right:7px!important;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 48px)!important;
+    font-size:10px!important;
+    padding:8px 9px!important;
+    letter-spacing:.02em!important;
+  }
+}
