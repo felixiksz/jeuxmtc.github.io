@@ -1,24 +1,62 @@
 /* === 41-force-comparison-history-fix.js
-   Comparaison : plus aucune barre de chargement interne ou externe.
-   On ouvre le panneau puis on diffère simplement le rendu d'une frame pour que l'UI réagisse.
-   Historique : position mobile intermédiaire + popover opaque.
+   Comparaison : aucune barre interne dans le panneau.
+   On utilise le même composant visuel que l'import/export (#mtcImportExportProgress),
+   puis on diffère le rendu d'une frame pour éviter l'impression de blocage.
+   Historique : position mobile intermédiaire, sans chevauchement avec la footbar.
 */
 (function(){
   "use strict";
 
   let comparisonTimer = 0;
+  let progressHideTimer = 0;
+
   function byId(id){ return document.getElementById(id); }
 
   function clearComparisonTimer(){
     if(comparisonTimer){ window.clearTimeout(comparisonTimer); comparisonTimer = 0; }
   }
 
+  function clearProgressHideTimer(){
+    if(progressHideTimer){ window.clearTimeout(progressHideTimer); progressHideTimer = 0; }
+  }
+
   function removeComparisonLoaders(){
     const content = byId("comparisonPanelContent");
     if(!content) return;
     content.querySelectorAll(
-      ".mtc-comparison-force-loading, .mtc-comparison-loading, .mtc-comparison-loading-note, .mtc-comparison-loading-spacer"
+      ".mtc-comparison-force-loading, .mtc-comparison-loading, .mtc-comparison-loading-note, .mtc-comparison-loading-spacer, .mtc-compare-progress-dos"
     ).forEach(node => node.remove());
+  }
+
+  function ensureSharedProgressBox(){
+    let box = byId("mtcImportExportProgress");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "mtcImportExportProgress";
+      box.setAttribute("aria-live", "polite");
+      box.innerHTML = '<span class="mtc-import-export-progress-label"></span><span class="mtc-import-export-progress-bar"><span></span></span>';
+      document.body.appendChild(box);
+    }
+    return box;
+  }
+
+  function setSharedProgress(label, percent){
+    const box = ensureSharedProgressBox();
+    const p = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
+    const labelEl = box.querySelector(".mtc-import-export-progress-label");
+    const bar = box.querySelector(".mtc-import-export-progress-bar > span");
+    box.classList.add("visible", "mtc-comparison-progress-active");
+    if(labelEl) labelEl.textContent = `${String(label || "COMPARAISON").toUpperCase()} ${String(p).padStart(3, "0")}%`;
+    if(bar) bar.style.width = `${p}%`;
+  }
+
+  function hideSharedProgress(delay){
+    clearProgressHideTimer();
+    const box = byId("mtcImportExportProgress");
+    if(!box) return;
+    progressHideTimer = window.setTimeout(() => {
+      box.classList.remove("visible", "mtc-comparison-progress-active");
+    }, delay == null ? 650 : delay);
   }
 
   function openPanelShell(){
@@ -36,18 +74,33 @@
     clearComparisonTimer();
     try{
       removeComparisonLoaders();
+      setSharedProgress("comparaison", 72);
       if(typeof window.renderComparisonPanel === "function") window.renderComparisonPanel();
       removeComparisonLoaders();
+      setSharedProgress("comparaison", 100);
+      hideSharedProgress(650);
     }catch(error){
       console.error("Erreur de rendu du panneau comparaison", error);
+      setSharedProgress("erreur", 100);
+      hideSharedProgress(1200);
     }
   }
 
   function forceOpenComparisonPanel(){
     clearComparisonTimer();
+    clearProgressHideTimer();
     openPanelShell();
-    // Pas de barre : on laisse juste le navigateur peindre l'ouverture du panneau avant le rendu lourd.
-    comparisonTimer = window.setTimeout(renderNow, 32);
+    setSharedProgress("comparaison", 8);
+
+    window.requestAnimationFrame(() => {
+      removeComparisonLoaders();
+      setSharedProgress("comparaison", 28);
+      comparisonTimer = window.setTimeout(() => {
+        removeComparisonLoaders();
+        setSharedProgress("comparaison", 54);
+        window.requestAnimationFrame(renderNow);
+      }, 70);
+    });
   }
 
   function forceToggleComparisonPanel(){
@@ -55,6 +108,7 @@
     if(!panel) return;
     if(panel.classList.contains("open")){
       clearComparisonTimer();
+      hideSharedProgress(0);
       if(typeof window.closeComparisonPanel === "function") return window.closeComparisonPanel();
       panel.classList.remove("open");
       return;
@@ -67,8 +121,8 @@
 
   function bindComparisonButton(){
     const button = byId("comparisonButton");
-    if(!button || button.__mtcForceComparisonBound41NoBar) return;
-    button.__mtcForceComparisonBound41NoBar = true;
+    if(!button || button.__mtcForceComparisonBound41SharedBar) return;
+    button.__mtcForceComparisonBound41SharedBar = true;
     button.removeAttribute("onclick");
     button.onclick = null;
     button.addEventListener("click", event => {
@@ -89,7 +143,8 @@
       #comparisonPanelContent .mtc-comparison-force-loading,
       #comparisonPanelContent .mtc-comparison-loading,
       #comparisonPanelContent .mtc-comparison-loading-note,
-      #comparisonPanelContent .mtc-comparison-loading-spacer{
+      #comparisonPanelContent .mtc-comparison-loading-spacer,
+      #comparisonPanelContent .mtc-compare-progress-dos{
         display:none !important;
         content:none !important;
         visibility:hidden !important;
@@ -102,8 +157,10 @@
         padding:0 !important;
         overflow:hidden !important;
       }
-      #comparisonPanel.mtc-comparison-is-preloading{
-        cursor:default !important;
+      #comparisonPanel.mtc-comparison-is-preloading{ cursor:default !important; }
+
+      #mtcImportExportProgress.mtc-comparison-progress-active{
+        z-index:1000006 !important;
       }
 
       #mtcPersonalDataStatus.history-open{
@@ -136,14 +193,13 @@
         backdrop-filter:none !important;
         -webkit-backdrop-filter:none !important;
       }
-      #mtcPersonalDataStatus.history-open .mtc-status-history-popover{
-        display:flex !important;
-      }
+      #mtcPersonalDataStatus.history-open .mtc-status-history-popover{ display:flex !important; }
+
       @media(max-width:699px), (hover:none), (pointer:coarse){
         #mtcPersonalDataStatus,
         #mtcPersonalDataStatus.visible{
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 12px) 50% !important;
           left:50% !important;
           right:auto !important;
           top:auto !important;
@@ -157,9 +213,7 @@
           z-index:1000001 !important;
         }
         #mtcPersonalDataStatus.history-open,
-        #mtcPersonalDataStatus.history-open.visible{
-          opacity:1 !important;
-        }
+        #mtcPersonalDataStatus.history-open.visible{ opacity:1 !important; }
         #mtcPersonalDataStatus.history-open .mtc-status-history-popover{
           background:var(--page-bg, #fff) !important;
           color:var(--text-color, currentColor) !important;

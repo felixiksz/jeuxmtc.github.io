@@ -66,8 +66,8 @@
           left:50% !important;
           right:auto !important;
           top:auto !important;
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 12px) 50% !important;
           transform:translateX(-50%) !important;
           width:max-content !important;
           max-width:calc(100vw - 14px) !important;
@@ -169,17 +169,13 @@
       }
 
 
-        /* Mobile PHARMA : suppression totale des anciennes bulles ESPRIT.
-           Il ne reste que #mtcPharmaEspritMobileBubble, ouvert par le bouton +. */
-        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::before,
+      @media(max-width:900px), (hover:none), (pointer:coarse){
+        /* Mobile PHARMA : on enlève seulement les anciennes bulles étroites.
+           La grande bulle basse #mtcPharmaEspritMobileBubble reste active. */
         html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point:hover::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point:hover::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point:focus::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point:focus::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::after,
         html[data-study-domain="pharmacology"] .pharma-solved-point .pharma-solved-esprit-tooltip{
           display:none !important;
@@ -197,6 +193,7 @@
           border:0 !important;
           box-shadow:none !important;
         }
+      }
 
       #mtcPharmaEspritMobileBubble{
         position:fixed !important;

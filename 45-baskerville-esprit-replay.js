@@ -68,15 +68,10 @@
       }
 
       @media(max-width:900px), (hover:none), (pointer:coarse){
-        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point:hover::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point:hover::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point:focus::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point:focus::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::before,
         html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::after,
         html[data-study-domain="pharmacology"] .pharma-solved-point .pharma-solved-esprit-tooltip{
           display:none !important;
