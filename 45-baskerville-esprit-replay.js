@@ -66,6 +66,36 @@
       html:not([data-study-domain="pharmacology"]) body.game-finished #solved .solved-point *{
         font-family:Baskerville, "Libre Baskerville", Georgia, serif !important;
       }
+
+      @media(max-width:900px), (hover:none), (pointer:coarse){
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::before,
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::after,
+        html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::before,
+        html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after,
+        html[data-study-domain="pharmacology"] .pharma-solved-point:hover::before,
+        html[data-study-domain="pharmacology"] .pharma-solved-point:hover::after,
+        html[data-study-domain="pharmacology"] .pharma-solved-point:focus::before,
+        html[data-study-domain="pharmacology"] .pharma-solved-point:focus::after,
+        html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::before,
+        html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::after,
+        html[data-study-domain="pharmacology"] .pharma-solved-point .pharma-solved-esprit-tooltip{
+          display:none !important;
+          content:none !important;
+          visibility:hidden !important;
+          opacity:0 !important;
+          pointer-events:none !important;
+          width:0 !important;
+          height:0 !important;
+          max-width:0 !important;
+          max-height:0 !important;
+          overflow:hidden !important;
+          padding:0 !important;
+          margin:0 !important;
+          border:0 !important;
+          box-shadow:none !important;
+        }
+      }
+
       #mtcReplaySameGridButton{
         font-family:"Archivo", system-ui, sans-serif !important;
       }
