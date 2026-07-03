@@ -8,6 +8,15 @@
   function isPharma(){ return document.documentElement.getAttribute("data-study-domain") === "pharmacology"; }
   function isFinished(){ return document.body.classList.contains("game-finished") || document.body.classList.contains("game-complete"); }
 
+  function shuffledCopy(items){
+    const copy = Array.isArray(items) ? items.slice() : [];
+    for(let index = copy.length - 1; index > 0; index -= 1){
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+    }
+    return copy;
+  }
+
   function cloneAcuSnapshot(){
     try{
       if(typeof solution === "undefined" || !Array.isArray(solution) || !solution.length) return null;
@@ -141,7 +150,8 @@
       try{ solution.push(copy); }catch(error){}
     });
 
-    snap.board.forEach(point => {
+    const replayBoard = shuffledCopy(snap.board);
+    replayBoard.forEach(point => {
       const tile = document.createElement("div");
       tile.className = "tile";
       tile.dataset.point = point;
@@ -156,7 +166,7 @@
     state.acu = {
       type:"acu",
       groups:snap.groups.map(group => ({key:group.key, name:group.name, points:group.points.slice(), color:group.color || ""})),
-      board:snap.board.slice()
+      board:replayBoard.slice()
     };
     removeReplayButton();
     return true;
@@ -169,7 +179,8 @@
       return false;
     }
     resetSharedInterface();
-    window.startPharmaReplayGame(snap);
+    const replaySnap = Object.assign({}, snap, {board:shuffledCopy(snap.board)});
+    window.startPharmaReplayGame(replaySnap);
     window.setTimeout(captureCurrentGame, 120);
     removeReplayButton();
     return true;
@@ -193,7 +204,7 @@
     const wrap = document.createElement("div");
     wrap.id = "mtcReplaySameGridWrap";
     wrap.innerHTML = `
-      <button type="button" id="mtcReplaySameGridButton" title="Rejouer exactement les mêmes tuiles">
+      <button type="button" id="mtcReplaySameGridButton" title="Rejouer les mêmes tuiles mélangées">
         <span aria-hidden="true">↻</span><span class="mtc-replay-label">même grille</span>
       </button>
     `;
