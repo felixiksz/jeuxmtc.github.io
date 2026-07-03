@@ -70,17 +70,12 @@ html:not([data-study-domain="pharmacology"]) body.game-finished #solved .solved-
 }
 
 
-/* Mobile PHARMA : aucune ancienne bulle ESPRIT dans les tuiles validées. */
+/* Mobile PHARMA : enlève seulement les anciennes bulles étroites ; la grande bulle basse reste active. */
 @media(max-width:900px), (hover:none), (pointer:coarse){
-  html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::before,
   html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::after,
-  html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::before,
   html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after,
-  html[data-study-domain="pharmacology"] .pharma-solved-point:hover::before,
   html[data-study-domain="pharmacology"] .pharma-solved-point:hover::after,
-  html[data-study-domain="pharmacology"] .pharma-solved-point:focus::before,
   html[data-study-domain="pharmacology"] .pharma-solved-point:focus::after,
-  html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::before,
   html[data-study-domain="pharmacology"] .pharma-solved-point:focus-within::after,
   html[data-study-domain="pharmacology"] .pharma-solved-point .pharma-solved-esprit-tooltip{
     display:none !important;
