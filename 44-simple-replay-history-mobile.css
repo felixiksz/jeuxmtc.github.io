@@ -64,7 +64,7 @@
   /* Desktop inchangé : on remonte seulement la ligne historique sur téléphone. */
   #mtcPersonalDataStatus,
   #mtcPersonalDataStatus.visible{
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
     inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
   }
 }

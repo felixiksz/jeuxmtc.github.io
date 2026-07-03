@@ -84,7 +84,11 @@
     // faisait échouer des fichiers pourtant présents, par exemple 厚朴_baidu_zh.mp3.
     const fromManifest = manifestByHanzi[clean];
     const listed = Array.isArray(fromManifest) ? fromManifest : (fromManifest ? [fromManifest] : []);
-    listed.forEach(item => addUnique(out, item));
+
+    // D'abord les fichiers réellement listés dans audio-manifest.js.
+    // Sur mobile, tester un premier fichier inexistant peut consommer le geste utilisateur
+    // et bloquer la lecture du bon candidat suivant.
+    listed.forEach(item => { if(fileIsInManifest(item)) addUnique(out, item); });
 
     const uStem = hanziToUStem(clean);
     manifestFiles.forEach(file => {
@@ -92,6 +96,10 @@
         addUnique(out, file);
       }
     });
+
+    // Ensuite seulement, les noms proposés par byHanzi qui ne sont pas dans files.
+    // Cela garde une chance si l'utilisateur a renommé/téléversé des fichiers directs.
+    listed.forEach(item => addUnique(out, item));
     return out;
   }
 
@@ -100,11 +108,10 @@
     const out = [];
     if(!clean) return out;
 
-    // Ordre choisi pour GitHub : chinois direct d’abord, puis manifest, puis #Uxxxx.
-    // Cela corrige le cas où le manifest du zip liste #U539a#U6734_baidu_zh.mp3,
-    // mais où le vrai fichier publié est audio/厚朴_baidu_zh.mp3.
-    generatedCandidates(clean).forEach(item => addUnique(out, item));
+    // Ordre mobile-safe : fichiers confirmés par le manifest d'abord.
+    // Si on teste d'abord un nom inexistant, iOS/Android peut bloquer les essais suivants.
     manifestCandidatesForHanzi(clean).forEach(item => addUnique(out, item));
+    generatedCandidates(clean).forEach(item => addUnique(out, item));
 
     // Alias audio globaux portés par la base PHARMA : utile quand le nom
     // pédagogique a été corrigé sans renommer immédiatement tous les mp3.
@@ -558,4 +565,50 @@
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", initCheatsheetScrollReset);
   else initCheatsheetScrollReset();
+})();
+
+
+/* === Fermeture automatique du cheatsheet quand une fiche est ouverte depuis le cheatsheet === */
+(function(){
+  function closeCheatsheet(){
+    if(typeof window.closeCheatsheetPanel === "function") return window.closeCheatsheetPanel();
+    const panel = document.getElementById("cheatsheetPanel");
+    const toggle = document.getElementById("cheatsheetToggle");
+    if(panel) panel.classList.remove("open");
+    if(toggle) toggle.innerHTML = "&gt;";
+  }
+  function wrap(name){
+    const original = window[name];
+    if(typeof original !== "function" || original.__mtcCloseCheatsheetAfterPanelOpen) return;
+    const wrapped = function(){
+      const fromCheatsheet = !!(document.__mtcLastCheatsheetTapAt && Date.now() - document.__mtcLastCheatsheetTapAt < 900);
+      const result = original.apply(this, arguments);
+      if(fromCheatsheet) window.setTimeout(closeCheatsheet, 0);
+      return result;
+    };
+    wrapped.__mtcCloseCheatsheetAfterPanelOpen = true;
+    window[name] = wrapped;
+    try{
+      if(name === "openPointPanel" && typeof openPointPanel === "function") openPointPanel = wrapped;
+      if(name === "openPointPanelDirect" && typeof openPointPanelDirect === "function") openPointPanelDirect = wrapped;
+      if(name === "openPharmaHerbPanel" && typeof openPharmaHerbPanel === "function") openPharmaHerbPanel = wrapped;
+    }catch(error){}
+  }
+  function init(){
+    document.addEventListener("pointerdown", event => {
+      if(event.target && event.target.closest && event.target.closest("#cheatsheetPanelContent")){
+        document.__mtcLastCheatsheetTapAt = Date.now();
+      }
+    }, true);
+    document.addEventListener("click", event => {
+      if(event.target && event.target.closest && event.target.closest("#cheatsheetPanelContent")){
+        document.__mtcLastCheatsheetTapAt = Date.now();
+      }
+    }, true);
+    wrap("openPointPanel");
+    wrap("openPointPanelDirect");
+    wrap("openPharmaHerbPanel");
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, {once:true});
+  else init();
 })();

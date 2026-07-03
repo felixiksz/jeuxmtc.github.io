@@ -32,6 +32,9 @@
       .replace(/'/g,"&#039;");
   }
 
+  let lastEspritTriggerKey = "";
+  let lastEspritTriggerAt = 0;
+
   function substanceNameFrom(item){
     if(!item) return "Substance";
     const label = item.querySelector(".pharma-solved-chinese-name");
@@ -66,8 +69,8 @@
           left:50% !important;
           right:auto !important;
           top:auto !important;
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 18px) 50% !important;
           transform:translateX(-50%) !important;
           width:max-content !important;
           max-width:calc(100vw - 14px) !important;
@@ -90,8 +93,21 @@
           -webkit-backdrop-filter:none !important;
         }
 
+        html[data-study-domain="pharmacology"] .pharma-solved-row{
+          overflow:visible !important;
+        }
         html[data-study-domain="pharmacology"] .pharma-solved-row .solved-points{
+          width:100% !important;
+          max-width:100% !important;
+          box-sizing:border-box !important;
+          grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
           gap:7px !important;
+          margin-left:0 !important;
+          margin-right:-2px !important;
+          padding-left:0 !important;
+          padding-right:-2px !important;
+          transform:none !important;
+          overflow:visible !important;
         }
         html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip],
         html[data-study-domain="pharmacology"].pharma-show-solved-nature .pharma-solved-point[data-esprit-tooltip][data-pharma-nature-tier],
@@ -102,7 +118,7 @@
           box-shadow:none !important;
           border-color:transparent !important;
           border-radius:8px !important;
-          padding:5px 24px 5px 3px !important;
+          padding:5px 18px 5px 3px !important;
           min-height:0 !important;
           line-height:1.08 !important;
           overflow:visible !important;
@@ -138,7 +154,7 @@
           justify-content:center !important;
           position:absolute !important;
           top:-2px !important;
-          right:0 !important;
+          right:-2px !important;
           width:24px !important;
           height:24px !important;
           min-width:24px !important;
@@ -353,6 +369,16 @@
     event.preventDefault();
     event.stopPropagation();
     if(event.stopImmediatePropagation) event.stopImmediatePropagation();
+
+    const key = item.getAttribute("data-herb-id") || item.getAttribute("data-esprit-tooltip") || "esprit";
+    const now = Date.now();
+    // Sur mobile, un seul tap peut déclencher pointerup + touchend + click.
+    // Sans ce verrou, la bulle s'ouvre puis se referme immédiatement.
+    if(lastEspritTriggerKey === key && now - lastEspritTriggerAt < 520){
+      return;
+    }
+    lastEspritTriggerKey = key;
+    lastEspritTriggerAt = now;
     showBubbleFor(item);
   }
 
@@ -373,6 +399,8 @@
 
     document.addEventListener("pointerdown", preventLegacyEspritBubbles, {capture:true, passive:true});
     document.addEventListener("touchstart", preventLegacyEspritBubbles, {capture:true, passive:true});
+    document.addEventListener("pointerdown", handleButtonEvent, {capture:true, passive:false});
+    document.addEventListener("touchstart", handleButtonEvent, {capture:true, passive:false});
     document.addEventListener("pointerup", handleButtonEvent, {capture:true, passive:false});
     document.addEventListener("touchend", handleButtonEvent, {capture:true, passive:false});
     document.addEventListener("click", event => {
