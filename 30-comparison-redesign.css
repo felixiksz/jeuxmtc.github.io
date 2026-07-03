@@ -1866,3 +1866,117 @@
 #comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed{
   opacity:.72 !important;
 }
+
+/* === Performance comparaison : placeholders des lignes lourdes repliées === */
+#comparisonPanelContent .mtc-compare-collapsed-placeholder{
+  opacity:.42;
+  font-size:.9em;
+}
+
+
+/* === Comparaison : lignes fermées compactes mais identifiables === */
+#comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed,
+#comparisonPanelContent .mtc-compare-cell.is-compare-row-collapsed{
+  background-image:linear-gradient(0deg, rgba(0,0,0,.045), rgba(0,0,0,.045)) !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed{
+  min-height:28px !important;
+  max-height:30px !important;
+  padding-top:3px !important;
+  padding-bottom:3px !important;
+  opacity:.88 !important;
+  cursor:pointer !important;
+}
+
+#comparisonPanelContent .mtc-compare-cell.is-compare-row-collapsed{
+  min-height:28px !important;
+  max-height:30px !important;
+  padding-top:3px !important;
+  padding-bottom:3px !important;
+  overflow:hidden !important;
+  cursor:pointer !important;
+}
+
+#comparisonPanelContent .mtc-compare-cell.is-compare-row-collapsed > .mtc-compare-cell-inner{
+  display:block !important;
+  min-height:0 !important;
+  max-height:1.25em !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+  line-height:1.2 !important;
+}
+
+#comparisonPanelContent .mtc-compare-collapsed-preview{
+  display:block !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+  opacity:.62 !important;
+  font-size:.78rem !important;
+  line-height:1.2 !important;
+  font-style:italic !important;
+}
+
+#comparisonPanelContent .mtc-compare-collapsed-empty{
+  display:block !important;
+  opacity:.32 !important;
+  font-size:.78rem !important;
+  line-height:1.2 !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed .mtc-compare-row-collapse-toggle{
+  opacity:.9 !important;
+}
+
+#comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed:hover,
+#comparisonPanelContent .mtc-compare-cell.is-compare-row-collapsed:hover{
+  background-image:linear-gradient(0deg, rgba(0,0,0,.07), rgba(0,0,0,.07)) !important;
+}
+
+@supports (background:color-mix(in srgb, white, black)){
+  #comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed,
+  #comparisonPanelContent .mtc-compare-cell.is-compare-row-collapsed{
+    background-image:linear-gradient(0deg, color-mix(in srgb, var(--shadow-color, #777) 7%, transparent), color-mix(in srgb, var(--shadow-color, #777) 7%, transparent)) !important;
+  }
+  #comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed:hover,
+  #comparisonPanelContent .mtc-compare-cell.is-compare-row-collapsed:hover{
+    background-image:linear-gradient(0deg, color-mix(in srgb, var(--shadow-color, #777) 11%, transparent), color-mix(in srgb, var(--shadow-color, #777) 11%, transparent)) !important;
+  }
+}
+
+/* === Comparaison : titre de ligne visible pendant le scroll vertical ===
+   Sur les lignes très hautes, le libellé de la ligne reste collé juste sous
+   l’en-tête des substances. Cela évite de perdre le nom du champ sur desktop
+   et surtout sur téléphone. */
+#comparisonPanelContent .mtc-compare-scroll{
+  --mtc-compare-sticky-row-top:58px;
+}
+#comparisonPanelContent .mtc-compare-row-label:not(.mtc-compare-corner){
+  position:sticky !important;
+  left:0 !important;
+  top:var(--mtc-compare-sticky-row-top, 58px) !important;
+  align-self:start !important;
+  z-index:240 !important;
+  max-height:min(42vh, calc(100dvh - var(--mtc-compare-sticky-row-top, 58px) - 18px)) !important;
+  overflow:hidden !important;
+}
+#comparisonPanelContent .mtc-compare-row-label.is-compare-row-collapsed{
+  max-height:30px !important;
+}
+#comparisonPanelContent .mtc-compare-corner{
+  z-index:320 !important;
+}
+#comparisonPanelContent .mtc-compare-header{
+  z-index:300 !important;
+}
+@media(max-width:699px){
+  #comparisonPanelContent .mtc-compare-scroll{
+    --mtc-compare-sticky-row-top:54px;
+  }
+  #comparisonPanelContent .mtc-compare-row-label:not(.mtc-compare-corner){
+    max-height:min(38vh, calc(100dvh - var(--mtc-compare-sticky-row-top, 54px) - 12px)) !important;
+  }
+}

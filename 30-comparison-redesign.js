@@ -8,6 +8,21 @@
   const ROW_ORDER_PHARMA_KEY = "mtc_compare_row_order_pharma_v4";
   const COLLAPSED_ROWS_ACU_KEY = "mtc_compare_collapsed_rows_acu_v1";
   const COLLAPSED_ROWS_PHARMA_KEY = "mtc_compare_collapsed_rows_pharma_v1";
+  const DEFAULT_COLLAPSED_ROWS_PHARMA_FLAG_KEY = "mtc_compare_default_collapsed_pharma_v3";
+  const DEFAULT_COLLAPSED_ROWS_PHARMA = [
+    "indications",
+    "contre-indications",
+    "precaution",
+    "associations",
+    "comparaison",
+    "formules",
+    "recherches-modernes",
+    "ingredients",
+    "preparation",
+    "synonymes",
+    "notes",
+    "synthese"
+  ];
   const SLOT_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const PHARMA_HANZI_PREFIX = "mtc_pharma_herb_hanzi_";
   const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
@@ -81,6 +96,38 @@
     return esc(clean).replace(/\n/g,"<br>");
   }
 
+  function plainComparePreview(value, isHtml){
+    let raw = Array.isArray(value) ? value.map(item => String(item ?? "")).join(" ") : String(value ?? "");
+    if(isHtml){
+      raw = raw
+        .replace(/<br\s*\/?\s*>/gi, " ")
+        .replace(/<\/p>/gi, " ")
+        .replace(/<\/div>/gi, " ")
+        .replace(/<\/li>/gi, " ")
+        .replace(/<[^>]*>/g, " ");
+    }
+    raw = raw
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/&lt;/gi, "<")
+      .replace(/&gt;/gi, ">")
+      .replace(/&quot;/gi, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&#39;/g, "'")
+      .replace(/[\r\n]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if(!raw || raw === "Aucune" || raw === "(Aucune)") return "";
+    const limit = 86;
+    return raw.length > limit ? `${raw.slice(0, limit).trim()}…` : raw;
+  }
+
+  function collapsedPreviewHtml(value, isHtml){
+    const preview = plainComparePreview(value, isHtml);
+    if(!preview) return `<span class="mtc-compare-collapsed-empty">—</span>`;
+    return `<span class="mtc-compare-collapsed-preview">${esc(preview)}</span>`;
+  }
+
   function compareRowKey(label, opts){
     const base = opts?.rowKey || opts?.rowKind || label || "ligne";
     return String(base)
@@ -93,6 +140,18 @@
 
   function collapsedRowsStorageKey(){
     return isPharma() ? COLLAPSED_ROWS_PHARMA_KEY : COLLAPSED_ROWS_ACU_KEY;
+  }
+
+  function ensureDefaultPharmaCollapsedRows(){
+    if(!isPharma()) return;
+    try{
+      if(localStorage.getItem(DEFAULT_COLLAPSED_ROWS_PHARMA_FLAG_KEY) === "1") return;
+      const current = readJson(COLLAPSED_ROWS_PHARMA_KEY, []);
+      const rows = Array.isArray(current) ? current.map(item => String(item || "")).filter(Boolean) : [];
+      DEFAULT_COLLAPSED_ROWS_PHARMA.forEach(key => { if(key && !rows.includes(key)) rows.push(key); });
+      localStorage.setItem(COLLAPSED_ROWS_PHARMA_KEY, JSON.stringify(rows));
+      localStorage.setItem(DEFAULT_COLLAPSED_ROWS_PHARMA_FLAG_KEY, "1");
+    }catch(error){}
   }
 
   function collapsedRowKeys(){
@@ -132,14 +191,36 @@
     });
   }
 
+
+  function updateComparisonStickyRowOffset(){
+    const content = byId("comparisonPanelContent");
+    const scroll = content?.querySelector?.(".mtc-compare-scroll");
+    const corner = content?.querySelector?.(".mtc-compare-corner");
+    if(!scroll || !corner) return;
+    const rect = corner.getBoundingClientRect ? corner.getBoundingClientRect() : null;
+    const height = Math.max(42, Math.ceil((rect && rect.height) || corner.offsetHeight || 58));
+    scroll.style.setProperty("--mtc-compare-sticky-row-top", `${height}px`);
+  }
+
+  function scheduleComparisonStickyRowOffset(){
+    requestAnimationFrame(() => {
+      updateComparisonStickyRowOffset();
+      requestAnimationFrame(updateComparisonStickyRowOffset);
+    });
+  }
+
   function applyComparisonRowCollapsedInDom(rowKey, collapsed){
     const key = String(rowKey || "");
     const content = byId("comparisonPanelContent");
     if(!key || !content) return false;
     let found = false;
+    let needsRender = false;
 
     content.querySelectorAll("[data-mtc-compare-row-key]").forEach(element => {
       if(element.getAttribute("data-mtc-compare-row-key") !== key) return;
+      if(!collapsed && element.getAttribute("data-mtc-compare-row-lazy") === "1"){
+        needsRender = true;
+      }
       element.classList.toggle("is-compare-row-collapsed", !!collapsed);
       found = true;
     });
@@ -151,6 +232,9 @@
       found = true;
     });
 
+    // Les lignes longues sont rendues paresseusement quand elles sont repliées.
+    // Si on les déplie, il faut reconstruire cette ligne/le panneau pour charger le vrai contenu.
+    if(needsRender) return false;
     return found;
   }
 
@@ -202,6 +286,18 @@
       .filter(slot => !!slot.id && !!getHerb(slot.id));
   }
 
+
+  function rawPharmaSlotArray(){
+    const raw = readJson(PHARMA_KEY, []);
+    return Array.isArray(raw) ? raw.map(value => value ? String(value) : "") : [];
+  }
+
+  function saveRawPharmaSlots(slots){
+    try{ localStorage.setItem(PHARMA_KEY, JSON.stringify(Array.isArray(slots) ? slots : [])); }catch(error){}
+    if(typeof window.updatePharmaComparisonButtonLabel === "function") window.updatePharmaComparisonButtonLabel();
+    if(typeof window.updateComparisonButtonLabel === "function") window.updateComparisonButtonLabel();
+  }
+
   function getPointDetails(point){
     try{
       if(typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point]) return POINT_DETAILS[point];
@@ -209,9 +305,32 @@
     return (window.POINT_DETAILS && window.POINT_DETAILS[point]) || {};
   }
 
-  function getHerb(id){
+  let pharmaHerbByIdCache = null;
+  let pharmaHerbAliasCache = null;
+
+  function resetPharmaComparisonCaches(){
+    pharmaHerbByIdCache = null;
+    pharmaHerbAliasCache = null;
+  }
+
+  function pharmaHerbByIdMap(){
     const herbs = Array.isArray(window.PHARMA_HERBS) ? window.PHARMA_HERBS : [];
-    return herbs.find(item => String(item.id) === String(id) || String(item.code) === String(id));
+    if(pharmaHerbByIdCache && pharmaHerbByIdCache.__length === herbs.length) return pharmaHerbByIdCache;
+    const map = new Map();
+    herbs.forEach(item => {
+      if(!item) return;
+      [item.id, item.code].forEach(key => {
+        const clean = String(key || "");
+        if(clean && !map.has(clean)) map.set(clean, item);
+      });
+    });
+    map.__length = herbs.length;
+    pharmaHerbByIdCache = map;
+    return map;
+  }
+
+  function getHerb(id){
+    return pharmaHerbByIdMap().get(String(id || "")) || null;
   }
 
   function herbHanzi(herb){
@@ -516,16 +635,17 @@
         aria-expanded="${collapsed ? "false" : "true"}">${collapsed ? "▸" : "▾"}</button>
       <span class="mtc-compare-row-label-text">${esc(label)}</span>
     `;
+    const lazyCollapsed = collapsed && opts.lazyWhenCollapsed !== false;
     return `
-      <div class="mtc-compare-row-label ${indexClass} ${rowKind} ${collapsedClass} ${opts.rowClass || ""}" data-mtc-compare-row-key="${attr(rowKey)}" draggable="true" title="${attr(dragTitle)}">${labelHtml}</div>
+      <div class="mtc-compare-row-label ${indexClass} ${rowKind} ${collapsedClass} ${opts.rowClass || ""}" data-mtc-compare-row-key="${attr(rowKey)}" data-mtc-compare-row-lazy="${lazyCollapsed ? "1" : "0"}" draggable="true" title="${attr(dragTitle)}">${labelHtml}</div>
       ${slots.map((slot, localIndex) => {
         const value = getter(slot, localIndex, slots);
-        const html = opts.html ? String(value || `<span class="mtc-compare-empty">—</span>`) : displayValue(value);
+        const html = lazyCollapsed ? collapsedPreviewHtml(value, !!opts.html) : (opts.html ? String(value || `<span class="mtc-compare-empty">—</span>`) : displayValue(value));
         const columnStyle = opts.columnStyle ? (opts.columnStyle(slot, localIndex, slots) || "") : "";
         const gradientClass = columnStyle ? "has-column-gradient" : "";
-        return `<div class="mtc-compare-cell ${indexClass} ${rowKind} ${opts.cellClass || ""} ${gradientClass} ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}" style="${attr(columnStyle)}"><div class="mtc-compare-cell-inner">${html}</div></div>`;
+        return `<div class="mtc-compare-cell ${indexClass} ${rowKind} ${opts.cellClass || ""} ${gradientClass} ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}" data-mtc-compare-row-lazy="${lazyCollapsed ? "1" : "0"}" title="${lazyCollapsed ? attr(plainComparePreview(value, !!opts.html) || "Aucun contenu") : ""}" style="${attr(columnStyle)}"><div class="mtc-compare-cell-inner">${html}</div></div>`;
       }).join("")}
-      ${opts.addEmptyColumn ? `<div class="mtc-compare-cell ${indexClass} ${rowKind} mtc-compare-add-cell ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}"><div class="mtc-compare-cell-inner"></div></div>` : ""}
+      ${opts.addEmptyColumn ? `<div class="mtc-compare-cell ${indexClass} ${rowKind} mtc-compare-add-cell ${collapsedClass}" data-mtc-compare-row-key="${attr(rowKey)}" data-mtc-compare-row-lazy="${lazyCollapsed ? "1" : "0"}"><div class="mtc-compare-cell-inner">${lazyCollapsed ? `<span class="mtc-compare-collapsed-empty">—</span>` : ""}</div></div>` : ""}
     `;
   }
 
@@ -575,16 +695,36 @@
     return text(herb?.pinyinSansTons || herb?.pinyin || herb?.code || herb?.id || "");
   }
 
+  function pharmaHerbAliasIndex(){
+    const herbs = Array.isArray(window.PHARMA_HERBS) ? window.PHARMA_HERBS : [];
+    if(pharmaHerbAliasCache && pharmaHerbAliasCache.__length === herbs.length) return pharmaHerbAliasCache;
+    const map = new Map();
+    herbs.forEach(herb => {
+      if(!herb) return;
+      [
+        herb.id,
+        herb.code,
+        herb.pinyinSansTons,
+        herb.pinyin,
+        herbHanzi(herb),
+        herb.hanzi,
+        herb.nom,
+        herbTitle(herb),
+        herbSearchName(herb)
+      ].forEach(alias => {
+        const key = normalizeKey(alias);
+        if(key && !map.has(key)) map.set(key, herb);
+      });
+    });
+    map.__length = herbs.length;
+    pharmaHerbAliasCache = map;
+    return map;
+  }
+
   function herbExactMatch(label){
     const key = normalizeKey(label);
     if(!key) return null;
-    const herbs = Array.isArray(window.PHARMA_HERBS) ? window.PHARMA_HERBS : [];
-    return herbs.find(herb => {
-      const aliases = [herb.id, herb.code, herb.pinyinSansTons, herb.pinyin, herbHanzi(herb), herb.hanzi, herb.nom, herbTitle(herb), herbSearchName(herb)]
-        .map(normalizeKey)
-        .filter(Boolean);
-      return aliases.includes(key);
-    }) || null;
+    return pharmaHerbAliasIndex().get(key) || null;
   }
 
   function linkedReferenceTextHtml(value, exactMatch, displayNameForLink, refAttr, cssClass, titleGetter){
@@ -873,6 +1013,7 @@
     `;
 
     applySavedComparisonRowOrder();
+    scheduleComparisonStickyRowOffset();
 
     if(typeof window.enhancePointReferencesInPanel === "function"){
       window.enhancePointReferencesInPanel(content);
@@ -1090,6 +1231,7 @@
   function renderPharmaComparisonPanelClean(){
     const content = byId("comparisonPanelContent");
     if(!content) return;
+    ensureDefaultPharmaCollapsedRows();
     const slots = getPharmaSlots();
     const count = Math.max(1, slots.length + 1);
 
@@ -1159,6 +1301,7 @@
       </div>
     `;
     applySavedComparisonRowOrder();
+    scheduleComparisonStickyRowOffset();
   }
 
   window.clearComparisonPanelClean = function(event){
@@ -1166,18 +1309,19 @@
       event.preventDefault();
       event.stopPropagation();
     }
-    const slots = isPharma() ? getPharmaSlots() : getAcuSlots();
+    if(isPharma()){
+      saveRawPharmaSlots([]);
+      if(typeof window.renderComparisonPanel === "function") window.renderComparisonPanel();
+      if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
+      return;
+    }
+    const slots = getAcuSlots();
     slots.forEach(slot => {
       if(typeof window.clearComparisonPoint === "function") window.clearComparisonPoint(slot.index);
     });
-    try{
-      localStorage.setItem(isPharma() ? PHARMA_KEY : ACU_KEY, JSON.stringify([]));
-    }catch(error){}
+    try{ localStorage.setItem(ACU_KEY, JSON.stringify([])); }catch(error){}
     if(typeof window.updateComparisonButtonLabel === "function") window.updateComparisonButtonLabel();
-    setTimeout(() => {
-      if(typeof window.renderComparisonPanel === "function") window.renderComparisonPanel();
-      if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
-    }, 0);
+    if(typeof window.renderComparisonPanel === "function") window.renderComparisonPanel();
   };
 
   window.clearComparisonSlotClean = function(slotIndex, event){
@@ -1185,12 +1329,17 @@
       event.preventDefault();
       event.stopPropagation();
     }
-    if(typeof window.clearComparisonPoint === "function"){
-      window.clearComparisonPoint(slotIndex);
-    }
-    setTimeout(() => {
+    if(isPharma()){
+      const slots = rawPharmaSlotArray();
+      const index = Math.max(0, Number(slotIndex) || 0);
+      if(index < slots.length) slots[index] = "";
+      saveRawPharmaSlots(slots);
       if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
-    }, 0);
+      if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
+      return;
+    }
+    if(typeof window.clearComparisonPoint === "function") window.clearComparisonPoint(slotIndex);
+    if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
   };
 
   window.renderComparisonPanel = function(){
@@ -1447,12 +1596,30 @@
     if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
   }
 
+  window.addEventListener("resize", () => {
+    const panel = byId("comparisonPanel");
+    if(panel && panel.classList.contains("open")) scheduleComparisonStickyRowOffset();
+  }, {passive:true});
+
   document.addEventListener("click", event => {
     const button = event.target?.closest?.("[data-mtc-compare-collapse-toggle]");
-    if(!button) return;
+    if(button){
+      event.preventDefault();
+      event.stopPropagation();
+      toggleComparisonRowCollapsed(button.getAttribute("data-mtc-compare-collapse-toggle") || "");
+      return;
+    }
+
+    // Quand une ligne est fermée, toute la bande compacte sert aussi de bouton.
+    // On ignore les vrais contrôles interactifs pour ne pas gêner l'édition/suppression.
+    if(event.target?.closest?.("button,a,input,textarea,select,[contenteditable='true'],[data-comparison-remove],[data-comparison-slot]")) return;
+    const collapsedRow = event.target?.closest?.("[data-mtc-compare-row-key].is-compare-row-collapsed");
+    if(!collapsedRow) return;
+    const key = collapsedRow.getAttribute("data-mtc-compare-row-key") || "";
+    if(!key) return;
     event.preventDefault();
     event.stopPropagation();
-    toggleComparisonRowCollapsed(button.getAttribute("data-mtc-compare-collapse-toggle") || "");
+    toggleComparisonRowCollapsed(key);
   });
 
   document.addEventListener("dragstart", event => {
@@ -1965,7 +2132,8 @@
     }, 0);
   }
 
-  document.addEventListener("pharma-herb-edited", requestCleanComparisonRerender);
+  document.addEventListener("pharma-herb-edited", () => { resetPharmaComparisonCaches(); requestCleanComparisonRerender(); });
+  document.addEventListener("mtc-personal-data-imported", () => { resetPharmaComparisonCaches(); requestCleanComparisonRerender(); });
   document.addEventListener("acu-point-edited", requestCleanComparisonRerender);
 
   const previousStartTour = window.startTour;
