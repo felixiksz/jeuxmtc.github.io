@@ -307,18 +307,30 @@
 
     updateClassEssentialCheckboxStates(loadEssentialIds());
 
+    function openCheatsheetHerbFromEvent(event){
+      const button = event.target && event.target.closest && event.target.closest("#cheatsheetPanelContent .pharma-cheatsheet-herb-link");
+      if(!button) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const herbId = button.dataset.herbId;
+      if(herbId && typeof window.openPharmaHerbPanel === "function"){
+        window.openPharmaHerbPanel(herbId);
+      }
+    }
+
     document
       .querySelectorAll("#cheatsheetPanelContent .pharma-cheatsheet-herb-link")
       .forEach(button => {
-        button.addEventListener("click", event => {
-          event.preventDefault();
-          event.stopPropagation();
-          const herbId = button.dataset.herbId;
-          if(herbId && typeof window.openPharmaHerbPanel === "function"){
-            window.openPharmaHerbPanel(herbId);
-          }
-        });
+        button.addEventListener("click", openCheatsheetHerbFromEvent);
+        button.addEventListener("touchend", openCheatsheetHerbFromEvent, {passive:false});
       });
+
+    const content = byId("cheatsheetPanelContent");
+    if(content && !content.__mtcPharmaCheatsheetDelegated){
+      content.__mtcPharmaCheatsheetDelegated = true;
+      content.addEventListener("click", openCheatsheetHerbFromEvent, true);
+      content.addEventListener("touchend", openCheatsheetHerbFromEvent, {capture:true, passive:false});
+    }
   }
 
   function openPharmaCheatsheetPanel(){

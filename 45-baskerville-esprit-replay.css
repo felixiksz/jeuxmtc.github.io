@@ -9,3 +9,62 @@ html:not([data-study-domain="pharmacology"]) body.game-finished #solved .solved-
 html:not([data-study-domain="pharmacology"]) body.game-finished #solved .solved-point *{
   font-family:Baskerville, "Libre Baskerville", Georgia, serif !important;
 }
+
+/* Mobile PHARMA cheatsheet : clic sur le nom réaligné + espacement propre.
+   On remplace l'ancien grid mobile, qui plaçait parfois le séparateur et le + sur de mauvaises colonnes. */
+@media(max-width:699px), (hover:none), (pointer:coarse){
+  html[data-study-domain="pharmacology"] #cheatsheetPanel.open #cheatsheetPanelContent .pharma-cheatsheet-line{
+    display:flex !important;
+    align-items:center !important;
+    gap:5px !important;
+    padding:4px 0 !important;
+    min-height:32px !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  html[data-study-domain="pharmacology"] #cheatsheetPanel.open #cheatsheetPanelContent .pharma-cheatsheet-herb-link{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    width:auto !important;
+    display:block !important;
+    padding:7px 4px !important;
+    margin:-4px 0 !important;
+    line-height:1.15 !important;
+    text-align:left !important;
+    overflow-wrap:anywhere !important;
+    word-break:normal !important;
+    touch-action:manipulation !important;
+    position:relative !important;
+    z-index:3 !important;
+  }
+  html[data-study-domain="pharmacology"] #cheatsheetPanel.open #cheatsheetPanelContent .pharma-cheatsheet-separator{
+    display:none !important;
+  }
+  html[data-study-domain="pharmacology"] #cheatsheetPanel.open #cheatsheetPanelContent .pharma-cheatsheet-common{
+    flex:0 1 auto !important;
+    max-width:34% !important;
+    min-width:0 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    opacity:.58 !important;
+    font-size:.84em !important;
+    pointer-events:none !important;
+  }
+  html[data-study-domain="pharmacology"] #cheatsheetPanel.open #cheatsheetPanelContent .pharma-cheatsheet-basket-add{
+    flex:0 0 32px !important;
+    width:32px !important;
+    min-width:32px !important;
+    max-width:32px !important;
+    height:32px !important;
+    min-height:32px !important;
+    margin-left:auto !important;
+    justify-self:auto !important;
+    position:relative !important;
+    z-index:4 !important;
+    touch-action:manipulation !important;
+  }
+  html[data-study-domain="pharmacology"] #cheatsheetPanel.open #cheatsheetPanelContent .pharma-essential-checkbox-wrap{
+    flex:0 0 17px !important;
+  }
+}
