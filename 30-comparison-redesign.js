@@ -1400,12 +1400,16 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "category-info-button pharma-solved-info-button";
-      button.title = "Afficher la synthèse";
-      button.setAttribute("aria-label", "Afficher la synthèse de cette substance");
-      button.textContent = "💡";
+      button.title = "Afficher / masquer l’esprit";
+      button.setAttribute("aria-label", "Afficher / masquer l’esprit de cette substance");
+      button.textContent = "+";
       button.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
+        event.stopImmediatePropagation();
+        if(typeof window.showPharmaMobileEspritBubble === "function" && window.showPharmaMobileEspritBubble(item)){
+          return;
+        }
         document.querySelectorAll(".pharma-solved-point.pharma-synthesis-open").forEach(other => {
           if(other !== item) other.classList.remove("pharma-synthesis-open");
         });

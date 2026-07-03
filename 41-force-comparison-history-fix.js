@@ -1,7 +1,7 @@
 /* === 41-force-comparison-history-fix.js
    Correctif plus explicite :
-   1) la comparaison s'ouvre immédiatement avec une barre visible, puis le tableau lourd se rend après un court délai ;
-   2) l'historique import est forcé sous la footbar, avec un style injecté APRÈS les styles dynamiques précédents.
+   1) la comparaison s'ouvre immédiatement avec la même barre import/export, puis le tableau lourd se rend après un court délai ;
+   2) l'historique import est forcé sous la footbar, opaque sur mobile, avec un style injecté APRÈS les styles dynamiques précédents.
 */
 (function(){
   "use strict";
@@ -183,6 +183,7 @@
       #mtcPersonalDataStatus.history-open{
         z-index:1000002 !important;
         max-width:calc(100vw - 14px) !important;
+        opacity:1 !important;
       }
       #mtcPersonalDataStatus .mtc-status-history-link{
         text-decoration:none !important;
@@ -202,9 +203,12 @@
         border-top:0 !important;
         border-bottom:1px solid currentColor !important;
         padding:5px 7px !important;
-        background:color-mix(in srgb, var(--page-bg, #fff) 88%, transparent) !important;
-        backdrop-filter:blur(8px) !important;
-        -webkit-backdrop-filter:blur(8px) !important;
+        background:var(--page-bg, #fff) !important;
+        color:var(--text-color, currentColor) !important;
+        opacity:1 !important;
+        box-shadow:0 10px 28px rgba(0,0,0,.18) !important;
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
       }
       #mtcPersonalDataStatus.history-open .mtc-status-history-popover{
         display:flex !important;
@@ -225,6 +229,14 @@
           line-height:1.12 !important;
           opacity:.72 !important;
           pointer-events:auto !important;
+        }
+        #mtcPersonalDataStatus.history-open,
+        #mtcPersonalDataStatus.history-open.visible{
+          opacity:1 !important;
+        }
+        #mtcPersonalDataStatus.history-open .mtc-status-history-popover{
+          background:var(--page-bg, #fff) !important;
+          opacity:1 !important;
         }
       }
     `;
