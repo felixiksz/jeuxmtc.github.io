@@ -1,0 +1,11 @@
+/* 45 — Typographies fin de jeu + bulle ESPRIT reformattée */
+#mtcReplaySameGridButton{
+  font-family:"Archivo", system-ui, sans-serif !important;
+}
+
+html:not([data-study-domain="pharmacology"]) body.game-complete #solved .solved-point,
+html:not([data-study-domain="pharmacology"]) body.game-complete #solved .solved-point *,
+html:not([data-study-domain="pharmacology"]) body.game-finished #solved .solved-point,
+html:not([data-study-domain="pharmacology"]) body.game-finished #solved .solved-point *{
+  font-family:Baskerville, "Libre Baskerville", Georgia, serif !important;
+}

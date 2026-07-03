@@ -31,8 +31,8 @@
         left:50% !important;
         right:auto !important;
         top:auto !important;
-        bottom:calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
-        inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 18px) 50% !important;
+        bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+        inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
         transform:translateX(-50%) !important;
         width:max-content !important;
         max-width:calc(100vw - 14px) !important;
@@ -43,8 +43,8 @@
       @media(max-width:699px){
         #mtcPersonalDataStatus,
         #mtcPersonalDataStatus.visible{
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 16px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
           opacity:.72 !important;
         }
       }

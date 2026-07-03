@@ -36,27 +36,41 @@
     }
   }
 
-  function bar(percent){
-    const total = 26;
+  function ensureSharedProgressBox(){
+    let box = document.getElementById("mtcImportExportProgress");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "mtcImportExportProgress";
+      box.setAttribute("aria-live", "polite");
+      box.innerHTML = '<span class="mtc-import-export-progress-label"></span><span class="mtc-import-export-progress-bar"><span></span></span>';
+      document.body.appendChild(box);
+    }
+    return box;
+  }
+
+  function setSharedProgress(label, percent){
+    const box = ensureSharedProgressBox();
     const p = Math.max(0, Math.min(100, Number(percent) || 0));
-    const filled = Math.round((p / 100) * total);
-    return "[" + "█".repeat(filled) + "░".repeat(Math.max(0, total - filled)) + "]";
+    const text = String(label || "COMPARAISON").toUpperCase();
+    const labelEl = box.querySelector(".mtc-import-export-progress-label");
+    const bar = box.querySelector(".mtc-import-export-progress-bar > span");
+    if(labelEl) labelEl.textContent = `${text} ${Math.round(p).toString().padStart(3, "0")}%`;
+    if(bar) bar.style.width = `${p}%`;
+    box.classList.add("visible");
+  }
+
+  function hideSharedProgress(delay){
+    const box = document.getElementById("mtcImportExportProgress");
+    if(!box) return;
+    window.setTimeout(() => box.classList.remove("visible"), delay == null ? 500 : delay);
   }
 
   function comparisonLoadingHtml(percent, status){
     const p = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
-    const label = isPharma() ? "SUBSTANCES" : "POINTS";
-    const count = countItems();
+    setSharedProgress(status || "COMPARAISON", p);
     return `
       <div class="${LOADING_CLASS}" role="status" aria-live="polite">
-        <div class="mtc-force-progress-dos">
-          <div class="mtc-force-progress-head">
-            <span>C:\\MTC\\A-B&gt; ${esc(status || "chargement")}</span>
-            <span>${String(p).padStart(3,"0")}%</span>
-          </div>
-          <div class="mtc-force-progress-bar">${bar(p)}</div>
-          <div class="mtc-force-progress-sub">${esc(count ? `${count} ${label} À COMPARER` : "PANNEAU COMPARAISON")}</div>
-        </div>
+        <span>Chargement de la comparaison…</span>
       </div>
     `;
   }
@@ -78,7 +92,7 @@
     const panel = byId("comparisonPanel");
     const content = byId("comparisonPanelContent");
     if(!panel || !content) return;
-    paintComparisonLoading(58, "CONSTRUCTION DU TABLEAU...");
+    paintComparisonLoading(58, "comparaison");
 
     comparisonRenderTimer = window.setTimeout(() => {
       comparisonOpening = false;
@@ -87,9 +101,13 @@
         if(typeof window.renderComparisonPanel === "function"){
           window.renderComparisonPanel();
         }
+        setSharedProgress("comparaison", 100);
+        hideSharedProgress(520);
       }catch(error){
         console.error("Erreur de rendu du panneau comparaison", error);
-        content.innerHTML = comparisonLoadingHtml(100, "ERREUR DE CHARGEMENT");
+        setSharedProgress("erreur comparaison", 100);
+        content.innerHTML = `<div class="${LOADING_CLASS}" role="status" aria-live="polite">Erreur de chargement de la comparaison.</div>`;
+        hideSharedProgress(1200);
       }
     }, 160);
   }
@@ -148,80 +166,20 @@
         z-index:9800 !important;
       }
       #comparisonPanelContent .${LOADING_CLASS}{
-        padding:16px 10px 18px !important;
-        min-height:86px !important;
+        padding:18px 12px !important;
+        min-height:72px !important;
         display:flex !important;
         align-items:center !important;
         justify-content:center !important;
         box-sizing:border-box !important;
-      }
-      #comparisonPanelContent .mtc-force-progress-dos{
-        width:min(760px, calc(100vw - 34px)) !important;
-        padding:10px 12px !important;
-        border:1px solid #72ff72 !important;
-        background:#010501 !important;
-        color:#72ff72 !important;
-        font-family:"Courier New", Courier, ui-monospace, Menlo, Consolas, monospace !important;
-        font-size:12px !important;
-        line-height:1.25 !important;
-        letter-spacing:.035em !important;
-        text-shadow:0 0 5px rgba(114,255,114,.48) !important;
-        box-shadow:0 0 0 1px rgba(114,255,114,.15), 0 0 18px rgba(114,255,114,.18), 0 10px 28px rgba(0,0,0,.24) !important;
-        box-sizing:border-box !important;
-      }
-      #comparisonPanelContent .mtc-force-progress-head{
-        display:flex !important;
-        justify-content:space-between !important;
-        gap:12px !important;
-        white-space:nowrap !important;
-        margin-bottom:4px !important;
-      }
-      #comparisonPanelContent .mtc-force-progress-bar{
-        white-space:nowrap !important;
-        overflow:hidden !important;
-        margin:3px 0 !important;
-      }
-      #comparisonPanelContent .mtc-force-progress-sub{
-        opacity:.88 !important;
-        white-space:nowrap !important;
-        overflow:hidden !important;
-        text-overflow:ellipsis !important;
-      }
-      @media(max-width:650px){
-        #comparisonPanelContent .mtc-force-progress-dos{
-          font-size:10px !important;
-          padding:8px 9px !important;
-          letter-spacing:.018em !important;
-        }
+        font-family:"Archivo", system-ui, sans-serif !important;
+        font-size:.9rem !important;
+        line-height:1.3 !important;
+        color:var(--text-color, currentColor) !important;
+        opacity:.72 !important;
+        text-align:center !important;
       }
 
-      /* La ligne d'historique doit être SOUS la footbar, pas dessus. */
-      #footerTitle{
-        bottom:calc(env(safe-area-inset-bottom, 0px) + 36px) !important;
-      }
-      #mtcPersonalDataStatus,
-      #mtcPersonalDataStatus.visible{
-        position:fixed !important;
-        left:50% !important;
-        right:auto !important;
-        top:auto !important;
-        bottom:calc(env(safe-area-inset-bottom, 0px) + 3px) !important;
-        inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 3px) 50% !important;
-        transform:translateX(-50%) !important;
-        width:max-content !important;
-        max-width:calc(100vw - 14px) !important;
-        text-align:center !important;
-        z-index:9001 !important;
-        font-size:8.8px !important;
-        line-height:1.12 !important;
-        padding:1px 4px !important;
-        margin:0 !important;
-        background:color-mix(in srgb, var(--page-bg, #fff) 58%, transparent) !important;
-        pointer-events:auto !important;
-      }
-      #mtcPersonalDataStatus.visible{
-        opacity:.74 !important;
-      }
       #mtcPersonalDataStatus.history-open{
         z-index:1000002 !important;
         max-width:calc(100vw - 14px) !important;
@@ -240,7 +198,6 @@
         transform:translateX(-50%) !important;
         min-width:min(92vw, 420px) !important;
         max-width:min(96vw, 680px) !important;
-        display:none;
         justify-content:center !important;
         border-top:0 !important;
         border-bottom:1px solid currentColor !important;
@@ -252,17 +209,22 @@
       #mtcPersonalDataStatus.history-open .mtc-status-history-popover{
         display:flex !important;
       }
-      @media(max-width:699px){
-        #footerTitle{
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 39px) !important;
-        }
+      @media(max-width:699px), (hover:none), (pointer:coarse){
         #mtcPersonalDataStatus,
         #mtcPersonalDataStatus.visible{
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 2px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 2px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
+          left:50% !important;
+          right:auto !important;
+          top:auto !important;
+          transform:translateX(-50%) !important;
+          width:max-content !important;
           max-width:calc(100vw - 10px) !important;
+          text-align:center !important;
           font-size:7.8px !important;
-          opacity:.68 !important;
+          line-height:1.12 !important;
+          opacity:.72 !important;
+          pointer-events:auto !important;
         }
       }
     `;
