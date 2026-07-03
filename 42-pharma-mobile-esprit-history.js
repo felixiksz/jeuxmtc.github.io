@@ -157,6 +157,76 @@
         pointer-events:auto !important;
         transform:translateY(0) !important;
       }
+      /* PHARMA mobile : même rendu ESPRIT pour les tuiles validées pendant la partie.
+         La première version ne ciblait que body.game-finished ; pendant le jeu,
+         les tuiles déjà validées retombaient sur l'ancien pseudo-tooltip étroit. */
+      @media(max-width:699px), (hover:none), (pointer:coarse){
+        html[data-study-domain="pharmacology"] .pharma-solved-row .solved-points{
+          gap:7px !important;
+        }
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip],
+        html[data-study-domain="pharmacology"].pharma-show-solved-nature .pharma-solved-point[data-esprit-tooltip][data-pharma-nature-tier],
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip][data-pharma-nature-tier]{
+          background:transparent !important;
+          background-color:transparent !important;
+          box-shadow:none !important;
+          border-color:transparent !important;
+          border-radius:8px !important;
+          padding:5px 24px 5px 3px !important;
+          min-height:0 !important;
+          line-height:1.08 !important;
+          overflow:visible !important;
+          text-align:center !important;
+        }
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]:hover,
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]:focus,
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]:active{
+          transform:none !important;
+          box-shadow:none !important;
+        }
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip] .pharma-solved-chinese-name,
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip] .pharma-solved-common-name,
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip] .pharma-solved-tropism,
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip] .pharma-solved-toxicity{
+          max-width:100% !important;
+          overflow-wrap:anywhere !important;
+          word-break:normal !important;
+          hyphens:auto !important;
+        }
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip] .pharma-solved-chinese-name{
+          font-size:.92em !important;
+          line-height:1.08 !important;
+        }
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip] .pharma-solved-common-name{
+          font-size:.58em !important;
+          line-height:1.05 !important;
+          margin-top:1px !important;
+        }
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip] .pharma-solved-info-button{
+          top:-2px !important;
+          right:0 !important;
+          width:21px !important;
+          height:21px !important;
+          min-width:21px !important;
+          min-height:21px !important;
+          padding:0 !important;
+          border:0 !important;
+          background:transparent !important;
+          box-shadow:none !important;
+          color:var(--text-color) !important;
+          font-size:.92rem !important;
+          line-height:1 !important;
+          opacity:.82 !important;
+        }
+        html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::after,
+        html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after{
+          display:none !important;
+          content:none !important;
+          visibility:hidden !important;
+          opacity:0 !important;
+        }
+      }
+
       #mtcPharmaEspritMobileBubble::before{
         content:"ESPRIT";
         display:block;
