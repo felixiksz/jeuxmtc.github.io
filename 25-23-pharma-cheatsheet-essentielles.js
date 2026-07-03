@@ -315,6 +315,13 @@
       const herbId = button.dataset.herbId;
       if(herbId && typeof window.openPharmaHerbPanel === "function"){
         window.openPharmaHerbPanel(herbId);
+        if(typeof window.closeCheatsheetPanel === "function") window.closeCheatsheetPanel();
+        else {
+          const panel = byId("cheatsheetPanel");
+          const toggle = byId("cheatsheetToggle");
+          if(panel) panel.classList.remove("open");
+          if(toggle) toggle.innerHTML = "&gt;";
+        }
       }
     }
 

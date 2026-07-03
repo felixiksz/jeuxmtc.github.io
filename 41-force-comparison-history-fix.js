@@ -132,6 +132,68 @@
     }, true);
   }
 
+
+  let searchTimer = 0;
+  let searchProgressHideTimer = 0;
+
+  function clearSearchTimer(){
+    if(searchTimer){ window.clearTimeout(searchTimer); searchTimer = 0; }
+  }
+
+  function clearSearchProgressHideTimer(){
+    if(searchProgressHideTimer){ window.clearTimeout(searchProgressHideTimer); searchProgressHideTimer = 0; }
+  }
+
+  function openSearchWithSharedProgress(original, context, args){
+    clearSearchTimer();
+    clearSearchProgressHideTimer();
+    setSharedProgress("recherche", 8);
+    window.requestAnimationFrame(() => {
+      setSharedProgress("recherche", 32);
+      searchTimer = window.setTimeout(() => {
+        try{
+          setSharedProgress("recherche", 68);
+          const result = original.apply(context, args || []);
+          setSharedProgress("recherche", 100);
+          hideSharedProgress(650);
+          return result;
+        }catch(error){
+          console.error("Erreur d'ouverture du panneau recherche", error);
+          setSharedProgress("erreur", 100);
+          hideSharedProgress(1200);
+        }
+      }, 55);
+    });
+  }
+
+  function bindSearchPanelProgress(){
+    if(typeof window.openAdvancedSearchPanel === "function" && !window.openAdvancedSearchPanel.__mtcSearchSharedProgressWrapped){
+      const originalOpen = window.openAdvancedSearchPanel;
+      const wrappedOpen = function(){
+        return openSearchWithSharedProgress(originalOpen, this, Array.from(arguments));
+      };
+      wrappedOpen.__mtcSearchSharedProgressWrapped = true;
+      window.openAdvancedSearchPanel = wrappedOpen;
+      try{ if(typeof openAdvancedSearchPanel === "function") openAdvancedSearchPanel = wrappedOpen; }catch(error){}
+    }
+    if(typeof window.toggleAdvancedSearchPanel === "function" && !window.toggleAdvancedSearchPanel.__mtcSearchSharedProgressWrapped){
+      const wrappedToggle = function(){
+        const panel = byId("advancedSearchPanel");
+        if(panel && panel.classList.contains("open")){
+          clearSearchTimer();
+          hideSharedProgress(0);
+          if(typeof window.closeAdvancedSearchPanel === "function") return window.closeAdvancedSearchPanel();
+          panel.classList.remove("open");
+          return;
+        }
+        if(typeof window.openAdvancedSearchPanel === "function") return window.openAdvancedSearchPanel();
+      };
+      wrappedToggle.__mtcSearchSharedProgressWrapped = true;
+      window.toggleAdvancedSearchPanel = wrappedToggle;
+      try{ if(typeof toggleAdvancedSearchPanel === "function") toggleAdvancedSearchPanel = wrappedToggle; }catch(error){}
+    }
+  }
+
   function injectLateStyle(){
     let style = byId("mtcForceComparisonHistoryStyle");
     if(!style){
@@ -198,8 +260,8 @@
       @media(max-width:699px), (hover:none), (pointer:coarse){
         #mtcPersonalDataStatus,
         #mtcPersonalDataStatus.visible{
-          bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
-          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
+          bottom:calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+          inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 18px) 50% !important;
           left:50% !important;
           right:auto !important;
           top:auto !important;
@@ -227,9 +289,11 @@
   function init(){
     injectLateStyle();
     bindComparisonButton();
+    bindSearchPanelProgress();
     removeComparisonLoaders();
     const observer = new MutationObserver(() => {
       bindComparisonButton();
+      bindSearchPanelProgress();
       removeComparisonLoaders();
     });
     if(document.body) observer.observe(document.body, {childList:true, subtree:true});
