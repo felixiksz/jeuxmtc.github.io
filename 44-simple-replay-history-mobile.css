@@ -1,0 +1,70 @@
+/* 44 — Rejouer la même grille, sans lasso + historique mobile intermédiaire */
+#mtcReplaySameGridWrap{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:10px auto 8px;
+  pointer-events:auto;
+  position:relative;
+  z-index:24;
+}
+#mtcReplaySameGridButton{
+  appearance:none;
+  border:1px solid color-mix(in srgb, var(--shadow-color, currentColor) 42%, transparent);
+  border-radius:999px;
+  background:color-mix(in srgb, var(--page-bg, #fff) 72%, transparent);
+  color:var(--text-color, currentColor);
+  min-width:42px;
+  min-height:38px;
+  padding:7px 13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  font-family:"Tomorrow", "Archivo", system-ui, sans-serif;
+  font-size:1.02rem;
+  line-height:1;
+  font-weight:650;
+  letter-spacing:.02em;
+  cursor:pointer;
+  box-shadow:0 8px 22px rgba(0,0,0,.12), 0 0 12px color-mix(in srgb, var(--shadow-color, currentColor) 22%, transparent);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+#mtcReplaySameGridButton:hover,
+#mtcReplaySameGridButton:focus-visible{
+  transform:translateY(-1px);
+  background:color-mix(in srgb, var(--shadow-color, currentColor) 14%, var(--page-bg, #fff));
+  box-shadow:0 10px 26px rgba(0,0,0,.16), 0 0 18px color-mix(in srgb, var(--shadow-color, currentColor) 32%, transparent);
+  outline:none;
+}
+#mtcReplaySameGridButton:active{
+  transform:translateY(1px) scale(.98);
+}
+#mtcReplaySameGridButton .mtc-replay-label{
+  font-size:.74rem;
+  opacity:.82;
+  white-space:nowrap;
+}
+@media(max-width:699px), (hover:none), (pointer:coarse){
+  #mtcReplaySameGridWrap{
+    margin:8px auto 6px;
+  }
+  #mtcReplaySameGridButton{
+    min-width:40px;
+    min-height:36px;
+    padding:7px 11px;
+    font-size:1rem;
+  }
+  #mtcReplaySameGridButton .mtc-replay-label{
+    font-size:.68rem;
+  }
+
+  /* Desktop inchangé : on remonte seulement la ligne historique sur téléphone. */
+  #mtcPersonalDataStatus,
+  #mtcPersonalDataStatus.visible{
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
+    inset:auto auto calc(env(safe-area-inset-bottom, 0px) + 24px) 50% !important;
+  }
+}

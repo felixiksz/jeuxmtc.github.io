@@ -1444,8 +1444,96 @@
     updatePharmaCounter();
   }
 
+
+
+  function startPharmaReplayGame(snapshot){
+    if(!snapshot || !Array.isArray(snapshot.board) || !Array.isArray(snapshot.groups)){
+      startPharmaGame();
+      return;
+    }
+
+    closeAcupuncturePanelsForPharma();
+
+    const message = byId("message");
+    const hint = byId("hint");
+    const solved = byId("solved");
+    const grid = byId("grid");
+    const finalGuess = byId("finalGuess");
+    const finalGuessChoices = byId("finalGuessChoices");
+    const manualControls = byId("manualControls");
+    const manualEditButton = byId("manualEditButton");
+
+    if(message) message.textContent = "";
+    if(hint) hint.textContent = "";
+    if(solved) solved.innerHTML = "";
+    if(grid) grid.innerHTML = "";
+    if(finalGuess){
+      finalGuess.classList.remove("pharma-final-guess-visible");
+      finalGuess.style.setProperty("display", "none", "important");
+      finalGuess.dataset.correctKey = "";
+    }
+    if(finalGuessChoices) finalGuessChoices.innerHTML = "";
+    if(manualControls) manualControls.style.display = "none";
+    if(manualEditButton) manualEditButton.style.display = "none";
+    syncPharmaManualControls();
+
+    const herbById = new Map(
+      snapshot.board
+        .filter(Boolean)
+        .map(herb => [String(herb.id), Object.assign({}, herb)])
+    );
+
+    const groups = snapshot.groups.map((rawGroup, index) => {
+      const ids = Array.isArray(rawGroup.herbIds) ? rawGroup.herbIds.map(String) : [];
+      const herbs = ids.map(id => herbById.get(id)).filter(Boolean);
+      return {
+        key:String(rawGroup.key || rawGroup.classCode || ""),
+        name:String(rawGroup.name || rawGroup.key || ""),
+        classCode:String(rawGroup.classCode || rawGroup.key || ""),
+        herbs,
+        herbIds:herbs.map(herb => String(herb.id)),
+        size:herbs.length,
+        solved:false,
+        color:Array.isArray(window.CATEGORY_COLORS)
+          ? window.CATEGORY_COLORS[index % window.CATEGORY_COLORS.length]
+          : "var(--shadow-color)"
+      };
+    }).filter(group => group.herbs.length > 0).slice(0, PHARMA_CATEGORY_COUNT);
+
+    const allowedIds = new Set(groups.flatMap(group => group.herbIds));
+    const board = snapshot.board
+      .filter(herb => herb && allowedIds.has(String(herb.id)))
+      .map(herb => herbById.get(String(herb.id)) || herb)
+      .filter(Boolean);
+
+    pharmaState.groups = groups;
+    pharmaState.board = board.length ? board : groups.flatMap(group => group.herbs);
+    pharmaState.activeClassCode = null;
+    pharmaState.selectedIds = [];
+    pharmaState.solvedClassCodes = new Set();
+    pharmaState.running = true;
+
+    if(!grid || pharmaState.groups.length !== PHARMA_CATEGORY_COUNT || pharmaState.board.length === 0){
+      if(message) message.textContent = "Impossible de rejouer cette grille.";
+      return;
+    }
+
+    if(typeof window.resetPharmaLivesHints === "function"){
+      window.resetPharmaLivesHints();
+    }
+
+    if(typeof window.onPharmaGameStarted === "function"){
+      window.onPharmaGameStarted(pharmaState.groups, pharmaState.board);
+    }
+
+    pharmaState.board.forEach(herb => {
+      grid.appendChild(renderPharmaTile(herb));
+    });
+  }
+
   window.revealAllPharmaSolutions = revealAllPharmaSolutions;
   window.startPharmaGame = startPharmaGame;
+  window.startPharmaReplayGame = startPharmaReplayGame;
   window.getPharmaManualClassCodes = getManualClassCodes;
   window.setPharmaManualClassCodes = setManualClassCodes;
   window.ensurePharmaDisplayControls = ensurePharmaDisplayControls;
