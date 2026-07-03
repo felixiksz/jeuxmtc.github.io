@@ -1,7 +1,7 @@
 /* === 42-pharma-mobile-esprit-history.js
-   Correctifs ciblés :
-   - PHARMA mobile : même bulle ESPRIT lisible pour les tuiles validées pendant la partie et en fin de jeu.
-   - Historique import : position mobile intermédiaire et popover opaque/lisible.
+   PHARMA mobile : applique la grande bulle ESPRIT lisible aux tuiles validées pendant la partie
+   et en fin de jeu. Le bouton + est ajouté ici aussi, pour ne pas dépendre d'un autre module.
+   Historique : popover opaque/lisible sur mobile.
 */
 (function(){
   "use strict";
@@ -10,13 +10,17 @@
   function isPharma(){ return document.documentElement.getAttribute("data-study-domain") === "pharmacology"; }
   function isMobileLike(){
     try{
-      return !!(window.matchMedia && (
-        window.matchMedia("(max-width: 699px)").matches ||
-        window.matchMedia("(hover: none)").matches ||
-        window.matchMedia("(pointer: coarse)").matches
-      ));
+      return !!(
+        (window.matchMedia && (
+          window.matchMedia("(max-width: 900px)").matches ||
+          window.matchMedia("(hover: none)").matches ||
+          window.matchMedia("(pointer: coarse)").matches
+        )) ||
+        (navigator && Number(navigator.maxTouchPoints || 0) > 0) ||
+        window.innerWidth <= 900
+      );
     }catch(error){
-      return window.innerWidth <= 699;
+      return window.innerWidth <= 900;
     }
   }
   function esc(value){
@@ -35,11 +39,13 @@
   }
 
   function injectStyle(){
-    if(byId("mtcPharmaMobileEspritHistoryStyle42")) return;
-    const style = document.createElement("style");
-    style.id = "mtcPharmaMobileEspritHistoryStyle42";
+    let style = byId("mtcPharmaMobileEspritHistoryStyle42");
+    if(!style){
+      style = document.createElement("style");
+      style.id = "mtcPharmaMobileEspritHistoryStyle42";
+      document.head.appendChild(style);
+    }
     style.textContent = `
-      /* Historique : position mobile intermédiaire, popover opaque. */
       #mtcPersonalDataStatus.history-open{
         opacity:1 !important;
         z-index:1000002 !important;
@@ -52,7 +58,8 @@
         backdrop-filter:none !important;
         -webkit-backdrop-filter:none !important;
       }
-      @media(max-width:699px), (hover:none), (pointer:coarse){
+
+      @media(max-width:900px), (hover:none), (pointer:coarse){
         #mtcPersonalDataStatus,
         #mtcPersonalDataStatus.visible{
           position:fixed !important;
@@ -65,7 +72,7 @@
           width:max-content !important;
           max-width:calc(100vw - 14px) !important;
           text-align:center !important;
-          z-index:9001 !important;
+          z-index:1000001 !important;
           opacity:.72 !important;
         }
         #mtcPersonalDataStatus.history-open,
@@ -79,11 +86,10 @@
           border-top:0 !important;
           border-bottom:1px solid currentColor !important;
           box-shadow:0 10px 28px rgba(0,0,0,.22) !important;
+          backdrop-filter:none !important;
+          -webkit-backdrop-filter:none !important;
         }
-      }
 
-      /* PHARMA mobile : tuiles validées sans ancien fond rond et bouton + stable. */
-      @media(max-width:699px), (hover:none), (pointer:coarse){
         html[data-study-domain="pharmacology"] .pharma-solved-row .solved-points{
           gap:7px !important;
         }
@@ -133,24 +139,27 @@
           position:absolute !important;
           top:-2px !important;
           right:0 !important;
-          width:21px !important;
-          height:21px !important;
-          min-width:21px !important;
-          min-height:21px !important;
+          width:24px !important;
+          height:24px !important;
+          min-width:24px !important;
+          min-height:24px !important;
           padding:0 !important;
           border:0 !important;
           background:transparent !important;
           box-shadow:none !important;
           color:var(--text-color) !important;
-          font-size:.92rem !important;
+          font-family:"Archivo", system-ui, sans-serif !important;
+          font-size:1rem !important;
           line-height:1 !important;
           font-weight:900 !important;
-          opacity:.86 !important;
-          z-index:8 !important;
+          opacity:.9 !important;
+          z-index:20 !important;
           touch-action:manipulation !important;
+          pointer-events:auto !important;
         }
         html[data-study-domain="pharmacology"] .pharma-solved-point[data-esprit-tooltip]::after,
-        html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after{
+        html[data-study-domain="pharmacology"] .pharma-solved-point.pharma-synthesis-open::after,
+        html[data-study-domain="pharmacology"] .pharma-solved-point .pharma-solved-esprit-tooltip{
           display:none !important;
           content:none !important;
           visibility:hidden !important;
@@ -196,10 +205,6 @@
         pointer-events:auto !important;
         transform:translateY(0) !important;
       }
-      #mtcPharmaEspritMobileBubble::before{
-        content:none !important;
-        display:none !important;
-      }
       #mtcPharmaEspritMobileBubble .mtc-esprit-bubble-title{
         display:flex !important;
         align-items:baseline !important;
@@ -227,6 +232,7 @@
         font-weight:850 !important;
         letter-spacing:.12em !important;
         text-transform:uppercase !important;
+        text-shadow:0 0 8px color-mix(in srgb, var(--shadow-color, currentColor) 42%, transparent) !important;
         opacity:.92 !important;
       }
       #mtcPharmaEspritMobileBubble .mtc-esprit-bubble-body{
@@ -239,7 +245,6 @@
         overflow-wrap:anywhere !important;
       }
     `;
-    document.head.appendChild(style);
   }
 
   function bubble(){
@@ -269,10 +274,7 @@
     const node = bubble();
     const id = item.getAttribute("data-herb-id") || text.slice(0, 80);
     const already = node.classList.contains("visible") && node.dataset.sourceHerbId === id;
-    if(already){
-      hideBubble();
-      return true;
-    }
+    if(already){ hideBubble(); return true; }
 
     document.querySelectorAll(".pharma-solved-point.pharma-synthesis-open").forEach(other => {
       if(other !== item) other.classList.remove("pharma-synthesis-open");
@@ -293,73 +295,76 @@
     return true;
   }
 
-  function normalizeButtons(root){
+  function normalizeButton(button){
+    if(!button) return;
+    if(button.textContent !== "+") button.textContent = "+";
+    button.title = "Afficher / masquer l’esprit";
+    button.setAttribute("aria-label", "Afficher / masquer l’esprit de cette substance");
+    button.type = "button";
+  }
+
+  function ensureButtons(root){
+    if(!isPharma() || !isMobileLike()) return;
     const scope = root && root.querySelectorAll ? root : document;
-    scope.querySelectorAll(".pharma-solved-info-button").forEach(button => {
-      if(button.textContent !== "+") button.textContent = "+";
-      button.title = "Afficher / masquer l’esprit";
-      button.setAttribute("aria-label", "Afficher / masquer l’esprit de cette substance");
-      button.type = "button";
+    scope.querySelectorAll(".pharma-solved-point[data-esprit-tooltip]").forEach(item => {
+      let button = item.querySelector(".pharma-solved-info-button");
+      if(!button){
+        button = document.createElement("button");
+        button.className = "category-info-button pharma-solved-info-button";
+        item.appendChild(button);
+      }
+      normalizeButton(button);
     });
+  }
+
+  function handleButtonEvent(event){
+    const button = event.target && event.target.closest && event.target.closest(".pharma-solved-info-button");
+    if(!button || !isPharma() || !isMobileLike()) return;
+    const item = button.closest(".pharma-solved-point[data-esprit-tooltip]");
+    if(!item) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if(event.stopImmediatePropagation) event.stopImmediatePropagation();
+    showBubbleFor(item);
   }
 
   function bind(){
     window.showPharmaMobileEspritBubble = showBubbleFor;
     window.hidePharmaMobileEspritBubble = hideBubble;
 
+    document.addEventListener("pointerup", handleButtonEvent, {capture:true, passive:false});
+    document.addEventListener("touchend", handleButtonEvent, {capture:true, passive:false});
     document.addEventListener("click", event => {
       const button = event.target && event.target.closest && event.target.closest(".pharma-solved-info-button");
-      if(button && isPharma() && isMobileLike()){
-        const item = button.closest(".pharma-solved-point[data-esprit-tooltip]");
-        if(item){
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-          showBubbleFor(item);
-          return;
-        }
-      }
+      if(button){ handleButtonEvent(event); return; }
       if(isMobileLike()){
         const insideBubble = event.target && event.target.closest && event.target.closest("#mtcPharmaEspritMobileBubble");
-        const insideButton = event.target && event.target.closest && event.target.closest(".pharma-solved-info-button");
-        if(!insideBubble && !insideButton) hideBubble();
+        if(!insideBubble) hideBubble();
       }
     }, true);
 
-    document.addEventListener("touchend", event => {
-      const button = event.target && event.target.closest && event.target.closest(".pharma-solved-info-button");
-      if(button && isPharma() && isMobileLike()){
-        const item = button.closest(".pharma-solved-point[data-esprit-tooltip]");
-        if(item){
-          event.preventDefault();
-          event.stopPropagation();
-          showBubbleFor(item);
-        }
-      }
-    }, {capture:true, passive:false});
-
-    document.addEventListener("keydown", event => {
-      if(event.key === "Escape") hideBubble();
-    });
-
+    document.addEventListener("keydown", event => { if(event.key === "Escape") hideBubble(); });
     window.addEventListener("resize", () => {
+      ensureButtons(document);
       const node = byId("mtcPharmaEspritMobileBubble");
       if(node && node.classList.contains("visible") && !isMobileLike()) hideBubble();
     });
 
     const observer = new MutationObserver(mutations => {
       for(const mutation of mutations){
-        mutation.addedNodes.forEach(node => {
-          if(node.nodeType === 1) normalizeButtons(node);
-        });
+        mutation.addedNodes.forEach(node => { if(node.nodeType === 1) ensureButtons(node); });
+        if(mutation.type === "attributes" && mutation.target && mutation.target.nodeType === 1) ensureButtons(mutation.target.parentElement || document);
       }
     });
-    if(document.body) observer.observe(document.body, {childList:true, subtree:true});
+    if(document.body) observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["data-esprit-tooltip", "class"]});
+
+    // Petit balayage périodique : utile quand une catégorie validée existait déjà avant que le script s'attache.
+    window.setInterval(() => ensureButtons(document), 900);
   }
 
   function init(){
     injectStyle();
-    normalizeButtons(document);
+    ensureButtons(document);
     bind();
   }
 
