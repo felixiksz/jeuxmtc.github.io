@@ -7,6 +7,7 @@
   const ACU_ASSOC_PREFIX = "mtc_point_associations_";
   const ACU_VS_PREFIX = "mtc_point_vs_";
   const ACU_PRECAUTION_PREFIX = "mtc_point_precaution_";
+  const ACU_IMAGE_PREFIX = "mtc_point_image_";
   const PHARMA_HANZI_PREFIX = "mtc_pharma_herb_hanzi_";
   const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
   const PHARMA_NOTE_PREFIX = "mtc_pharma_herb_notes_";
@@ -99,6 +100,7 @@
       ACU_ASSOC_PREFIX,
       ACU_VS_PREFIX,
       ACU_PRECAUTION_PREFIX,
+      ACU_IMAGE_PREFIX,
       PHARMA_HANZI_PREFIX,
       PHARMA_ESPRIT_PREFIX,
       PHARMA_NOTE_PREFIX,
@@ -126,7 +128,7 @@
   function importHistoryPrefixes(){
     // On garde l’historique léger : les images base64 peuvent saturer localStorage.
     // Elles restent exportées dans les sauvegardes classiques, mais ne sont pas dupliquées dans la timeline.
-    return personalDataPrefixes().filter(prefix => prefix !== PHARMA_IMAGE_PREFIX);
+    return personalDataPrefixes().filter(prefix => prefix !== PHARMA_IMAGE_PREFIX && prefix !== ACU_IMAGE_PREFIX);
   }
 
   function capturePersonalTextDataSnapshot(){
@@ -757,7 +759,8 @@
         esprits:safeLocalStorageEntries(ACU_ESPRIT_PREFIX),
         associations:safeLocalStorageEntries(ACU_ASSOC_PREFIX),
         vs:safeLocalStorageEntries(ACU_VS_PREFIX),
-        precautions:safeLocalStorageEntries(ACU_PRECAUTION_PREFIX)
+        precautions:safeLocalStorageEntries(ACU_PRECAUTION_PREFIX),
+        images:safeLocalStorageEntries(ACU_IMAGE_PREFIX)
       },
       pharmacology:{
         hanzi:safeLocalStorageEntries(PHARMA_HANZI_PREFIX),
@@ -884,6 +887,7 @@
           count += await applyImportChunk("IMPORT", 38, () => setPrefixedValues(ACU_ASSOC_PREFIX, parsed.acupuncture.associations || parsed.acupuncture.association, "associations"));
           count += await applyImportChunk("IMPORT", 41, () => setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison, "vs"));
           count += await applyImportChunk("IMPORT", 44, () => setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution, "precautions"));
+          count += await applyImportChunk("IMPORT", 46, () => setPrefixedValues(ACU_IMAGE_PREFIX, parsed.acupuncture.images || parsed.acupuncture.image, "images"));
         }
 
         const looksLikeDirectPharmaImport = parsed && typeof parsed === "object" && (
@@ -1218,7 +1222,7 @@
             {
               selector:"#exportNotesButton",
               title:"Export",
-              text:"Ce bouton sauvegarde tes notes personnelles ACU, tes Esprits et notes PHARMA, ainsi que les images locales ajoutées aux fiches PHARMA. Le fichier reste sur ton appareil.",
+              text:"Ce bouton sauvegarde tes notes personnelles ACU, tes Esprits et notes PHARMA, ainsi que les images locales ajoutées aux fiches ACU/PHARMA. Le fichier reste sur ton appareil.",
               fallback:() => document.querySelector("#footerTitle"),
               position:"aboveBottom"
             },
