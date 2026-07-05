@@ -350,7 +350,7 @@
     message.innerHTML = `
       <div class="game-over-title pharma-end-title ${won ? "bravo-punch" : ""}">${won ? "BRAVO !" : "GAME OVER !"}</div>
       <div class="game-over-subtitle pharma-end-subtitle mtc-final-detail-hint">
-        ${won ? " " : "Tu peux maintenant aller dans les détails si tu veux :)"}
+        ${won ? " " : ""}
       </div>
       ${pharmaEndReviewHtml()}
     `;

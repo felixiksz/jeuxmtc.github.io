@@ -3746,7 +3746,7 @@ function showEndReviewScreen(mode){
       ? " "
       : mode === "tour"
         ? "Regarde les éléments de révision autour de la grille."
-        : "Tu peux maintenant aller dans les détails si tu veux :)";
+        : "";
 
   message.innerHTML = `
     <div class="game-over-title ${mode === "win" ? "bravo-punch" : ""}">
