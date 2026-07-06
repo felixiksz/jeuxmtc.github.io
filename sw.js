@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260706-offline-v6-audiofix";
+const MTC_OFFLINE_VERSION = "20260706-offline-v8-audio-tts";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -527,11 +527,14 @@ function withoutSearch(urlString){
   return url.toString();
 }
 
-async function cacheAssetList(list){
+async function cacheAssetList(list, onProgress){
   const cache = await caches.open(MTC_CACHE_NAME);
   let ok = 0;
   const failed = [];
-  for(const asset of list){
+  const total = Math.max(1, list.length);
+  let lastPercent = -1;
+  for(let index = 0; index < list.length; index += 1){
+    const asset = list[index];
     const url = scopedUrl(asset);
     try{
       const response = await fetch(url, {cache:"reload"});
@@ -543,6 +546,13 @@ async function cacheAssetList(list){
       }
     }catch(error){
       failed.push(asset);
+    }
+    if(typeof onProgress === "function"){
+      const percent = Math.floor(((index + 1) / total) * 100);
+      if(percent !== lastPercent || index === list.length - 1){
+        lastPercent = percent;
+        onProgress({index:index + 1, total, percent, ok, failedCount:failed.length, asset});
+      }
     }
   }
   return {ok, failedCount: failed.length, failed: failed.slice(0, 12)};
@@ -565,10 +575,30 @@ self.addEventListener("message", event => {
   if(data.type !== "PRECACHE_OFFLINE") return;
   const includeAudio = Boolean(data.includeAudio);
   event.waitUntil((async () => {
-    const core = await cacheAssetList(CORE_ASSETS);
-    const audio = includeAudio ? await cacheAssetList(AUDIO_ASSETS) : {ok:0, failedCount:0, failed:[]};
-    if(event.ports && event.ports[0]){
-      event.ports[0].postMessage({ok:true, version:MTC_OFFLINE_VERSION, includeAudio, core, audio});
+    const port = event.ports && event.ports[0];
+    const sendProgress = data => {
+      if(port) port.postMessage(Object.assign({progress:true}, data || {}));
+    };
+    sendProgress({label: includeAudio ? "hors connexion + audio" : "hors connexion", percent:4, message:"Préparation de la liste des fichiers…"});
+    const core = await cacheAssetList(CORE_ASSETS, info => {
+      const percent = includeAudio ? Math.round(6 + info.percent * 0.24) : Math.round(8 + info.percent * 0.86);
+      sendProgress({
+        label: includeAudio ? "jeu" : "hors connexion",
+        percent,
+        message:`Jeu : ${info.index}/${info.total} fichiers`
+      });
+    });
+    const audio = includeAudio ? await cacheAssetList(AUDIO_ASSETS, info => {
+      const percent = Math.round(31 + info.percent * 0.67);
+      sendProgress({
+        label:"audio",
+        percent,
+        message:`Audios : ${info.index}/${info.total} fichiers`
+      });
+    }) : {ok:0, failedCount:0, failed:[]};
+    sendProgress({label:"hors connexion", percent:99, message:"Finalisation du cache hors connexion…"});
+    if(port){
+      port.postMessage({ok:true, version:MTC_OFFLINE_VERSION, includeAudio, core, audio});
     }
   })().catch(error => {
     if(event.ports && event.ports[0]){
