@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260706-offline-v5";
+const MTC_OFFLINE_VERSION = "20260706-offline-v6-audiofix";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
