@@ -114,7 +114,7 @@
       if(currentGameAudio === audio) currentGameAudio = null;
     }, {once:true});
 
-    timeoutId = window.setTimeout(fail, 3200);
+    timeoutId = window.setTimeout(fail, 8000);
     audio.src = audioUrl(filename);
 
     let promise = null;

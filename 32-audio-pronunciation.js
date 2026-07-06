@@ -4,7 +4,8 @@
    Version stable :
    - bouton toujours présent quand un hanzi existe
    - manifest explicite audio-manifest.js si disponible
-   - candidates testées dans l'ordre : chinois direct, manifest, #Uxxxx
+   - candidats réellement présents dans le manifest en priorité
+   - timeout allongé sur mobile/connexion lente
    - compatible fichiers GitHub chinois directs et fichiers zip #Uxxxx
    - volume 40 %
    ============================================================ */
@@ -270,7 +271,7 @@
       if(currentAudio === audio){ currentAudio = null; currentButton = null; }
     });
 
-    timeoutId = setTimeout(fail, 3000);
+    timeoutId = setTimeout(fail, 8000);
     audio.src = audioUrl(filename);
 
     // Important : play() est appelé immédiatement dans le gestionnaire du clic.
