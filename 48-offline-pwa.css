@@ -1,0 +1,262 @@
+/* 48 — PWA / hors connexion — linefix2 */
+#mtcOfflineButton{
+  appearance:none;
+  position:fixed!important;
+  left:50%!important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 22px)!important;
+  z-index:9002!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:0!important;
+  background:transparent!important;
+  color:color-mix(in srgb, var(--text-color, #111) 72%, transparent)!important;
+  opacity:.68;
+  min-width:24px;
+  min-height:24px;
+  padding:0 4px;
+  font:700 1rem/1 "Archivo", system-ui, sans-serif;
+  cursor:pointer;
+  box-shadow:none!important;
+  transform:translateX(-50%)!important;
+}
+#mtcOfflineButton:hover,
+#mtcOfflineButton:focus-visible{
+  opacity:1;
+  outline:0;
+}
+#mtcOfflineButton.is-ready{
+  opacity:.86;
+}
+#mtcOfflineButton.is-loading{
+  opacity:.95;
+  cursor:progress;
+}
+.mtc-offline-modal{
+  position:fixed;
+  inset:0;
+  z-index:2147482500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  box-sizing:border-box;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 18%, rgba(0,0,0,.22));
+  color:var(--text-color, #111);
+  font-family:"Archivo", system-ui, sans-serif;
+}
+.mtc-offline-modal.visible{display:flex;}
+.mtc-offline-card{
+  width:min(420px, 100%);
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 28%, transparent);
+  border-radius:22px;
+  background:var(--page-bg, #fff);
+  padding:18px;
+  box-shadow:0 18px 48px color-mix(in srgb, var(--shadow-color, #4b63ff) 22%, transparent);
+}
+.mtc-offline-card h2{
+  margin:0 0 8px;
+  font-size:1.1rem;
+  line-height:1.15;
+}
+.mtc-offline-card p{
+  margin:0 0 12px;
+  opacity:.78;
+  font-size:.9rem;
+  line-height:1.38;
+}
+.mtc-offline-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.mtc-offline-actions button{
+  appearance:none;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 32%, transparent);
+  border-radius:999px;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 10%, var(--page-bg, #fff));
+  color:inherit;
+  padding:9px 12px;
+  font:650 .86rem/1 "Archivo", system-ui, sans-serif;
+  cursor:pointer;
+}
+.mtc-offline-actions button.secondary{
+  opacity:.72;
+  box-shadow:none;
+  background:transparent;
+}
+.mtc-offline-actions button[disabled]{
+  opacity:.5;
+  cursor:progress;
+}
+.mtc-offline-status{
+  min-height:1.2em;
+  margin-top:10px;
+  font-size:.82rem;
+  line-height:1.35;
+  opacity:.82;
+}
+@media(max-width:699px){
+  #mtcOfflineButton{
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 50px)!important;
+    min-width:22px;
+    min-height:22px;
+    padding-inline:2px;
+    font-size:.92rem;
+  }
+  .mtc-offline-modal{
+    align-items:flex-end;
+    padding:12px;
+  }
+  .mtc-offline-card{
+    border-radius:18px;
+    padding:16px;
+  }
+  .mtc-offline-actions button{
+    flex:1 1 auto;
+  }
+}
+
+.mtc-offline-steps{
+  margin: 0.55rem 0 0.9rem;
+  padding-left: 1.25rem;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  opacity: 0.86;
+}
+.mtc-offline-steps li{ margin: 0.18rem 0; }
+
+.mtc-offline-psst{
+  margin: 10px 0 0;
+  opacity: .78;
+  font-size: .88rem;
+  font-style: italic;
+}
+.mtc-offline-card a{
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+body.mtc-memo-open #mtcOfflineButton{display:none!important;}
+
+
+/* Ligne basse commune : ✈︎ + export/import/historique + nouveauté */
+#mtcBottomMetaLine{
+  position:fixed!important;
+  left:8px!important;
+  right:8px!important;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 18px)!important;
+  z-index:1000007!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:baseline!important;
+  justify-content:flex-start!important;
+  gap:.1em .55em!important;
+  box-sizing:border-box!important;
+  max-width:calc(100vw - 16px)!important;
+  pointer-events:none!important;
+  font:600 10px/1.22 "Archivo", system-ui, sans-serif!important;
+  color:color-mix(in srgb, var(--text-color, #111) 70%, transparent)!important;
+}
+#mtcBottomMetaLine #mtcOfflineButton,
+#mtcBottomMetaLine #mtcPersonalDataStatus,
+#mtcBottomMetaLine #mtcPharmaImportNovelty{
+  position:static!important;
+  left:auto!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:auto!important;
+  inset:auto!important;
+  transform:none!important;
+  z-index:auto!important;
+  width:auto!important;
+  max-width:none!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:2px 3px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color:inherit!important;
+  opacity:.68!important;
+  text-align:left!important;
+  text-transform:none!important;
+  font:inherit!important;
+  line-height:inherit!important;
+  letter-spacing:.01em!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  pointer-events:auto!important;
+}
+#mtcBottomMetaLine #mtcOfflineButton{
+  appearance:none!important;
+  visibility:visible!important;
+  opacity:.74!important;
+  display:inline-flex!important;
+  align-items:baseline!important;
+  justify-content:center!important;
+  cursor:pointer!important;
+  font-weight:700!important;
+}
+#mtcBottomMetaLine #mtcOfflineButton:hover,
+#mtcBottomMetaLine #mtcOfflineButton:focus-visible,
+#mtcBottomMetaLine #mtcPersonalDataStatus .mtc-status-history-link:hover,
+#mtcBottomMetaLine #mtcPersonalDataStatus .mtc-status-history-link:focus-visible,
+#mtcBottomMetaLine #mtcPharmaImportNovelty:hover,
+#mtcBottomMetaLine #mtcPharmaImportNovelty:focus-visible{
+  opacity:1!important;
+  outline:0!important;
+}
+#mtcBottomMetaLine #mtcPersonalDataStatus{
+  display:inline-block!important;
+  flex:0 1 auto!important;
+}
+#mtcBottomMetaLine #mtcPersonalDataStatus .mtc-status-history-link{
+  color:inherit!important;
+  font:inherit!important;
+  margin-left:.35em!important;
+  padding:0 .08em!important;
+}
+#mtcBottomMetaLine #mtcPersonalDataStatus.history-open{
+  flex-basis:100%!important;
+  max-width:min(92vw, 680px)!important;
+}
+#mtcBottomMetaLine #mtcPharmaImportNovelty{
+  flex:0 1 auto!important;
+  margin-left:auto!important;
+  text-align:right!important;
+}
+html[data-study-domain="pharmacology"] body:not(.mtc-memo-open) #mtcBottomMetaLine #mtcPharmaImportNovelty.visible{
+  display:inline-block!important;
+}
+body.mtc-memo-open #mtcBottomMetaLine #mtcOfflineButton{display:none!important;}
+@media(max-width:700px){
+  #mtcBottomMetaLine{
+    left:7px!important;
+    right:7px!important;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 50px)!important;
+    max-width:calc(100vw - 14px)!important;
+    font-size:8.8px!important;
+    gap:.05em .42em!important;
+  }
+  #mtcBottomMetaLine #mtcOfflineButton,
+  #mtcBottomMetaLine #mtcPersonalDataStatus,
+  #mtcBottomMetaLine #mtcPharmaImportNovelty{
+    padding:1px 2px!important;
+    line-height:1.18!important;
+  }
+  #mtcBottomMetaLine #mtcPersonalDataStatus{
+    flex:1 1 auto!important;
+    min-width:min(64vw, 25rem)!important;
+  }
+  #mtcBottomMetaLine #mtcPharmaImportNovelty{
+    flex:1 1 100%!important;
+    margin-left:0!important;
+    text-align:right!important;
+  }
+}

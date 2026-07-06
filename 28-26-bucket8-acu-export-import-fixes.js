@@ -345,9 +345,11 @@
       box.setAttribute("aria-live", "polite");
       box.setAttribute("aria-label", "Statut import et modification des notes");
     }
-    // La ligne reste attachée au body en position fixed basse.
-    // Son z-index bas la place sous les panneaux recherche/comparaison/cheatsheet.
-    if(box.parentElement !== document.body || box.nextElementSibling){
+    // Si la ligne basse commune existe, on y range le statut pour obtenir : ✈︎ → historique → nouveauté.
+    const bottomLine = document.getElementById("mtcBottomMetaLine");
+    if(bottomLine){
+      if(box.parentElement !== bottomLine) bottomLine.appendChild(box);
+    }else if(box.parentElement !== document.body || box.nextElementSibling){
       document.body.appendChild(box);
     }
     return box;
