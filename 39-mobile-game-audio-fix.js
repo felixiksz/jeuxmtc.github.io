@@ -142,8 +142,23 @@
     const clean = normalizeHanzi(hanzi);
     if(!clean || !containsCjk(clean)) return false;
 
+    // Si aucun mp3 confirmé n'existe dans le manifest, on délègue au module
+    // principal : il utilise une synthèse vocale immédiate, compatible mobile.
+    try{
+      if(typeof window.mtcConfirmedAudioCandidatesForHanzi === "function" &&
+         !window.mtcConfirmedAudioCandidatesForHanzi(clean).length &&
+         typeof window.playMtcAudioByHanzi === "function"){
+        return window.playMtcAudioByHanzi(clean, null);
+      }
+    }catch(error){}
+
     const candidates = orderedGameCandidates(clean);
-    if(!candidates.length) return false;
+    if(!candidates.length){
+      try{
+        if(typeof window.playMtcAudioByHanzi === "function") return window.playMtcAudioByHanzi(clean, null);
+      }catch(error){}
+      return false;
+    }
 
     stopGameAudio();
     const serial = gameAudioSerial + 1;
