@@ -128,8 +128,8 @@
   }
 
   async function precacheOffline(includeAudio){
-    if(statusEl) statusEl.textContent = includeAudio ? "Téléchargement du jeu et des audios sur ce téléphone…" : "Téléchargement du jeu sur ce téléphone…";
-    setMessage(includeAudio ? "Préparation du jeu sans internet avec audios…" : "Préparation du jeu sans internet…");
+    if(statusEl) statusEl.textContent = includeAudio ? "Téléchargement du jeu et des audios sur cet appareil…" : "Téléchargement du jeu sur cet appareil…";
+    setMessage(includeAudio ? "Préparation du jeu hors-connexion avec audios…" : "Préparation du jeu hors-connexion…");
     setBusy(true);
     try{
       const registration = await registerServiceWorker();
@@ -140,7 +140,7 @@
       const audioInfo = includeAudio && result.audio ? ` + ${result.audio.ok} audios` : "";
       const failed = (result.core && result.core.failedCount || 0) + (result.audio && result.audio.failedCount || 0);
       const suffix = failed ? ` (${failed} fichier(s) non récupéré(s), le reste est prêt)` : "";
-      const text = `Jeu prêt sans internet sur ce téléphone : ${coreInfo}${audioInfo}${suffix}.`;
+      const text = `Jeu prêt hors-connexion sur cet appareil : ${coreInfo}${audioInfo}${suffix}.`;
       if(statusEl) statusEl.textContent = text;
       setMessage("Jeu prêt sans internet.");
       updateButton();
