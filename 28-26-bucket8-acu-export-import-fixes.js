@@ -892,8 +892,10 @@
           count += await applyImportChunk("IMPORT", 38, () => setPrefixedValues(ACU_ASSOC_PREFIX, parsed.acupuncture.associations || parsed.acupuncture.association, "associations"));
           count += await applyImportChunk("IMPORT", 41, () => setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison, "vs"));
           count += await applyImportChunk("IMPORT", 44, () => setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution, "precautions"));
-          count += await applyImportChunk("IMPORT", 46, () => setPrefixedValues(ACU_IMAGE_PREFIX, parsed.acupuncture.images || parsed.acupuncture.image, "images", {replace:true}));
-          count += await applyImportChunk("IMPORT", 47, () => setPrefixedValues(ACU_NOTE_IMAGE_PREFIX, parsed.acupuncture.note_images || parsed.acupuncture.noteImages || parsed.acupuncture.images_notes || parsed.acupuncture.notes_images, "note_images", {replace:true}));
+          // Les images complémentaires sont importées avant les images principales afin
+          // qu'elles ne soient pas évincées si le stockage local approche de sa limite.
+          count += await applyImportChunk("IMPORT", 45, () => setPrefixedValues(ACU_NOTE_IMAGE_PREFIX, parsed.acupuncture.note_images || parsed.acupuncture.noteImages || parsed.acupuncture.images_notes || parsed.acupuncture.notes_images, "note_images", {replace:true}));
+          count += await applyImportChunk("IMPORT", 47, () => setPrefixedValues(ACU_IMAGE_PREFIX, parsed.acupuncture.images || parsed.acupuncture.image, "images", {replace:true}));
         }
 
         const looksLikeDirectPharmaImport = parsed && typeof parsed === "object" && (
