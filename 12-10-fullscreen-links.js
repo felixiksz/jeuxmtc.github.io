@@ -227,15 +227,37 @@
 
   function renderPointAssociationsSectionFinal(point, value){
     const current = pointAssociationsValueFinal(point, value);
-    const admin = Boolean(window.MTC_DATABASE_ADMIN_MODE);
+    const clean = String(current || "").trim();
+    const display = clean
+      ? (typeof window.mtcLinkifiedAcuAssistHtml === "function"
+          ? window.mtcLinkifiedAcuAssistHtml(clean)
+          : pointAssociationsDisplayHtmlFinal(clean))
+      : "";
+
     return `
       <details class="point-info-section point-associations-section" open>
         <summary class="point-associations-summary">
           <span>Associations</span>
-          ${admin ? `<button type="button" class="point-association-edit-button" onclick="event.preventDefault();event.stopPropagation();togglePointAssociationsEdit(this)" title="Corriger les associations" aria-label="Corriger les associations" aria-pressed="false">✎</button>` : ""}
         </summary>
-        <div class="point-association-display js-point-ref-content">${pointAssociationsDisplayHtmlFinal(current)}</div>
-        ${admin ? `<textarea hidden class="point-association-textarea" data-point="${safeEscapeAttribute(point)}" oninput="updatePointAssociationsFromTextarea(this)" onblur="commitPointAssociationsFromTextarea(this)" placeholder="Ajoute les associations de ce point…">${safeEscapeHtml(current)}</textarea>` : ""}
+        <div class="acu-assisted-editable-block point-associations-public-editor">
+          <div class="mtc-assisted-edit-wrap">
+            <div
+              class="acu-comparison-editable acu-comparison-editable-associations mtc-assisted-link-editable"
+              contenteditable="false"
+              role="textbox"
+              aria-multiline="true"
+              spellcheck="false"
+              data-acu-compare-edit="associations"
+              data-acu-point-id="${safeEscapeAttribute(point)}"
+              data-acu-link-assist="1"
+              data-assist-editing="0"
+              data-raw-value="${safeEscapeAttribute(clean)}"
+              data-placeholder="Ajoute une association de points…"
+              title="Modifier les associations avec saisie assistée">${display}</div>
+            <button type="button" class="mtc-assisted-edit-pencil" data-assisted-edit-trigger="1" title="Modifier les associations" aria-label="Modifier les associations">✎</button>
+          </div>
+          <div class="point-association-hint">Tape le nom ou le code d’un point, puis choisis-le dans les propositions. La correction est enregistrée automatiquement dans ce navigateur.</div>
+        </div>
       </details>
     `;
   }
