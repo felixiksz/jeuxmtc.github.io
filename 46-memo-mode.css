@@ -897,3 +897,140 @@ body.mtc-memo-prep-open .mtc-memo-shell{
   }
 }
 
+
+/* 46 — Mémo galerie : texte ESPRIT complet, tuiles à hauteur variable */
+.mtc-memo-item,
+.mtc-memo-item.memo-summary,
+.mtc-memo-found-pair em{
+  overflow:visible !important;
+  max-height:none !important;
+  display:block !important;
+  -webkit-line-clamp:unset !important;
+  -webkit-box-orient:initial !important;
+  text-overflow:clip !important;
+}
+.mtc-memo-item.memo-summary{
+  white-space:normal !important;
+  height:auto !important;
+  min-height:fit-content;
+  line-height:1.25;
+}
+.mtc-memo-item.memo-name{
+  height:auto !important;
+  min-height:42px;
+}
+.mtc-memo-shell{
+  overflow:auto !important;
+}
+#mtcMemoBoard{
+  min-height:0;
+}
+.mtc-memo-columns{
+  align-items:start;
+}
+.memo-names-col,
+.memo-summaries-col{
+  min-width:0;
+}
+
+@media(min-width:700px) and (hover:hover) and (pointer:fine){
+  .mtc-memo-shell{
+    width:min(1320px, 100vw) !important;
+    height:100dvh;
+    min-height:0;
+    overflow:auto !important;
+    display:flex;
+    flex-direction:column;
+  }
+  #mtcMemoBoard{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:auto;
+    padding-right:2px;
+  }
+  .mtc-memo-columns{
+    display:grid !important;
+    grid-template-columns:minmax(210px, .62fr) minmax(520px, 1.38fr) !important;
+    gap:12px !important;
+    margin-top:6px !important;
+  }
+  .memo-names-col{
+    display:grid !important;
+    grid-template-columns:repeat(auto-fit, minmax(92px, 1fr));
+    align-content:start;
+    gap:6px !important;
+  }
+  .memo-summaries-col{
+    display:block !important;
+    columns:280px auto;
+    column-gap:10px;
+  }
+  .memo-summaries-col .mtc-memo-item.memo-summary{
+    display:block !important;
+    width:100%;
+    box-sizing:border-box;
+    margin:0 0 10px;
+    break-inside:avoid;
+    page-break-inside:avoid;
+    font-size:clamp(.7rem, 1.05vw, .92rem) !important;
+    line-height:1.24 !important;
+    padding:9px 10px !important;
+    border-radius:13px !important;
+  }
+  .memo-names-col .mtc-memo-item.memo-name{
+    font-size:clamp(.72rem, .95vw, .95rem) !important;
+    line-height:1.12 !important;
+    padding:8px 7px !important;
+    text-align:center;
+  }
+  .mtc-memo-found-zone{
+    max-height:none !important;
+    overflow:visible !important;
+  }
+}
+
+@media(max-width:699px), (hover:none), (pointer:coarse){
+  .mtc-memo-shell{
+    overflow:auto !important;
+  }
+  .mtc-memo-columns{
+    display:flex !important;
+    flex-direction:column;
+    gap:8px !important;
+  }
+  .memo-names-col{
+    display:grid !important;
+    grid-template-columns:repeat(auto-fit, minmax(72px, 1fr)) !important;
+    gap:5px !important;
+  }
+  .memo-summaries-col{
+    display:block !important;
+    columns:1;
+  }
+  @media(min-width:430px){
+    .memo-summaries-col{ columns:2 190px; column-gap:7px; }
+  }
+  .mtc-memo-item.memo-name{
+    min-height:36px !important;
+    font-size:.66rem !important;
+    line-height:1.12 !important;
+    padding:6px 4px !important;
+    text-align:center;
+  }
+  .mtc-memo-item.memo-summary{
+    display:block !important;
+    width:100%;
+    box-sizing:border-box;
+    margin:0 0 7px;
+    break-inside:avoid;
+    page-break-inside:avoid;
+    min-height:0 !important;
+    font-size:.72rem !important;
+    line-height:1.22 !important;
+    padding:8px 9px !important;
+    border-radius:12px !important;
+  }
+  .mtc-memo-found-zone:has(#mtcMemoFoundPairs:empty){
+    display:none !important;
+  }
+}

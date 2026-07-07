@@ -48,27 +48,67 @@
     return direct ? [String(direct)] : [];
   }
 
-  function orderedGameCandidates(hanzi){
+  function hanziToUStem(value){
+    return [...String(value || "")].map(ch => {
+      const code = ch.codePointAt(0);
+      if(code >= 0x3400 && code <= 0x9fff){
+        return "#U" + code.toString(16).padStart(4, "0");
+      }
+      return ch;
+    }).join("");
+  }
+
+  function generatedCandidates(hanzi){
     const clean = normalizeHanzi(hanzi);
     const out = [];
     if(!clean) return out;
+    const uStem = hanziToUStem(clean);
+    // Les fichiers du projet sont principalement nommés en #Uxxxx.
+    addUnique(out, uStem + "_baidu_zh.mp3");
+    addUnique(out, uStem + "_google_zh-CN.mp3");
+    addUnique(out, clean + "_baidu_zh.mp3");
+    addUnique(out, clean + "_google_zh-CN.mp3");
+    if(!clean.endsWith("穴")){
+      const withXue = clean + "穴";
+      const withXueU = hanziToUStem(withXue);
+      addUnique(out, withXueU + "_baidu_zh.mp3");
+      addUnique(out, withXueU + "_google_zh-CN.mp3");
+      addUnique(out, withXue + "_baidu_zh.mp3");
+      addUnique(out, withXue + "_google_zh-CN.mp3");
+    }
+    return out;
+  }
 
-    // 1) Candidats explicitement indexés pour ce hanzi.
-    manifestByHanziList(clean).forEach(item => addUnique(out, item));
+  function orderedGameCandidates(hanzi){
+    const clean = normalizeHanzi(hanzi);
+    if(!clean) return [];
 
-    // 2) Candidats calculés par le module audio principal.
-    const generated = [];
+    const out = [];
+
+    // 1) mp3 confirmés par le manifest, quand il est à jour.
     try{
-      if(typeof window.mtcAudioCandidatesForHanzi === "function"){
-        window.mtcAudioCandidatesForHanzi(clean).forEach(item => addUnique(generated, item));
+      if(typeof window.mtcConfirmedAudioCandidatesForHanzi === "function"){
+        const confirmed = window.mtcConfirmedAudioCandidatesForHanzi(clean);
+        if(Array.isArray(confirmed)) confirmed.map(String).filter(Boolean).forEach(item => addUnique(out, item));
       }
     }catch(error){}
 
-    // 3) Parmi les candidats calculés, on met d'abord ceux dont le fichier est
-    // dans le manifest. C'est le point crucial pour Safari/Chrome mobile.
     const files = manifestFilesSet();
-    generated.filter(item => files.has(String(item))).forEach(item => addUnique(out, item));
-    generated.filter(item => !files.has(String(item))).forEach(item => addUnique(out, item));
+    manifestByHanziList(clean).forEach(item => {
+      if(files.has(String(item))) addUnique(out, item);
+    });
+
+    // 2) Si l'utilisateur a ajouté de nouveaux fichiers audio sans régénérer
+    // audio-manifest.js, on tente quand même les noms attendus, #Uxxxx d'abord.
+    generatedCandidates(clean).forEach(item => addUnique(out, item));
+
+    // 3) Derniers candidats exposés par le module 32, en conservant les doublons retirés.
+    try{
+      if(typeof window.mtcAudioCandidatesForHanzi === "function"){
+        const extra = window.mtcAudioCandidatesForHanzi(clean);
+        if(Array.isArray(extra)) extra.map(String).filter(Boolean).forEach(item => addUnique(out, item));
+      }
+    }catch(error){}
 
     return out;
   }
@@ -142,21 +182,10 @@
     const clean = normalizeHanzi(hanzi);
     if(!clean || !containsCjk(clean)) return false;
 
-    // Si aucun mp3 confirmé n'existe dans le manifest, on délègue au module
-    // principal : il utilise une synthèse vocale immédiate, compatible mobile.
-    try{
-      if(typeof window.mtcConfirmedAudioCandidatesForHanzi === "function" &&
-         !window.mtcConfirmedAudioCandidatesForHanzi(clean).length &&
-         typeof window.playMtcAudioByHanzi === "function"){
-        return window.playMtcAudioByHanzi(clean, null);
-      }
-    }catch(error){}
-
     const candidates = orderedGameCandidates(clean);
     if(!candidates.length){
-      try{
-        if(typeof window.playMtcAudioByHanzi === "function") return window.playMtcAudioByHanzi(clean, null);
-      }catch(error){}
+      // Pas de synthèse vocale navigateur : si aucun mp3 confirmé n'existe,
+      // on reste silencieux au lieu de bloquer le geste mobile sur des essais faux.
       return false;
     }
 

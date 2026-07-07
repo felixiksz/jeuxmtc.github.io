@@ -6,6 +6,7 @@
    - manifest explicite audio-manifest.js si disponible
    - candidats réellement présents dans le manifest en priorité
    - timeout allongé sur mobile/connexion lente
+   - pas de synthèse vocale navigateur : uniquement les mp3 disponibles
    - compatible fichiers GitHub chinois directs et fichiers zip #Uxxxx
    - volume 40 %
    ============================================================ */
@@ -55,17 +56,24 @@
     const list = [];
     if(!clean) return list;
     const uStem = hanziToUStem(clean);
-    addUnique(list, clean + "_baidu_zh.mp3");
-    addUnique(list, clean + "_google_zh-CN.mp3");
+
+    // Ordre mobile-safe avec les fichiers du projet : les mp3 du dossier audio/
+    // sont majoritairement encodés en #Uxxxx. Si le manifest est en retard après
+    // ajout de nouveaux audios, il vaut mieux tenter ces noms AVANT les noms
+    // chinois directs, sinon iOS/Android peuvent consommer le geste utilisateur
+    // sur un premier fichier absent.
     addUnique(list, uStem + "_baidu_zh.mp3");
     addUnique(list, uStem + "_google_zh-CN.mp3");
+    addUnique(list, clean + "_baidu_zh.mp3");
+    addUnique(list, clean + "_google_zh-CN.mp3");
+
     if(!clean.endsWith("穴")){
       const withXue = clean + "穴";
       const withXueU = hanziToUStem(withXue);
-      addUnique(list, withXue + "_baidu_zh.mp3");
-      addUnique(list, withXue + "_google_zh-CN.mp3");
       addUnique(list, withXueU + "_baidu_zh.mp3");
       addUnique(list, withXueU + "_google_zh-CN.mp3");
+      addUnique(list, withXue + "_baidu_zh.mp3");
+      addUnique(list, withXue + "_google_zh-CN.mp3");
     }
     return list;
   }
@@ -161,14 +169,10 @@
     const clean = normalizeHanzi(hanzi);
     if(!clean) return Promise.resolve("");
     if(audioResolveCache.has(clean)) return audioResolveCache.get(clean);
-    // Si le manifest est présent et ne contient aucun fichier confirmé pour ce hanzi,
-    // on évite de tester une série de noms inexistants. Sur mobile, ces échecs
-    // peuvent consommer le geste utilisateur et empêcher ensuite la lecture.
-    if(manifestFiles.size > 0 && !confirmedManifestCandidatesForHanzi(clean).length){
-      audioResolveCache.set(clean, Promise.resolve(""));
-      return audioResolveCache.get(clean);
-    }
-
+    // Même si le manifest ne connaît pas encore ce hanzi, on résout quand même
+    // les noms générés : l'utilisateur peut avoir ajouté les mp3 sur GitHub sans
+    // régénérer audio-manifest.js. Le résultat est mis en cache avant le clic
+    // suivant, ce qui évite les échecs mobiles répétés.
     const candidates = candidateAudioFilenamesForHanzi(clean);
     const promise = candidates.reduce((chain, filename) => chain.then(found => {
       if(found) return found;
@@ -216,49 +220,9 @@
   }
 
   function speakHanziFallback(hanzi, button){
-    const clean = normalizeHanzi(hanzi);
-    if(!clean || !containsCjk(clean)) return false;
-    if(!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return false;
-
-    stopCurrentAudio();
-    const serial = playbackSerial + 1;
-    playbackSerial = serial;
-
-    try{ window.speechSynthesis.cancel(); }catch(error){}
-
-    const utterance = new SpeechSynthesisUtterance(clean);
-    utterance.lang = "zh-CN";
-    utterance.rate = 0.82;
-    utterance.pitch = 1;
-    utterance.volume = 0.92;
-
-    if(button){
-      button.disabled = false;
-      button.classList.remove("mtc-audio-loading", "mtc-audio-missing");
-      button.classList.add("mtc-audio-playing", "mtc-audio-speech");
-      button.title = "Prononciation par synthèse vocale";
-      button.setAttribute("aria-label", "Prononciation de " + clean + " par synthèse vocale");
-    }
-
-    utterance.onend = utterance.onerror = () => {
-      if(serial !== playbackSerial) return;
-      if(button){
-        button.classList.remove("mtc-audio-playing", "mtc-audio-speech");
-        button.title = "Écouter la prononciation";
-      }
-      currentAudio = null;
-      currentButton = null;
-    };
-
-    try{
-      currentAudio = null;
-      currentButton = button || null;
-      window.speechSynthesis.speak(utterance);
-      return true;
-    }catch(error){
-      if(button) button.classList.remove("mtc-audio-playing", "mtc-audio-speech");
-      return false;
-    }
+    // Désactivé volontairement : la synthèse vocale navigateur n’est pas utilisée
+    // dans ce jeu, car elle s’est révélée non fiable pour la prononciation demandée.
+    return false;
   }
 
   function tryPlayCandidateList(candidates, index, button, hanzi, serial){
@@ -271,10 +235,6 @@
 
     if(index >= candidates.length){
       if(serial !== playbackSerial) return false;
-      // Dernier recours : si aucun fichier mp3 n'est disponible, on lit le hanzi
-      // avec la synthèse vocale du navigateur. C'est ce qui permet aux fiches
-      // hors grille de rester audibles même quand le dossier audio n'a pas le mp3.
-      if(speakHanziFallback(hanzi, button)) return true;
       markMissing(button, hanzi);
       currentAudio = null;
       currentButton = null;
@@ -375,12 +335,10 @@
     }
     if(button && button.dataset.audioResolved === "1" && remembered){
       candidates = [remembered];
-    }else if(manifestFiles.size > 0 && !confirmed.length){
-      // Manifest chargé + aucun mp3 pour ce hanzi : ne pas tester des noms
-      // inexistants. Sur téléphone, ces essais empêchent souvent toute lecture.
-      return speakHanziFallback(clean, button);
     }
 
+    // Pas de synthèse vocale navigateur : uniquement les mp3. Mais on ne bloque
+    // plus la lecture seulement parce que le manifest est incomplet.
     return tryPlayCandidateList(candidates, 0, button, clean);
   }
 
@@ -402,7 +360,7 @@
       const known = likelyManifestCandidate(clean);
       markAvailable(button, clean, known || "");
       button.dataset.audioResolved = "0";
-      if(!known) button.title = "Écouter la prononciation — synthèse vocale si le fichier mp3 manque";
+      if(!known) button.title = "Audio mp3 non confirmé";
       resolveAudioFilenameForHanzi(clean).then(filename => {
         if(!button.isConnected || button.dataset.audioHanzi !== clean) return;
         if(filename){
@@ -410,8 +368,7 @@
           markAvailable(button, clean, filename);
         }else{
           button.dataset.audioResolved = "0";
-          // On garde le bouton cliquable : si aucun mp3 n'est confirmé, le clic utilisera la synthèse vocale.
-          button.title = "Audio mp3 non confirmé — clic pour synthèse vocale";
+          markMissing(button, clean);
         }
       });
     }else{
