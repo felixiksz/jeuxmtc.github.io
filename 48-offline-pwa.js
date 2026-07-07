@@ -1,9 +1,9 @@
-/* 48 — PWA / bouton hors connexion — linefix2 */
+/* 48 — PWA / bouton hors connexion — progress1 */
 (function(){
   "use strict";
 
   const READY_KEY = "mtc_offline_ready_v1";
-  const SW_URL = "sw.js";
+  const SW_URL = "sw.js?v=20260706-offline-v10-memo-gallery-audio-u-first";
   let registrationPromise = null;
   let modal = null;
   let statusEl = null;
@@ -18,6 +18,35 @@
   function setMessage(text){
     const message = byId("message");
     if(message) message.textContent = text;
+  }
+
+  function ensureSharedProgressBox(){
+    let box = byId("mtcImportExportProgress");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "mtcImportExportProgress";
+      box.setAttribute("aria-live", "polite");
+      box.innerHTML = '<span class="mtc-import-export-progress-label"></span><span class="mtc-import-export-progress-bar"><span></span></span>';
+      document.body.appendChild(box);
+    }
+    return box;
+  }
+
+  function setSharedProgress(label, percent){
+    const box = ensureSharedProgressBox();
+    const p = Math.max(0, Math.min(100, Number(percent) || 0));
+    const text = String(label || "TRAITEMENT").toUpperCase();
+    box.classList.add("visible", "mtc-offline-progress-active");
+    const labelEl = box.querySelector(".mtc-import-export-progress-label");
+    const bar = box.querySelector(".mtc-import-export-progress-bar > span");
+    if(labelEl) labelEl.textContent = `${text} ${Math.round(p).toString().padStart(3, "0")}%`;
+    if(bar) bar.style.width = `${p}%`;
+  }
+
+  function hideSharedProgress(delay){
+    const box = byId("mtcImportExportProgress");
+    if(!box) return;
+    window.setTimeout(() => box.classList.remove("visible", "mtc-offline-progress-active"), delay == null ? 500 : delay);
   }
 
   function updateButton(){
@@ -113,15 +142,34 @@
     return registrationPromise;
   }
 
-  function sendMessageToWorker(registration, payload){
+  function sendMessageToWorker(registration, payload, onProgress){
     return new Promise((resolve, reject) => {
       const worker = registration.active || navigator.serviceWorker.controller || registration.waiting || registration.installing;
       if(!worker){ reject(new Error("Le mode hors connexion n’est pas encore prêt. Réessaie après avoir rechargé la page.")); return; }
       const channel = new MessageChannel();
-      const timer = setTimeout(() => reject(new Error("Le téléchargement a été interrompu ou a pris trop longtemps. Réessaie avec une connexion plus stable.")), payload.includeAudio ? 180000 : 60000);
+      let done = false;
+      let timer = null;
+      const limit = payload.includeAudio ? 300000 : 90000;
+      const resetTimer = () => {
+        if(timer) window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          if(done) return;
+          done = true;
+          reject(new Error("Le téléchargement a été interrompu ou a pris trop longtemps. Réessaie avec une connexion plus stable."));
+        }, limit);
+      };
+      resetTimer();
       channel.port1.onmessage = event => {
-        clearTimeout(timer);
-        resolve(event.data || {});
+        const data = event.data || {};
+        resetTimer();
+        if(data.progress){
+          if(typeof onProgress === "function") onProgress(data);
+          return;
+        }
+        if(done) return;
+        done = true;
+        if(timer) window.clearTimeout(timer);
+        resolve(data);
       };
       worker.postMessage(payload, [channel.port2]);
     });
@@ -130,10 +178,21 @@
   async function precacheOffline(includeAudio){
     if(statusEl) statusEl.textContent = includeAudio ? "Téléchargement du jeu et des audios sur cet appareil…" : "Téléchargement du jeu sur cet appareil…";
     setMessage(includeAudio ? "Préparation du jeu hors-connexion avec audios…" : "Préparation du jeu hors-connexion…");
+    setSharedProgress(includeAudio ? "hors connexion + audio" : "hors connexion", 2);
     setBusy(true);
     try{
       const registration = await registerServiceWorker();
-      const result = await sendMessageToWorker(registration, {type:"PRECACHE_OFFLINE", includeAudio:Boolean(includeAudio)});
+      setSharedProgress(includeAudio ? "hors connexion + audio" : "hors connexion", 6);
+      const result = await sendMessageToWorker(
+        registration,
+        {type:"PRECACHE_OFFLINE", includeAudio:Boolean(includeAudio)},
+        progress => {
+          const percent = Math.max(0, Math.min(100, Number(progress.percent) || 0));
+          const label = progress.label || (includeAudio ? "hors connexion + audio" : "hors connexion");
+          setSharedProgress(label, percent);
+          if(statusEl && progress.message) statusEl.textContent = progress.message;
+        }
+      );
       if(!result.ok) throw new Error(result.message || "Préchargement impossible.");
       storageSet(READY_KEY, includeAudio ? "audio" : "core");
       const coreInfo = result.core ? `${result.core.ok} fichiers essentiels` : "fichiers essentiels";
@@ -142,11 +201,15 @@
       const suffix = failed ? ` (${failed} fichier(s) non récupéré(s), le reste est prêt)` : "";
       const text = `Jeu prêt hors-connexion sur cet appareil : ${coreInfo}${audioInfo}${suffix}.`;
       if(statusEl) statusEl.textContent = text;
+      setSharedProgress("hors connexion", 100);
+      hideSharedProgress(850);
       setMessage("Jeu prêt sans internet.");
       updateButton();
     }catch(error){
       const text = String(error && error.message || error);
       if(statusEl) statusEl.textContent = text;
+      setSharedProgress("erreur", 100);
+      hideSharedProgress(1200);
       setMessage("Préparation hors connexion impossible pour le moment.");
     }finally{
       setBusy(false);
