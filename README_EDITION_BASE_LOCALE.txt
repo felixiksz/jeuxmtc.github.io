@@ -24,3 +24,9 @@ IMPORTANT
 Ce mode administrateur est local au navigateur : il masque les outils aux visiteurs ordinaires,
 mais ce n’est pas une authentification serveur. Pour publier définitivement les corrections,
 il faut exporter le JSON corrigé puis l’intégrer à la base publiée.
+
+CHAMP ASSOCIATIONS DES POINTS ACU
+- Tous les points possèdent désormais le champ « Associations », même lorsqu’il est vide.
+- Dans une fiche ACU, ce champ est toujours visible. En mode administrateur, le crayon permet de le corriger directement ; la correction est enregistrée automatiquement.
+- Dans le panneau Comparaison ACU, la ligne « Associations » est présente pour chaque point et reste modifiable.
+- Les corrections sont incluses dans l’export de la base éditable et peuvent être réimportées.

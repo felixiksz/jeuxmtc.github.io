@@ -125,10 +125,89 @@
       .join("\n");
   }
 
+  function mtcPointAssociationsValue(point, fallback){
+    try{
+      const stored = localStorage.getItem("mtc_point_associations_" + point);
+      if(stored !== null) return stored;
+    }catch(error){}
+    return String(fallback || "");
+  }
+
+  function mtcAssociationsDisplayHtml(value){
+    const clean = String(value || "").trim();
+    return clean
+      ? escapeHtml(clean).replace(/\n/g,"<br>")
+      : '<span class="point-association-empty">Aucune association renseignée.</span>';
+  }
+
+  window.updatePointAssociationsFromTextarea = function(textarea){
+    if(!textarea) return;
+    const point = String(textarea.dataset.point || "");
+    if(!point) return;
+    const value = String(textarea.value || "").replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+    try{ localStorage.setItem("mtc_point_associations_" + point, value); }catch(error){}
+    try{
+      if(window.POINT_DETAILS && window.POINT_DETAILS[point]) window.POINT_DETAILS[point].associations = value;
+      if(typeof POINT_DETAILS !== "undefined" && POINT_DETAILS[point]) POINT_DETAILS[point].associations = value;
+    }catch(error){}
+    const section = textarea.closest(".point-associations-section");
+    const display = section && section.querySelector(".point-association-display");
+    if(display) display.innerHTML = mtcAssociationsDisplayHtml(value);
+  };
+
+  window.commitPointAssociationsFromTextarea = function(textarea){
+    if(!textarea) return;
+    window.updatePointAssociationsFromTextarea(textarea);
+    const point = String(textarea.dataset.point || "");
+    let details = null;
+    try{ details = (window.POINT_DETAILS && window.POINT_DETAILS[point]) || (typeof POINT_DETAILS !== "undefined" ? POINT_DETAILS[point] : null); }catch(error){}
+    if(window.MTC_DATABASE_ADMIN_MODE && details && window.mtcDatabaseEditor && typeof window.mtcDatabaseEditor.saveRecord === "function"){
+      window.mtcDatabaseEditor.saveRecord("acupuncture", point, Object.assign({}, details, {associations:textarea.value}), ["associations"]);
+    }
+    document.dispatchEvent(new CustomEvent("acu-point-edited", {detail:{point,field:"associations"}}));
+  };
+
+  window.togglePointAssociationsEdit = function(button){
+    if(!window.MTC_DATABASE_ADMIN_MODE || !button) return;
+    const section = button.closest(".point-associations-section");
+    if(!section) return;
+    const textarea = section.querySelector(".point-association-textarea");
+    const display = section.querySelector(".point-association-display");
+    if(!textarea || !display) return;
+    const opening = textarea.hidden;
+    textarea.hidden = !opening;
+    display.hidden = opening;
+    button.setAttribute("aria-pressed", opening ? "true" : "false");
+    button.textContent = opening ? "✓" : "✎";
+    button.title = opening ? "Terminer la correction" : "Corriger les associations";
+    if(opening){
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    }else{
+      window.commitPointAssociationsFromTextarea(textarea);
+    }
+  };
+
+  function mtcRenderAssociationsSection(point, value){
+    const current = mtcPointAssociationsValue(point, value);
+    const admin = Boolean(window.MTC_DATABASE_ADMIN_MODE);
+    return `
+      <details class="point-info-section point-associations-section" open>
+        <summary class="point-associations-summary">
+          <span>Associations</span>
+          ${admin ? `<button type="button" class="point-association-edit-button" onclick="event.preventDefault();event.stopPropagation();togglePointAssociationsEdit(this)" title="Corriger les associations" aria-label="Corriger les associations" aria-pressed="false">✎</button>` : ""}
+        </summary>
+        <div class="point-association-display">${mtcAssociationsDisplayHtml(current)}</div>
+        ${admin ? `<textarea hidden class="point-association-textarea" data-point="${escapeAttribute(point)}" oninput="updatePointAssociationsFromTextarea(this)" onblur="commitPointAssociationsFromTextarea(this)" placeholder="Ajoute les associations de ce point…">${escapeHtml(current)}</textarea>` : ""}
+      </details>
+    `;
+  }
+
   window.renderPointInfoSections = function(sections, point){
     return sections
       .filter(([title,value]) =>
         title === "Notes" ||
+        title === "Associations" ||
         (
           value &&
           value !== "(Aucune)" &&
@@ -136,6 +215,9 @@
         )
       )
       .map(([title,value]) => {
+        if(title === "Associations"){
+          return mtcRenderAssociationsSection(point, value);
+        }
         if(title === "Notes"){
           const noteValue = getEditablePointNote(point, value);
           return `
@@ -192,6 +274,7 @@
     if(!isSolvedPoint) return;
 
     const details = POINT_DETAILS[point];
+    if(details && !Object.prototype.hasOwnProperty.call(details,"associations")) details.associations = "";
 
     if(!details){
       pointPanelContent.innerHTML = `
@@ -202,8 +285,12 @@
         <p>Aucune fiche trouvée pour ce point.</p>
       `;
     }else{
+      const fullEditor = typeof window.renderMtcFullRecordEditor === "function"
+        ? window.renderMtcFullRecordEditor("acupuncture", point, details)
+        : "";
       pointPanelContent.innerHTML = `
         ${mtcPointHeaderHtml(point, details)}
+        ${fullEditor}
         ${renderPointInfoSections(mtcSectionsForPoint(details), point)}
       `;
     }
@@ -212,6 +299,9 @@
     pointPanel.classList.add("open");
     panelToggle.innerHTML = "&gt;";
     document.body.classList.add("panel-open");
+    if(typeof window.bindMtcFullRecordEditor === "function"){
+      window.bindMtcFullRecordEditor(pointPanelContent, () => window.openPointPanelDirect(point));
+    }
 
     showProgressHintSoon(
       "point_basket_button_plus",
@@ -236,6 +326,7 @@
     currentPointPanelPoint = point;
 
     const details = POINT_DETAILS[point];
+    if(details && !Object.prototype.hasOwnProperty.call(details,"associations")) details.associations = "";
 
     if(!details){
       pointPanelContent.innerHTML = `
@@ -246,8 +337,12 @@
         <p>Aucune fiche trouvée pour ce point.</p>
       `;
     }else{
+      const fullEditor = typeof window.renderMtcFullRecordEditor === "function"
+        ? window.renderMtcFullRecordEditor("acupuncture", point, details)
+        : "";
       pointPanelContent.innerHTML = `
         ${mtcPointHeaderHtml(point, details)}
+        ${fullEditor}
         ${renderPointInfoSections(mtcSectionsForPoint(details), point)}
       `;
     }
@@ -256,6 +351,15 @@
     pointPanel.classList.add("open");
     panelToggle.innerHTML = "&gt;";
     document.body.classList.add("panel-open");
+    if(typeof window.bindMtcFullRecordEditor === "function"){
+      window.bindMtcFullRecordEditor(pointPanelContent, () => window.openPointPanelDirect(point));
+    }
+  };
+
+  window.refreshCurrentPointPanel = function(){
+    try{
+      if(currentPointPanelPoint) window.openPointPanelDirect(currentPointPanelPoint);
+    }catch(error){}
   };
 
   window.solveGroup = function(group){

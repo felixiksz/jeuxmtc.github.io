@@ -6676,6 +6676,18 @@ function normalizeOldPointDetails(){
 
 normalizeOldPointDetails();
 
+/* Every acupuncture point exposes an Associations field, even when empty. */
+function ensurePointAssociationsField(){
+  try{
+    Object.values(POINT_DETAILS || {}).forEach(details => {
+      if(details && !Object.prototype.hasOwnProperty.call(details, "associations")){
+        details.associations = "";
+      }
+    });
+  }catch(error){}
+}
+ensurePointAssociationsField();
+
 /* Flat-root compatibility: expose ACU point fiches to later correction files.
    Top-level `const POINT_DETAILS` is not always available via `window.POINT_DETAILS`,
    especially across browser implementations and cached script contexts. */

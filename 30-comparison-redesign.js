@@ -299,10 +299,13 @@
   }
 
   function getPointDetails(point){
+    let details = null;
     try{
-      if(typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point]) return POINT_DETAILS[point];
+      if(typeof POINT_DETAILS !== "undefined" && POINT_DETAILS && POINT_DETAILS[point]) details = POINT_DETAILS[point];
     }catch(error){}
-    return (window.POINT_DETAILS && window.POINT_DETAILS[point]) || {};
+    if(!details) details = (window.POINT_DETAILS && window.POINT_DETAILS[point]) || {};
+    if(details && !Object.prototype.hasOwnProperty.call(details,"associations")) details.associations = "";
+    return details;
   }
 
   let pharmaHerbByIdCache = null;
@@ -1464,6 +1467,9 @@
     if(field === "associations") setLocalStorageValue(ACU_ASSOC_PREFIX, point, value);
     if(field === "vs") setLocalStorageValue(ACU_VS_PREFIX, point, value);
     if(field === "precaution") setLocalStorageValue(ACU_PRECAUTION_PREFIX, point, value);
+    const details = getPointDetails(point);
+    if(details && field) details[field] = value;
+    document.dispatchEvent(new CustomEvent("acu-point-edited", {detail:{point,field}}));
   }
 
   function addPointFromComparisonInput(input){
