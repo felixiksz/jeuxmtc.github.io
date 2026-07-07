@@ -253,3 +253,29 @@ html.mtc-db-dialog-open,html.mtc-db-dialog-open body{overflow:hidden!important}
   outline:2px solid currentColor;outline-offset:1px;
 }
 html:not(.mtc-database-admin) .mtc-db-record-editor,html:not(.mtc-database-admin) #databaseEditorButton{display:none!important}
+
+
+/* Image complémentaire importée dans la section Notes des fiches ACU. */
+.point-note-local-image-wrap{
+  margin:12px 0 4px;
+  display:flex;
+  justify-content:center;
+}
+.point-note-local-image{
+  display:block;
+  width:auto;
+  max-width:min(100%, 760px);
+  max-height:72vh;
+  object-fit:contain;
+  border-radius:10px;
+  box-shadow:0 1px 8px rgba(0,0,0,.16);
+  background:#fff;
+}
+@media (max-width:700px){
+  .point-note-local-image-wrap{ margin:10px -2px 2px; }
+  .point-note-local-image{
+    max-width:100%;
+    max-height:62vh;
+    border-radius:8px;
+  }
+}
