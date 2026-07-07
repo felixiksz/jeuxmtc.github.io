@@ -205,6 +205,23 @@
 
   window.formatNoteTextForDisplay = pointNoteDisplayHtml;
 
+  const ACU_NOTE_IMAGE_STORAGE_PREFIX = "mtc_point_note_image_";
+
+  function pointNoteImageValue(point){
+    try{ return localStorage.getItem(ACU_NOTE_IMAGE_STORAGE_PREFIX + String(point || "")) || ""; }
+    catch(error){ return ""; }
+  }
+
+  function pointNoteImageHtml(point){
+    const image = pointNoteImageValue(point);
+    if(!image || !/^data:image\/(?:webp|png|jpe?g|gif);base64,/i.test(image)) return "";
+    return `
+      <figure class="point-note-local-image-wrap">
+        <img class="point-note-local-image" src="${safeEscapeAttribute(image)}" alt="Image complémentaire de localisation de ${safeEscapeAttribute(point)}">
+      </figure>
+    `;
+  }
+
   function categoryInfoForLineFinal(line){
     if(typeof categoryInlineInfoButtons !== "function") return "";
     try{ return categoryInlineInfoButtons(line) || ""; }
@@ -299,6 +316,8 @@
               <div class="point-note-display js-point-ref-content">
                 ${pointNoteDisplayHtml(noteValue)}
               </div>
+
+              ${pointNoteImageHtml(point)}
 
               <textarea
                 class="point-note-textarea"
