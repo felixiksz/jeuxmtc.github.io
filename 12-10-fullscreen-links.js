@@ -211,10 +211,40 @@
     catch(error){ return ""; }
   }
 
+  function pointAssociationsValueFinal(point, fallback){
+    try{
+      const stored = localStorage.getItem("mtc_point_associations_" + String(point || ""));
+      if(stored !== null) return stored;
+    }catch(error){}
+    return String(fallback || "");
+  }
+
+  function pointAssociationsDisplayHtmlFinal(value){
+    const clean = String(value || "").trim();
+    if(!clean) return `<span class="point-association-empty">Aucune association renseignée.</span>`;
+    return `<span class="js-point-ref-content">${plainTextWithBreaks(clean)}</span>`;
+  }
+
+  function renderPointAssociationsSectionFinal(point, value){
+    const current = pointAssociationsValueFinal(point, value);
+    const admin = Boolean(window.MTC_DATABASE_ADMIN_MODE);
+    return `
+      <details class="point-info-section point-associations-section" open>
+        <summary class="point-associations-summary">
+          <span>Associations</span>
+          ${admin ? `<button type="button" class="point-association-edit-button" onclick="event.preventDefault();event.stopPropagation();togglePointAssociationsEdit(this)" title="Corriger les associations" aria-label="Corriger les associations" aria-pressed="false">✎</button>` : ""}
+        </summary>
+        <div class="point-association-display js-point-ref-content">${pointAssociationsDisplayHtmlFinal(current)}</div>
+        ${admin ? `<textarea hidden class="point-association-textarea" data-point="${safeEscapeAttribute(point)}" oninput="updatePointAssociationsFromTextarea(this)" onblur="commitPointAssociationsFromTextarea(this)" placeholder="Ajoute les associations de ce point…">${safeEscapeHtml(current)}</textarea>` : ""}
+      </details>
+    `;
+  }
+
   window.renderPointInfoSections = function(sections, point){
     return sections
       .filter(([title,value]) =>
         title === "Notes" ||
+        title === "Associations" ||
         (
           value &&
           value !== "(Aucune)" &&
@@ -222,6 +252,10 @@
         )
       )
       .map(([title,value]) => {
+        if(title === "Associations"){
+          return renderPointAssociationsSectionFinal(point, value);
+        }
+
         if(title === "Notes"){
           const noteValue = typeof getEditablePointNote === "function"
             ? getEditablePointNote(point, value)
@@ -269,12 +303,10 @@
           content = plainTextWithBreaks(value);
         }
 
-        const linkClass = title === "Associations" ? " js-point-ref-content" : "";
-
         return `
           <details class="point-info-section">
             <summary>${safeEscapeHtml(title)}</summary>
-            <div class="${linkClass.trim()}">${content}</div>
+            <div>${content}</div>
           </details>
         `;
       })
