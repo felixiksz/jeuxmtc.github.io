@@ -1276,11 +1276,12 @@
   const ADMIN_STORAGE_KEY = "mtc_database_admin_mode_v1";
 
   function resolveAdminMode(){
+    /* Le mode administrateur n'est jamais mémorisé. Il est actif uniquement
+       sur la page dont l'URL contient explicitement ?admin=1. */
     try{
       const params = new URLSearchParams(window.location.search || "");
-      if(params.get("admin") === "1") localStorage.setItem(ADMIN_STORAGE_KEY,"1");
-      if(params.get("admin") === "0") localStorage.removeItem(ADMIN_STORAGE_KEY);
-      return localStorage.getItem(ADMIN_STORAGE_KEY) === "1";
+      try{ localStorage.removeItem(ADMIN_STORAGE_KEY); }catch(_error){}
+      return params.get("admin") === "1";
     }catch(error){
       return /(?:\?|&)admin=1(?:&|$)/.test(window.location.search || "");
     }

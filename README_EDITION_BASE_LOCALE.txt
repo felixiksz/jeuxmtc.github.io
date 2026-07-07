@@ -1,9 +1,10 @@
 CORRECTIONS ADMINISTRATEUR — CONNECTIONS MTC
 
 ACTIVER LE MODE ADMINISTRATEUR
-1. Ouvrir une fois le jeu avec ?admin=1 à la fin de l’adresse.
+1. Ouvrir le jeu avec ?admin=1 à la fin de l’adresse.
    Exemple : https://ton-site.github.io/?admin=1
-2. Le mode reste actif dans ce navigateur. Pour le désactiver, ouvrir la page avec ?admin=0.
+2. Le mode administrateur est actif uniquement tant que ?admin=1 reste visible dans l’URL.
+3. Une page ouverte ou rechargée sans ?admin=1 reste toujours en mode normal.
 
 CORRIGER UNE FICHE
 1. Ouvrir la fiche ACU ou PHARMA concernée.

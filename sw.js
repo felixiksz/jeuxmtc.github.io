@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260707-offline-v14-acu-associations-visible";
+const MTC_OFFLINE_VERSION = "20260707-offline-v15-admin-url-only";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
