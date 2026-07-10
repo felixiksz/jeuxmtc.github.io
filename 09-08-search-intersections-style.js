@@ -8,6 +8,12 @@
 (function(){
   const EXTRAORDINARY_INTERSECTION_PREFIX = "EXTRA_VESSEL::";
 
+  /* DM20 (bǎi huì) réunit chacun des six canaux yáng principaux.
+     Cette liste explicite évite que la recherche dépende de la formule
+     générique « tous les canaux yáng » dans le texte de la fiche. */
+  const DM20_YANG_INTERSECTION_CANALS = new Set(["GI","E","IG","V","TF","VB"]);
+  const DM20_ALL_INTERSECTION_CANALS = ["GI","E","IG","V","TF","VB","F"];
+
   const EXTRAORDINARY_VESSEL_INTERSECTIONS = [
     {
       key:"Chong_Mai",
@@ -150,7 +156,13 @@
       .map(group => group.label)
       .join(" ");
 
-    return [original, extraordinaryLabels].filter(Boolean).join(" ");
+    const forcedDm20Labels = cleanPointCode(point) === "DM20"
+      ? DM20_ALL_INTERSECTION_CANALS
+          .map(canal => (typeof CANAL_LABELS !== "undefined" && CANAL_LABELS[canal]) || canal)
+          .join(" ")
+      : "";
+
+    return [original, extraordinaryLabels, forcedDm20Labels].filter(Boolean).join(" ");
   };
 
   window.pointHasCorrespondence = function(point){
@@ -171,6 +183,10 @@
 
   window.pointMatchesSingleCorrespondenceCanal = function(point, value){
     if(!value) return true;
+
+    if(cleanPointCode(point) === "DM20" && DM20_YANG_INTERSECTION_CANALS.has(value)){
+      return true;
+    }
 
     if(value === MTC_CORRESPONDENCE_FILTER_ANY){
       return pointHasCorrespondence(point);
