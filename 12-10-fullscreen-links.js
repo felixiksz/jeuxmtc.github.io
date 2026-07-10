@@ -205,85 +205,16 @@
 
   window.formatNoteTextForDisplay = pointNoteDisplayHtml;
 
-  const ACU_NOTE_IMAGE_STORAGE_PREFIX = "mtc_point_note_image_";
-
-  function pointNoteImageValue(point){
-    try{ return localStorage.getItem(ACU_NOTE_IMAGE_STORAGE_PREFIX + String(point || "")) || ""; }
-    catch(error){ return ""; }
-  }
-
-  function pointNoteImageHtml(point){
-    const image = pointNoteImageValue(point);
-    if(!image || !/^data:image\/(?:webp|png|jpe?g|gif);base64,/i.test(image)) return "";
-    return `
-      <figure class="point-note-local-image-wrap">
-        <img class="point-note-local-image" src="${safeEscapeAttribute(image)}" alt="Image complémentaire de localisation de ${safeEscapeAttribute(point)}">
-      </figure>
-    `;
-  }
-
   function categoryInfoForLineFinal(line){
     if(typeof categoryInlineInfoButtons !== "function") return "";
     try{ return categoryInlineInfoButtons(line) || ""; }
     catch(error){ return ""; }
   }
 
-  function pointAssociationsValueFinal(point, fallback){
-    try{
-      const stored = localStorage.getItem("mtc_point_associations_" + String(point || ""));
-      if(stored !== null) return stored;
-    }catch(error){}
-    return String(fallback || "");
-  }
-
-  function pointAssociationsDisplayHtmlFinal(value){
-    const clean = String(value || "").trim();
-    if(!clean) return `<span class="point-association-empty">Aucune association renseignée.</span>`;
-    return `<span class="js-point-ref-content">${plainTextWithBreaks(clean)}</span>`;
-  }
-
-  function renderPointAssociationsSectionFinal(point, value){
-    const current = pointAssociationsValueFinal(point, value);
-    const clean = String(current || "").trim();
-    const display = clean
-      ? (typeof window.mtcLinkifiedAcuAssistHtml === "function"
-          ? window.mtcLinkifiedAcuAssistHtml(clean)
-          : pointAssociationsDisplayHtmlFinal(clean))
-      : "";
-
-    return `
-      <details class="point-info-section point-associations-section" open>
-        <summary class="point-associations-summary">
-          <span>Associations</span>
-        </summary>
-        <div class="acu-assisted-editable-block point-associations-public-editor">
-          <div class="mtc-assisted-edit-wrap">
-            <div
-              class="acu-comparison-editable acu-comparison-editable-associations mtc-assisted-link-editable"
-              contenteditable="false"
-              role="textbox"
-              aria-multiline="true"
-              spellcheck="false"
-              data-acu-compare-edit="associations"
-              data-acu-point-id="${safeEscapeAttribute(point)}"
-              data-acu-link-assist="1"
-              data-assist-editing="0"
-              data-raw-value="${safeEscapeAttribute(clean)}"
-              data-placeholder="Ajoute une association de points…"
-              title="Modifier les associations avec saisie assistée">${display}</div>
-            <button type="button" class="mtc-assisted-edit-pencil" data-assisted-edit-trigger="1" title="Modifier les associations" aria-label="Modifier les associations">✎</button>
-          </div>
-          <div class="point-association-hint">Tape le nom ou le code d’un point, puis choisis-le dans les propositions. La correction est enregistrée automatiquement dans ce navigateur.</div>
-        </div>
-      </details>
-    `;
-  }
-
   window.renderPointInfoSections = function(sections, point){
     return sections
       .filter(([title,value]) =>
         title === "Notes" ||
-        title === "Associations" ||
         (
           value &&
           value !== "(Aucune)" &&
@@ -291,10 +222,6 @@
         )
       )
       .map(([title,value]) => {
-        if(title === "Associations"){
-          return renderPointAssociationsSectionFinal(point, value);
-        }
-
         if(title === "Notes"){
           const noteValue = typeof getEditablePointNote === "function"
             ? getEditablePointNote(point, value)
@@ -316,8 +243,6 @@
               <div class="point-note-display js-point-ref-content">
                 ${pointNoteDisplayHtml(noteValue)}
               </div>
-
-              ${pointNoteImageHtml(point)}
 
               <textarea
                 class="point-note-textarea"
@@ -344,10 +269,12 @@
           content = plainTextWithBreaks(value);
         }
 
+        const linkClass = title === "Associations" ? " js-point-ref-content" : "";
+
         return `
           <details class="point-info-section">
             <summary>${safeEscapeHtml(title)}</summary>
-            <div>${content}</div>
+            <div class="${linkClass.trim()}">${content}</div>
           </details>
         `;
       })
