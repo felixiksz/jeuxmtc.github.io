@@ -5608,7 +5608,7 @@ const POINT_DETAILS = {
     "localisation": "À la jonction de la ligne unissant les apex des oreilles et la ligne médiane postérieure. Au niveau du vertex, 5 cùn au-dessus de la ligne postérieure des cheveux et 7 cùn en arrière de la ligne antérieure des cheveux.",
     "methode_travail": "Puncture sous-cutanée de 0,5 à 1 cùn de profondeur, vers le bas ou vers le haut.",
     "categories_du_point": "🖇️ Point d’intersection avec tous les canaux yáng et le zù jué yīn\n•   Point de la mer des moelles",
-    "correspondances": "🖇️ shǒu yáng míng (GI)\n🖇️ zú yáng míng (E)\n🖇️ shǒu tài yáng (IG)\n🖇️ zú tài yáng (V)\n🖇️ shǒu shǎo yáng (TF)\n🖇️ zú shǎo yáng (VB)\n🖇️ zú jué yīn (F)",
+    "correspondances": "🖇️ tous les canaux yáng\n🖇️ zù jué yīn",
     "actions": "➢ Équilibre le foie et éteint le vent\n➢ Fortifie le cerveau et tranquilise l’esprit\n➢ Clarifie la chaleur et ouvre les orifices\n➢ Fait revenir le yáng et affermit l’échappement",
     "indications": "- Céphalée\n- Vertiges, vertiges de Ménière, éblouissements, étourdissements\n- Obstruction nasale, épistaxis\n- Épilepsie, psychose, schizophrénie, hystérie, neurasthénie, insomnie\n- Perte de conscience, syncope, apoplexie, coma, aphasie\n- Amnésie, mauvaise mémoire\n- Hypertension artérielle\n- Prolapsus anal, prolapsus utérin\n- Diarrhée\n- Maladies de consomption\n- Talalgie, douleur du pied, douleur du coccyx",
     "associations": "Chaleur qui perturbe la tete: DM 20 + DM 24 + Yin tang, dans le sens inverse du canal",
@@ -6675,18 +6675,6 @@ function normalizeOldPointDetails(){
 }
 
 normalizeOldPointDetails();
-
-/* Every acupuncture point exposes an Associations field, even when empty. */
-function ensurePointAssociationsField(){
-  try{
-    Object.values(POINT_DETAILS || {}).forEach(details => {
-      if(details && !Object.prototype.hasOwnProperty.call(details, "associations")){
-        details.associations = "";
-      }
-    });
-  }catch(error){}
-}
-ensurePointAssociationsField();
 
 /* Flat-root compatibility: expose ACU point fiches to later correction files.
    Top-level `const POINT_DETAILS` is not always available via `window.POINT_DETAILS`,
