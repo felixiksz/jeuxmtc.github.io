@@ -6,8 +6,11 @@
   const STORAGE_ACU = "mtcMemoAcuEsprit.v1";
   const STORAGE_PHARMA = "mtcMemoPharmaSyntheses.v1";
   const STORAGE_SESSION = "mtcMemoSession.v1";
+  const ACU_IMAGE_PREFIX = "mtc_point_image_";
+  const MATCH_MODE_KEY = "mtcMemoAcuMatchMode.v1";
   const state = {
     hasSession:false,
+    matchMode:"localisation",
     phase:"idle",
     gridSignature:"",
     pairs:[],
@@ -44,9 +47,10 @@
     const payload = {
       at:Date.now(),
       domain:isPharma() ? "pharma" : "acu",
+      matchMode:state.matchMode,
       gridSignature:state.gridSignature,
       phase:state.phase,
-      pairs:state.pairs.map(pair => ({id:pair.id, rawId:pair.rawId, kind:pair.kind, label:pair.label, summary:pair.summary, commonName:pair.commonName, className:pair.className, classKey:pair.classKey, classLabel:pair.classLabel, placeholder:pair.placeholder})),
+      pairs:state.pairs.map(pair => ({id:pair.id, rawId:pair.rawId, kind:pair.kind, label:pair.label, summary:pair.summary, summaryImage:pair.summaryImage, summaryLabel:pair.summaryLabel, commonName:pair.commonName, className:pair.className, classKey:pair.classKey, classLabel:pair.classLabel, placeholder:pair.placeholder})),
       matched:Array.from(state.matched),
       attempts:state.attempts,
       matchIndex:state.matchIndex,
@@ -60,6 +64,7 @@
     const saved = loadStore(STORAGE_SESSION);
     if(!saved || saved.gridSignature !== signature) return null;
     if(saved.domain !== (isPharma() ? "pharma" : "acu")) return null;
+    if(!isPharma() && (saved.matchMode || "localisation") !== state.matchMode) return null;
     return saved;
   }
   function clearSession(){
@@ -168,6 +173,20 @@
     };
   }
 
+  function getPointImage(point){
+    try{ return localStorage.getItem(ACU_IMAGE_PREFIX + String(point || "")) || ""; }
+    catch(error){ return ""; }
+  }
+  function loadMatchMode(){
+    try{
+      const saved = localStorage.getItem(MATCH_MODE_KEY);
+      return saved === "image" ? "image" : "localisation";
+    }catch(error){ return "localisation"; }
+  }
+  function saveMatchMode(mode){
+    try{ localStorage.setItem(MATCH_MODE_KEY, mode === "image" ? "image" : "localisation"); }catch(error){}
+  }
+
   function applySavedAcuSyntheses(){
     const saved = loadStore(STORAGE_ACU);
     if(!window.POINT_DETAILS) return saved;
@@ -200,15 +219,13 @@
       }
     });
 
-    return unique.slice(0, 16).map(point => {
+    const imageMode = state.matchMode === "image";
+    const pool = imageMode ? unique.filter(point => getPointImage(point)) : unique;
+
+    return pool.slice(0, 16).map(point => {
       const details = detailsForAcuPoint(point);
-      // Le mémo ACU associe le nom du point à sa localisation anatomique
-      // (donnée déjà présente pour chaque point, donc pas besoin d'écrire
-      // quoi que ce soit avant de jouer). Un ancien "esprit" personnalisé
-      // ou une synthèse éditée manuellement restent prioritaires si présents.
-      const summary = cleanText(saved[point] || details.localisation || details.espritAcu || "");
       const info = getAcuMemoInfo(point);
-      return {
+      const base = {
         id:"acu:" + point,
         rawId:point,
         kind:"acu",
@@ -216,12 +233,27 @@
         // à associer un point à sa localisation, et alourdit la tuile.
         label:getPointCodeLabel(point),
         promptTitle:getPointCodeLabel(point),
-        summary,
-        summaryLabel:"localisation",
         placeholder:makeAcuPlaceholder(point, details),
         classKey:info.classKey,
         classLabel:info.classLabel
       };
+      if(imageMode){
+        // L'image locale sert de contenu visuel de la tuile ; le texte de
+        // secours (accessibilité/placeholder) reste la localisation si connue.
+        return Object.assign(base, {
+          summary:cleanText(details.localisation || base.promptTitle),
+          summaryImage:getPointImage(point),
+          summaryLabel:"image"
+        });
+      }
+      // Le mémo ACU associe le nom du point à sa localisation anatomique
+      // (donnée déjà présente pour chaque point, donc pas besoin d'écrire
+      // quoi que ce soit avant de jouer). Un ancien "esprit" personnalisé
+      // ou une synthèse éditée manuellement restent prioritaires si présents.
+      return Object.assign(base, {
+        summary:cleanText(saved[point] || details.localisation || details.espritAcu || ""),
+        summaryLabel:"localisation"
+      });
     });
   }
   function capturePharmaPairs(){
@@ -342,9 +374,47 @@
     return true;
   }
   function openMemo(){
+    if(isPharma()){
+      launchMemoFlow();
+      return;
+    }
+    renderMatchModeChoice();
+  }
+  function renderMatchModeChoice(){
+    state.hasSession = false;
+    state.phase = "choice";
+    setOverlayVisible(true);
+    const current = loadMatchMode();
+    const hasAnyLocalImage = Array.from(document.querySelectorAll("#grid .tile[data-point]"))
+      .some(tile => getPointImage(tile.dataset.point));
+    content().innerHTML = headerHtml("Mémo — que veux-tu associer aux points ?", "") +
+      '<div class="mtc-memo-choice">' +
+        '<button type="button" class="mtc-memo-choice-option' + (current === "localisation" ? " is-current" : "") + '" data-memo-action="choose-mode" data-mode="localisation">' +
+          '<strong>Nom ↔ Localisation</strong>' +
+          '<span>Associe chaque point à sa description anatomique.</span>' +
+        '</button>' +
+        '<button type="button" class="mtc-memo-choice-option' + (current === "image" ? " is-current" : "") + '" data-memo-action="choose-mode" data-mode="image"' + (hasAnyLocalImage ? "" : " disabled") + '>' +
+          '<strong>Nom ↔ Image</strong>' +
+          '<span>' + (hasAnyLocalImage ? "Associe chaque point à son image locale." : "Aucune image locale importée pour l’instant.") + '</span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="mtc-memo-actions bottom">' +
+        '<button type="button" data-memo-action="close" class="secondary">Retour</button>' +
+      '</div>';
+  }
+  function chooseMatchMode(mode){
+    const clean = mode === "image" ? "image" : "localisation";
+    state.matchMode = clean;
+    saveMatchMode(clean);
+    launchMemoFlow();
+  }
+  function launchMemoFlow(){
     const pairs = capturePairs();
     if(!pairs.length){
-      alert("Je n'arrive pas à récupérer la grille actuelle pour le mémo.");
+      alert(state.matchMode === "image"
+        ? "Aucun point de cette grille n’a d’image locale importée."
+        : "Je n'arrive pas à récupérer la grille actuelle pour le mémo.");
+      renderMatchModeChoice();
       return;
     }
     const signature = pairSignature(pairs);
@@ -518,6 +588,12 @@
     updateScore();
     saveSession();
   }
+  function summaryContentHtml(pair){
+    if(pair.summaryImage){
+      return '<img src="' + escapeHtml(pair.summaryImage) + '" alt="' + escapeHtml(pair.summary || pair.label) + '" loading="lazy">';
+    }
+    return escapeHtml(pair.summary);
+  }
   function renderFoundPairs(){
     return state.foundPairs.map(found => {
       const pair = state.visiblePairs.find(item => item.id === found.id);
@@ -525,7 +601,7 @@
       return '<article class="mtc-memo-found-pair" data-found-id="' + escapeHtml(pair.id) + '" style="--memo-match-hue:' + String(found.hue) + '">' +
         '<span class="mtc-memo-found-badge">' + escapeHtml(found.label) + '</span>' +
         '<b>' + escapeHtml(pair.label) + '</b>' +
-        '<em>' + escapeHtml(pair.summary) + '</em>' +
+        (pair.summaryImage ? '<em class="has-image">' + summaryContentHtml(pair) + '</em>' : '<em>' + escapeHtml(pair.summary) + '</em>') +
       '</article>';
     }).join("");
   }
@@ -542,7 +618,7 @@
           return '<button type="button" class="mtc-memo-item memo-name' + kindClass + easyClass(pair) + '"' + easyAttrs(pair) + ' data-id="' + escapeHtml(pair.id) + '">' + escapeHtml(pair.label) + '</button>';
         }).join("") + '</div>' +
         '<div class="mtc-memo-col memo-summaries-col" aria-label="Synthèses">' + summaries.map(pair => (
-          '<button type="button" class="mtc-memo-item memo-summary' + easyClass(pair) + '"' + easyAttrs(pair) + ' data-id="' + escapeHtml(pair.id) + '" data-summary-label="' + escapeHtml(pair.summaryLabel || "info") + '">' + escapeHtml(pair.summary) + '</button>'
+          '<button type="button" class="mtc-memo-item memo-summary' + (pair.summaryImage ? " has-image" : "") + easyClass(pair) + '"' + easyAttrs(pair) + ' data-id="' + escapeHtml(pair.id) + '" data-summary-label="' + escapeHtml(pair.summaryLabel || "info") + '">' + summaryContentHtml(pair) + '</button>'
         )).join("") + '</div>' +
       '</div>' +
       '<div class="mtc-memo-found-zone" aria-live="polite">' +
@@ -576,7 +652,8 @@
     const zone = byId("mtcMemoFoundPairs");
     const pair = state.visiblePairs.find(item => item.id === id);
     if(zone && pair){
-      zone.insertAdjacentHTML("beforeend", '<article class="mtc-memo-found-pair" data-found-id="' + escapeHtml(pair.id) + '" style="--memo-match-hue:' + String(hue) + '"><span class="mtc-memo-found-badge">' + escapeHtml(label) + '</span><b>' + escapeHtml(pair.label) + '</b><em>' + escapeHtml(pair.summary) + '</em></article>');
+      const summaryHtml = pair.summaryImage ? '<em class="has-image">' + summaryContentHtml(pair) + '</em>' : '<em>' + escapeHtml(pair.summary) + '</em>';
+      zone.insertAdjacentHTML("beforeend", '<article class="mtc-memo-found-pair" data-found-id="' + escapeHtml(pair.id) + '" style="--memo-match-hue:' + String(hue) + '"><span class="mtc-memo-found-badge">' + escapeHtml(label) + '</span><b>' + escapeHtml(pair.label) + '</b>' + summaryHtml + '</article>');
     }
     elements.filter(Boolean).forEach(el => {
       el.classList.add("matched");
@@ -633,7 +710,7 @@
     saveSession();
     renderMemoGame();
   }
-  function handleAction(action){
+  function handleAction(action, button){
     if(action === "close") closeMemo();
     else if(action === "save-synth") saveSynthesesAndLaunch();
     else if(action === "restart") restartMemo();
@@ -641,6 +718,7 @@
     else if(action === "hint") revealMemoHint();
     else if(action === "toggle-easy") toggleEasyMode();
     else if(action === "open") openMemo();
+    else if(action === "choose-mode") chooseMatchMode(button && button.getAttribute("data-mode"));
   }
   function ensureMemoButton(){
     if(!isFinished()) return;
@@ -666,11 +744,13 @@
   function removeMemoButtonIfNeeded(){ if(!isFinished()) byId("mtcMemoStartButton")?.remove(); }
   function install(){
     applySavedAcuSyntheses();
+    state.matchMode = loadMatchMode();
     document.addEventListener("click", event => {
       const actionButton = event.target && event.target.closest ? event.target.closest("[data-memo-action]") : null;
       if(actionButton){
         event.preventDefault();
-        handleAction(actionButton.getAttribute("data-memo-action"));
+        if(actionButton.disabled) return;
+        handleAction(actionButton.getAttribute("data-memo-action"), actionButton);
         return;
       }
       const columnItem = event.target && event.target.closest ? event.target.closest(".mtc-memo-item") : null;

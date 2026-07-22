@@ -24,6 +24,84 @@
     return sharedAudioEl;
   }
 
+  // --- Pré-chargement Web Audio : lecture quasi instantanée -------------
+  // Le <audio> classique doit re-négocier réseau + décodage à chaque son,
+  // même fichier déjà visité. On précharge et pré-décode en tâche de fond
+  // dès que la grille apparaît, puis on joue depuis un buffer déjà prêt.
+  let audioCtx = null;
+  const decodedBuffers = new Map(); // filename -> AudioBuffer
+  const pendingDecodes = new Map(); // filename -> Promise
+
+  function getAudioContext(){
+    if(audioCtx) return audioCtx;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return null;
+    try{ audioCtx = new Ctx(); }catch(error){ audioCtx = null; }
+    return audioCtx;
+  }
+
+  function prefetchBuffer(filename){
+    if(!filename || decodedBuffers.has(filename) || pendingDecodes.has(filename)) return;
+    const ctx = getAudioContext();
+    if(!ctx) return;
+    const promise = fetch(audioUrl(filename))
+      .then(response => (response && response.ok) ? response.arrayBuffer() : Promise.reject(new Error("404")))
+      .then(bytes => ctx.decodeAudioData(bytes))
+      .then(buffer => { decodedBuffers.set(filename, buffer); pendingDecodes.delete(filename); })
+      .catch(() => { pendingDecodes.delete(filename); });
+    pendingDecodes.set(filename, promise);
+  }
+
+  function prefetchAudioForHanzi(hanzi){
+    const clean = normalizeHanzi(hanzi);
+    if(!clean) return;
+    // On ne précharge que le premier candidat (le plus probable) pour éviter
+    // de télécharger des fichiers inutiles pour chaque point de la grille.
+    const candidates = orderedGameCandidates(clean);
+    if(candidates.length) prefetchBuffer(candidates[0]);
+  }
+
+  function prefetchVisibleGridAudio(){
+    try{
+      if(typeof window.isMtcAudioModeEnabled === "function" && !window.isMtcAudioModeEnabled()) return;
+    }catch(error){ return; }
+    document.querySelectorAll("#grid .tile[data-point]").forEach(tile => {
+      const point = tile.dataset.point;
+      const details = window.POINT_DETAILS && point ? window.POINT_DETAILS[point] : null;
+      if(details && details.hanzi) prefetchAudioForHanzi(details.hanzi);
+    });
+  }
+
+  function playFromBuffer(candidates){
+    const ctx = audioCtx;
+    if(!ctx) return false;
+    const ready = candidates.find(name => decodedBuffers.has(name));
+    if(!ready) return false;
+    try{
+      if(ctx.state === "suspended") ctx.resume();
+      const source = ctx.createBufferSource();
+      source.buffer = decodedBuffers.get(ready);
+      const gain = ctx.createGain();
+      gain.gain.value = 0.42;
+      source.connect(gain).connect(ctx.destination);
+      source.start(0);
+      return true;
+    }catch(error){
+      return false;
+    }
+  }
+
+  function initGridAudioPrefetch(){
+    const grid = document.getElementById("grid");
+    if(!grid || grid.dataset.mtcAudioPrefetchObserved === "1") return;
+    grid.dataset.mtcAudioPrefetchObserved = "1";
+    const observer = new MutationObserver(() => prefetchVisibleGridAudio());
+    observer.observe(grid, {childList:true});
+    prefetchVisibleGridAudio();
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", initGridAudioPrefetch, {once:true});
+  else initGridAudioPrefetch();
+
   function normalizeHanzi(value){
     const raw = String(value || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
     const cjk = raw.match(/[\u3400-\u9fff]+/g);
@@ -191,6 +269,15 @@
     stopGameAudio();
     const serial = gameAudioSerial + 1;
     gameAudioSerial = serial;
+
+    // Voie rapide : le fichier a déjà été pré-chargé et décodé en tâche de
+    // fond pendant que le joueur regardait la grille — lecture quasi instantanée.
+    if(playFromBuffer(candidates)) return true;
+
+    // Pas encore prêt (grille tout juste affichée, ou préchargement raté) :
+    // on lance quand même le préchargement pour la prochaine fois, et on
+    // utilise l'ancienne méthode <audio> en attendant.
+    candidates.forEach(prefetchBuffer);
     return playCandidateNow(candidates, 0, serial, clean);
   }
 
