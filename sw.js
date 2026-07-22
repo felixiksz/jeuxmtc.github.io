@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260722-smarties-easy-colors";
+const MTC_OFFLINE_VERSION = "20260722-cleanup-phase1";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -31,7 +31,6 @@ const CORE_ASSETS = [
   "25-23-pharma-cheatsheet-essentielles.js",
   "26-24-pharma-tools.js",
   "27-25-pharma-stats-gameplay.js",
-  "28-26-acu-image-synthese-stats.js",
   "28-26-bucket8-acu-export-import-fixes.js",
   "29-27-visible-gameplay-mode-switch.js",
   "30-comparison-redesign.css",
