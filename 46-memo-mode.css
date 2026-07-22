@@ -239,11 +239,6 @@ body.mtc-memo-prep-open .mtc-memo-shell{
   width:100%;
   max-height:130px;
   object-fit:contain;
-  /* Cache les noms/codes de points souvent imprimés sur les images perso :
-     flou tant que la paire n'est pas trouvée (voir .mtc-memo-found-pair
-     plus bas pour l'image nette une fois la paire validée). */
-  filter:blur(7px) saturate(0.85);
-  transform:scale(1.12);
 }
 .mtc-memo-found-pair em.has-image{
   display:block;
