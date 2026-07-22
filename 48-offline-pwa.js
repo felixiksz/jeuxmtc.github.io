@@ -109,8 +109,30 @@
       registrationPromise = Promise.reject(new Error("Ouvre d’abord le jeu depuis son lien web avec internet : https://felixiksz.github.io/jeuxmtc.github.io/ puis clique sur ✈︎."));
       return registrationPromise;
     }
-    registrationPromise = navigator.serviceWorker.register(SW_URL).then(() => navigator.serviceWorker.ready);
+    registrationPromise = navigator.serviceWorker.register(SW_URL).then(registration => {
+      // Force une vérification réseau immédiate d'une nouvelle version, plutôt
+      // que d'attendre le cycle de vérification par défaut du navigateur (qui
+      // peut laisser une ancienne version en cache bien plus longtemps).
+      try{ registration.update(); }catch(error){}
+      return navigator.serviceWorker.ready;
+    });
     return registrationPromise;
+  }
+
+  function watchForServiceWorkerUpdates(){
+    if(!("serviceWorker" in navigator)) return;
+    // Si une mise à jour du service worker prend le contrôle de cette page
+    // pendant qu'elle est ouverte, les scripts déjà chargés en mémoire restent
+    // les anciens. Un unique rechargement automatique suffit à passer sur la
+    // nouvelle version — sans jamais toucher aux notes/données personnelles,
+    // qui sont dans localStorage, pas dans le cache du service worker.
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if(reloaded || !hadController) return;
+      reloaded = true;
+      window.location.reload();
+    });
   }
 
   function sendMessageToWorker(registration, payload){
@@ -280,6 +302,7 @@
     patchOfflineTour();
     setTimeout(ensureBottomMetaLine, 0);
     setTimeout(ensureBottomMetaLine, 600);
+    watchForServiceWorkerUpdates();
     registerServiceWorker().catch(() => {});
     window.addEventListener("online", updateButton);
     window.addEventListener("offline", updateButton);
