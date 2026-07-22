@@ -7,6 +7,7 @@
   const STORAGE_PHARMA = "mtcMemoPharmaSyntheses.v1";
   const STORAGE_SESSION = "mtcMemoSession.v1";
   const ACU_IMAGE_PREFIX = "mtc_point_image_";
+  const ACU_IMAGE_MEMO_PREFIX = "mtc_point_image_memo_";
   const MATCH_MODE_KEY = "mtcMemoAcuMatchMode.v1";
   const state = {
     hasSession:false,
@@ -186,8 +187,13 @@
   }
 
   function getPointImage(point){
-    try{ return localStorage.getItem(ACU_IMAGE_PREFIX + String(point || "")) || ""; }
-    catch(error){ return ""; }
+    // La version "memo" (sans nom/code visible) est prioritaire quand elle existe,
+    // pour ne pas pouvoir lire la réponse sur l'image pendant le jeu ; sinon on
+    // retombe sur l'image normale de la fiche du point.
+    try{
+      const key = String(point || "");
+      return localStorage.getItem(ACU_IMAGE_MEMO_PREFIX + key) || localStorage.getItem(ACU_IMAGE_PREFIX + key) || "";
+    }catch(error){ return ""; }
   }
   function loadMatchMode(){
     try{

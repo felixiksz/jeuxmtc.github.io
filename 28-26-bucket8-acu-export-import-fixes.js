@@ -8,6 +8,7 @@
   const ACU_VS_PREFIX = "mtc_point_vs_";
   const ACU_PRECAUTION_PREFIX = "mtc_point_precaution_";
   const ACU_IMAGE_PREFIX = "mtc_point_image_";
+  const ACU_IMAGE_MEMO_PREFIX = "mtc_point_image_memo_";
   const PHARMA_HANZI_PREFIX = "mtc_pharma_herb_hanzi_";
   const PHARMA_ESPRIT_PREFIX = "mtc_pharma_herb_esprit_";
   const PHARMA_NOTE_PREFIX = "mtc_pharma_herb_notes_";
@@ -102,6 +103,7 @@
       ACU_VS_PREFIX,
       ACU_PRECAUTION_PREFIX,
       ACU_IMAGE_PREFIX,
+      ACU_IMAGE_MEMO_PREFIX,
       PHARMA_HANZI_PREFIX,
       PHARMA_ESPRIT_PREFIX,
       PHARMA_NOTE_PREFIX,
@@ -129,7 +131,7 @@
   function importHistoryPrefixes(){
     // On garde l’historique léger : les images base64 peuvent saturer localStorage.
     // Elles restent exportées dans les sauvegardes classiques, mais ne sont pas dupliquées dans la timeline.
-    return personalDataPrefixes().filter(prefix => prefix !== PHARMA_IMAGE_PREFIX && prefix !== ACU_IMAGE_PREFIX);
+    return personalDataPrefixes().filter(prefix => prefix !== PHARMA_IMAGE_PREFIX && prefix !== ACU_IMAGE_PREFIX && prefix !== ACU_IMAGE_MEMO_PREFIX);
   }
 
   function capturePersonalTextDataSnapshot(){
@@ -770,7 +772,8 @@
         associations:safeLocalStorageEntries(ACU_ASSOC_PREFIX),
         vs:safeLocalStorageEntries(ACU_VS_PREFIX),
         precautions:safeLocalStorageEntries(ACU_PRECAUTION_PREFIX),
-        images:safeLocalStorageEntries(ACU_IMAGE_PREFIX)
+        images:safeLocalStorageEntries(ACU_IMAGE_PREFIX),
+        images_memo_safe:safeLocalStorageEntries(ACU_IMAGE_MEMO_PREFIX)
       },
       pharmacology:{
         hanzi:safeLocalStorageEntries(PHARMA_HANZI_PREFIX),
@@ -899,6 +902,7 @@
           count += await applyImportChunk("IMPORT", 41, () => setPrefixedValues(ACU_VS_PREFIX, parsed.acupuncture.vs || parsed.acupuncture.comparaisons || parsed.acupuncture.comparison, "vs"));
           count += await applyImportChunk("IMPORT", 44, () => setPrefixedValues(ACU_PRECAUTION_PREFIX, parsed.acupuncture.precautions || parsed.acupuncture.precaution, "precautions"));
           count += await applyImportChunk("IMPORT", 46, () => setPrefixedValues(ACU_IMAGE_PREFIX, parsed.acupuncture.images || parsed.acupuncture.image, "images"));
+          count += await applyImportChunk("IMPORT", 47, () => setPrefixedValues(ACU_IMAGE_MEMO_PREFIX, parsed.acupuncture.images_memo_safe || parsed.acupuncture.images_memo, "images_memo"));
         }
 
         const looksLikeDirectPharmaImport = parsed && typeof parsed === "object" && (
