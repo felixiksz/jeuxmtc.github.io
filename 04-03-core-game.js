@@ -89,7 +89,13 @@ function loadMtcStats(){
 
 function saveMtcStats(stats){
   stats.lastUpdated = new Date().toISOString();
-  localStorage.setItem(MTC_STATS_KEY, JSON.stringify(stats));
+  try{
+    localStorage.setItem(MTC_STATS_KEY, JSON.stringify(stats));
+  }catch(error){
+    // Stockage plein ou indisponible : ne pas planter l'appelant (ex. newGame()),
+    // qui perdrait sinon la grille en cours de construction pour une simple
+    // écriture de stats.
+  }
 }
 
 function todayStatsKey(){
@@ -241,7 +247,7 @@ function setAutoPracticeMode(mode){
     mode = "balanced";
   }
 
-  localStorage.setItem(MTC_AUTO_PRACTICE_MODE_KEY, mode);
+  try{ localStorage.setItem(MTC_AUTO_PRACTICE_MODE_KEY, mode); }catch(error){}
   renderStatsPanel();
 }
 
@@ -787,7 +793,7 @@ function getReviewBasket(){
 
 function saveReviewBasket(points){
   const clean = [...new Set((points || []).map(point => String(point).trim()).filter(Boolean))];
-  localStorage.setItem(MTC_REVIEW_BASKET_KEY, JSON.stringify(clean));
+  try{ localStorage.setItem(MTC_REVIEW_BASKET_KEY, JSON.stringify(clean)); }catch(error){}
   updateBasketCount();
   renderAdvancedSearchPanelIfOpen();
   renderReviewBasketPanelIfOpen();
@@ -1643,10 +1649,12 @@ function saveComparisonPoints(points){
     points?.[1] ? String(points[1]) : ""
   ];
 
-  localStorage.setItem(
-    MTC_COMPARISON_POINTS_KEY,
-    JSON.stringify(clean)
-  );
+  try{
+    localStorage.setItem(
+      MTC_COMPARISON_POINTS_KEY,
+      JSON.stringify(clean)
+    );
+  }catch(error){}
 
   updateComparisonButtonLabel();
   renderComparisonPanelIfOpen();
@@ -2208,7 +2216,7 @@ function mtcGameplayModeLabel(mode = getMtcGameplayMode()){
 
 function setMtcGameplayMode(mode){
   if(!["normal","review","exam"].includes(mode)) mode = "normal";
-  localStorage.setItem(MTC_GAMEPLAY_MODE_KEY, mode);
+  try{ localStorage.setItem(MTC_GAMEPLAY_MODE_KEY, mode); }catch(error){}
   updateGameStatus();
   renderStatsPanelIfOpen();
   if(typeof window.updateVisibleGameplayModeSwitch === "function") window.updateVisibleGameplayModeSwitch();
@@ -2273,7 +2281,7 @@ function mtcSessionGoalMessage(){
 
 function setMtcSessionGoal(goal){
   if(!["none","no_hint","review_errors","fragile_categories"].includes(goal)) goal = "none";
-  localStorage.setItem(MTC_SESSION_GOAL_KEY, goal);
+  try{ localStorage.setItem(MTC_SESSION_GOAL_KEY, goal); }catch(error){}
   renderStatsPanelIfOpen();
 }
 
@@ -2576,10 +2584,10 @@ function saveManualCategories(){
     [...manualChecklist.querySelectorAll("input:checked")]
       .map(input => input.value);
 
-  localStorage.setItem(
+  try{ localStorage.setItem(
     "mtc_manual_categories",
     JSON.stringify(checkedKeys)
-  );
+  ); }catch(error){}
 }
 
 function canBuildCategorySet(categories){
@@ -2605,10 +2613,12 @@ function chooseManualCategories(){
     [...manualChecklist.querySelectorAll("input:checked")]
       .map(input => input.value);
 
-      localStorage.setItem(
+  try{
+    localStorage.setItem(
       "mtc_manual_categories",
       JSON.stringify(checkedKeys)
     );
+  }catch(error){}
 
   if(checkedKeys.length < 4){
     message.textContent =
@@ -2737,7 +2747,7 @@ function generateCategoryColors(){
 }
 
 function saveColorSetting(key,value,cssVar){
-  localStorage.setItem(key,value);
+  try{ localStorage.setItem(key,value); }catch(error){}
   document.documentElement.style.setProperty(cssVar,value);
   updateSelectionFeedback();
 }
@@ -2801,8 +2811,8 @@ function pickFourVariedPoints(categoryKey, points){
 
   const historyKey = "mtc_recent_points_" + categoryKey;
 
-  const recent =
-    JSON.parse(localStorage.getItem(historyKey) || "[]");
+  let recent = [];
+  try{ recent = JSON.parse(localStorage.getItem(historyKey) || "[]"); }catch(error){}
 
   let preferred =
     uniquePoints.filter(p => !recent.includes(p));
@@ -2819,10 +2829,12 @@ function pickFourVariedPoints(categoryKey, points){
       .filter((p,index,self) => self.indexOf(p) === index)
       .slice(0, Math.min(uniquePoints.length, 12));
 
-  localStorage.setItem(
-    historyKey,
-    JSON.stringify(newRecent)
-  );
+  try{
+    localStorage.setItem(
+      historyKey,
+      JSON.stringify(newRecent)
+    );
+  }catch(error){}
 
   return picked;
 }
@@ -3402,7 +3414,7 @@ function showProgressHint(id, selector, title, text, options = {}){
   if(!target) return;
 
   progressHintActive = true;
-  localStorage.setItem(progressHintKey(id), "1");
+  try{ localStorage.setItem(progressHintKey(id), "1"); }catch(error){}
 
   document
     .querySelectorAll(".tour-highlight")
@@ -3503,19 +3515,19 @@ let supportBloodDropState = null;
 let supportBloodDropFrame = null;
 
 function markSupportCoffeeClicked(){
-  localStorage.setItem(
+  try{ localStorage.setItem(
     MTC_SUPPORT_COFFEE_CLICKED_KEY,
     "1"
-  );
+  ); }catch(error){}
 
   hideSupportBloodDrop();
 }
 
 function rememberSupportCoffeeReminderShown(){
-  localStorage.setItem(
+  try{ localStorage.setItem(
     MTC_SUPPORT_COFFEE_LAST_HINT_KEY,
     String(Date.now())
-  );
+  ); }catch(error){}
 }
 
 function registerSupportCoffeeVisit(){
@@ -3527,10 +3539,10 @@ function registerSupportCoffeeVisit(){
     );
 
   if(!firstSeen){
-    localStorage.setItem(
+    try{ localStorage.setItem(
       MTC_SUPPORT_COFFEE_FIRST_SEEN_KEY,
       String(now)
-    );
+    ); }catch(error){}
   }
 
   const lastSession =
@@ -3542,16 +3554,16 @@ function registerSupportCoffeeVisit(){
     lastSession &&
     now - lastSession >= MTC_SUPPORT_COFFEE_RETURN_DELAY_MS
   ){
-    localStorage.setItem(
+    try{ localStorage.setItem(
       MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY,
       "1"
-    );
+    ); }catch(error){}
   }
 
-  localStorage.setItem(
+  try{ localStorage.setItem(
     MTC_SUPPORT_COFFEE_LAST_SESSION_KEY,
     String(now)
-  );
+  ); }catch(error){}
 }
 
 function hasSupportCoffeeClicked(){
@@ -3750,10 +3762,10 @@ function handleSupportCoffeeButtonClick(event, link){
     return false;
   }
 
-  localStorage.setItem(
+  try{ localStorage.setItem(
     MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY,
     "1"
-  );
+  ); }catch(error){}
 
   showSupportCoffeeReminder();
 
@@ -5393,10 +5405,10 @@ function savePointNoteFromTextarea(textarea){
   const point = textarea.dataset.point;
   if(!point) return;
 
-  localStorage.setItem(
+  try{ localStorage.setItem(
     noteStorageKey(point),
     textarea.value
-  );
+  ); }catch(error){}
 
   const section = textarea.closest(".point-info-section");
   const display = section?.querySelector(".point-note-display");
@@ -5495,10 +5507,10 @@ function importPersonalNotesFromFile(input){
       }
 
       Object.entries(notes).forEach(([point,value])=>{
-        localStorage.setItem(
+        try{ localStorage.setItem(
           noteStorageKey(point),
           String(value ?? "")
-        );
+        ); }catch(error){}
       });
 
       if(currentPointPanelPoint){
@@ -5947,7 +5959,7 @@ function solveGroup(group){
 
   if(!localStorage.getItem("mtc_point_panel_hint_seen")){
     showPanelHint();
-    localStorage.setItem("mtc_point_panel_hint_seen","1");
+    try{ localStorage.setItem("mtc_point_panel_hint_seen","1"); }catch(error){}
   }
 
   showProgressHintSoon(
@@ -6826,7 +6838,7 @@ function resetAppearance(){
 
   applyPreset("#FCFCFA","#271629","#0000FF");
 
-  localStorage.setItem("mtc_fontSize", "18");
+  try{ localStorage.setItem("mtc_fontSize", "18"); }catch(error){}
   fontSizeSlider.value = 18;
   document.documentElement.style.setProperty("--ui-font-size", "18px");
 }
@@ -6842,7 +6854,7 @@ function applyDarkroomMode(){
     "#ff3b1f"
   );
 
-  localStorage.setItem("mtc_darkroom", "1");
+  try{ localStorage.setItem("mtc_darkroom", "1"); }catch(error){}
 }
 
 function shortPointLine(point){
@@ -6916,7 +6928,7 @@ shadowPicker.oninput =
 fontSizeSlider.oninput = e => {
   const size = e.target.value;
 
-  localStorage.setItem("mtc_fontSize", size);
+  try{ localStorage.setItem("mtc_fontSize", size); }catch(error){}
 
   document.documentElement
     .style

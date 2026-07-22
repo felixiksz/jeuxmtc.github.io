@@ -149,8 +149,8 @@
       const current = readJson(COLLAPSED_ROWS_PHARMA_KEY, []);
       const rows = Array.isArray(current) ? current.map(item => String(item || "")).filter(Boolean) : [];
       DEFAULT_COLLAPSED_ROWS_PHARMA.forEach(key => { if(key && !rows.includes(key)) rows.push(key); });
-      localStorage.setItem(COLLAPSED_ROWS_PHARMA_KEY, JSON.stringify(rows));
-      localStorage.setItem(DEFAULT_COLLAPSED_ROWS_PHARMA_FLAG_KEY, "1");
+      try{ localStorage.setItem(COLLAPSED_ROWS_PHARMA_KEY, JSON.stringify(rows)); }catch(error){}
+      try{ localStorage.setItem(DEFAULT_COLLAPSED_ROWS_PHARMA_FLAG_KEY, "1"); }catch(error){}
     }catch(error){}
   }
 

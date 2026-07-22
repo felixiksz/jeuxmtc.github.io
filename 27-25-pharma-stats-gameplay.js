@@ -187,7 +187,7 @@
 
   function setPharmaGameplayMode(mode){
     if(!["normal","review","exam"].includes(mode)) mode = "normal";
-    localStorage.setItem(PHARMA_GAMEPLAY_MODE_KEY, mode);
+    try{ localStorage.setItem(PHARMA_GAMEPLAY_MODE_KEY, mode); }catch(error){}
     updateStatusDisplay();
     renderPharmaStatsPanelIfOpen();
     if(typeof window.updateVisibleGameplayModeSwitch === "function") window.updateVisibleGameplayModeSwitch();
@@ -227,7 +227,7 @@
 
   function setPharmaSessionGoal(goal){
     if(!["none","no_hint","review_errors","fragile_classes","essential_sm"].includes(goal)) goal = "none";
-    localStorage.setItem(PHARMA_SESSION_GOAL_KEY, goal);
+    try{ localStorage.setItem(PHARMA_SESSION_GOAL_KEY, goal); }catch(error){}
     renderPharmaStatsPanelIfOpen();
   }
 

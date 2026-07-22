@@ -138,7 +138,7 @@
     const cleanMode = normalizePracticeMode(mode);
     const previousMode = getAutoPracticeMode();
 
-    localStorage.setItem(MTC_AUTO_PRACTICE_MODE_KEY, cleanMode);
+    try{ localStorage.setItem(MTC_AUTO_PRACTICE_MODE_KEY, cleanMode); }catch(error){}
 
     updatePracticeModeSwitch();
     renderStatsPanelIfOpen();

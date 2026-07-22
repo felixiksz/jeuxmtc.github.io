@@ -343,7 +343,7 @@
       if(typeof noteStorageKey === "function"){
         localStorage.setItem(noteStorageKey(point), textarea.value);
       }else{
-        localStorage.setItem("mtc_point_note_" + String(point), textarea.value);
+        try{ localStorage.setItem("mtc_point_note_" + String(point), textarea.value); }catch(error){}
       }
     }catch(error){
       console.error(error);
