@@ -534,6 +534,7 @@ window.MTC_AUDIO_MANIFEST = {
     "覆盆子_baidu_zh.mp3",
     "角孙_baidu_zh.mp3",
     "解溪_baidu_zh.mp3",
+    "譩譆噫嘻_baidu_zh.mp3",
     "赤小豆_baidu_zh.mp3",
     "赤芍_baidu_zh.mp3",
     "足三里_baidu_zh.mp3",
