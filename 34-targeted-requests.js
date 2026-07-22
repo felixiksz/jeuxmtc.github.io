@@ -276,9 +276,12 @@
   }
   document.addEventListener("mtc-personal-data-imported", event => {
     const count = event && event.detail ? Number(event.detail.count || 0) : 0;
-    setTimeout(() => setMessageSoon(count
-      ? `Import notes/images locales terminé : ${count} élément(s) modifié(s).`
-      : "Import notes/images locales terminé : rien à modifier."), 120);
+    const failures = event && event.detail ? Number(event.detail.failures || 0) : 0;
+    setTimeout(() => setMessageSoon(failures
+      ? `Import incomplet : stockage plein sur cet appareil, ${failures} élément(s) non enregistré(s)${count ? ` (${count} réussi(s))` : ""}. Libère de l’espace dans ce navigateur puis réessaie.`
+      : (count
+        ? `Import notes/images locales terminé : ${count} élément(s) modifié(s).`
+        : "Import notes/images locales terminé : rien à modifier.")), 120);
   });
 
   function refreshExportImportLabels(){

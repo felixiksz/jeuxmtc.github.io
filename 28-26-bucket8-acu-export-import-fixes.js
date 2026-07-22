@@ -92,6 +92,7 @@
   const IMPORT_HISTORY_MAX = 8;
   let personalDataImportInProgress = false;
   let lastImportCompatibleCount = 0;
+  let lastImportStorageFailures = 0;
 
   function personalDataPrefixes(){
     return [
@@ -630,17 +631,23 @@
     const next = normalizeMergeText(incoming);
     if(!next) return false;
     const storageKey = prefix + id;
-    const shouldReplace = Boolean(options && options.replace);
+    // Les champs "images" sont une valeur unique (une image), jamais du texte
+    // cumulable : les fusionner comme des notes produirait une data URI
+    // invalide (deux images concaténées avec \n\n). On les remplace toujours.
+    const shouldReplace = Boolean((options && options.replace) || field === "images");
     let existing = "";
     try{ existing = localStorage.getItem(storageKey) || ""; }catch(error){}
     const current = normalizeMergeText(existing);
     let merged = next;
     if(shouldReplace){
+      if(current === next) return false;
       try{
-        if(current === next) return false;
         localStorage.setItem(storageKey, next);
         return true;
       }catch(error){
+        // Échec d'écriture réel (ex: quota de stockage dépassé sur mobile) :
+        // à distinguer de "rien à changer" pour ne pas afficher un message trompeur.
+        lastImportStorageFailures++;
         return false;
       }
     }
@@ -655,6 +662,7 @@
       localStorage.setItem(storageKey, merged);
       return true;
     }catch(error){
+      lastImportStorageFailures++;
       return false;
     }
   }
@@ -864,6 +872,7 @@
       try{
         personalDataImportInProgress = true;
         lastImportCompatibleCount = 0;
+        lastImportStorageFailures = 0;
         setImportExportProgress("IMPORT", 4);
         await yieldToImportUi();
         const parsed = JSON.parse(String(reader.result || "{}"));
@@ -921,7 +930,7 @@
         await yieldToImportUi();
         markPersonalDataStatus("import");
         document.dispatchEvent(new CustomEvent("pharma-herb-edited", {detail:{field:"import"}}));
-        document.dispatchEvent(new CustomEvent("mtc-personal-data-imported", {detail:{count}}));
+        document.dispatchEvent(new CustomEvent("mtc-personal-data-imported", {detail:{count, failures:lastImportStorageFailures}}));
         setImportExportProgress("IMPORT", 100);
         const refreshAfterImport = () => {
           if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
@@ -933,7 +942,9 @@
         else setTimeout(refreshAfterImport, 40);
 
         if(message){
-          if(lastImportCompatibleCount){
+          if(lastImportStorageFailures){
+            message.textContent = `Import incomplet : stockage plein sur cet appareil. ${lastImportStorageFailures} élément(s) n’ont pas pu être enregistré(s)${count ? ` (${count} élément(s) importé(s) avec succès)` : ""}. Libère de l’espace dans ce navigateur puis réessaie.`;
+          }else if(lastImportCompatibleCount){
             message.textContent = count
               ? `Import terminé : ${lastImportCompatibleCount} champ(s) compatible(s) lu(s), ${count} élément(s) modifié(s).`
               : `Import terminé : ${lastImportCompatibleCount} champ(s) compatible(s) lu(s), base déjà à jour.`;
