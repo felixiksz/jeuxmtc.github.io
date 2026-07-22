@@ -88,9 +88,17 @@
     currentGameAudio = null;
   }
 
-  function playCandidateNow(candidates, index, serial){
+  function playCandidateNow(candidates, index, serial, hanzi){
     if(serial !== gameAudioSerial) return false;
-    if(index >= candidates.length) return false;
+    if(index >= candidates.length){
+      // Tous les candidats mp3 ont échoué (fichier manquant, réseau...).
+      // Sans repli, la partie reste silencieuse alors que le module principal
+      // sait basculer sur la synthèse vocale : on délègue au lieu d'abandonner.
+      try{
+        if(typeof window.playMtcAudioByHanzi === "function") return window.playMtcAudioByHanzi(hanzi, null);
+      }catch(error){}
+      return false;
+    }
 
     const filename = candidates[index];
     const audio = new Audio();
@@ -111,7 +119,7 @@
       try{ audio.pause(); }catch(error){}
       // Si le manifest est correct, on ne devrait presque jamais arriver ici.
       // On garde un fallback pour ordinateur / Android tolérant.
-      playCandidateNow(candidates, index + 1, serial);
+      playCandidateNow(candidates, index + 1, serial, hanzi);
     }
     function onError(){ fail(); }
 
@@ -170,7 +178,7 @@
     stopGameAudio();
     const serial = gameAudioSerial + 1;
     gameAudioSerial = serial;
-    return playCandidateNow(candidates, 0, serial);
+    return playCandidateNow(candidates, 0, serial, clean);
   }
 
   // On remplace seulement le lecteur automatique pendant la partie.
