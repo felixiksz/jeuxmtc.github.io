@@ -109,7 +109,10 @@
       registrationPromise = Promise.reject(new Error("Ouvre d’abord le jeu depuis son lien web avec internet : https://felixiksz.github.io/jeuxmtc.github.io/ puis clique sur ✈︎."));
       return registrationPromise;
     }
-    registrationPromise = navigator.serviceWorker.register(SW_URL).then(registration => {
+    // updateViaCache:"none" est essentiel : par défaut, le navigateur peut
+    // vérifier les mises à jour de sw.js en utilisant son propre cache HTTP,
+    // ce qui renvoie une version tout aussi périmée et rend .update() inutile.
+    registrationPromise = navigator.serviceWorker.register(SW_URL, {updateViaCache: "none"}).then(registration => {
       // Force une vérification réseau immédiate d'une nouvelle version, plutôt
       // que d'attendre le cycle de vérification par défaut du navigateur (qui
       // peut laisser une ancienne version en cache bien plus longtemps).
