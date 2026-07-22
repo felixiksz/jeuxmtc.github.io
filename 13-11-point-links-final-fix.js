@@ -54,10 +54,10 @@
       });
     }
 
-    localStorage.setItem(
+    try{ localStorage.setItem(
       MTC_COMPARISON_POINTS_KEY,
       JSON.stringify(slots)
-    );
+    ); }catch(error){}
 
     updateComparisonButtonLabel();
     renderComparisonPanelIfOpen();

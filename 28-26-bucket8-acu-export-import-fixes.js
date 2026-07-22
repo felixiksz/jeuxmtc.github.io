@@ -192,7 +192,7 @@
         if(key && prefixes.some(prefix => key.startsWith(prefix))) toRemove.push(key);
       }
       toRemove.forEach(key => localStorage.removeItem(key));
-      Object.entries(entry.data).forEach(([key, value]) => localStorage.setItem(key, String(value ?? "")));
+      Object.entries(entry.data).forEach(([key, value]) => { try{ localStorage.setItem(key, String(value ?? "")); }catch(error){} });
       markPersonalDataStatus("modified");
       if(typeof window.renderComparisonPanelIfOpen === "function") window.renderComparisonPanelIfOpen();
       if(typeof window.renderReviewBasketPanelIfOpen === "function") window.renderReviewBasketPanelIfOpen();
@@ -396,9 +396,9 @@
         localStorage.setItem(STATUS_IMPORT_KEY, now);
         if(opts.markModified !== false) localStorage.setItem(STATUS_MODIFIED_KEY, now);
       }else if(kind === "export"){
-        localStorage.setItem(STATUS_EXPORTED_KEY, now);
+        try{ localStorage.setItem(STATUS_EXPORTED_KEY, now); }catch(error){}
       }else if(kind === "modified"){
-        localStorage.setItem(STATUS_MODIFIED_KEY, now);
+        try{ localStorage.setItem(STATUS_MODIFIED_KEY, now); }catch(error){}
       }
     }catch(error){}
     refreshPersonalDataStatusBox();
@@ -698,16 +698,16 @@
           return;
         }
         if(point){
-          localStorage.setItem(ACU_NOTE_PREFIX + point, String(value ?? ""));
+          try{ localStorage.setItem(ACU_NOTE_PREFIX + point, String(value ?? "")); }catch(error){}
           count++;
           return;
         }
         // Ancien export très libre : si l’entrée ne ressemble pas à un point,
         // on tente d’abord la pharmacopée, sinon on garde la note ACU telle quelle.
         if(herb){
-          localStorage.setItem(PHARMA_NOTE_PREFIX + herb.id, String(value ?? ""));
+          try{ localStorage.setItem(PHARMA_NOTE_PREFIX + herb.id, String(value ?? "")); }catch(error){}
         }else{
-          localStorage.setItem(ACU_NOTE_PREFIX + label, String(value ?? ""));
+          try{ localStorage.setItem(ACU_NOTE_PREFIX + label, String(value ?? "")); }catch(error){}
         }
         count++;
       }catch(error){}

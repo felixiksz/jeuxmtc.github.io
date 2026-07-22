@@ -455,7 +455,7 @@
 
     if(!localStorage.getItem("mtc_point_panel_hint_seen")){
       showPanelHint();
-      localStorage.setItem("mtc_point_panel_hint_seen","1");
+      try{ localStorage.setItem("mtc_point_panel_hint_seen","1"); }catch(error){}
     }
 
     showProgressHintSoon(

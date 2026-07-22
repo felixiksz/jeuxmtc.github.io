@@ -49,7 +49,7 @@
     if(typeof saveComparisonPoints === "function"){
       saveComparisonPoints(cleanSlots);
     }else{
-      localStorage.setItem("connections_mtc_comparison_points_v1", JSON.stringify(cleanSlots));
+      try{ localStorage.setItem("connections_mtc_comparison_points_v1", JSON.stringify(cleanSlots)); }catch(error){}
       if(typeof updateComparisonButtonLabel === "function") updateComparisonButtonLabel();
       if(typeof renderComparisonPanelIfOpen === "function") renderComparisonPanelIfOpen();
       if(typeof renderReviewBasketPanelIfOpen === "function") renderReviewBasketPanelIfOpen();
