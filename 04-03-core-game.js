@@ -2879,32 +2879,6 @@ function currentMode(){
     : "auto";
 }
 
-function toggleManualMode(){
-
-  pool = buildPool();
-  fillManualSelectors();
-
-  if(currentMode() === "manual"){
-
-    manualEditButton.style.display = "inline-block";
-
-    const alreadyOpenedManual =
-      localStorage.getItem("mtc_manual_opened_once") === "1";
-
-    if(!alreadyOpenedManual){
-      manualControls.style.display = "flex";
-      localStorage.setItem("mtc_manual_opened_once", "1");
-    }else{
-      manualControls.style.display = "none";
-    }
-
-  }else{
-
-    manualEditButton.style.display = "none";
-    manualControls.style.display = "none";
-  }
-}
-
 const CANAL_LABELS = {
   P:"Shǒu tài yīn",
   GI:"Shǒu yáng míng",
@@ -5671,7 +5645,7 @@ function newGame(){
   document
     .querySelectorAll(".association-postit")
     .forEach(el=>el.remove());
-    
+
   document.body.classList.remove("game-complete");
   document.body.classList.remove("game-finished");
 
