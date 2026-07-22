@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260722-quota-fix-and-memo-resize";
+const MTC_OFFLINE_VERSION = "20260722-network-first-fetch";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -629,9 +629,10 @@ self.addEventListener("fetch", event => {
   }
 
   event.respondWith((async () => {
+    // Réseau d'abord : un ancien service worker actif ne doit jamais bloquer
+    // indéfiniment la mise à jour des fichiers du jeu tant que l'appareil a
+    // du réseau. Le cache ne sert que de repli hors connexion.
     const normalized = withoutSearch(request.url);
-    const cached = await caches.match(request) || await caches.match(normalized);
-    if(cached) return cached;
     try{
       const response = await fetch(request);
       if(response && (response.ok || response.type === "opaque")){
@@ -640,6 +641,7 @@ self.addEventListener("fetch", event => {
       }
       return response;
     }catch(error){
+      const cached = await caches.match(request) || await caches.match(normalized);
       return cached || Response.error();
     }
   })());
