@@ -53,8 +53,13 @@
     const out = [];
     if(!clean) return out;
 
-    // 1) Candidats explicitement indexés pour ce hanzi.
-    manifestByHanziList(clean).forEach(item => addUnique(out, item));
+    const files = manifestFilesSet();
+    const rawByHanzi = manifestByHanziList(clean);
+
+    // 1) Candidats explicitement indexés pour ce hanzi, mais seulement ceux
+    // dont le fichier existe vraiment dans le manifest. Un premier essai sur
+    // un nom absent (ex : anciens noms #Uxxxx) casse la lecture suivante sur mobile.
+    rawByHanzi.forEach(item => { if(files.has(String(item))) addUnique(out, item); });
 
     // 2) Candidats calculés par le module audio principal.
     const generated = [];
@@ -66,9 +71,11 @@
 
     // 3) Parmi les candidats calculés, on met d'abord ceux dont le fichier est
     // dans le manifest. C'est le point crucial pour Safari/Chrome mobile.
-    const files = manifestFilesSet();
     generated.filter(item => files.has(String(item))).forEach(item => addUnique(out, item));
     generated.filter(item => !files.has(String(item))).forEach(item => addUnique(out, item));
+
+    // 4) En dernier recours seulement, les entrées byHanzi non confirmées.
+    rawByHanzi.forEach(item => addUnique(out, item));
 
     return out;
   }
