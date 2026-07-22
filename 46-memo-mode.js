@@ -212,9 +212,12 @@
         id:"acu:" + point,
         rawId:point,
         kind:"acu",
-        label:getPointLabel(point),
+        // Uniquement la nomenclature (ex. "TF 8") : le pinyin/hanzi n'aide pas
+        // à associer un point à sa localisation, et alourdit la tuile.
+        label:getPointCodeLabel(point),
         promptTitle:getPointCodeLabel(point),
         summary,
+        summaryLabel:"localisation",
         placeholder:makeAcuPlaceholder(point, details),
         classKey:info.classKey,
         classLabel:info.classLabel
@@ -251,6 +254,7 @@
         label:getHerbLabel(fullHerb),
         promptTitle:getHerbLabel(fullHerb),
         summary,
+        summaryLabel:"esprit",
         commonName:getPharmaCommonName(fullHerb),
         className,
         classKey:cleanText(fullHerb.classCode || className),
@@ -538,7 +542,7 @@
           return '<button type="button" class="mtc-memo-item memo-name' + kindClass + easyClass(pair) + '"' + easyAttrs(pair) + ' data-id="' + escapeHtml(pair.id) + '">' + escapeHtml(pair.label) + '</button>';
         }).join("") + '</div>' +
         '<div class="mtc-memo-col memo-summaries-col" aria-label="Synthèses">' + summaries.map(pair => (
-          '<button type="button" class="mtc-memo-item memo-summary' + easyClass(pair) + '"' + easyAttrs(pair) + ' data-id="' + escapeHtml(pair.id) + '">' + escapeHtml(pair.summary) + '</button>'
+          '<button type="button" class="mtc-memo-item memo-summary' + easyClass(pair) + '"' + easyAttrs(pair) + ' data-id="' + escapeHtml(pair.id) + '" data-summary-label="' + escapeHtml(pair.summaryLabel || "info") + '">' + escapeHtml(pair.summary) + '</button>'
         )).join("") + '</div>' +
       '</div>' +
       '<div class="mtc-memo-found-zone" aria-live="polite">' +

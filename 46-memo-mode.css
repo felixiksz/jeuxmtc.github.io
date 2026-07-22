@@ -226,7 +226,11 @@ body.mtc-memo-prep-open .mtc-memo-shell{
   opacity:.54;
 }
 .mtc-memo-item.memo-name::before{ content:"nom"; }
-.mtc-memo-item.memo-summary::before{ content:"esprit"; }
+.mtc-memo-item.memo-summary::before{ content:attr(data-summary-label); }
+.mtc-memo-item.memo-summary{
+  text-transform:none;
+  white-space:pre-line;
+}
 .mtc-memo-item.selected{
   outline:2px solid var(--shadow-color, currentColor);
   outline-offset:1px;
@@ -493,12 +497,9 @@ body.mtc-memo-prep-open .mtc-memo-shell{
     grid-column:1 / -1;
   }
   .mtc-memo-col:last-child{
-    display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-    gap:5px;
-  }
-  .mtc-memo-col:last-child .mtc-memo-col-title{
-    grid-column:1 / -1;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
   }
   .mtc-memo-item{
     border-radius:10px;
@@ -513,14 +514,11 @@ body.mtc-memo-prep-open .mtc-memo-shell{
     padding:5px 3px;
   }
   .mtc-memo-item.memo-summary{
-    min-height:47px;
-    max-height:58px;
-    font-size:.62rem;
-    line-height:1.12;
-    padding:6px 7px;
-    display:-webkit-box;
-    -webkit-line-clamp:3;
-    -webkit-box-orient:vertical;
+    min-height:40px;
+    height:auto;
+    font-size:.74rem;
+    line-height:1.32;
+    padding:8px 9px;
   }
   .mtc-memo-item.memo-name::before,
   .mtc-memo-item.memo-summary::before{
@@ -721,13 +719,20 @@ body.mtc-memo-prep-open .mtc-memo-shell{
     flex:1 1 auto;
     min-height:0;
     display:grid;
-    grid-template-columns:minmax(170px, .72fr) minmax(360px, 1.28fr);
+    grid-template-columns:minmax(110px, .42fr) minmax(420px, 1.58fr);
     gap:8px;
     margin-top:4px;
+    overflow-y:auto;
+    align-items:start;
   }
   .mtc-memo-col{
     min-height:0;
     gap:clamp(2px, .55vh, 6px);
+  }
+  .mtc-memo-col:first-child{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(76px, 1fr));
+    align-content:start;
   }
   .mtc-memo-item{
     flex:1 1 0;
@@ -738,15 +743,14 @@ body.mtc-memo-prep-open .mtc-memo-shell{
     line-height:1.08;
   }
   .mtc-memo-item.memo-name{
-    font-size:clamp(.62rem, 1.35vh, .9rem);
+    font-size:clamp(.72rem, 1.6vh, 1rem);
     line-height:1.05;
+    min-height:48px;
   }
   .mtc-memo-item.memo-summary{
-    font-size:clamp(.52rem, 1.12vh, .78rem);
-    line-height:1.08;
-    display:-webkit-box;
-    -webkit-line-clamp:3;
-    -webkit-box-orient:vertical;
+    font-size:clamp(.68rem, 1.3vh, .88rem);
+    line-height:1.28;
+    height:auto;
   }
   .mtc-memo-found-zone{
     flex:0 0 auto;
@@ -794,27 +798,28 @@ body.mtc-memo-prep-open .mtc-memo-shell{
   .mtc-memo-columns{
     flex:1 1 auto;
     min-height:0;
-    grid-template-columns:minmax(260px, .9fr) minmax(560px, 1.7fr);
-    align-items:stretch;
+    grid-template-columns:minmax(130px, .4fr) minmax(560px, 1.6fr);
+    align-items:start;
     gap:clamp(10px, 1.2vw, 16px);
+    overflow-y:auto;
   }
   .mtc-memo-col{
     display:grid;
     min-height:0;
-    align-content:stretch;
+    align-content:start;
     gap:clamp(6px, .9vh, 10px);
   }
   .mtc-memo-col:first-child{
-    grid-template-columns:repeat(auto-fit, minmax(112px, 1fr));
-    grid-auto-rows:minmax(58px, 1fr);
+    grid-template-columns:repeat(auto-fit, minmax(84px, 1fr));
+    grid-auto-rows:minmax(52px, min-content);
   }
   .mtc-memo-col:last-child{
-    grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
-    grid-auto-rows:minmax(64px, 1fr);
+    grid-template-columns:1fr;
+    grid-auto-rows:min-content;
   }
   .mtc-memo-item{
     min-height:58px;
-    height:100%;
+    height:auto;
     display:flex;
     align-items:center;
     justify-content:flex-start;
@@ -825,16 +830,15 @@ body.mtc-memo-prep-open .mtc-memo-shell{
   .mtc-memo-item.memo-name{
     justify-content:center;
     text-align:center;
-    min-height:58px;
+    min-height:52px;
     font-size:clamp(.86rem, 1.75vh, 1.16rem);
     line-height:1.12;
   }
   .mtc-memo-item.memo-summary{
     min-height:64px;
-    font-size:clamp(.74rem, 1.35vh, .98rem);
-    line-height:1.18;
-    display:flex;
-    -webkit-line-clamp:unset;
+    font-size:clamp(.76rem, 1.35vh, .96rem);
+    line-height:1.32;
+    display:block;
   }
   .mtc-memo-found-zone{
     max-height:min(20dvh, 150px);
@@ -843,23 +847,23 @@ body.mtc-memo-prep-open .mtc-memo-shell{
 @media(min-width:700px) and (max-height:760px) and (hover:hover) and (pointer:fine){
   .mtc-memo-header p{display:none;}
   .mtc-memo-columns{
-    grid-template-columns:minmax(300px, .95fr) minmax(560px, 1.55fr);
+    grid-template-columns:minmax(120px, .38fr) minmax(560px, 1.62fr);
   }
   .mtc-memo-col:first-child{
-    grid-template-columns:repeat(auto-fit, minmax(92px, 1fr));
-    grid-auto-rows:minmax(54px, 1fr);
+    grid-template-columns:repeat(auto-fit, minmax(80px, 1fr));
+    grid-auto-rows:minmax(48px, min-content);
   }
   .mtc-memo-col:last-child{
-    grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
-    grid-auto-rows:minmax(58px, 1fr);
+    grid-template-columns:1fr;
+    grid-auto-rows:min-content;
   }
   .mtc-memo-item.memo-name{
-    min-height:54px;
+    min-height:48px;
     font-size:clamp(.78rem, 1.75vh, 1.04rem);
   }
   .mtc-memo-item.memo-summary{
-    min-height:58px;
-    font-size:clamp(.68rem, 1.45vh, .9rem);
+    min-height:52px;
+    font-size:clamp(.7rem, 1.45vh, .88rem);
   }
   .mtc-memo-found-zone{
     max-height:min(16dvh, 110px);
@@ -876,21 +880,21 @@ body.mtc-memo-prep-open .mtc-memo-shell{
     margin:2px 0 4px;
   }
   .mtc-memo-col:first-child{
-    grid-template-columns:repeat(auto-fit, minmax(78px, 1fr));
-    grid-auto-rows:minmax(48px, 1fr);
+    grid-template-columns:repeat(auto-fit, minmax(72px, 1fr));
+    grid-auto-rows:minmax(44px, min-content);
   }
   .mtc-memo-col:last-child{
-    grid-template-columns:repeat(auto-fit, minmax(145px, 1fr));
-    grid-auto-rows:minmax(52px, 1fr);
+    grid-template-columns:1fr;
+    grid-auto-rows:min-content;
   }
   .mtc-memo-item.memo-name{
-    min-height:48px;
+    min-height:44px;
     font-size:.76rem;
   }
   .mtc-memo-item.memo-summary{
-    min-height:52px;
-    font-size:.64rem;
-    line-height:1.12;
+    min-height:48px;
+    font-size:.68rem;
+    line-height:1.28;
   }
   .mtc-memo-found-zone{
     max-height:86px;
