@@ -202,7 +202,11 @@
 
     return unique.slice(0, 16).map(point => {
       const details = detailsForAcuPoint(point);
-      const summary = cleanText(saved[point] || details.espritAcu || "");
+      // Le mémo ACU associe le nom du point à sa localisation anatomique
+      // (donnée déjà présente pour chaque point, donc pas besoin d'écrire
+      // quoi que ce soit avant de jouer). Un ancien "esprit" personnalisé
+      // ou une synthèse éditée manuellement restent prioritaires si présents.
+      const summary = cleanText(saved[point] || details.localisation || details.espritAcu || "");
       const info = getAcuMemoInfo(point);
       return {
         id:"acu:" + point,
@@ -367,7 +371,7 @@
     const subject = isPharma() ? "substances" : "points";
     const intro = isPharma()
       ? "Certaines substances n’ont pas encore de champ ESPRIT. Écris une synthèse courte pour lancer le mémo."
-      : "Écris toi-même une synthèse courte pour chaque point manquant.";
+      : "Localisation manquante pour ces points : écris toi-même une courte description pour lancer le mémo.";
     const rows = allMissing.map(pair => {
       const placeholder = pair.kind === "acu" && pair.placeholder ? pair.placeholder : "Synthèse courte…";
       const rowClass = pair.kind === "acu" ? " mtc-memo-synth-row-acu" : "";
