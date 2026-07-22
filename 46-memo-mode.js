@@ -208,12 +208,19 @@
     });
     return saved;
   }
-  function captureAcuPairs(){
-    const saved = applySavedAcuSyntheses();
+  function collectCurrentAcuPoints(){
     let points = [];
     const groups = getCurrentSolutionGroups();
     if(groups.length){
       points = groups.flatMap(group => Array.isArray(group.points) ? group.points : []);
+    }
+    if(points.length < 1){
+      // Une fois la partie terminée, les tuiles .tile sont retirées du DOM
+      // au fur et à mesure (04-03-core-game.js), donc on retombe sur les
+      // .solved-point restants avant d'essayer les tuiles encore présentes.
+      points = Array.from(document.querySelectorAll("#solved .solved-point[data-point]"))
+        .map(el => el.dataset.point)
+        .filter(Boolean);
     }
     if(points.length < 1){
       points = Array.from(document.querySelectorAll("#grid .tile[data-point]"))
@@ -230,6 +237,11 @@
         unique.push(key);
       }
     });
+    return unique;
+  }
+  function captureAcuPairs(){
+    const saved = applySavedAcuSyntheses();
+    const unique = collectCurrentAcuPoints();
 
     const imageMode = state.matchMode === "image";
     const pool = imageMode ? unique.filter(point => getPointImage(point)) : unique;
@@ -397,8 +409,7 @@
     state.phase = "choice";
     setOverlayVisible(true);
     const current = loadMatchMode();
-    const hasAnyLocalImage = Array.from(document.querySelectorAll("#grid .tile[data-point]"))
-      .some(tile => getPointImage(tile.dataset.point));
+    const hasAnyLocalImage = collectCurrentAcuPoints().some(point => getPointImage(point));
     content().innerHTML = headerHtml("Mémo — que veux-tu associer aux points ?", "") +
       '<div class="mtc-memo-choice">' +
         '<button type="button" class="mtc-memo-choice-option' + (current === "localisation" ? " is-current" : "") + '" data-memo-action="choose-mode" data-mode="localisation">' +
