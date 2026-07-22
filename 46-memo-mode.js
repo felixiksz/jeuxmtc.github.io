@@ -24,6 +24,7 @@
     hintTargetId:null,
     hintStep:0,
     easyMode:false,
+    easyColorMap:new Map(),
     observer:null
   };
 
@@ -88,14 +89,25 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
-  function hashHue(value){
-    const text = cleanText(value) || "memo";
-    let hash = 0;
-    for(let i = 0; i < text.length; i += 1){
-      hash = ((hash << 5) - hash) + text.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash) % 360;
+  // Mode facile : 7 couleurs choisies à partir d'une photo de smarties,
+  // affinées avec l'utilisatrice (brun/rouge éclaircis pour le contraste,
+  // rouge réchauffé pour se distinguer du rose). Classées ici pour que les
+  // 4 premières catégories rencontrées (le cas courant : une grille ACU a
+  // 4 catégories) reçoivent les couleurs les plus faciles à distinguer
+  // entre elles ; les suivantes n'arrivent que s'il y a plus de 4 catégories.
+  const EASY_MODE_COLORS = ["#6FA8CC", "#E67561", "#7FA06C", "#9C93CC", "#B8946A", "#CD93B3", "#D6D571"];
+  function assignEasyColors(pairs){
+    state.easyColorMap = new Map();
+    let nextIndex = 0;
+    (pairs || []).forEach(pair => {
+      const key = pair && pair.classKey;
+      if(!key || state.easyColorMap.has(key)) return;
+      state.easyColorMap.set(key, EASY_MODE_COLORS[nextIndex % EASY_MODE_COLORS.length]);
+      nextIndex += 1;
+    });
+  }
+  function easyModeColorForKey(value){
+    return state.easyColorMap.get(value) || EASY_MODE_COLORS[0];
   }
   function pairSignature(pairs){
     return (pairs || []).map(pair => pair.id).filter(Boolean).sort().join("|");
@@ -562,13 +574,14 @@
   }
   function easyAttrs(pair){
     if(!state.easyMode || !pair || !pair.classKey) return "";
-    const hue = hashHue(pair.classKey);
+    const color = easyModeColorForKey(pair.classKey);
     const title = pair.classLabel ? ' title="' + escapeHtml(pair.classLabel) + '"' : "";
-    return ' style="--memo-easy-hue:' + hue + '" data-easy-key="' + escapeHtml(pair.classKey) + '"' + title;
+    return ' style="--memo-easy-color:' + color + '" data-easy-key="' + escapeHtml(pair.classKey) + '"' + title;
   }
   function renderMemoGame(){
     document.body.classList.remove("mtc-memo-prep-open");
     state.phase = "game";
+    assignEasyColors(state.pairs);
     const hintButton = isPharma() ? '<button type="button" data-memo-action="hint" class="secondary memo-hint-button">Astuce</button>' : '';
     const easyActive = state.easyMode ? " is-active" : "";
     content().innerHTML = headerHtml("Mémo", "") +
