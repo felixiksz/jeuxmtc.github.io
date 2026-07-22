@@ -19,7 +19,18 @@
   let currentAudio = null;
   let currentButton = null;
   let playbackSerial = 0;
+  let sharedAudioEl = null;
   const AUDIO_MODE_STORAGE_KEY = "mtc_audio_mode_enabled_v1";
+
+  function getSharedAudio(){
+    // Un seul élément <audio> réutilisé plutôt qu'un nouveau à chaque clic :
+    // évite le coût de (re-)négociation du pipeline audio sur mobile.
+    if(!sharedAudioEl){
+      sharedAudioEl = new Audio();
+      sharedAudioEl.preload = "auto";
+    }
+    return sharedAudioEl;
+  }
 
   function normalizeHanzi(value){
     const raw = String(value || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
@@ -283,8 +294,8 @@
 
     const filename = candidates[index];
 
-    const audio = new Audio();
-    audio.preload = "auto";
+    const audio = getSharedAudio();
+    try{ audio.pause(); }catch(error){}
     audio.volume = 0.4;
     currentAudio = audio;
     currentButton = button || null;

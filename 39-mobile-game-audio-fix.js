@@ -11,6 +11,18 @@
   const AUDIO_BASE_PATH = "audio/";
   let currentGameAudio = null;
   let gameAudioSerial = 0;
+  let sharedAudioEl = null;
+
+  function getSharedAudio(){
+    // Réutiliser un seul élément <audio> au lieu d'en créer un nouveau à
+    // chaque tuile évite le coût de (re-)négociation du pipeline audio du
+    // navigateur à chaque lecture, sensible sur certains mobiles.
+    if(!sharedAudioEl){
+      sharedAudioEl = new Audio();
+      sharedAudioEl.preload = "auto";
+    }
+    return sharedAudioEl;
+  }
 
   function normalizeHanzi(value){
     const raw = String(value || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
@@ -101,7 +113,8 @@
     }
 
     const filename = candidates[index];
-    const audio = new Audio();
+    const audio = getSharedAudio();
+    try{ audio.pause(); }catch(error){}
     currentGameAudio = audio;
     audio.preload = "auto";
     audio.volume = 0.42;
