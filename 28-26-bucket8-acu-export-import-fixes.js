@@ -636,7 +636,7 @@
     // Les champs "images" sont une valeur unique (une image), jamais du texte
     // cumulable : les fusionner comme des notes produirait une data URI
     // invalide (deux images concaténées avec \n\n). On les remplace toujours.
-    const shouldReplace = Boolean((options && options.replace) || field === "images");
+    const shouldReplace = Boolean((options && options.replace) || field === "images" || field === "images_memo");
     let existing = "";
     try{ existing = localStorage.getItem(storageKey) || ""; }catch(error){}
     const current = normalizeMergeText(existing);

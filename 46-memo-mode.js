@@ -410,12 +410,36 @@
     }
     renderMatchModeChoice();
   }
+  function hasAnyMemoSafeImage(){
+    try{
+      for(let i = 0; i < localStorage.length; i++){
+        const key = localStorage.key(i);
+        if(key && key.startsWith(ACU_IMAGE_MEMO_PREFIX)) return true;
+      }
+    }catch(error){}
+    return false;
+  }
+  function resetMemoSafeImages(){
+    if(!confirm("Effacer toutes les images anti-triche du mode mémo ? Les images normales de la fiche du point ne sont pas touchées.")) return;
+    try{
+      const toRemove = [];
+      for(let i = 0; i < localStorage.length; i++){
+        const key = localStorage.key(i);
+        if(key && key.startsWith(ACU_IMAGE_MEMO_PREFIX)) toRemove.push(key);
+      }
+      toRemove.forEach(key => { try{ localStorage.removeItem(key); }catch(error){} });
+    }catch(error){}
+    renderMatchModeChoice();
+  }
   function renderMatchModeChoice(){
     state.hasSession = false;
     state.phase = "choice";
     setOverlayVisible(true);
     const current = loadMatchMode();
     const hasAnyLocalImage = collectCurrentAcuPoints().some(point => getPointImage(point));
+    const resetButton = hasAnyMemoSafeImage()
+      ? '<button type="button" data-memo-action="reset-memo-images" class="secondary">Réinitialiser les images anti-triche</button>'
+      : "";
     content().innerHTML = headerHtml("Mémo — que veux-tu associer aux points ?", "") +
       '<div class="mtc-memo-choice">' +
         '<button type="button" class="mtc-memo-choice-option' + (current === "localisation" ? " is-current" : "") + '" data-memo-action="choose-mode" data-mode="localisation">' +
@@ -429,6 +453,7 @@
       '</div>' +
       '<div class="mtc-memo-actions bottom">' +
         '<button type="button" data-memo-action="close" class="secondary">Retour</button>' +
+        resetButton +
       '</div>';
   }
   function chooseMatchMode(mode){
@@ -749,6 +774,7 @@
     else if(action === "toggle-easy") toggleEasyMode();
     else if(action === "open") openMemo();
     else if(action === "choose-mode") chooseMatchMode(button && button.getAttribute("data-mode"));
+    else if(action === "reset-memo-images") resetMemoSafeImages();
   }
   function ensureMemoButton(){
     if(!isFinished()) return;
