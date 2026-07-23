@@ -22,6 +22,7 @@
     attempts:0,
     matchIndex:0,
     foundPairs:[],
+    slideCurrentId:null,
     hintTargetId:null,
     hintStep:0,
     easyMode:false,
@@ -564,6 +565,7 @@
     state.attempts = 0;
     state.matchIndex = 0;
     state.foundPairs = [];
+    state.slideCurrentId = null;
     state.selectedName = null;
     state.selectedSummary = null;
     resetMemoHint(null);
@@ -639,7 +641,8 @@
         '<button type="button" data-memo-action="close" class="secondary">Retour à la grille</button>' +
         '<button type="button" data-memo-action="edit-synth" class="secondary memo-edit-synth">Synthèses</button>' +
       '</div>';
-    renderColumnsBoard();
+    if(state.matchMode === "image" && !isPharma()) renderSlideBoard();
+    else renderColumnsBoard();
     updateScore();
     saveSession();
   }
@@ -697,8 +700,8 @@
     elements.filter(Boolean).forEach(el => el.classList.add("wrong"));
     window.setTimeout(() => elements.filter(Boolean).forEach(el => el.classList.remove("wrong", "selected")), 520);
   }
-  function applyMatchedVisual(elements, id){
-    if(!id || state.matched.has(id)) return;
+  function recordMatch(id){
+    if(!id || state.matched.has(id)) return null;
     state.matchIndex += 1;
     const label = "paire " + state.matchIndex;
     const hue = (state.matchIndex * 47) % 360;
@@ -710,15 +713,72 @@
       const summaryHtml = pair.summaryImage ? '<em class="has-image">' + summaryContentHtml(pair) + '</em>' : '<em>' + escapeHtml(pair.summary) + '</em>';
       zone.insertAdjacentHTML("beforeend", '<article class="mtc-memo-found-pair" data-found-id="' + escapeHtml(pair.id) + '" style="--memo-match-hue:' + String(hue) + '"><span class="mtc-memo-found-badge">' + escapeHtml(label) + '</span><b>' + escapeHtml(pair.label) + '</b>' + summaryHtml + '</article>');
     }
+    resetMemoHint(null);
+    saveSession();
+    return {label, hue};
+  }
+  function applyMatchedVisual(elements, id){
+    const result = recordMatch(id);
+    if(!result) return;
     elements.filter(Boolean).forEach(el => {
       el.classList.add("matched");
       el.classList.remove("selected");
-      el.setAttribute("data-match-label", label);
-      el.style.setProperty("--memo-match-hue", String(hue));
+      el.setAttribute("data-match-label", result.label);
+      el.style.setProperty("--memo-match-hue", String(result.hue));
       window.setTimeout(() => { if(el && el.parentNode) el.remove(); }, 120);
     });
-    resetMemoHint(null);
-    saveSession();
+  }
+  function pickSlideCandidate(){
+    const unmatched = state.visiblePairs.filter(pair => !state.matched.has(pair.id));
+    if(!unmatched.length){ state.slideCurrentId = null; return null; }
+    const still = unmatched.find(pair => pair.id === state.slideCurrentId);
+    if(still) return still;
+    const pick = unmatched[Math.floor(Math.random() * unmatched.length)];
+    state.slideCurrentId = pick.id;
+    return pick;
+  }
+  function renderSlideBoard(){
+    const board = byId("mtcMemoBoard");
+    if(!board) return;
+    const current = pickSlideCandidate();
+    if(!current){
+      board.innerHTML = '<div class="mtc-memo-found-zone" aria-live="polite">' +
+        '<div class="mtc-memo-found-title">Paires trouvées</div>' +
+        '<div id="mtcMemoFoundPairs" class="mtc-memo-found-pairs">' + renderFoundPairs() + '</div>' +
+      '</div>';
+      return;
+    }
+    const unmatched = state.visiblePairs.filter(pair => !state.matched.has(pair.id));
+    const options = shuffle(unmatched);
+    board.innerHTML =
+      '<div class="mtc-memo-slide">' +
+        '<div class="mtc-memo-slide-card' + (current.summaryImage ? " has-image" : "") + '">' + summaryContentHtml(current) + '</div>' +
+        '<div class="mtc-memo-slide-options">' + options.map(pair => {
+          const kindClass = pair.kind === "pharma" ? " memo-pharma-name" : " memo-acu-name";
+          return '<button type="button" class="mtc-memo-item memo-name mtc-memo-slide-option' + kindClass + easyClass(pair) + '"' + easyAttrs(pair) + ' data-slide-answer="' + escapeHtml(pair.id) + '">' + escapeHtml(pair.label) + '</button>';
+        }).join("") + '</div>' +
+      '</div>' +
+      '<div class="mtc-memo-found-zone" aria-live="polite">' +
+        '<div class="mtc-memo-found-title">Paires trouvées</div>' +
+        '<div id="mtcMemoFoundPairs" class="mtc-memo-found-pairs">' + renderFoundPairs() + '</div>' +
+      '</div>';
+  }
+  function handleSlideClick(button){
+    if(!button) return;
+    const answerId = button.getAttribute("data-slide-answer");
+    const current = state.visiblePairs.find(pair => pair.id === state.slideCurrentId);
+    if(!current) return;
+    state.attempts += 1;
+    if(answerId === current.id){
+      recordMatch(current.id);
+      state.slideCurrentId = null;
+      updateScore();
+      renderSlideBoard();
+    }else{
+      markWrong([button]);
+      updateScore();
+      saveSession();
+    }
   }
   function handleColumnsClick(button){
     if(!button || button.classList.contains("matched")) return;
@@ -749,6 +809,7 @@
     state.attempts = 0;
     state.matchIndex = 0;
     state.foundPairs = [];
+    state.slideCurrentId = null;
     state.selectedName = null;
     state.selectedSummary = null;
     resetMemoHint(null);
@@ -807,6 +868,12 @@
         event.preventDefault();
         if(actionButton.disabled) return;
         handleAction(actionButton.getAttribute("data-memo-action"), actionButton);
+        return;
+      }
+      const slideOption = event.target && event.target.closest ? event.target.closest("[data-slide-answer]") : null;
+      if(slideOption){
+        event.preventDefault();
+        handleSlideClick(slideOption);
         return;
       }
       const columnItem = event.target && event.target.closest ? event.target.closest(".mtc-memo-item") : null;
