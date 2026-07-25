@@ -6918,40 +6918,51 @@ body.tour-active{
   align-items:stretch !important;
 }
 
+/* Portrait/mobile : les 3 sections restent empilées, chacune en grille responsive. */
 #advancedSearchPanel .correspondence-checklist{
-  display:grid !important;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr)) !important;
-  gap:3px 14px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
   width:100% !important;
   margin-top:4px !important;
 }
 
+#advancedSearchPanel .intersection-column{
+  display:flex !important;
+  flex-direction:column !important;
+  min-width:0 !important;
+}
+
 #advancedSearchPanel .correspondence-checklist .intersection-filter-heading{
-  grid-column-start:1 !important;
-  grid-column-end:-1 !important;
-  margin:10px 0 2px !important;
+  margin:0 0 4px !important;
   padding-top:8px !important;
   border-top:1px solid rgba(127,127,127,.22) !important;
   font-family:var(--ui-font-family) !important;
   font-weight:800 !important;
-  font-size:.76em !important;
+  font-size:.88em !important;
   text-transform:uppercase !important;
   letter-spacing:.04em !important;
-  opacity:.65 !important;
+  opacity:.7 !important;
 }
 
-#advancedSearchPanel .correspondence-checklist .intersection-filter-heading:first-child{
-  margin-top:0 !important;
+#advancedSearchPanel .intersection-column:first-child .intersection-filter-heading{
   padding-top:0 !important;
   border-top:none !important;
+}
+
+#advancedSearchPanel .intersection-column-items{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr)) !important;
+  gap:3px 14px !important;
 }
 
 #advancedSearchPanel .correspondence-checklist label{
   display:flex !important;
   align-items:center !important;
-  gap:4px !important;
+  gap:5px !important;
   min-width:0 !important;
-  padding:2px 0 !important;
+  padding:3px 0 !important;
+  font-size:.95em !important;
 }
 
 #advancedSearchPanel .correspondence-checklist label span{
@@ -6960,11 +6971,78 @@ body.tour-active{
   white-space:nowrap !important;
 }
 
+/* Paysage/écran large : les 3 sections deviennent 3 colonnes côte à côte. */
+@media (orientation:landscape) and (min-width:760px){
+  #advancedSearchPanel .correspondence-checklist{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    align-items:start !important;
+    gap:0 20px !important;
+  }
+
+  #advancedSearchPanel .intersection-column{
+    border-left:1px solid rgba(127,127,127,.22) !important;
+    padding-left:16px !important;
+  }
+
+  #advancedSearchPanel .intersection-column:first-child{
+    border-left:none !important;
+    padding-left:0 !important;
+  }
+
+  #advancedSearchPanel .intersection-column .intersection-filter-heading{
+    padding-top:0 !important;
+    border-top:none !important;
+  }
+
+  #advancedSearchPanel .intersection-column-items{
+    grid-template-columns:1fr !important;
+  }
+}
+
 @media (max-width:640px){
   #advancedSearchPanel .search-controls{
     grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important;
   }
-  #advancedSearchPanel .correspondence-checklist{
+  #advancedSearchPanel .intersection-column-items{
     grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) !important;
   }
+}
+
+/* === Correctif taille de texte : trop petite dans recherche/panier, harmonisée avec le reste du site === */
+#advancedSearchPanel .search-control-label,
+#advancedSearchPanel .search-control > span{
+  font-size:.85em !important;
+}
+
+#advancedSearchPanel .search-control input[type="search"],
+#advancedSearchPanel .search-control select{
+  font-size:.95em !important;
+}
+
+#advancedSearchPanel .search-scope-options,
+#advancedSearchPanel .search-scope-options label{
+  font-size:.85em !important;
+}
+
+#advancedSearchPanel .search-result-count,
+.advanced-search-panel .search-result-count{
+  font-size:.88em !important;
+}
+
+#advancedSearchPanel .compact-point-code,
+#reviewBasketPanel .compact-point-code{
+  font-size:.95em !important;
+}
+
+#advancedSearchPanel .stats-small,
+#advancedSearchPanel .stats-intro,
+#reviewBasketPanel .stats-small,
+#reviewBasketPanel .stats-intro{
+  font-size:.9em !important;
+}
+
+/* === Correctif feedback visuel : surligner aussi les points du panier ajoutés à la comparaison === */
+#reviewBasketPanel .basket-list-item.search-compare-selected .compact-point-row{
+  background:color-mix(in srgb, var(--shadow-color) 7%, transparent) !important;
 }

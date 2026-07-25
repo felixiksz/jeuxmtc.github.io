@@ -252,11 +252,11 @@
   }
 
   function getHerbImage(herb){
-    return getStoredValue(IMAGE_STORAGE_PREFIX, herb.id) || "";
+    return window.MTC_IMAGE_STORE.getImage(IMAGE_STORAGE_PREFIX, herb.id) || "";
   }
 
   function setHerbImage(herbId, value){
-    setStoredValue(IMAGE_STORAGE_PREFIX, herbId, value || "");
+    window.MTC_IMAGE_STORE.setImage(IMAGE_STORAGE_PREFIX, herbId, value || "");
   }
 
   function renderImageBlock(herb){

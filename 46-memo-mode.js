@@ -191,10 +191,8 @@
     // La version "memo" (sans nom/code visible) est prioritaire quand elle existe,
     // pour ne pas pouvoir lire la réponse sur l'image pendant le jeu ; sinon on
     // retombe sur l'image normale de la fiche du point.
-    try{
-      const key = String(point || "");
-      return localStorage.getItem(ACU_IMAGE_MEMO_PREFIX + key) || localStorage.getItem(ACU_IMAGE_PREFIX + key) || "";
-    }catch(error){ return ""; }
+    const key = String(point || "");
+    return window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_MEMO_PREFIX, key) || window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_PREFIX, key) || "";
   }
   function loadMatchMode(){
     try{
@@ -412,24 +410,11 @@
     renderMatchModeChoice();
   }
   function hasAnyMemoSafeImage(){
-    try{
-      for(let i = 0; i < localStorage.length; i++){
-        const key = localStorage.key(i);
-        if(key && key.startsWith(ACU_IMAGE_MEMO_PREFIX)) return true;
-      }
-    }catch(error){}
-    return false;
+    return window.MTC_IMAGE_STORE.hasAnyForPrefix(ACU_IMAGE_MEMO_PREFIX);
   }
   function resetMemoSafeImages(){
     if(!confirm("Effacer toutes les images anti-triche du mode mémo ? Les images normales de la fiche du point ne sont pas touchées.")) return;
-    try{
-      const toRemove = [];
-      for(let i = 0; i < localStorage.length; i++){
-        const key = localStorage.key(i);
-        if(key && key.startsWith(ACU_IMAGE_MEMO_PREFIX)) toRemove.push(key);
-      }
-      toRemove.forEach(key => { try{ localStorage.removeItem(key); }catch(error){} });
-    }catch(error){}
+    window.MTC_IMAGE_STORE.clearPrefix(ACU_IMAGE_MEMO_PREFIX);
     renderMatchModeChoice();
   }
   function renderMatchModeChoice(){

@@ -27,9 +27,8 @@
   function storageGet(key){ try{ return localStorage.getItem(key) || ""; }catch(error){ return ""; } }
   function storageSet(key, value){ try{ localStorage.setItem(key, value || ""); }catch(error){} }
   function storageRemove(key){ try{ localStorage.removeItem(key); }catch(error){} }
-  function pointImageKey(point){ return ACU_IMAGE_PREFIX + String(point || ""); }
-  function getPointImage(point){ return storageGet(pointImageKey(point)); }
-  function setPointImage(point, value){ value ? storageSet(pointImageKey(point), value) : storageRemove(pointImageKey(point)); }
+  function getPointImage(point){ return window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_PREFIX, point); }
+  function setPointImage(point, value){ window.MTC_IMAGE_STORE.setImage(ACU_IMAGE_PREFIX, point, value); }
   function resizeImageFileToDataUrl(file, callback){
     const reader = new FileReader();
     reader.onload = () => {
