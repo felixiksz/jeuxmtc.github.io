@@ -636,7 +636,25 @@
     // Les champs "images" sont une valeur unique (une image), jamais du texte
     // cumulable : les fusionner comme des notes produirait une data URI
     // invalide (deux images concaténées avec \n\n). On les remplace toujours.
-    const shouldReplace = Boolean((options && options.replace) || field === "images" || field === "images_memo");
+    const isImageField = field === "images" || field === "images_memo";
+    const shouldReplace = Boolean((options && options.replace) || isImageField);
+
+    if(isImageField){
+      // Les images vivent dans IndexedDB (voir 03-03-image-store-indexeddb.js),
+      // pas dans localStorage, pour ne pas être limitées à son quota de 5-10 Mo.
+      const current = normalizeMergeText(window.MTC_IMAGE_STORE.getImage(prefix, id));
+      if(current === next) return false;
+      return Promise.resolve(window.MTC_IMAGE_STORE.setImage(prefix, id, next))
+        .then(ok => {
+          if(!ok) lastImportStorageFailures++;
+          return !!ok;
+        })
+        .catch(() => {
+          lastImportStorageFailures++;
+          return false;
+        });
+    }
+
     let existing = "";
     try{ existing = localStorage.getItem(storageKey) || ""; }catch(error){}
     const current = normalizeMergeText(existing);
@@ -669,10 +687,10 @@
     }
   }
 
-  function setPrefixedValues(prefix, values, field, options){
+  async function setPrefixedValues(prefix, values, field, options){
     if(!values || typeof values !== "object") return 0;
     let count = 0;
-    Object.entries(values).forEach(([rawId, value]) => {
+    for(const [rawId, value] of Object.entries(values)){
       // Solution robuste : dans les imports, on accepte l’ID interne (PT4),
       // le pinyin (Gui Zhi / Guì zhī), le hanzi (桂枝) ou le nom affiché.
       // Le stockage local, lui, reste toujours indexé par ID interne stable.
@@ -682,8 +700,9 @@
       if(herb && herb.id) id = herb.id;
       else if(point) id = point;
       if(valueHasImportContent(value) && (herb || point || hasKnownImportTarget(rawId))) lastImportCompatibleCount++;
-      if(mergeLocalValue(prefix, id, value, field || "", options || {})) count++;
-    });
+      const saved = await mergeLocalValue(prefix, id, value, field || "", options || {});
+      if(saved) count++;
+    }
     return count;
   }
 
@@ -755,6 +774,7 @@
   window.exportPersonalNotes = function(){
     (async () => {
       setImportExportProgress("EXPORT", 4);
+      if(window.mtcImageStoreReady) await window.mtcImageStoreReady;
       await yieldToImportUi();
       const acuNotes = safeLocalStorageEntries(ACU_NOTE_PREFIX);
       setImportExportProgress("EXPORT", 35);
@@ -772,8 +792,8 @@
         associations:safeLocalStorageEntries(ACU_ASSOC_PREFIX),
         vs:safeLocalStorageEntries(ACU_VS_PREFIX),
         precautions:safeLocalStorageEntries(ACU_PRECAUTION_PREFIX),
-        images:safeLocalStorageEntries(ACU_IMAGE_PREFIX),
-        images_memo_safe:safeLocalStorageEntries(ACU_IMAGE_MEMO_PREFIX)
+        images:window.MTC_IMAGE_STORE.entriesForPrefix(ACU_IMAGE_PREFIX),
+        images_memo_safe:window.MTC_IMAGE_STORE.entriesForPrefix(ACU_IMAGE_MEMO_PREFIX)
       },
       pharmacology:{
         hanzi:safeLocalStorageEntries(PHARMA_HANZI_PREFIX),
@@ -790,7 +810,7 @@
         indications:safeLocalStorageEntries(PHARMA_INDICATIONS_PREFIX),
         contre_indications:safeLocalStorageEntries(PHARMA_CONTRE_INDICATIONS_PREFIX),
         preparations:safeLocalStorageEntries(PHARMA_PREPARATION_PREFIX),
-        images:safeLocalStorageEntries(PHARMA_IMAGE_PREFIX)
+        images:window.MTC_IMAGE_STORE.entriesForPrefix(PHARMA_IMAGE_PREFIX)
       }
     };
 
@@ -877,6 +897,7 @@
         lastImportCompatibleCount = 0;
         lastImportStorageFailures = 0;
         setImportExportProgress("IMPORT", 4);
+        if(window.mtcImageStoreReady) await window.mtcImageStoreReady;
         await yieldToImportUi();
         const parsed = JSON.parse(String(reader.result || "{}"));
         setImportExportProgress("IMPORT", 14);
@@ -1265,8 +1286,109 @@
     else fn();
   }
 
+  /* === Nettoyage ponctuel : d'anciens imports ont fusionné du texte correctement
+     encodé avec une copie mal encodée (mojibake) du même texte, séparées par "\n\n"
+     (ex: "café" + "cafÃ©"). On détecte et supprime la copie mal encodée, une seule fois. */
+  const MOJIBAKE_CLEANUP_FLAG = "mtc_mojibake_cleanup_v1_done";
+
+  const TEXT_FIELD_PREFIXES = [
+    ACU_NOTE_PREFIX, ACU_ESPRIT_PREFIX, ACU_ASSOC_PREFIX, ACU_VS_PREFIX, ACU_PRECAUTION_PREFIX,
+    PHARMA_HANZI_PREFIX, PHARMA_ESPRIT_PREFIX, PHARMA_NOTE_PREFIX, PHARMA_ASSOC_PREFIX,
+    PHARMA_FORMULES_PREFIX, PHARMA_VS_PREFIX, PHARMA_PRECAUTION_PREFIX, PHARMA_SYNONYMES_PREFIX,
+    PHARMA_SYNTHESE_PREFIX, PHARMA_INGREDIENTS_PREFIX, PHARMA_RECHERCHES_MODERNES_PREFIX,
+    PHARMA_INDICATIONS_PREFIX, PHARMA_CONTRE_INDICATIONS_PREFIX, PHARMA_PREPARATION_PREFIX
+  ];
+
+  function fixMojibakeSegment(str){
+    if(typeof str !== "string" || !str) return null;
+    var hasHigh = false;
+    for(var i = 0; i < str.length; i++){ var code = str.charCodeAt(i); if(code >= 128 && code <= 255){ hasHigh = true; break; } }
+    if(!hasHigh) return null;
+    try{
+      const bytes = Uint8Array.from(str, ch => {
+        const code = ch.charCodeAt(0);
+        if(code > 0xFF) throw new Error("out of latin1 range");
+        return code;
+      });
+      const fixed = new TextDecoder("utf-8", {fatal:true}).decode(bytes);
+      return fixed !== str ? fixed : null;
+    }catch(error){
+      return null;
+    }
+  }
+
+  function dedupeMojibakeSegmentsInText(value){
+    if(typeof value !== "string" || !value.includes("\n\n")) return value;
+    const segments = value.split("\n\n");
+    if(segments.length < 2) return value;
+
+    const dropped = new Array(segments.length).fill(false);
+    const kept = [];
+
+    for(let i = 0; i < segments.length; i++){
+      if(dropped[i]) continue;
+      let seg = segments[i];
+
+      for(let j = i + 1; j < segments.length; j++){
+        if(dropped[j] || !segments[j].trim()) continue;
+        const other = segments[j];
+
+        if(seg.trim() === other.trim()){ dropped[j] = true; continue; }
+
+        const fixedOther = fixMojibakeSegment(other);
+        if(fixedOther !== null && fixedOther.trim() === seg.trim()){ dropped[j] = true; continue; }
+
+        const fixedSeg = fixMojibakeSegment(seg);
+        if(fixedSeg !== null && fixedSeg.trim() === other.trim()){ seg = other; dropped[j] = true; }
+      }
+
+      kept.push(seg);
+    }
+
+    const result = kept.join("\n\n");
+    return result !== value ? result : value;
+  }
+
+  function cleanupMojibakeDuplicatesOnce(){
+    try{
+      if(localStorage.getItem(MOJIBAKE_CLEANUP_FLAG)) return;
+    }catch(error){ return; }
+
+    let fixedCount = 0;
+
+    TEXT_FIELD_PREFIXES.forEach(prefix => {
+      const keys = [];
+      for(let index = 0; index < localStorage.length; index++){
+        const key = localStorage.key(index);
+        if(key && key.startsWith(prefix)) keys.push(key);
+      }
+      keys.forEach(key => {
+        try{
+          const value = localStorage.getItem(key) || "";
+          const cleaned = dedupeMojibakeSegmentsInText(value);
+          if(cleaned !== value){
+            localStorage.setItem(key, cleaned);
+            fixedCount++;
+          }
+        }catch(error){}
+      });
+    });
+
+    try{ localStorage.setItem(MOJIBAKE_CLEANUP_FLAG, "1"); }catch(error){}
+
+    if(fixedCount > 0){
+      const message = document.getElementById("message");
+      if(message){
+        message.textContent = `Nettoyage automatique : ${fixedCount} champ(s) avec un doublon mal encodé corrigé(s).`;
+      }
+      if(typeof window.refreshCurrentPointPanel === "function") window.refreshCurrentPointPanel();
+      if(typeof window.refreshCurrentPharmaHerbPanel === "function") window.refreshCurrentPharmaHerbPanel();
+    }
+  }
+
   ready(() => {
     initMobileDomainSwitchFix();
+    cleanupMojibakeDuplicatesOnce();
     const exportButton = document.getElementById("exportNotesButton");
     const importButton = document.getElementById("importNotesButton");
     if(exportButton){

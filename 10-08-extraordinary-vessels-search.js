@@ -234,12 +234,18 @@
     }).join("");
 
     return `
-      <div class="intersection-filter-heading">Canaux principaux</div>
-      ${regularHtml}
-      <div class="intersection-filter-heading">Canaux distincts (jīng bié)</div>
-      ${divergentChannelHtml}
-      <div class="intersection-filter-heading">Merveilleux vaisseaux</div>
-      ${extraordinaryHtml}
+      <div class="intersection-column">
+        <div class="intersection-filter-heading">Canaux principaux</div>
+        <div class="intersection-column-items">${regularHtml}</div>
+      </div>
+      <div class="intersection-column">
+        <div class="intersection-filter-heading">Canaux distincts (jīng bié)</div>
+        <div class="intersection-column-items">${divergentChannelHtml}</div>
+      </div>
+      <div class="intersection-column">
+        <div class="intersection-filter-heading">Merveilleux vaisseaux</div>
+        <div class="intersection-column-items">${extraordinaryHtml}</div>
+      </div>
     `;
   };
 
@@ -409,10 +415,6 @@
       if(el){
         el.style.setProperty("grid-column", "1 / -1", "important");
       }
-    });
-
-    content.querySelectorAll(".correspondence-checklist .intersection-filter-heading").forEach(el => {
-      el.style.setProperty("grid-column", "1 / -1", "important");
     });
 
     renderAdvancedSearchResultsWith(results, total);

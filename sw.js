@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260725-assoc-link-fix";
+const MTC_OFFLINE_VERSION = "20260725-indexeddb-v1";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -7,6 +7,7 @@ const CORE_ASSETS = [
   "01-00-recherche-rendu-compact.js",
   "02-01-point-details-data.js",
   "03-02-raw-data.js",
+  "03-03-image-store-indexeddb.js",
   "04-03-core-game.js",
   "05-04-final-corrections.js",
   "06-05-stats-total-real-points.js",
