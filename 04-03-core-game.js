@@ -17,6 +17,9 @@ let cheatCount = 0;
 let gameOver = false;
 let currentPointPanelPoint = null;
 
+window.getCurrentGridSolution = function(){ return solution; };
+window.getCurrentGridPool = function(){ return pool; };
+
 
 const MTC_STATS_KEY = "connections_mtc_stats_v1";
 const MTC_AUTO_PRACTICE_MODE_KEY = "connections_mtc_auto_practice_mode_v1";

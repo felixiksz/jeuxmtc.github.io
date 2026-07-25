@@ -99,7 +99,7 @@
   document.documentElement.setAttribute('data-study-domain', domain);
 })();
 </script>
-<link href="mtc-styles.css?v=20260725-search-panel-polish" rel="stylesheet"/>
+<link href="mtc-styles.css?v=20260726-lock-icon" rel="stylesheet"/>
 <link href="study-domain-launcher.css" rel="stylesheet"/>
 <link href="pharma-game-v1.css" rel="stylesheet"/>
 <link href="pharma-cheatsheet-essentielles.css" rel="stylesheet"/>
@@ -137,6 +137,7 @@
 <div class="topbar-row topbar-main-row">
 <div class="topbar-main-buttons">
 <button onclick="newGame()">⟳ Nouvelle partie</button>
+<span aria-label="Grille verrouillée" class="grid-lock-indicator" id="gridLockIndicator" style="display:none;" title="Cette grille est verrouillée : elle reste la même à chaque partie">🔒</span>
 <button onclick="toggleSettings()">⚆ Affichage</button>
 <button onclick="startTour()">? Aide</button>
 </div>
@@ -146,6 +147,7 @@
     <option value="pharmacology">PHARMA</option>
   </select>
 </div>
+<span aria-label="Série de jours consécutifs joués" class="daily-streak-badge" id="dailyStreakBadge" style="display:none;" title="Série de jours consécutifs joués"></span>
 </div>
 <div class="topbar-row practice-row">
 <button type="button" id="mtcAudioModeToggle" class="mtc-audio-mode-toggle" aria-label="Mode audio" aria-pressed="false" title="Mode audio">🔊</button>
@@ -189,6 +191,10 @@
 <label class="pharma-display-setting pharma-solved-toxicity-setting">
 <span>Tuiles validées : toxicité</span>
 <input id="pharmaSolvedToxicityToggle" type="checkbox"/>
+</label>
+<label class="grid-lock-setting">
+<span>Verrouiller cette grille</span>
+<input id="gridLockToggle" onchange="toggleGridLock(this.checked)" type="checkbox"/>
 </label>
 <label>Fond <input id="pageBgPicker" type="color"/></label>
 <label>Lettres <input id="textPicker" type="color"/></label>
@@ -351,6 +357,8 @@
 <script src="45-baskerville-esprit-replay.js?v=20260703-finalbatch2"></script>
 <script src="46-memo-mode.js?v=20260725-indexeddb-v1"></script>
 <script src="47-acu-image-import-novelty.js?v=20260725-indexeddb-v1"></script>
+<script src="50-grid-lock.js?v=20260726-lock-icon"></script>
+<script src="51-daily-streak.js?v=20260726-v1"></script>
 <script src="48-offline-pwa.js?v=20260722-updateviacache-none"></script>
 </body>
 </html>

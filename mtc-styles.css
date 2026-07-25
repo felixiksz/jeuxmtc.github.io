@@ -7046,3 +7046,28 @@ body.tour-active{
 #reviewBasketPanel .basket-list-item.search-compare-selected .compact-point-row{
   background:color-mix(in srgb, var(--shadow-color) 7%, transparent) !important;
 }
+
+/* === Série quotidienne : pastille dans la barre du haut === */
+.daily-streak-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  font-family:var(--ui-font-family);
+  font-size:.85em;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+/* === Verrouillage de grille : interrupteur dans le panneau Affichage === */
+.grid-lock-setting{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.grid-lock-indicator{
+  display:inline-flex;
+  align-items:center;
+  font-size:1em;
+}
