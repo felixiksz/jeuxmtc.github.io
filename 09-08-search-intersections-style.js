@@ -70,6 +70,33 @@
 
   window.MTC_EXTRAORDINARY_VESSEL_INTERSECTIONS = EXTRAORDINARY_VESSEL_INTERSECTIONS;
 
+  /* Canaux distincts (jīng bié) : points de séparation, d'entrée et d'union
+     issus du trajet de chacun des 12 canaux distincts (Documentation - Les
+     canaux distincts, École de Médecine Chinoise Zhāng Lì). */
+  const DIVERGENT_CHANNEL_INTERSECTIONS = [
+    { key:"P", label:"Canal distinct du Poumon", shortLabel:"Distinct P", points:["P3","P1","P4","VB22","GI18"] },
+    { key:"GI", label:"Canal distinct du Gros Intestin", shortLabel:"Distinct GI", points:["GI15","DM14","GI18"] },
+    { key:"E", label:"Canal distinct de l'Estomac", shortLabel:"Distinct E", points:["E9"] },
+    { key:"Rt", label:"Canal distinct de la Rate", shortLabel:"Distinct Rt", points:["E9"] },
+    { key:"C", label:"Canal distinct du Cœur", shortLabel:"Distinct C", points:["C1","VB22","RM23","V1"] },
+    { key:"IG", label:"Canal distinct de l'Intestin Grêle", shortLabel:"Distinct IG", points:["IG10","IG11","C1","VB22","V1"] },
+    { key:"V", label:"Canal distinct de la Vessie", shortLabel:"Distinct V", points:["V40","V36","V23","RM23","V10"] },
+    { key:"Rn", label:"Canal distinct du Rein", shortLabel:"Distinct Rn", points:["Rn10","V40","V36","V23","RM23","V10"] },
+    { key:"EC", label:"Canal distinct de l'Enveloppe du Cœur", shortLabel:"Distinct EC", points:["VB22","EC1","VB12","TF16"] },
+    { key:"TF", label:"Canal distinct du Trois Foyers", shortLabel:"Distinct TF", points:["TF20","DM20","TF16"] },
+    { key:"VB", label:"Canal distinct de la Vésicule Biliaire", shortLabel:"Distinct VB", points:["RM2","F13","VB1"] },
+    { key:"F", label:"Canal distinct du Foie", shortLabel:"Distinct F", points:["VB1","F13"] }
+  ];
+
+  window.MTC_DIVERGENT_CHANNEL_INTERSECTIONS = DIVERGENT_CHANNEL_INTERSECTIONS;
+
+  function divergentChannelGroupsForPoint(point){
+    const clean = cleanPointCode(point);
+    return DIVERGENT_CHANNEL_INTERSECTIONS.filter(group =>
+      group.points.includes(clean)
+    );
+  }
+
   function cleanPointCode(point){
     return String(point || "").replace(/\s+/g,"").trim();
   }
@@ -156,13 +183,17 @@
       .map(group => group.label)
       .join(" ");
 
+    const divergentChannelLabels = divergentChannelGroupsForPoint(point)
+      .map(group => group.label)
+      .join(" ");
+
     const forcedDm20Labels = cleanPointCode(point) === "DM20"
       ? DM20_ALL_INTERSECTION_CANALS
           .map(canal => (typeof CANAL_LABELS !== "undefined" && CANAL_LABELS[canal]) || canal)
           .join(" ")
       : "";
 
-    return [original, extraordinaryLabels, forcedDm20Labels].filter(Boolean).join(" ");
+    return [original, extraordinaryLabels, divergentChannelLabels, forcedDm20Labels].filter(Boolean).join(" ");
   };
 
   window.pointHasCorrespondence = function(point){

@@ -7,6 +7,7 @@
 /* === Recherche Intersections : mode de correspondance + inclure/exclure === */
 (function(){
   const EXTRA_PREFIX = "EXTRA_VESSEL::";
+  const DIVERGENT_PREFIX = "DIVERGENT_CHANNEL::";
 
   function helpHtml(text){
     if(typeof searchHelp === "function") return searchHelp(text);
@@ -76,6 +77,23 @@
     return `${EXTRA_PREFIX}${key}`;
   }
 
+  function divergentChannelGroupFromValueForSearch(value){
+    const raw = String(value || "");
+    if(!raw.startsWith(DIVERGENT_PREFIX)) return null;
+    const key = raw.slice(DIVERGENT_PREFIX.length);
+    return (window.MTC_DIVERGENT_CHANNEL_INTERSECTIONS || [])
+      .find(group => group.key === key) || null;
+  }
+
+  function pointMatchesDivergentChannelGroupForSearch(point, group){
+    if(!group || !Array.isArray(group.points)) return false;
+    return group.points.includes(cleanPointCodeForSearch(point));
+  }
+
+  function divergentChannelFilterValueForSearch(key){
+    return `${DIVERGENT_PREFIX}${key}`;
+  }
+
   window.pointMatchesSingleCorrespondenceCanal = function(point, value){
     if(!value) return true;
 
@@ -86,6 +104,11 @@
     const extraordinaryGroup = extraordinaryGroupFromValueForSearch(value);
     if(extraordinaryGroup){
       return pointMatchesExtraordinaryGroupForSearch(point, extraordinaryGroup);
+    }
+
+    const divergentChannelGroup = divergentChannelGroupFromValueForSearch(value);
+    if(divergentChannelGroup){
+      return pointMatchesDivergentChannelGroupForSearch(point, divergentChannelGroup);
     }
 
     /* Dans Intersections, un canal coché doit aussi inclure tous ses propres points. */
@@ -192,9 +215,29 @@
       `;
     }).join("");
 
+    const divergentChannelHtml = (window.MTC_DIVERGENT_CHANNEL_INTERSECTIONS || []).map(group => {
+      const value = divergentChannelFilterValueForSearch(group.key);
+      const canalName = CANAL_LABELS[group.key] || group.key;
+      return `
+        <label title="${escapeAttribute(group.label)} · ${group.points.map(formatPointCode).join(", ")}">
+          <input
+            type="checkbox"
+            name="advancedSearchCorrespondence"
+            value="${escapeAttribute(value)}"
+            ${correspondenceChecked(values, value)}
+            onchange="renderAdvancedSearchResults()"
+          >
+          <span class="correspondence-filter-code">${escapeHtml(group.key)}</span>
+          <span class="correspondence-filter-name">${escapeHtml(canalName)}</span>
+        </label>
+      `;
+    }).join("");
+
     return `
       <div class="intersection-filter-heading">Canaux principaux</div>
       ${regularHtml}
+      <div class="intersection-filter-heading">Canaux distincts (jīng bié)</div>
+      ${divergentChannelHtml}
       <div class="intersection-filter-heading">Merveilleux vaisseaux</div>
       ${extraordinaryHtml}
     `;
@@ -318,7 +361,7 @@
         <div class="search-control search-correspondence-control">
           <span class="search-control-label">
             Intersections
-            ${help("Filtre les points jiāo huì-intersection : points où plusieurs canaux ou vaisseaux se croisent. Les huit merveilleux vaisseaux sont disponibles ici.")}
+            ${help("Filtre les points jiāo huì-intersection : points où plusieurs canaux ou vaisseaux se croisent. Les huit merveilleux vaisseaux et les 12 canaux distincts (jīng bié) sont disponibles ici.")}
           </span>
 
           <label class="search-correspondence-any">
@@ -357,6 +400,20 @@
     if(canalSelect){
       canalSelect.value = currentFilters.canal;
     }
+
+    /* Certains navigateurs n'appliquent pas grid-column:1/-1 défini en feuille de style
+       sur ces éléments (constaté en test) ; on le force en ligne pour garantir la mise
+       en page pleine largeur du panneau. */
+    ["search-keyword-control", "search-scope-options", "search-correspondence-control"].forEach(cls => {
+      const el = content.querySelector(`.${cls}`);
+      if(el){
+        el.style.setProperty("grid-column", "1 / -1", "important");
+      }
+    });
+
+    content.querySelectorAll(".correspondence-checklist .intersection-filter-heading").forEach(el => {
+      el.style.setProperty("grid-column", "1 / -1", "important");
+    });
 
     renderAdvancedSearchResultsWith(results, total);
   };
