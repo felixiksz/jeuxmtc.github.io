@@ -127,6 +127,7 @@
     if(isInComparison(cleanId)) removeItem(cleanId);
     else addItem(cleanId);
     setTimeout(enhanceSearchPanel, 0);
+    setTimeout(enhanceBasketPanel, 0);
   }
 
   function panel(){ return document.getElementById("advancedSearchPanel"); }
@@ -392,6 +393,185 @@
     injectResultButtons();
   }
 
+  /* === Panier de révision : même bouton A|B que la recherche, pour envoyer
+     tout ou partie du panier vers la comparaison === */
+  const basketState = { acupuncture:false, pharmacology:false };
+
+  function isBasketActive(){ return !!basketState[domain()]; }
+
+  function basketPanelEl(){ return document.getElementById("reviewBasketPanel"); }
+  function basketResultsContainer(){ return document.getElementById("reviewBasketContent"); }
+
+  function basketRows(){
+    const container = basketResultsContainer();
+    if(!container) return [];
+    return Array.from(container.querySelectorAll(".basket-list-item .compact-point-row"));
+  }
+
+  function basketVisibleIds(){ return basketRows().map(itemIdFromRow).filter(Boolean); }
+  function hasBasketItems(){ return basketVisibleIds().length > 0; }
+
+  function addAllBasketVisible(){
+    const ids = Array.from(new Set(basketVisibleIds()));
+    if(!ids.length) return;
+
+    let added = 0;
+    ids.forEach(id => {
+      if(!isInComparison(id)){
+        if(addItem(id)) added += 1;
+      }
+    });
+
+    const msg = document.getElementById("message") || window.message;
+    if(msg){
+      msg.textContent = added
+        ? `${added} élément(s) ajouté(s) à la comparaison.`
+        : "Tous les points du panier sont déjà dans la comparaison.";
+    }
+
+    setTimeout(enhanceBasketPanel, 0);
+  }
+
+  function handleBasketTrigger(event){
+    stop(event);
+    if(dedupe("basketTrigger")) return false;
+    window.toggleBasketCompareSelectMode();
+    return false;
+  }
+
+  function handleBasketAddAll(event){
+    stop(event);
+    if(dedupe("basketAddAll")) return false;
+    window.addVisibleBasketItemsToComparison();
+    return false;
+  }
+
+  function buildBasketControls(hasItems){
+    const active = isBasketActive() && hasItems;
+    const actions = document.createElement("span");
+    actions.className = "search-compare-actions basket-compare-actions";
+    actions.setAttribute("data-basket-compare-actions", "");
+
+    const title = "Sélectionner des points du panier à comparer";
+    const toggle = makeButton(
+      `search-compare-mode-button ${active ? "is-active" : ""}`,
+      "A|B",
+      title,
+      !hasItems
+    );
+    toggle.setAttribute("data-basket-compare-trigger", "1");
+    bindActionButton(toggle, handleBasketTrigger);
+    actions.appendChild(toggle);
+
+    if(active){
+      const addAll = makeButton(
+        "search-compare-add-visible-button",
+        "Tout",
+        `Ajouter tous les ${resultNoun()} du panier à la comparaison`,
+        !hasItems
+      );
+      addAll.setAttribute("data-basket-compare-add-all", "1");
+      bindActionButton(addAll, handleBasketAddAll);
+      actions.appendChild(addAll);
+    }
+
+    return actions;
+  }
+
+  function ensureBasketActionsLine(){
+    const content = document.getElementById("reviewBasketPanelContent");
+    if(!content) return;
+
+    const actionsBar = content.querySelector(".search-actions");
+    if(!actionsBar) return;
+
+    let holder = actionsBar.querySelector(":scope > .basket-compare-actions-holder");
+    if(!holder){
+      holder = document.createElement("span");
+      holder.className = "basket-compare-actions-holder";
+      actionsBar.appendChild(holder);
+    }
+
+    holder.innerHTML = "";
+    holder.appendChild(buildBasketControls(hasBasketItems()));
+  }
+
+  function injectBasketResultButtons(){
+    const p = basketPanelEl();
+    if(!p || !p.classList.contains("open")) return;
+
+    basketRows().forEach(row => {
+      const id = itemIdFromRow(row);
+      if(!id) return;
+
+      const item = row.closest(".basket-list-item");
+      const tools = row.querySelector(".compact-point-tools");
+      if(!tools) return;
+
+      const present = isInComparison(id);
+      if(item) item.classList.toggle("search-compare-selected", present);
+
+      let button = tools.querySelector(".search-compare-result-toggle");
+      if(!isBasketActive()){
+        if(button) button.remove();
+        return;
+      }
+
+      const label = labelFromRow(row, id);
+      const title = present
+        ? `Retirer ${label} de la comparaison`
+        : `Ajouter ${label} à la comparaison`;
+
+      if(!button){
+        button = document.createElement("button");
+        button.type = "button";
+        button.className = "search-compare-result-toggle";
+        button.textContent = "A|B";
+        button.addEventListener("click", event => handleResultToggleButton(button, event), true);
+        button.addEventListener("pointerup", event => handleResultToggleButton(button, event), {capture:true, passive:false});
+        button.addEventListener("touchend", event => handleResultToggleButton(button, event), {capture:true, passive:false});
+        tools.insertBefore(button, tools.firstChild || null);
+      }
+
+      button.classList.toggle("is-active", present);
+      button.setAttribute("data-search-compare-result-id", id);
+      button.title = title;
+      button.setAttribute("aria-label", title);
+      button.setAttribute("data-search-compare-tooltip", title);
+    });
+  }
+
+  function enhanceBasketPanel(){
+    const p = basketPanelEl();
+    if(!p || !p.classList.contains("open")) return;
+
+    const hasItems = hasBasketItems();
+    if(!hasItems) basketState[domain()] = false;
+
+    ensureBasketActionsLine();
+    injectBasketResultButtons();
+  }
+
+  window.toggleBasketCompareSelectMode = function(event){
+    stop(event);
+    const key = domain();
+    if(!hasBasketItems()){
+      basketState[key] = false;
+      enhanceBasketPanel();
+      return false;
+    }
+    basketState[key] = !basketState[key];
+    enhanceBasketPanel();
+    return false;
+  };
+
+  window.addVisibleBasketItemsToComparison = function(event){
+    stop(event);
+    addAllBasketVisible();
+    return false;
+  };
+  window.enhanceBasketCompareSelectPanel = enhanceBasketPanel;
+
   window.toggleSearchCompareSelectMode = function(event){
     stop(event);
     const key = domain();
@@ -515,6 +695,24 @@
       }
       return handleAddAll(event);
     }
+
+    const basketTrigger = event.target.closest?.("[data-basket-compare-trigger]");
+    if(basketTrigger){
+      if(basketTrigger.getAttribute("aria-disabled") === "true"){
+        stop(event);
+        return false;
+      }
+      return handleBasketTrigger(event);
+    }
+
+    const basketAddAll = event.target.closest?.("[data-basket-compare-add-all]");
+    if(basketAddAll){
+      if(basketAddAll.getAttribute("aria-disabled") === "true"){
+        stop(event);
+        return false;
+      }
+      return handleBasketAddAll(event);
+    }
   }
 
   function bindGlobalEvents(){
@@ -544,9 +742,11 @@
   function init(){
     wrapRender("renderAdvancedSearchPanel");
     wrapRender("renderAdvancedSearchResults");
+    wrapRender("renderReviewBasketPanel");
     patchTour();
     bindGlobalEvents();
     enhanceSearchPanel();
+    enhanceBasketPanel();
 
     const p = panel();
     if(p && window.MutationObserver){
@@ -554,6 +754,14 @@
         window.requestAnimationFrame(enhanceSearchPanel);
       });
       observer.observe(p, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
+    }
+
+    const bp = basketPanelEl();
+    if(bp && window.MutationObserver){
+      const basketObserver = new MutationObserver(() => {
+        window.requestAnimationFrame(enhanceBasketPanel);
+      });
+      basketObserver.observe(bp, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
     }
   }
 

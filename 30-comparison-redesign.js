@@ -744,7 +744,7 @@
       const item = exactMatch(core);
       if(!item) return esc(part);
       const label = displayNameForLink(item) || core;
-      const id = item.id || item.point || item.code || core;
+      const id = typeof item === "string" ? item : (item.id || item.point || item.code || core);
       const title = titleGetter ? titleGetter(item, label) : label;
       return `${esc(leading)}<button type="button" class="${cssClass}" contenteditable="false" ${refAttr}="${attr(id)}" title="${attr(title)}">${esc(label)}</button>${esc(trailing)}`;
     }).join("");

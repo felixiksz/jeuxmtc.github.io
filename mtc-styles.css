@@ -6894,3 +6894,77 @@ body.tour-active{
     scroll-margin-inline:0 !important;
   }
 }
+
+/* === Correctif mise en page recherche : grille responsive pour remplir l'espace du panneau === */
+#advancedSearchPanel .search-controls{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)) !important;
+  align-items:start !important;
+  gap:10px 14px !important;
+  width:100% !important;
+}
+
+#advancedSearchPanel .search-keyword-control,
+#advancedSearchPanel .search-scope-options,
+#advancedSearchPanel .search-correspondence-control{
+  grid-column-start:1 !important;
+  grid-column-end:-1 !important;
+}
+
+#advancedSearchPanel .search-correspondence-control{
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+}
+
+#advancedSearchPanel .correspondence-checklist{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr)) !important;
+  gap:3px 14px !important;
+  width:100% !important;
+  margin-top:4px !important;
+}
+
+#advancedSearchPanel .correspondence-checklist .intersection-filter-heading{
+  grid-column-start:1 !important;
+  grid-column-end:-1 !important;
+  margin:10px 0 2px !important;
+  padding-top:8px !important;
+  border-top:1px solid rgba(127,127,127,.22) !important;
+  font-family:var(--ui-font-family) !important;
+  font-weight:800 !important;
+  font-size:.76em !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  opacity:.65 !important;
+}
+
+#advancedSearchPanel .correspondence-checklist .intersection-filter-heading:first-child{
+  margin-top:0 !important;
+  padding-top:0 !important;
+  border-top:none !important;
+}
+
+#advancedSearchPanel .correspondence-checklist label{
+  display:flex !important;
+  align-items:center !important;
+  gap:4px !important;
+  min-width:0 !important;
+  padding:2px 0 !important;
+}
+
+#advancedSearchPanel .correspondence-checklist label span{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+@media (max-width:640px){
+  #advancedSearchPanel .search-controls{
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important;
+  }
+  #advancedSearchPanel .correspondence-checklist{
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr)) !important;
+  }
+}
