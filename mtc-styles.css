@@ -7070,34 +7070,7 @@ body.tour-active{
   display:inline-flex;
   align-items:center;
   font-size:1em;
+  padding:0 !important;
+  line-height:1;
 }
 
-/* === Outil de repositionnement des pastilles (série + verrou) === */
-.badge-position-controls{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:8px;
-  margin:8px 0;
-}
-
-.badge-position-controls p{
-  width:100%;
-  margin:0;
-  font-size:.82em;
-  opacity:.7;
-}
-
-#badgePositionEditToggle.is-active{
-  background:var(--text-color);
-  color:var(--page-bg);
-}
-
-.badge-position-editing{
-  cursor:move;
-  touch-action:none;
-  outline:1px dashed currentColor;
-  outline-offset:3px;
-  border-radius:4px;
-  user-select:none;
-}
