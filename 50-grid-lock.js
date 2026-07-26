@@ -62,7 +62,7 @@
   window.confirmNewGame = function(){
     if(isLockEnabled()){
       const proceed = confirm(
-        "Cette grille est verrouillée : recommencer va réinitialiser ta progression sur les mêmes points (elle ne change pas). Continuer ?"
+        "Cette grille est verrouillée : recommencer va réinitialiser ta progression, mais ce seront toujours les mêmes 16 points et catégories (seule leur place dans le tableau est retirée au hasard à chaque fois). Continuer ?"
       );
       if(!proceed) return;
     }
@@ -74,7 +74,7 @@
       const snapshot = snapshotCurrentSolution();
       if(snapshot){
         saveLock(snapshot);
-        setMessage("Grille verrouillée : elle reste la même à chaque partie et à la réouverture du jeu.");
+        setMessage("Grille verrouillée : mêmes 16 points et catégories à chaque partie et à la réouverture du jeu — seule leur place dans le tableau change.");
       }
     }else{
       clearLock();
@@ -91,7 +91,7 @@
     if(indicator){
       indicator.textContent = enabled ? "🔒︎" : "🔓︎";
       const label = enabled
-        ? "Grille verrouillée : clique pour déverrouiller"
+        ? "Grille verrouillée (mêmes points, disposition mélangée à chaque fois) : clique pour déverrouiller"
         : "Grille libre : clique pour verrouiller cette grille";
       indicator.title = label;
       indicator.setAttribute("aria-label", label);
