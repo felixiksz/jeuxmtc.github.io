@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260726-confirm-prompt";
+const MTC_OFFLINE_VERSION = "20260726-badge-position";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -58,6 +58,7 @@ const CORE_ASSETS = [
   "46-memo-mode.js",
   "47-acu-image-import-novelty.js",
   "50-grid-lock.js",
+  "52-badge-position-editor.js",
   "51-daily-streak.js",
   "48-offline-pwa.css",
   "48-offline-pwa.js",
