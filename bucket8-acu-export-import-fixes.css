@@ -1480,3 +1480,17 @@ html[data-mtc-gameplay-mode="exam"] #cheatDisplay{
     font-size:.8em !important;
   }
 }
+
+/* === Ombre portée sous l'icône colombe/dinosaure quand le mode est actif === */
+.gameplay-mode-topline .gameplay-mode-icon.active,
+.gameplay-mode-topline .gameplay-mode-icon[aria-pressed="true"],
+#jokerBubble .gameplay-mode-topline .gameplay-mode-icon.active,
+#jokerBubble .gameplay-mode-topline .gameplay-mode-icon[aria-pressed="true"],
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-icon.active,
+.bottom-actions > .gameplay-mode-topline .gameplay-mode-icon[aria-pressed="true"],
+#gameplayModeReviewBtn.active,
+#gameplayModeReviewBtn[aria-pressed="true"],
+#gameplayModeExamBtn.active,
+#gameplayModeExamBtn[aria-pressed="true"]{
+  filter:drop-shadow(0 3px 4px var(--shadow-color)) !important;
+}
