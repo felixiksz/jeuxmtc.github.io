@@ -136,7 +136,7 @@
 <div class="topbar">
 <div class="topbar-row topbar-main-row">
 <div class="topbar-main-buttons">
-<button onclick="newGame()">⟳ Nouvelle partie</button>
+<button onclick="if(window.confirmNewGame){confirmNewGame()}else{newGame()}">⟳ Nouvelle partie</button>
 <span aria-label="Grille verrouillée" class="grid-lock-indicator" id="gridLockIndicator" style="display:none;" title="Cette grille est verrouillée : elle reste la même à chaque partie">🔒</span>
 <button onclick="toggleSettings()">⚆ Affichage</button>
 <button onclick="startTour()">? Aide</button>
@@ -357,7 +357,7 @@
 <script src="45-baskerville-esprit-replay.js?v=20260703-finalbatch2"></script>
 <script src="46-memo-mode.js?v=20260725-indexeddb-v1"></script>
 <script src="47-acu-image-import-novelty.js?v=20260725-indexeddb-v1"></script>
-<script src="50-grid-lock.js?v=20260726-lock-icon"></script>
+<script src="50-grid-lock.js?v=20260726-confirm-prompt"></script>
 <script src="51-daily-streak.js?v=20260726-v1"></script>
 <script src="48-offline-pwa.js?v=20260722-updateviacache-none"></script>
 </body>

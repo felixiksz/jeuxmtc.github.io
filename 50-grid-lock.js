@@ -59,6 +59,16 @@
 
   window.isGridLockEnabled = isLockEnabled;
 
+  window.confirmNewGame = function(){
+    if(isLockEnabled()){
+      const proceed = confirm(
+        "Cette grille est verrouillée : recommencer va réinitialiser ta progression sur les mêmes points (elle ne change pas). Continuer ?"
+      );
+      if(!proceed) return;
+    }
+    if(typeof window.newGame === "function") window.newGame();
+  };
+
   window.toggleGridLock = function(enabled){
     if(enabled){
       const snapshot = snapshotCurrentSolution();
