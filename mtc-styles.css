@@ -723,7 +723,7 @@ body.darkroom .point-info-section{
   color:#000;
 }
 
-.game-finished .panel-hint{
+.panel-hint-active .panel-hint{
 
   opacity:1;
   transform:translateY(0);
