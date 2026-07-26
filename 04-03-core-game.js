@@ -5346,7 +5346,11 @@ function showPanelHint(){
 
   document.body.appendChild(hint);
 
-  document.body.classList.add("game-finished");
+  // Classe dédiée : "game-finished" est aussi utilisée pour suivre l'état
+  // réel de fin de partie (voir showEndReviewScreen) ; la réutiliser ici
+  // pour ce tooltip ponctuel la faisait retirer 5s plus tard même en
+  // pleine victoire, cassant les vérifications isFinished() ailleurs.
+  document.body.classList.add("panel-hint-active");
 
   setTimeout(()=>{
     hint.classList.add("visible");
@@ -5356,7 +5360,7 @@ function showPanelHint(){
 
     hint.classList.remove("visible");
 
-    document.body.classList.remove("game-finished");
+    document.body.classList.remove("panel-hint-active");
 
     setTimeout(()=>{
       hint.remove();
