@@ -88,7 +88,14 @@
     const toggle = document.getElementById("gridLockToggle");
     if(toggle) toggle.checked = enabled;
     const indicator = document.getElementById("gridLockIndicator");
-    if(indicator) indicator.style.display = enabled ? "" : "none";
+    if(indicator){
+      indicator.textContent = enabled ? "🔒" : "🔓";
+      const label = enabled
+        ? "Grille verrouillée : clique pour déverrouiller"
+        : "Grille libre : clique pour verrouiller cette grille";
+      indicator.title = label;
+      indicator.setAttribute("aria-label", label);
+    }
   }
 
   function wrapCategoryChooser(name){
