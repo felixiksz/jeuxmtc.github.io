@@ -400,7 +400,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.className = "mtc-audio-button";
-    button.textContent = "🔊";
+    button.textContent = "🔊︎";
     button.dataset.audioHanzi = clean;
 
     button.addEventListener("click", event => {
@@ -491,7 +491,7 @@
     const button = document.getElementById("mtcAudioModeToggle");
     if(!button) return;
     // Même pictogramme que les boutons de prononciation des fiches.
-    if(button.textContent !== "🔊") button.textContent = "🔊";
+    if(button.textContent !== "🔊︎") button.textContent = "🔊︎";
     const enabled = isAudioModeEnabled();
     button.classList.toggle("active", enabled);
     button.setAttribute("aria-pressed", enabled ? "true" : "false");

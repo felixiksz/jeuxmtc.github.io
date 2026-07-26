@@ -149,7 +149,7 @@
 </div>
 </div>
 <div class="topbar-row practice-row">
-<button type="button" id="mtcAudioModeToggle" class="mtc-audio-mode-toggle" aria-label="Mode audio" aria-pressed="false" title="Mode audio">🔊</button>
+<button type="button" id="mtcAudioModeToggle" class="mtc-audio-mode-toggle" aria-label="Mode audio" aria-pressed="false" title="Mode audio">🔊︎</button>
 <div class="mode-switch">
 <span>Auto</span>
 <label class="switch">
@@ -163,7 +163,7 @@
 <input aria-label="Difficulté du mode Auto" class="practice-difficulty-slider" id="practiceDifficultySlider" max="2" min="0" onchange="setAutoPracticeModeFromSlider(this.value)" oninput="previewPracticeModeFromSlider(this.value)" step="1" type="range" value="1"/>
 <span class="practice-difficulty-end">Difficile</span>
 </div>
-<button aria-label="Verrouiller ou déverrouiller cette grille" class="grid-lock-indicator" id="gridLockIndicator" onclick="toggleGridLock(!isGridLockEnabled())" title="Verrouiller ou déverrouiller cette grille" type="button">🔓</button>
+<button aria-label="Verrouiller ou déverrouiller cette grille" class="grid-lock-indicator" id="gridLockIndicator" onclick="toggleGridLock(!isGridLockEnabled())" title="Verrouiller ou déverrouiller cette grille" type="button">🔓︎</button>
 <button id="manualEditButton" onclick="toggleManualChecklist()" style="display:none;">
       Catégories de points
     </button>
@@ -252,13 +252,13 @@
 </span>
 <span aria-label="Outils secondaires" class="footer-icon-tools">
 <button aria-label="Exporter mes notes personnelles" id="exportNotesButton" onclick="exportPersonalNotes()" title="Exporter mes notes personnelles" type="button">
-      📤
+      <svg viewBox="0 0 100 100" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M28 62 L28 82 L72 82 L72 62"/><path d="M50 74 L50 22"/><path d="M34 38 L50 22 L66 38"/></svg>
     </button>
 <button aria-label="Importer mes notes personnelles" id="importNotesButton" onclick="openImportPersonalNotesDialog()" title="Importer mes notes personnelles" type="button">
-      📥
+      <svg viewBox="0 0 100 100" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M28 62 L28 82 L72 82 L72 62"/><path d="M50 22 L50 74"/><path d="M34 58 L50 74 L66 58"/></svg>
     </button>
 <a aria-label="Envoyer une suggestion par email" href="mailto:papemesedorottya@gmail.com?subject=Suggestion%20Connections%20MTC" id="suggestionMailButton" onclick="window.open(this.href, '_blank', 'noopener'); return false;" rel="noopener" target="_blank" title="Envoyer une suggestion">
-      ✉️
+      ✉︎
     </a>
 <a aria-label="Soutenir le projet sur PayPal" href="https://paypal.me/emesepap1" id="supportCoffeeButton" onclick="return handleSupportCoffeeButtonClick(event, this);" rel="noopener noreferrer" target="_blank" title="Soutenir le projet">
       🩸
@@ -341,13 +341,13 @@
 <script src="26-24-pharma-tools.js"></script>
 <script src="27-25-pharma-stats-gameplay.js?v=20260722-storage-quota-fix"></script>
 <script src="28-26-bucket8-acu-export-import-fixes.js?v=20260725-indexeddb-v1"></script>
-<script src="29-27-visible-gameplay-mode-switch.js"></script>
+<script src="29-27-visible-gameplay-mode-switch.js?v=20260726-icons-v1"></script>
 <script src="30-comparison-redesign.js?v=20260725-assoc-link-fix"></script>
 <script src="31-search-compare-select.js?v=20260725-basket-ab-v1"></script>
 <script src="audio-manifest.js?v=20260722-cleanup"></script>
-<script src="32-audio-pronunciation.js?v=20260722-shared-audio-el"></script>
+<script src="32-audio-pronunciation.js?v=20260726-icons-v1"></script>
 <script src="33-stable-hotfix.js"></script>
-<script src="34-targeted-requests.js?v=20260722-storage-quota-fix"></script>
+<script src="34-targeted-requests.js?v=20260726-icons-v1"></script>
 <script src="38-tutorial-user-texts.js"></script>
 <script src="39-mobile-game-audio-fix.js?v=20260722-webaudio-prefetch"></script>
 <script src="40-comparison-loading-history.js?v=20260703-finalbatch2"></script>
@@ -355,10 +355,10 @@
 <script src="42-pharma-mobile-esprit-history.js?v=20260703-finalbatch2"></script>
 <script src="44-simple-replay-history-mobile.js?v=20260703-finalbatch2"></script>
 <script src="45-baskerville-esprit-replay.js?v=20260703-finalbatch2"></script>
-<script src="46-memo-mode.js?v=20260725-indexeddb-v1"></script>
+<script src="46-memo-mode.js?v=20260726-icons-v1"></script>
 <script src="47-acu-image-import-novelty.js?v=20260725-indexeddb-v1"></script>
-<script src="50-grid-lock.js?v=20260726-bootstrap-fix"></script>
-<script src="51-daily-streak.js?v=20260726-v1"></script>
+<script src="50-grid-lock.js?v=20260726-icons-v1"></script>
+<script src="51-daily-streak.js?v=20260726-icons-v1"></script>
 <script src="48-offline-pwa.js?v=20260722-updateviacache-none"></script>
 </body>
 </html>

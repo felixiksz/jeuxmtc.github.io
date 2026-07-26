@@ -836,7 +836,7 @@
     btn.type = "button";
     btn.id = "mtcMemoStartButton";
     btn.title = "Lancer le mémo avec cette grille";
-    btn.innerHTML = '<span aria-hidden="true">⚔︎</span><span class="mtc-replay-label">mémo</span>';
+    btn.innerHTML = `<span aria-hidden="true"><svg viewBox="0 0 100 100" width="1.15em" height="1.15em" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" style="vertical-align:-0.22em;"><circle cx="79.5" cy="80.3" r="9"/><path d="M73.4 73.7 L16 12"/><circle cx="20.5" cy="80.3" r="9"/><path d="M26.6 73.7 L84 12"/><g stroke-width="12"><path d="M66.67,73.06 L73.25,66.94"/><path d="M60.65,66.74 L67.23,60.62"/><path d="M54.61,60.10 L60.19,53.98"/><path d="M33.33,73.06 L26.75,66.94"/><path d="M39.35,66.74 L32.77,60.62"/><path d="M45.39,60.10 L39.81,53.98"/></g></svg></span><span class="mtc-replay-label">mémo</span>`;
     btn.addEventListener("click", event => {
       event.preventDefault();
       openMemo();

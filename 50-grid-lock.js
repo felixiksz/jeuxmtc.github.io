@@ -89,7 +89,7 @@
     if(toggle) toggle.checked = enabled;
     const indicator = document.getElementById("gridLockIndicator");
     if(indicator){
-      indicator.textContent = enabled ? "🔒" : "🔓";
+      indicator.textContent = enabled ? "🔒︎" : "🔓︎";
       const label = enabled
         ? "Grille verrouillée : clique pour déverrouiller"
         : "Grille libre : clique pour verrouiller cette grille";
