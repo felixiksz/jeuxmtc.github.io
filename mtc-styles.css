@@ -680,6 +680,11 @@ body.darkroom .point-panel.open{
   border-left:1px solid var(--shadow-color) !important;
 }
 
+body.darkroom .cheatsheet-panel.open{
+  box-shadow:10px 0 35px var(--shadow-color) !important;
+  border-right:1px solid var(--shadow-color) !important;
+}
+
 body.darkroom .tile{
   color:#ff3b1f !important;
   filter:drop-shadow(0 4px 8px #ff3b1f) !important;
@@ -7074,3 +7079,17 @@ body.tour-active{
   line-height:1;
 }
 
+
+/* === Grille plus resserrée sur grand écran : forme carrée plutôt que rectangle === */
+@media(min-width:651px){
+  .grid{
+    max-width:560px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  .tile{
+    min-height:92px !important;
+    padding:10px !important;
+  }
+}
