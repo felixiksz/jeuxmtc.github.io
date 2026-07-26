@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260726-panel-hint-class-fix";
+const MTC_OFFLINE_VERSION = "20260726-layout-fixes2";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -620,7 +620,12 @@ self.addEventListener("fetch", event => {
   if(request.mode === "navigate"){
     event.respondWith((async () => {
       try{
-        const response = await fetch(request);
+        // no-store : le cache HTTP du navigateur ne doit jamais servir une
+        // page.html périmée sous prétexte que GitHub Pages envoie un
+        // Cache-Control avec délai. Sans ça, un rechargement "réseau
+        // d'abord" peut quand même renvoyer une réponse disque obsolète,
+        // ce qui a déjà fait croire à des correctifs "pas appliqués".
+        const response = await fetch(request, {cache:"no-store"});
         const cache = await caches.open(MTC_CACHE_NAME);
         await cache.put(scopedUrl("index.html"), response.clone());
         return response;
@@ -635,9 +640,10 @@ self.addEventListener("fetch", event => {
     // Réseau d'abord : un ancien service worker actif ne doit jamais bloquer
     // indéfiniment la mise à jour des fichiers du jeu tant que l'appareil a
     // du réseau. Le cache ne sert que de repli hors connexion.
+    // no-store pour la même raison que la navigation ci-dessus.
     const normalized = withoutSearch(request.url);
     try{
-      const response = await fetch(request);
+      const response = await fetch(request, {cache:"no-store"});
       if(response && (response.ok || response.type === "opaque")){
         const cache = await caches.open(MTC_CACHE_NAME);
         await cache.put(normalized, response.clone());

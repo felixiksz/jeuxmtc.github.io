@@ -239,7 +239,7 @@ body.mtc-memo-open #mtcBottomMetaLine #mtcOfflineButton{display:none!important;}
   #mtcBottomMetaLine{
     left:7px!important;
     right:7px!important;
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 50px)!important;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 92px)!important;
     max-width:calc(100vw - 14px)!important;
     font-size:8.8px!important;
     gap:.05em .42em!important;

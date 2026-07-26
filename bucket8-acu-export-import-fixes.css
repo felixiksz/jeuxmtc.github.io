@@ -948,18 +948,20 @@
     padding-left:6px !important;
     padding-right:6px !important;
     column-gap:4px !important;
+    flex-wrap:nowrap !important;
   }
 
   .topbar-main-buttons{
     gap:4px !important;
+    flex-wrap:nowrap !important;
   }
 
   .study-domain-select{
-    min-width:70px !important;
-    max-width:82px !important;
+    min-width:66px !important;
+    max-width:78px !important;
     min-height:28px !important;
     padding:2px 3px !important;
-    font-size:.78em !important;
+    font-size:.76em !important;
   }
 }
 
@@ -1459,10 +1461,22 @@ html[data-mtc-gameplay-mode="exam"] #cheatDisplay{
   transition:width .08s linear;
 }
 
-/* === Correctif alignement mobile : sélecteur ACU/PHARMA aligné à droite === */
-.topbar-main-row{
-  justify-content:flex-start !important;
-}
-.study-domain-topline{
-  margin-left:auto !important;
+/* === Correctif définitif : ACU/PHARMA reste sur la même ligne que les boutons
+   sur mobile. Plusieurs correctifs précédents dans ce fichier se marchent
+   dessus sur .topbar-main-row (wrap vs nowrap) ; celui-ci est volontairement
+   le tout dernier appliqué pour trancher, au lieu d'ajouter un énième bloc
+   au milieu du fichier. === */
+@media(max-width:520px), (pointer:coarse){
+  .topbar-main-row{
+    flex-wrap:nowrap !important;
+  }
+  .topbar-main-buttons{
+    flex-wrap:nowrap !important;
+    gap:3px !important;
+  }
+  .topbar-main-buttons button{
+    padding-left:5px !important;
+    padding-right:5px !important;
+    font-size:.8em !important;
+  }
 }
