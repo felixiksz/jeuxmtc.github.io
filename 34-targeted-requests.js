@@ -324,7 +324,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.className = "mtc-audio-button mtc-audio-button-34";
-    button.textContent = "🔊";
+    button.textContent = "🔊︎";
     button.dataset.audioHanzi = hanzi;
     button.title = "Écouter la prononciation";
     button.setAttribute("aria-label", "Écouter la prononciation de " + hanzi);
