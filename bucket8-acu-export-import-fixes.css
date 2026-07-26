@@ -1458,3 +1458,11 @@ html[data-mtc-gameplay-mode="exam"] #cheatDisplay{
   background:currentColor;
   transition:width .08s linear;
 }
+
+/* === Correctif alignement mobile : sélecteur ACU/PHARMA aligné à droite === */
+.topbar-main-row{
+  justify-content:flex-start !important;
+}
+.study-domain-topline{
+  margin-left:auto !important;
+}

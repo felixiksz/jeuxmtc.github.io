@@ -141,11 +141,26 @@
   wrapCategoryChooser("chooseManualCategories");
   wrapPointPicker();
 
+  // La toute première grille affichée au chargement de la page est construite
+  // par l'appel de démarrage newGame() dans 04-03-core-game.js, qui s'exécute
+  // avant que ce fichier ait pu envelopper les fonctions de sélection
+  // ci-dessus : elle ignore donc le verrou. On la regénère ici avec les
+  // fonctions maintenant enveloppées, pour qu'elle respecte le verrou dès
+  // l'ouverture de la page.
+  if(isLockEnabled() && typeof window.newGame === "function"){
+    window.newGame();
+  }
+
   if(document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", syncToggleUi);
   }else{
     syncToggleUi();
   }
 
-  window.addEventListener("mtc-study-domain-changed", syncToggleUi);
+  window.addEventListener("mtc-study-domain-changed", () => {
+    syncToggleUi();
+    if(isLockEnabled() && typeof window.newGame === "function"){
+      window.newGame();
+    }
+  });
 })();
