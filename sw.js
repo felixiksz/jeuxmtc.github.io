@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260726-active-icon-shadow";
+const MTC_OFFLINE_VERSION = "20260726-quiz-mode-v1";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -56,6 +56,8 @@ const CORE_ASSETS = [
   "45-baskerville-esprit-replay.js",
   "46-memo-mode.css",
   "46-memo-mode.js",
+  "52-quiz-mode.css",
+  "52-quiz-mode.js",
   "47-acu-image-import-novelty.js",
   "50-grid-lock.js",
   "51-daily-streak.js",
