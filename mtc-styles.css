@@ -7092,4 +7092,13 @@ body.tour-active{
     min-height:92px !important;
     padding:10px !important;
   }
+
+  /* Les lignes de catégories résolues doivent faire la même largeur que la
+     grille elle-même, sinon elles s'étirent sur toute la largeur de la page
+     une fois la grille resserrée ci-dessus. */
+  #solved{
+    max-width:560px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
 }
