@@ -1,0 +1,261 @@
+/* 52 — Quiz de fin de partie */
+#mtcQuizStartButton{
+  appearance:none;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 36%, transparent);
+  border-radius:999px;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 8%, var(--page-bg, #fff));
+  color:var(--text-color, currentColor);
+  min-width:42px;
+  min-height:38px;
+  padding:7px 13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  font-family:"Archivo", system-ui, sans-serif;
+  font-size:1.02rem;
+  line-height:1;
+  font-weight:650;
+  letter-spacing:.02em;
+  cursor:pointer;
+  box-shadow:0 6px 16px color-mix(in srgb, var(--shadow-color, #4b63ff) 24%, transparent);
+}
+#mtcQuizStartButton:active{
+  transform:translateY(1px) scale(.98);
+}
+#mtcQuizStartButton .mtc-replay-label{
+  font-size:.74rem;
+  opacity:.82;
+  white-space:nowrap;
+}
+
+.mtc-quiz-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
+  display:none;
+  align-items:stretch;
+  justify-content:center;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 22%, rgba(0,0,0,.22));
+  color:var(--text-color, #111);
+  font-family:"Archivo", system-ui, sans-serif;
+}
+.mtc-quiz-overlay.visible{
+  display:flex;
+}
+body.mtc-quiz-open{
+  overflow:hidden;
+}
+body.mtc-quiz-open .study-domain-topline,
+body.mtc-quiz-open .study-domain-switch,
+body.mtc-quiz-open #studyDomainSelect,
+body.mtc-quiz-open [aria-label="Choix rapide de matière"]{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+.mtc-quiz-shell{
+  width:min(640px, 100vw);
+  min-height:100vh;
+  background:var(--page-bg, #fff);
+  overflow:auto;
+  padding:calc(env(safe-area-inset-top, 0px) + 14px) 14px calc(env(safe-area-inset-bottom, 0px) + 36px);
+  box-sizing:border-box;
+  overscroll-behavior:contain;
+}
+.mtc-quiz-header{
+  position:sticky;
+  top:0;
+  z-index:7;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 8px;
+  padding:4px 0 8px;
+  background:var(--page-bg, #fff);
+}
+.mtc-quiz-header h2{
+  margin:0 0 4px;
+  font-size:1.2rem;
+  line-height:1.12;
+}
+.mtc-quiz-header p{
+  margin:0;
+  opacity:.76;
+  font-size:.88rem;
+  line-height:1.35;
+}
+.mtc-quiz-close{
+  appearance:none;
+  position:relative;
+  z-index:8;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 38%, transparent);
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 7%, var(--page-bg, #fff));
+  border-radius:999px;
+  color:inherit;
+  width:42px;
+  min-width:42px;
+  height:42px;
+  font-size:1.55rem;
+  line-height:1;
+  box-shadow:0 4px 12px color-mix(in srgb, var(--shadow-color, #4b63ff) 18%, transparent);
+}
+
+.mtc-quiz-card{
+  margin-top:12px;
+  padding:20px 16px;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 28%, transparent);
+  border-radius:16px;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 5%, var(--page-bg, #fff));
+}
+.mtc-quiz-prompt{
+  margin:0 0 16px;
+  font-size:1.15rem;
+  line-height:1.4;
+  font-weight:650;
+  text-align:center;
+}
+.mtc-quiz-card.mtc-quiz-done .mtc-quiz-prompt{
+  margin-bottom:0;
+}
+
+.mtc-quiz-reveal-button,
+.mtc-quiz-nav button,
+.mtc-quiz-fiche-button{
+  appearance:none;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 34%, transparent);
+  border-radius:999px;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 14%, var(--page-bg, #fff));
+  color:inherit;
+  padding:9px 16px;
+  font:600 .88rem/1 "Archivo", system-ui, sans-serif;
+  cursor:pointer;
+  box-shadow:0 4px 10px color-mix(in srgb, var(--shadow-color, #4b63ff) 12%, transparent);
+}
+.mtc-quiz-reveal-button{
+  display:block;
+  margin:0 auto;
+}
+.mtc-quiz-nav{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin:14px 0;
+}
+.mtc-quiz-nav button.secondary{
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 6%, transparent);
+  opacity:.78;
+}
+.mtc-quiz-nav button[disabled]{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+.mtc-quiz-answer{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.mtc-quiz-answer-image{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:80px;
+}
+.mtc-quiz-answer-image img{
+  display:block;
+  max-width:100%;
+  max-height:220px;
+  object-fit:contain;
+  border-radius:10px;
+}
+.mtc-quiz-no-image{
+  font-size:.82rem;
+  opacity:.56;
+  font-style:italic;
+}
+.mtc-quiz-answer-fields{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.mtc-quiz-answer-row{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding:8px 10px;
+  border-radius:10px;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 4%, var(--page-bg, #fff));
+}
+.mtc-quiz-answer-row b{
+  font-size:.66rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  opacity:.58;
+}
+.mtc-quiz-answer-row span{
+  font-size:.96rem;
+  line-height:1.35;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.mtc-quiz-hanzi{
+  font-family:Baskerville, "Libre Baskerville", Georgia, serif;
+  opacity:.8;
+}
+.mtc-quiz-audio-button{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:inherit;
+  font-size:1.05em;
+  line-height:1;
+  cursor:pointer;
+  padding:2px 4px;
+}
+.mtc-quiz-answer-actions{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin-top:4px;
+}
+.mtc-quiz-fiche-button{
+  font-size:.82rem;
+}
+
+@media(max-width:699px), (hover:none), (pointer:coarse){
+  #mtcQuizStartButton{
+    min-height:36px;
+    padding:7px 11px;
+    font-size:1rem;
+  }
+  #mtcQuizStartButton .mtc-replay-label{
+    font-size:.68rem;
+  }
+  .mtc-quiz-shell{
+    width:100vw;
+    padding:8px 8px calc(env(safe-area-inset-bottom, 0px) + 36px);
+  }
+  .mtc-quiz-header h2{
+    font-size:1rem;
+  }
+  .mtc-quiz-header p{
+    font-size:.74rem;
+  }
+  .mtc-quiz-close{
+    width:40px;
+    min-width:40px;
+    height:40px;
+  }
+  .mtc-quiz-prompt{
+    font-size:1.02rem;
+  }
+  .mtc-quiz-card{
+    padding:14px 12px;
+  }
+}
