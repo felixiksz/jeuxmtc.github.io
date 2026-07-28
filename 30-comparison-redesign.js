@@ -733,20 +733,22 @@
     const raw = text(value);
     if(!raw) return "";
     const parts = raw.split(/(\n|[,;+=]|\bvs\.?\b)/gi);
+    // Chaque délimiteur (+, ,, ;, =, vs) impose lui-même son espacement " x ".
+    // Les segments voisins doivent donc être rognés de leur propre espace : sinon
+    // cet espace s'ADDITIONNE à celui du délimiteur, et double à chaque passage
+    // édition→affichage→édition (d'où les grands blancs signalés autour des "+").
     return parts.map(part => {
       if(part === "\n") return "<br>";
       if([",", ";", "+", "="].includes(part)) return ` ${esc(part)} `;
       if(/^vs\.?$/i.test(part.trim())) return ` ${esc(part.trim())} `;
-      const leading = part.match(/^\s*/)?.[0] || "";
-      const trailing = part.match(/\s*$/)?.[0] || "";
       const core = part.trim();
-      if(!core) return esc(part);
+      if(!core) return "";
       const item = exactMatch(core);
-      if(!item) return esc(part);
+      if(!item) return esc(core);
       const label = displayNameForLink(item) || core;
       const id = typeof item === "string" ? item : (item.id || item.point || item.code || core);
       const title = titleGetter ? titleGetter(item, label) : label;
-      return `${esc(leading)}<button type="button" class="${cssClass}" contenteditable="false" ${refAttr}="${attr(id)}" title="${attr(title)}">${esc(label)}</button>${esc(trailing)}`;
+      return `<button type="button" class="${cssClass}" contenteditable="false" ${refAttr}="${attr(id)}" title="${attr(title)}">${esc(label)}</button>`;
     }).join("");
   }
 
@@ -1455,10 +1457,13 @@
     const point = editable.dataset.acuPointId || "";
     const field = editable.dataset.acuCompareEdit || "";
     if(!point) return;
-    const value = String(editable.innerText || "")
+    let value = String(editable.innerText || "")
       .replace(/\u00a0/g, " ")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
+    // Auto-gu\u00e9rit les entr\u00e9es "associations"/"vs" ab\u00eem\u00e9es par l'ancien bug
+    // d'espacement doubl\u00e9 (voir linkedReferenceTextHtml) d\u00e8s qu'on les rouvre.
+    if(field === "associations" || field === "vs") value = value.replace(/[ \t]{2,}/g, " ");
     if(field === "esprit") setLocalStorageValue(ACU_ESPRIT_PREFIX, point, value);
     if(field === "notes") setLocalStorageValue(ACU_NOTE_PREFIX, point, value);
     if(field === "associations") setLocalStorageValue(ACU_ASSOC_PREFIX, point, value);
@@ -1723,10 +1728,11 @@
     const herbId = editable.dataset.pharmaHerbId || "";
     const field = editable.dataset.pharmaCompareEdit || "";
     if(!herbId) return;
-    const value = String(editable.innerText || "")
+    let value = String(editable.innerText || "")
       .replace(/\u00a0/g, " ")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
+    if(field === "associations" || field === "vs") value = value.replace(/[ \t]{2,}/g, " ");
     if(field === "esprit") setLocalStorageValue(PHARMA_ESPRIT_PREFIX, herbId, value);
     if(field === "notes") setLocalStorageValue(PHARMA_NOTES_PREFIX, herbId, value);
     if(field === "associations") setLocalStorageValue(PHARMA_ASSOC_PREFIX, herbId, value);
