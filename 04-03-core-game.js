@@ -290,6 +290,11 @@ function categoryMasteryScore(row){
 }
 
 function categoryPracticeWeight(cat){
+  // getAutoPracticeMode() résout window.getAutoPracticeMode, redéfini par
+  // 08-07-stats-v2.js pour retourner "easy"/"balanced"/"hard" (aligné sur
+  // le slider Facile/Difficile) au lieu de "weak"/"strong"/"balanced" —
+  // ces deux anciennes valeurs ne pouvaient donc plus jamais matcher ici,
+  // rendant ce réglage inopérant depuis l'introduction du slider.
   const mode = getAutoPracticeMode();
   const stats = loadMtcStats();
   const row = categoryStatsRowFromCat(stats, cat);
@@ -299,7 +304,7 @@ function categoryPracticeWeight(cat){
     ? 2
     : 1;
 
-  if(mode === "weak"){
+  if(mode === "hard"){
     if(row.seen === 0){
       weight += 5;
     }else{
@@ -307,7 +312,7 @@ function categoryPracticeWeight(cat){
     }
   }
 
-  if(mode === "strong"){
+  if(mode === "easy"){
     if(row.seen === 0){
       weight += 1;
     }else{
@@ -2805,6 +2810,36 @@ function distributeBoard(groups){
   return shuffle(allPoints).map(item=>item.point);
 }
 
+// Poids de sélection d'un point pour une nouvelle grille : les points mal
+// maîtrisés au quiz (voir 55-point-mastery.js) doivent revenir plus souvent
+// dans les grilles suivantes, jusqu'à être mieux maîtrisés. Ne s'applique
+// que si le module de maîtrise est chargé — sinon poids neutre (1) partout,
+// ce qui revient au comportement précédent (tirage uniforme).
+function pointPracticeWeight(point){
+  if(typeof window.MTC_QUIZ_MASTERY !== "object" || !window.MTC_QUIZ_MASTERY || typeof window.MTC_QUIZ_MASTERY.weightFor !== "function") return 1;
+  try{ return window.MTC_QUIZ_MASTERY.weightFor(point); }catch(error){ return 1; }
+}
+
+// Échantillonnage pondéré SANS remise : contrairement à un sac pondéré
+// suivi d'un slice(0,4), ceci garantit qu'un point à fort poids (très mal
+// maîtrisé) ne puisse pas être tiré deux fois dans la même grille.
+function weightedPickWithoutReplacement(items, weightFn, count){
+  const pool = items.slice();
+  const result = [];
+  while(pool.length && result.length < count){
+    const weights = pool.map(weightFn);
+    const total = weights.reduce((sum, value) => sum + value, 0) || 1;
+    let roll = Math.random() * total;
+    let index = 0;
+    for(; index < pool.length - 1; index++){
+      roll -= weights[index];
+      if(roll <= 0) break;
+    }
+    result.push(pool.splice(index, 1)[0]);
+  }
+  return result;
+}
+
 function pickFourVariedPoints(categoryKey, points){
   const uniquePoints = [...new Set(points)];
 
@@ -2825,7 +2860,7 @@ function pickFourVariedPoints(categoryKey, points){
   }
 
   const picked =
-    shuffle(preferred).slice(0,4);
+    weightedPickWithoutReplacement(preferred, pointPracticeWeight, 4);
 
   const newRecent =
     [...picked, ...recent]
