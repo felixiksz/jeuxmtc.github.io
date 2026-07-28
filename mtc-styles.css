@@ -3456,6 +3456,31 @@ select{
   .point-panel.open{ right:0 !important; }
 }
 
+/* Miroir exact du correctif ci-dessus pour le cheatsheet : il n'avait jamais
+   reçu le même traitement, donc en l'état il ne se rapprochait de l'écran
+   qu'une fois .available ajouté (après la première catégorie résolue), pas
+   dès le chargement de la grille comme le panneau latéral -- deux largeurs
+   d'ombre différentes selon le moment. */
+.cheatsheet-panel,
+.cheatsheet-panel.available{
+  left:calc(0px - min(340px, 86vw)) !important;
+  animation:none !important;
+  box-shadow:8px 0 30px var(--shadow-color) !important;
+}
+.cheatsheet-panel.open{
+  left:0 !important;
+  animation:none !important;
+}
+@media(max-width:699px){
+  .cheatsheet-panel,
+  .cheatsheet-panel.available{
+    left:calc(0px - 100vw) !important;
+    animation:none !important;
+    box-shadow:8px 0 30px var(--shadow-color) !important;
+  }
+  .cheatsheet-panel.open{ left:0 !important; }
+}
+
 .advanced-search-panel,
 .review-basket-panel,
 .comparison-panel{
