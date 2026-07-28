@@ -90,6 +90,15 @@
     return (points || []).some(point => getPointImage(point));
   }
 
+  // Certains noms de catégorie commencent déjà par "Points " (ex. "Points
+  // Luò-Liaison"), ce qui produisait "Quel est le point Points Luò-Liaison
+  // du..." une fois inséré dans le gabarit de question (qui dit déjà "le
+  // point"). On retire ce préfixe redondant uniquement pour la formulation
+  // de la question, sans toucher au nom de catégorie affiché ailleurs.
+  function questionCategoryPhrase(category){
+    return cleanText(String(category || "").replace(/^points?\s+/i, ""));
+  }
+
   function currentGridPoints(){
     const groups = getCurrentSolutionGroups();
     const list = [];
@@ -99,15 +108,43 @@
         const code = String(point || "");
         if(!code) return;
         const canal = canalOfPoint(code);
-        list.push({point:code, category, canal, canalPhrase:canalPhrase(canal)});
+        list.push({point:code, category, categoryPhrase:questionCategoryPhrase(category), canal, canalPhrase:canalPhrase(canal)});
       });
     });
     return list;
   }
+  // Échantillonnage pondéré (sans remise) : plus le poids d'un élément est
+  // grand, plus il a de chances de sortir tôt. Utilisé pour faire revenir
+  // en priorité les points les moins maîtrisés (voir 55-point-mastery.js),
+  // tout en gardant une part de hasard — pas un tri strict par faiblesse,
+  // qui rendrait le quiz prévisible.
+  function weightedOrder(items, weightFn){
+    const pool = items.slice();
+    const result = [];
+    while(pool.length){
+      const weights = pool.map(weightFn);
+      const total = weights.reduce((sum, value) => sum + value, 0) || 1;
+      let roll = Math.random() * total;
+      let index = 0;
+      for(; index < pool.length - 1; index++){
+        roll -= weights[index];
+        if(roll <= 0) break;
+      }
+      result.push(pool.splice(index, 1)[0]);
+    }
+    return result;
+  }
+
+  function masteryWeight(item){
+    if(typeof window.MTC_QUIZ_MASTERY !== "object" || !window.MTC_QUIZ_MASTERY) return 1;
+    try{ return window.MTC_QUIZ_MASTERY.weightFor(item.point); }catch(error){ return 1; }
+  }
+
   function buildQuestions(mode){
     let points = currentGridPoints();
     if(mode === "image") points = points.filter(item => getPointImage(item.point));
-    return shuffle(points.map(item => Object.assign({revealed:false, mode}, item)));
+    const questions = shuffle(points).map(item => Object.assign({revealed:false, mode, retryCount:0}, item));
+    return weightedOrder(questions, masteryWeight);
   }
 
   function ensureOverlay(){
@@ -238,22 +275,31 @@
       '</div>';
   }
 
+  function ratingHtml(){
+    return '' +
+      '<div class="mtc-quiz-rating">' +
+        '<button type="button" class="mtc-quiz-rating-again" data-quiz-action="rate" data-rating="again">🔁 À revoir</button>' +
+        '<button type="button" class="mtc-quiz-rating-good" data-quiz-action="rate" data-rating="good">✅ Je maîtrise</button>' +
+      '</div>';
+  }
+
   function renderCurrentQuestion(){
     if(state.index >= state.questions.length){
       renderCompletion();
       return;
     }
     const question = state.questions[state.index];
+    if(!question.shownAt) question.shownAt = Date.now();
     const total = state.questions.length;
     const isImageMode = question.mode === "image";
     const promptHtml = isImageMode
       ? '<div class="mtc-quiz-question-image"><img src="' + escapeHtml(getPointImage(question.point)) + '" alt="Quel est ce point ?" loading="lazy"></div><p class="mtc-quiz-prompt">Quel est ce point ?</p>'
-      : '<p class="mtc-quiz-prompt">' + escapeHtml('Quel est le point ' + question.category + ' ' + question.canalPhrase + ' ?') + '</p>';
+      : '<p class="mtc-quiz-prompt">' + escapeHtml('Quel est le point ' + question.categoryPhrase + ' ' + question.canalPhrase + ' ?') + '</p>';
     content().innerHTML = headerHtml("Quiz", "Question " + (state.index + 1) + " / " + total) +
       '<div class="mtc-quiz-card">' +
         promptHtml +
         (question.revealed
-          ? answerHtml(question)
+          ? answerHtml(question) + ratingHtml()
           : '<button type="button" class="mtc-quiz-reveal-button" data-quiz-action="reveal">Réponse</button>') +
       '</div>' +
       '<div class="mtc-quiz-nav">' +
@@ -287,6 +333,30 @@
     renderCurrentQuestion();
   }
 
+  const MAX_RETRIES_PER_POINT = 3;
+
+  // Auto-évaluation façon Anki : "à revoir" fait redescendre le niveau de
+  // maîtrise du point et le refait apparaître un peu plus loin dans la
+  // MÊME session (pas juste "à la prochaine grille"), tant qu'il n'a pas
+  // déjà été redemandé MAX_RETRIES_PER_POINT fois pour éviter qu'un point
+  // difficile ne boucle indéfiniment. "Je maîtrise" fait progresser le
+  // niveau et le point n'est pas reproposé cette fois-ci.
+  function rateCurrent(rating){
+    const question = state.questions[state.index];
+    if(!question) return;
+    const responseMs = question.shownAt ? Math.max(0, Date.now() - question.shownAt) : null;
+    if(window.MTC_QUIZ_MASTERY && typeof window.MTC_QUIZ_MASTERY.recordQuizRating === "function"){
+      try{ window.MTC_QUIZ_MASTERY.recordQuizRating(question.point, rating === "again" ? "again" : "good"); }catch(error){}
+    }
+    if(rating === "again" && (question.retryCount || 0) < MAX_RETRIES_PER_POINT){
+      const respawn = Object.assign({}, question, {revealed:false, shownAt:null, retryCount:(question.retryCount || 0) + 1, lastResponseMs:responseMs});
+      const spacing = 3 + Math.floor(Math.random() * 3);
+      const insertAt = Math.min(state.questions.length, state.index + spacing);
+      state.questions.splice(insertAt, 0, respawn);
+    }
+    goNext();
+  }
+
   function handleAction(action, button){
     const point = button && button.getAttribute("data-point");
     if(action === "close") closeQuiz();
@@ -295,6 +365,7 @@
     else if(action === "next") goNext();
     else if(action === "restart") restartQuiz();
     else if(action === "choose-mode") chooseQuizMode(button && button.getAttribute("data-mode"));
+    else if(action === "rate") rateCurrent(button && button.getAttribute("data-rating"));
     else if(action === "play-audio" && point){
       const details = detailsForPoint(point);
       if(details.hanzi && typeof window.playMtcAudioByHanzi === "function") window.playMtcAudioByHanzi(details.hanzi, button);
@@ -354,7 +425,7 @@
     });
     observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
     window.setTimeout(ensureQuizButton, 400);
-    window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, startQuiz, hasAnyLocalImage, currentGridPoints, state};
+    window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, startQuiz, hasAnyLocalImage, currentGridPoints, rateCurrent, state};
   }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
   else install();
