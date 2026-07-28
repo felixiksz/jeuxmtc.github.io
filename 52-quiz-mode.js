@@ -11,6 +11,7 @@
   const ACU_IMAGE_MEMO_PREFIX = "mtc_point_image_memo_";
 
   const state = {
+    mode:"text",
     questions:[],
     index:0
   };
@@ -78,12 +79,18 @@
   function getPointImage(point){
     if(!window.MTC_IMAGE_STORE) return "";
     const key = String(point || "");
-    return window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_PREFIX, key)
-      || window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_MEMO_PREFIX, key)
+    // La version "memo" (sans nom/code visible) passe en premier : quand
+    // l'image sert de question (mode image), elle ne doit pas trahir la
+    // réponse. Retombe sur l'image normale de la fiche si elle seule existe.
+    return window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_MEMO_PREFIX, key)
+      || window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_PREFIX, key)
       || "";
   }
+  function hasAnyLocalImage(points){
+    return (points || []).some(point => getPointImage(point));
+  }
 
-  function buildQuestions(){
+  function currentGridPoints(){
     const groups = getCurrentSolutionGroups();
     const list = [];
     groups.forEach(group => {
@@ -92,16 +99,15 @@
         const code = String(point || "");
         if(!code) return;
         const canal = canalOfPoint(code);
-        list.push({
-          point:code,
-          category,
-          canal,
-          canalPhrase:canalPhrase(canal),
-          revealed:false
-        });
+        list.push({point:code, category, canal, canalPhrase:canalPhrase(canal)});
       });
     });
-    return shuffle(list);
+    return list;
+  }
+  function buildQuestions(mode){
+    let points = currentGridPoints();
+    if(mode === "image") points = points.filter(item => getPointImage(item.point));
+    return shuffle(points.map(item => Object.assign({revealed:false, mode}, item)));
   }
 
   function ensureOverlay(){
@@ -139,20 +145,48 @@
   function closeQuiz(){ setOverlayVisible(false); }
 
   function openQuiz(){
-    const questions = buildQuestions();
-    if(!questions.length){
+    const points = currentGridPoints();
+    if(!points.length){
       alert("Je n'arrive pas à récupérer la grille actuelle pour le quiz.");
       return;
     }
+    setOverlayVisible(true);
+    if(hasAnyLocalImage(points.map(item => item.point))) renderModeChoice();
+    else startQuiz("text");
+  }
+  function renderModeChoice(){
+    content().innerHTML = headerHtml("Quiz — sur quoi veux-tu être interrogé·e ?", "") +
+      '<div class="mtc-quiz-choice">' +
+        '<button type="button" class="mtc-quiz-choice-option" data-quiz-action="choose-mode" data-mode="text">' +
+          '<strong>Quiz texte</strong>' +
+          '<span>« Quel est le point [catégorie] du [canal] ? »</span>' +
+        '</button>' +
+        '<button type="button" class="mtc-quiz-choice-option" data-quiz-action="choose-mode" data-mode="image">' +
+          '<strong>Quiz image</strong>' +
+          '<span>Devine le point à partir de son image locale.</span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="mtc-quiz-nav">' +
+        '<button type="button" data-quiz-action="close" class="secondary">Retour</button>' +
+      '</div>';
+  }
+  function chooseQuizMode(mode){
+    startQuiz(mode === "image" ? "image" : "text");
+  }
+  function startQuiz(mode){
+    const questions = buildQuestions(mode);
+    if(!questions.length){
+      alert("Aucun point de cette grille n'a d'image locale importée.");
+      renderModeChoice();
+      return;
+    }
+    state.mode = mode;
     state.questions = questions;
     state.index = 0;
-    setOverlayVisible(true);
     renderCurrentQuestion();
   }
   function restartQuiz(){
-    state.questions = buildQuestions();
-    state.index = 0;
-    renderCurrentQuestion();
+    startQuiz(state.mode);
   }
 
   function comparisonButtonHtml(point){
@@ -172,16 +206,21 @@
   function answerHtml(question){
     const point = question.point;
     const details = detailsForPoint(point);
-    const image = getPointImage(point);
-    const imageHtml = image
-      ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(point) + '" loading="lazy">'
-      : '<span class="mtc-quiz-no-image">Aucune image locale</span>';
+    // En mode image, l'image est déjà affichée comme énoncé de la question :
+    // pas besoin de la répéter dans la réponse.
+    const image = question.mode === "image" ? "" : getPointImage(point);
+    const imageBlockHtml = question.mode === "image" ? "" :
+      '<div class="mtc-quiz-answer-image">' +
+        (image
+          ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(point) + '" loading="lazy">'
+          : '<span class="mtc-quiz-no-image">Aucune image locale</span>') +
+      '</div>';
     const basketHtml = typeof window.basketButtonHtml === "function"
       ? window.basketButtonHtml(point, "point-header-basket-button", true)
       : "";
     return '' +
       '<div class="mtc-quiz-answer">' +
-        '<div class="mtc-quiz-answer-image">' + imageHtml + '</div>' +
+        imageBlockHtml +
         '<div class="mtc-quiz-answer-fields">' +
           '<div class="mtc-quiz-answer-row"><b>Nomenclature</b><span>' + escapeHtml(point) + '</span></div>' +
           '<div class="mtc-quiz-answer-row"><b>Pinyin</b><span>' + escapeHtml(details.pinyin || "—") +
@@ -206,10 +245,13 @@
     }
     const question = state.questions[state.index];
     const total = state.questions.length;
-    const prompt = 'Quel est le point ' + question.category + ' ' + question.canalPhrase + ' ?';
+    const isImageMode = question.mode === "image";
+    const promptHtml = isImageMode
+      ? '<div class="mtc-quiz-question-image"><img src="' + escapeHtml(getPointImage(question.point)) + '" alt="Quel est ce point ?" loading="lazy"></div><p class="mtc-quiz-prompt">Quel est ce point ?</p>'
+      : '<p class="mtc-quiz-prompt">' + escapeHtml('Quel est le point ' + question.category + ' ' + question.canalPhrase + ' ?') + '</p>';
     content().innerHTML = headerHtml("Quiz", "Question " + (state.index + 1) + " / " + total) +
       '<div class="mtc-quiz-card">' +
-        '<p class="mtc-quiz-prompt">' + escapeHtml(prompt) + '</p>' +
+        promptHtml +
         (question.revealed
           ? answerHtml(question)
           : '<button type="button" class="mtc-quiz-reveal-button" data-quiz-action="reveal">Réponse</button>') +
@@ -252,6 +294,7 @@
     else if(action === "prev") goPrev();
     else if(action === "next") goNext();
     else if(action === "restart") restartQuiz();
+    else if(action === "choose-mode") chooseQuizMode(button && button.getAttribute("data-mode"));
     else if(action === "play-audio" && point){
       const details = detailsForPoint(point);
       if(details.hanzi && typeof window.playMtcAudioByHanzi === "function") window.playMtcAudioByHanzi(details.hanzi, button);
@@ -311,7 +354,7 @@
     });
     observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
     window.setTimeout(ensureQuizButton, 400);
-    window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, state};
+    window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, startQuiz, hasAnyLocalImage, currentGridPoints, state};
   }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
   else install();

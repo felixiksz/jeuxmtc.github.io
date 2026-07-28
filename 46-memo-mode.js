@@ -6,12 +6,8 @@
   const STORAGE_ACU = "mtcMemoAcuEsprit.v1";
   const STORAGE_PHARMA = "mtcMemoPharmaSyntheses.v1";
   const STORAGE_SESSION = "mtcMemoSession.v1";
-  const ACU_IMAGE_PREFIX = "mtc_point_image_";
-  const ACU_IMAGE_MEMO_PREFIX = "mtc_point_image_memo_";
-  const MATCH_MODE_KEY = "mtcMemoAcuMatchMode.v1";
   const state = {
     hasSession:false,
-    matchMode:"localisation",
     phase:"idle",
     gridSignature:"",
     pairs:[],
@@ -22,7 +18,6 @@
     attempts:0,
     matchIndex:0,
     foundPairs:[],
-    slideCurrentId:null,
     hintTargetId:null,
     hintStep:0,
     easyMode:false,
@@ -50,7 +45,6 @@
     const payload = {
       at:Date.now(),
       domain:isPharma() ? "pharma" : "acu",
-      matchMode:state.matchMode,
       gridSignature:state.gridSignature,
       phase:state.phase,
       pairs:state.pairs.map(pair => ({id:pair.id, rawId:pair.rawId, kind:pair.kind, label:pair.label, summary:pair.summary, summaryImage:pair.summaryImage, summaryLabel:pair.summaryLabel, commonName:pair.commonName, className:pair.className, classKey:pair.classKey, classLabel:pair.classLabel, placeholder:pair.placeholder})),
@@ -67,7 +61,6 @@
     const saved = loadStore(STORAGE_SESSION);
     if(!saved || saved.gridSignature !== signature) return null;
     if(saved.domain !== (isPharma() ? "pharma" : "acu")) return null;
-    if(!isPharma() && (saved.matchMode || "localisation") !== state.matchMode) return null;
     return saved;
   }
   function clearSession(){
@@ -187,23 +180,6 @@
     };
   }
 
-  function getPointImage(point){
-    // La version "memo" (sans nom/code visible) est prioritaire quand elle existe,
-    // pour ne pas pouvoir lire la réponse sur l'image pendant le jeu ; sinon on
-    // retombe sur l'image normale de la fiche du point.
-    const key = String(point || "");
-    return window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_MEMO_PREFIX, key) || window.MTC_IMAGE_STORE.getImage(ACU_IMAGE_PREFIX, key) || "";
-  }
-  function loadMatchMode(){
-    try{
-      const saved = localStorage.getItem(MATCH_MODE_KEY);
-      return saved === "image" ? "image" : "localisation";
-    }catch(error){ return "localisation"; }
-  }
-  function saveMatchMode(mode){
-    try{ localStorage.setItem(MATCH_MODE_KEY, mode === "image" ? "image" : "localisation"); }catch(error){}
-  }
-
   function applySavedAcuSyntheses(){
     const saved = loadStore(STORAGE_ACU);
     if(!window.POINT_DETAILS) return saved;
@@ -248,13 +224,14 @@
     const saved = applySavedAcuSyntheses();
     const unique = collectCurrentAcuPoints();
 
-    const imageMode = state.matchMode === "image";
-    const pool = imageMode ? unique.filter(point => getPointImage(point)) : unique;
-
-    return pool.slice(0, 16).map(point => {
+    return unique.slice(0, 16).map(point => {
       const details = detailsForAcuPoint(point);
       const info = getAcuMemoInfo(point);
-      const base = {
+      // Le mémo ACU associe le nom du point à sa localisation anatomique
+      // (donnée déjà présente pour chaque point, donc pas besoin d'écrire
+      // quoi que ce soit avant de jouer). Un ancien "esprit" personnalisé
+      // ou une synthèse éditée manuellement restent prioritaires si présents.
+      return {
         id:"acu:" + point,
         rawId:point,
         kind:"acu",
@@ -264,25 +241,10 @@
         promptTitle:getPointCodeLabel(point),
         placeholder:makeAcuPlaceholder(point, details),
         classKey:info.classKey,
-        classLabel:info.classLabel
-      };
-      if(imageMode){
-        // L'image locale sert de contenu visuel de la tuile ; le texte de
-        // secours (accessibilité/placeholder) reste la localisation si connue.
-        return Object.assign(base, {
-          summary:cleanText(details.localisation || base.promptTitle),
-          summaryImage:getPointImage(point),
-          summaryLabel:"image"
-        });
-      }
-      // Le mémo ACU associe le nom du point à sa localisation anatomique
-      // (donnée déjà présente pour chaque point, donc pas besoin d'écrire
-      // quoi que ce soit avant de jouer). Un ancien "esprit" personnalisé
-      // ou une synthèse éditée manuellement restent prioritaires si présents.
-      return Object.assign(base, {
+        classLabel:info.classLabel,
         summary:cleanText(saved[point] || details.localisation || details.espritAcu || ""),
         summaryLabel:"localisation"
-      });
+      };
     });
   }
   function capturePharmaPairs(){
@@ -403,58 +365,12 @@
     return true;
   }
   function openMemo(){
-    if(isPharma()){
-      launchMemoFlow();
-      return;
-    }
-    renderMatchModeChoice();
-  }
-  function hasAnyMemoSafeImage(){
-    return window.MTC_IMAGE_STORE.hasAnyForPrefix(ACU_IMAGE_MEMO_PREFIX);
-  }
-  function resetMemoSafeImages(){
-    if(!confirm("Effacer toutes les images anti-triche du mode mémo ? Les images normales de la fiche du point ne sont pas touchées.")) return;
-    window.MTC_IMAGE_STORE.clearPrefix(ACU_IMAGE_MEMO_PREFIX);
-    renderMatchModeChoice();
-  }
-  function renderMatchModeChoice(){
-    state.hasSession = false;
-    state.phase = "choice";
-    setOverlayVisible(true);
-    const current = loadMatchMode();
-    const hasAnyLocalImage = collectCurrentAcuPoints().some(point => getPointImage(point));
-    const resetButton = hasAnyMemoSafeImage()
-      ? '<button type="button" data-memo-action="reset-memo-images" class="secondary">Réinitialiser les images anti-triche</button>'
-      : "";
-    content().innerHTML = headerHtml("Mémo — que veux-tu associer aux points ?", "") +
-      '<div class="mtc-memo-choice">' +
-        '<button type="button" class="mtc-memo-choice-option' + (current === "localisation" ? " is-current" : "") + '" data-memo-action="choose-mode" data-mode="localisation">' +
-          '<strong>Nom ↔ Localisation</strong>' +
-          '<span>Associe chaque point à sa description anatomique.</span>' +
-        '</button>' +
-        '<button type="button" class="mtc-memo-choice-option' + (current === "image" ? " is-current" : "") + '" data-memo-action="choose-mode" data-mode="image"' + (hasAnyLocalImage ? "" : " disabled") + '>' +
-          '<strong>Nom ↔ Image</strong>' +
-          '<span>' + (hasAnyLocalImage ? "Associe chaque point à son image locale." : "Aucune image locale importée pour l’instant.") + '</span>' +
-        '</button>' +
-      '</div>' +
-      '<div class="mtc-memo-actions bottom">' +
-        '<button type="button" data-memo-action="close" class="secondary">Retour</button>' +
-        resetButton +
-      '</div>';
-  }
-  function chooseMatchMode(mode){
-    const clean = mode === "image" ? "image" : "localisation";
-    state.matchMode = clean;
-    saveMatchMode(clean);
     launchMemoFlow();
   }
   function launchMemoFlow(){
     const pairs = capturePairs();
     if(!pairs.length){
-      alert(state.matchMode === "image"
-        ? "Aucun point de cette grille n’a d’image locale importée."
-        : "Je n'arrive pas à récupérer la grille actuelle pour le mémo.");
-      renderMatchModeChoice();
+      alert("Je n'arrive pas à récupérer la grille actuelle pour le mémo.");
       return;
     }
     const signature = pairSignature(pairs);
@@ -550,7 +466,6 @@
     state.attempts = 0;
     state.matchIndex = 0;
     state.foundPairs = [];
-    state.slideCurrentId = null;
     state.selectedName = null;
     state.selectedSummary = null;
     resetMemoHint(null);
@@ -626,8 +541,7 @@
         '<button type="button" data-memo-action="close" class="secondary">Retour à la grille</button>' +
         '<button type="button" data-memo-action="edit-synth" class="secondary memo-edit-synth">Synthèses</button>' +
       '</div>';
-    if(state.matchMode === "image" && !isPharma()) renderSlideBoard();
-    else renderColumnsBoard();
+    renderColumnsBoard();
     updateScore();
     saveSession();
   }
@@ -713,58 +627,6 @@
       window.setTimeout(() => { if(el && el.parentNode) el.remove(); }, 120);
     });
   }
-  function pickSlideCandidate(){
-    const unmatched = state.visiblePairs.filter(pair => !state.matched.has(pair.id));
-    if(!unmatched.length){ state.slideCurrentId = null; return null; }
-    const still = unmatched.find(pair => pair.id === state.slideCurrentId);
-    if(still) return still;
-    const pick = unmatched[Math.floor(Math.random() * unmatched.length)];
-    state.slideCurrentId = pick.id;
-    return pick;
-  }
-  function renderSlideBoard(){
-    const board = byId("mtcMemoBoard");
-    if(!board) return;
-    const current = pickSlideCandidate();
-    if(!current){
-      board.innerHTML = '<div class="mtc-memo-found-zone" aria-live="polite">' +
-        '<div class="mtc-memo-found-title">Paires trouvées</div>' +
-        '<div id="mtcMemoFoundPairs" class="mtc-memo-found-pairs">' + renderFoundPairs() + '</div>' +
-      '</div>';
-      return;
-    }
-    const unmatched = state.visiblePairs.filter(pair => !state.matched.has(pair.id));
-    const options = shuffle(unmatched);
-    board.innerHTML =
-      '<div class="mtc-memo-slide">' +
-        '<div class="mtc-memo-slide-card' + (current.summaryImage ? " has-image" : "") + '">' + summaryContentHtml(current) + '</div>' +
-        '<div class="mtc-memo-slide-options">' + options.map(pair => {
-          const kindClass = pair.kind === "pharma" ? " memo-pharma-name" : " memo-acu-name";
-          return '<button type="button" class="mtc-memo-item memo-name mtc-memo-slide-option' + kindClass + easyClass(pair) + '"' + easyAttrs(pair) + ' data-slide-answer="' + escapeHtml(pair.id) + '">' + escapeHtml(pair.label) + '</button>';
-        }).join("") + '</div>' +
-      '</div>' +
-      '<div class="mtc-memo-found-zone" aria-live="polite">' +
-        '<div class="mtc-memo-found-title">Paires trouvées</div>' +
-        '<div id="mtcMemoFoundPairs" class="mtc-memo-found-pairs">' + renderFoundPairs() + '</div>' +
-      '</div>';
-  }
-  function handleSlideClick(button){
-    if(!button) return;
-    const answerId = button.getAttribute("data-slide-answer");
-    const current = state.visiblePairs.find(pair => pair.id === state.slideCurrentId);
-    if(!current) return;
-    state.attempts += 1;
-    if(answerId === current.id){
-      recordMatch(current.id);
-      state.slideCurrentId = null;
-      updateScore();
-      renderSlideBoard();
-    }else{
-      markWrong([button]);
-      updateScore();
-      saveSession();
-    }
-  }
   function handleColumnsClick(button){
     if(!button || button.classList.contains("matched")) return;
     const id = button.getAttribute("data-id");
@@ -794,7 +656,6 @@
     state.attempts = 0;
     state.matchIndex = 0;
     state.foundPairs = [];
-    state.slideCurrentId = null;
     state.selectedName = null;
     state.selectedSummary = null;
     resetMemoHint(null);
@@ -819,8 +680,6 @@
     else if(action === "hint") revealMemoHint();
     else if(action === "toggle-easy") toggleEasyMode();
     else if(action === "open") openMemo();
-    else if(action === "choose-mode") chooseMatchMode(button && button.getAttribute("data-mode"));
-    else if(action === "reset-memo-images") resetMemoSafeImages();
   }
   function ensureMemoButton(){
     if(!isFinished()) return;
@@ -846,19 +705,12 @@
   function removeMemoButtonIfNeeded(){ if(!isFinished()) byId("mtcMemoStartButton")?.remove(); }
   function install(){
     applySavedAcuSyntheses();
-    state.matchMode = loadMatchMode();
     document.addEventListener("click", event => {
       const actionButton = event.target && event.target.closest ? event.target.closest("[data-memo-action]") : null;
       if(actionButton){
         event.preventDefault();
         if(actionButton.disabled) return;
         handleAction(actionButton.getAttribute("data-memo-action"), actionButton);
-        return;
-      }
-      const slideOption = event.target && event.target.closest ? event.target.closest("[data-slide-answer]") : null;
-      if(slideOption){
-        event.preventDefault();
-        handleSlideClick(slideOption);
         return;
       }
       const columnItem = event.target && event.target.closest ? event.target.closest(".mtc-memo-item") : null;
