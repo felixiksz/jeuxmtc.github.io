@@ -358,6 +358,25 @@
     return box;
   }
 
+  // Tant que #mtcBottomMetaLine (créé par 48-offline-pwa.js) n'existe pas
+  // encore au moment du premier rendu, le statut reste temporairement un
+  // enfant direct de body (position:fixed), ce qui le fait flotter par-dessus
+  // les panneaux. #mtcBottomMetaLine finit presque toujours par apparaître
+  // ensuite, mais rien ne redéclenche alors ce fichier pour le ranger dedans
+  // — d'où le bug observé sur mobile. On surveille nous-mêmes son apparition
+  // au lieu de dépendre du timing d'un autre fichier.
+  let bottomMetaLineWatcherStarted = false;
+  function watchForBottomMetaLine(){
+    if(bottomMetaLineWatcherStarted || typeof MutationObserver === "undefined" || !document.body) return;
+    bottomMetaLineWatcherStarted = true;
+    const observer = new MutationObserver(() => {
+      const box = document.getElementById("mtcPersonalDataStatus");
+      const bottomLine = document.getElementById("mtcBottomMetaLine");
+      if(box && bottomLine && box.parentElement !== bottomLine) bottomLine.appendChild(box);
+    });
+    observer.observe(document.body, {childList:true});
+  }
+
   function refreshPersonalDataStatusBox(){
     if(!document.body) return;
     let visible = "";
@@ -407,6 +426,7 @@
   }
 
   function initPersonalDataStatusBox(){
+    watchForBottomMetaLine();
     if(document.readyState === "loading"){
       document.addEventListener("DOMContentLoaded", refreshPersonalDataStatusBox, {once:true});
     }else{
@@ -674,8 +694,16 @@
     if(current && !isPlaceholderLocalValue(field, id, current)){
       const currentKey = normalizeMergeKey(current);
       const nextKey = normalizeMergeKey(next);
-      if(currentKey === nextKey || currentKey.includes(nextKey)) return false;
-      if(nextKey.includes(currentKey)) merged = next;
+      if(currentKey === nextKey) return false; // doublon exact : rien à faire
+      else if(nextKey.includes(currentKey)) merged = next; // l'import est une version plus complète du même texte : remplace au lieu de dupliquer
+      // Important : on ne saute JAMAIS l'import au seul motif que le texte
+      // actuel "contient" le texte importé comme sous-chaîne (ancien
+      // comportement) — ce test faisait perdre silencieusement du contenu
+      // réellement nouveau sur des champs courts (ex. associations/vs :
+      // le texte actuel "F5 + VB44" contient "VB44" sans que la nouvelle
+      // note "VB44" seule soit pour autant redondante). En cas de doute, on
+      // ajoute plutôt qu'on ne perd — un doublon visible se corrige, une
+      // perte silencieuse non.
       else merged = `${current}\n\n${next}`;
     }
     try{
