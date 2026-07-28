@@ -83,13 +83,20 @@
     syncToggleUi();
   };
 
+  // Icône SVG monochrome (stroke=currentColor) au lieu de l'émoji 🔒/🔓 natif :
+  // certains navigateurs mobiles (Android/Brave notamment) affichent les
+  // émojis couleur sans respecter un filter:grayscale CSS dessus, donc l'ancien
+  // rendu restait coloré (orange/or) malgré l'intention d'un rendu neutre.
+  const LOCK_ICON_CLOSED = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-0.15em"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  const LOCK_ICON_OPEN = '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-0.15em"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.75-1.5"/></svg>';
+
   function syncToggleUi(){
     const enabled = isLockEnabled();
     const toggle = document.getElementById("gridLockToggle");
     if(toggle) toggle.checked = enabled;
     const indicator = document.getElementById("gridLockIndicator");
     if(indicator){
-      indicator.textContent = enabled ? "🔒︎" : "🔓︎";
+      indicator.innerHTML = enabled ? LOCK_ICON_CLOSED : LOCK_ICON_OPEN;
       const label = enabled
         ? "Grille verrouillée (mêmes points, disposition mélangée à chaque fois) : clique pour déverrouiller"
         : "Grille libre : clique pour verrouiller cette grille";
