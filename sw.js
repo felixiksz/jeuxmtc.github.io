@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260728-quiz-image-merge";
+const MTC_OFFLINE_VERSION = "20260728-import-mastery-batch";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -58,6 +58,7 @@ const CORE_ASSETS = [
   "46-memo-mode.js",
   "52-quiz-mode.css",
   "52-quiz-mode.js",
+  "55-point-mastery.js",
   "47-acu-image-import-novelty.js",
   "50-grid-lock.js",
   "51-daily-streak.js",
