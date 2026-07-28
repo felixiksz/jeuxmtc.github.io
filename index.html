@@ -103,17 +103,17 @@
 <link href="study-domain-launcher.css" rel="stylesheet"/>
 <link href="pharma-game-v1.css" rel="stylesheet"/>
 <link href="pharma-cheatsheet-essentielles.css" rel="stylesheet"/>
-<link href="bucket8-acu-export-import-fixes.css?v=20260726-active-icon-shadow" rel="stylesheet"/>
+<link href="bucket8-acu-export-import-fixes.css?v=20260728-icon-fill-fix" rel="stylesheet"/>
 <link href="30-comparison-redesign.css?v=20260707-dm20-public-assoc-v1" rel="stylesheet"/>
 <link href="31-search-compare-select.css?v=20260707-admin-autosave-v2" rel="stylesheet"/>
 <link href="33-stable-hotfix.css" rel="stylesheet"/>
 <link href="34-targeted-requests.css" rel="stylesheet"/>
 <link href="37-fixed-detail-close-zone.css" rel="stylesheet"/>
 <link href="40-comparison-loading-history.css?v=20260703-finalbatch2" rel="stylesheet"/>
-<link href="44-simple-replay-history-mobile.css?v=20260703-finalbatch2" rel="stylesheet"/>
+<link href="44-simple-replay-history-mobile.css?v=20260728-button-color-match" rel="stylesheet"/>
 <link href="45-baskerville-esprit-replay.css?v=20260703-finalbatch2" rel="stylesheet"/>
 <link href="46-memo-mode.css?v=20260728-quiz-image-merge" rel="stylesheet"/>
-<link href="52-quiz-mode.css?v=20260728-quiz-image-merge" rel="stylesheet"/>
+<link href="52-quiz-mode.css?v=20260728-rating-ui" rel="stylesheet"/>
 <link href="48-offline-pwa.css?v=20260726-layout-fixes2" rel="stylesheet"/>
 </head>
 <body>
@@ -164,7 +164,7 @@
 <input aria-label="Difficulté du mode Auto" class="practice-difficulty-slider" id="practiceDifficultySlider" max="2" min="0" onchange="setAutoPracticeModeFromSlider(this.value)" oninput="previewPracticeModeFromSlider(this.value)" step="1" type="range" value="1"/>
 <span class="practice-difficulty-end">Difficile</span>
 </div>
-<button aria-label="Verrouiller ou déverrouiller cette grille" class="grid-lock-indicator" id="gridLockIndicator" onclick="toggleGridLock(!isGridLockEnabled())" title="Verrouiller ou déverrouiller cette grille" type="button">🔓︎</button>
+<button aria-label="Verrouiller ou déverrouiller cette grille" class="grid-lock-indicator" id="gridLockIndicator" onclick="toggleGridLock(!isGridLockEnabled())" title="Verrouiller ou déverrouiller cette grille" type="button"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-0.15em"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.75-1.5"/></svg></button>
 <button id="manualEditButton" onclick="toggleManualChecklist()" style="display:none;">
       Catégories de points
     </button>
@@ -341,9 +341,9 @@
 <script src="25-23-pharma-cheatsheet-essentielles.js?v=20260703-finalbatch2"></script>
 <script src="26-24-pharma-tools.js"></script>
 <script src="27-25-pharma-stats-gameplay.js?v=20260722-storage-quota-fix"></script>
-<script src="28-26-bucket8-acu-export-import-fixes.js?v=20260725-indexeddb-v1"></script>
-<script src="29-27-visible-gameplay-mode-switch.js?v=20260726-icons-v2"></script>
-<script src="30-comparison-redesign.js?v=20260725-assoc-link-fix"></script>
+<script src="28-26-bucket8-acu-export-import-fixes.js?v=20260728-import-merge-fix"></script>
+<script src="29-27-visible-gameplay-mode-switch.js?v=20260728-fill-toggle"></script>
+<script src="30-comparison-redesign.js?v=20260728-spacing-fix"></script>
 <script src="31-search-compare-select.js?v=20260725-basket-ab-v1"></script>
 <script src="audio-manifest.js?v=20260722-cleanup"></script>
 <script src="32-audio-pronunciation.js?v=20260726-icons-v1"></script>
@@ -357,9 +357,10 @@
 <script src="44-simple-replay-history-mobile.js?v=20260703-finalbatch2"></script>
 <script src="45-baskerville-esprit-replay.js?v=20260703-finalbatch2"></script>
 <script src="46-memo-mode.js?v=20260728-quiz-image-merge"></script>
-<script src="52-quiz-mode.js?v=20260728-quiz-image-merge"></script>
+<script src="52-quiz-mode.js?v=20260728-rating-ui"></script>
+<script src="55-point-mastery.js?v=20260728-v1"></script>
 <script src="47-acu-image-import-novelty.js?v=20260725-indexeddb-v1"></script>
-<script src="50-grid-lock.js?v=20260726-icons-v2"></script>
+<script src="50-grid-lock.js?v=20260728-svg-icon"></script>
 <script src="51-daily-streak.js?v=20260726-icons-v1"></script>
 <script src="48-offline-pwa.js?v=20260722-updateviacache-none"></script>
 </body>
