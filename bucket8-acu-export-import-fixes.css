@@ -387,9 +387,18 @@
   box-shadow:none !important;
   text-shadow:none !important;
   color:inherit !important;
-  filter:grayscale(1) saturate(0) contrast(1.02) !important;
   opacity:.52 !important;
   transform:none !important;
+}
+
+/* Rempli transparent par défaut (silhouette au trait, monochrome) : le
+   remplissage coloré n'apparaît qu'à l'état actif ci-dessous. Contrôler la
+   couleur via `fill` plutôt qu'un filter:grayscale sur un émoji évite le bug
+   où certains navigateurs mobiles ignorent filter sur un glyphe émoji couleur. */
+.gameplay-mode-glyph-body,
+.gameplay-mode-glyph-leaf{
+  fill:transparent !important;
+  transition:fill .18s ease;
 }
 
 .gameplay-mode-topline .gameplay-mode-icon:hover,
@@ -420,7 +429,6 @@
 #gameplayModeReviewBtn[aria-pressed="true"],
 #gameplayModeExamBtn.active,
 #gameplayModeExamBtn[aria-pressed="true"]{
-  filter:none !important;
   opacity:1 !important;
   border:0 !important;
   outline:0 !important;
@@ -428,6 +436,19 @@
   box-shadow:none !important;
   text-shadow:none !important;
   transform:none !important;
+}
+#gameplayModeReviewBtn.active .gameplay-mode-glyph-body,
+#gameplayModeReviewBtn[aria-pressed="true"] .gameplay-mode-glyph-body{
+  fill:#e9eef5 !important;
+}
+#gameplayModeReviewBtn.active .gameplay-mode-glyph-leaf,
+#gameplayModeReviewBtn[aria-pressed="true"] .gameplay-mode-glyph-leaf{
+  fill:#5aa85a !important;
+  stroke:#3d7a3d !important;
+}
+#gameplayModeExamBtn.active .gameplay-mode-glyph-body,
+#gameplayModeExamBtn[aria-pressed="true"] .gameplay-mode-glyph-body{
+  fill:#7c9c5c !important;
 }
 
 

@@ -10,9 +10,9 @@
 }
 #mtcReplaySameGridButton{
   appearance:none;
-  border:1px solid color-mix(in srgb, var(--shadow-color, currentColor) 42%, transparent);
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 36%, transparent);
   border-radius:999px;
-  background:color-mix(in srgb, var(--page-bg, #fff) 72%, transparent);
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 8%, var(--page-bg, #fff));
   color:var(--text-color, currentColor);
   min-width:42px;
   min-height:38px;
@@ -27,16 +27,12 @@
   font-weight:650;
   letter-spacing:.02em;
   cursor:pointer;
-  box-shadow:0 8px 22px rgba(0,0,0,.12), 0 0 12px color-mix(in srgb, var(--shadow-color, currentColor) 22%, transparent);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 6px 16px color-mix(in srgb, var(--shadow-color, #4b63ff) 24%, transparent);
   transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
 }
 #mtcReplaySameGridButton:hover,
 #mtcReplaySameGridButton:focus-visible{
   transform:translateY(-1px);
-  background:color-mix(in srgb, var(--shadow-color, currentColor) 14%, var(--page-bg, #fff));
-  box-shadow:0 10px 26px rgba(0,0,0,.16), 0 0 18px color-mix(in srgb, var(--shadow-color, currentColor) 32%, transparent);
   outline:none;
 }
 #mtcReplaySameGridButton:active{
