@@ -392,13 +392,23 @@
 }
 
 /* Rempli transparent par défaut (silhouette au trait, monochrome) : le
-   remplissage coloré n'apparaît qu'à l'état actif ci-dessous. Contrôler la
-   couleur via `fill` plutôt qu'un filter:grayscale sur un émoji évite le bug
-   où certains navigateurs mobiles ignorent filter sur un glyphe émoji couleur. */
+   remplissage coloré n'apparaît qu'à l'état actif ci-dessous. Ne s'applique
+   qu'au dinosaure (SVG) — la colombe est repassée en émoji natif, voir
+   #gameplayModeReviewBtn ci-dessous pour son propre mécanisme. */
 .gameplay-mode-glyph-body,
 .gameplay-mode-glyph-leaf{
   fill:transparent !important;
   transition:fill .18s ease;
+}
+
+/* La colombe (émoji natif 🕊️) n'a pas de fill CSS contrôlable comme le
+   dinosaure (SVG) : on revient donc à filter:grayscale pour la neutraliser
+   à l'état inactif. C'est moins fiable sur certains navigateurs mobiles
+   (qui n'appliquent pas toujours filter sur un glyphe émoji couleur), mais
+   l'émoji est nettement plus reconnaissable que la silhouette dessinée à
+   la main qui le remplaçait. */
+#gameplayModeReviewBtn{
+  filter:grayscale(1) saturate(0) contrast(1.02) !important;
 }
 
 .gameplay-mode-topline .gameplay-mode-icon:hover,
@@ -436,15 +446,6 @@
   box-shadow:none !important;
   text-shadow:none !important;
   transform:none !important;
-}
-#gameplayModeReviewBtn.active .gameplay-mode-glyph-body,
-#gameplayModeReviewBtn[aria-pressed="true"] .gameplay-mode-glyph-body{
-  fill:#e9eef5 !important;
-}
-#gameplayModeReviewBtn.active .gameplay-mode-glyph-leaf,
-#gameplayModeReviewBtn[aria-pressed="true"] .gameplay-mode-glyph-leaf{
-  fill:#5aa85a !important;
-  stroke:#3d7a3d !important;
 }
 #gameplayModeExamBtn.active .gameplay-mode-glyph-body,
 #gameplayModeExamBtn[aria-pressed="true"] .gameplay-mode-glyph-body{
