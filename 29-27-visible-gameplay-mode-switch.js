@@ -79,16 +79,11 @@
       review.id = "gameplayModeReviewBtn";
       review.type = "button";
       review.className = "gameplay-mode-icon gameplay-mode-review";
-      // Icône SVG plutôt que l'émoji 🕊️ natif : certains navigateurs mobiles
-      // n'appliquent pas filter:grayscale sur un émoji couleur (COLR/CPAL),
-      // donc le rendu restait coloré même à l'état inactif. Ici le remplissage
-      // (transparent par défaut, coloré seulement quand .active) est contrôlé
-      // directement en CSS, ce qui marche de façon fiable partout.
-      review.innerHTML = `<svg viewBox="0 0 100 100" width="1.15em" height="1.15em" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" style="vertical-align:-0.18em">
-        <path class="gameplay-mode-glyph-body" d="M18,58 C12,44 20,28 38,26 C48,25 55,30 59,37 C69,33 80,36 85,44 C76,45 69,50 67,56 C72,60 76,66 75,73 C64,71 55,66 51,59 C43,66 30,68 19,63 C26,58 29,53 27,48 C23,50 19,54 18,58 Z"/>
-        <circle class="gameplay-mode-glyph-body" cx="61" cy="32" r="6.5"/>
-        <path class="gameplay-mode-glyph-leaf" stroke-width="3" d="M60,22 C64,15 73,13 80,17 C75,22 68,24 61,23"/>
-      </svg>`;
+      // Retour à l'émoji 🕊️ : la silhouette SVG dessinée à la main ne se
+      // lisait pas comme une colombe. On perd la fiabilité du fill CSS
+      // (voir #gameplayModeReviewBtn en CSS pour le filter:grayscale qui
+      // remplace ce mécanisme ici), mais l'icône redevient reconnaissable.
+      review.textContent = "🕊︎";
       review.setAttribute("aria-label", "Révision douce");
       review.setAttribute("aria-pressed", "false");
       review.addEventListener("click", function(){ toggleVisibleGameplayMode("review"); });
