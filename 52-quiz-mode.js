@@ -99,6 +99,27 @@
     return cleanText(String(category || "").replace(/^points?\s+/i, ""));
   }
 
+  // Certaines catégories groupent des points dont le rôle catégoriel
+  // n'appartient PAS à leur propre canal (préfixe du code) : un point
+  // xì-crevasse peut être physiquement sur un canal régulier mais être en
+  // réalité le xì-crevasse d'un des 4 vaisseaux extraordinaires qiāo/wéi
+  // (ex. VB35 est bien sur le canal de la vésicule biliaire, mais c'est le
+  // xì-crevasse du yáng wéi mài, pas de la vésicule biliaire) — même chose
+  // pour les points d'ouverture des merveilleux vaisseaux (ex. P7 ouvre le
+  // rèn mài, ce n'est pas "le point d'ouverture du poumon"). Dans ces deux
+  // cas précis, 04-03-core-game.js expose déjà getContextLabelForPoint(),
+  // utilisée pour l'étiquette sous la tuile — on la réutilise ici pour ne
+  // pas répéter la question avec le mauvais canal.
+  const CONTEXTUAL_CANAL_GROUPS = ["Points_Xi_Crevasse", "Points_d_ouverture_des_merveilleux_vaisseaux"];
+  function contextualCanalPhrase(groupKey, point){
+    if(!CONTEXTUAL_CANAL_GROUPS.includes(groupKey)) return "";
+    if(typeof window.getContextLabelForPoint !== "function") return "";
+    try{
+      const label = cleanText(window.getContextLabelForPoint(groupKey, point));
+      return label ? "du " + label : "";
+    }catch(error){ return ""; }
+  }
+
   function currentGridPoints(){
     const groups = getCurrentSolutionGroups();
     const list = [];
@@ -108,7 +129,14 @@
         const code = String(point || "");
         if(!code) return;
         const canal = canalOfPoint(code);
-        list.push({point:code, category, categoryPhrase:questionCategoryPhrase(category), canal, canalPhrase:canalPhrase(canal)});
+        const contextualPhrase = contextualCanalPhrase(group && group.key, code);
+        list.push({
+          point:code,
+          category,
+          categoryPhrase:questionCategoryPhrase(category),
+          canal,
+          canalPhrase:contextualPhrase || canalPhrase(canal)
+        });
       });
     });
     return list;
