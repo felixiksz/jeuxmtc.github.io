@@ -54,7 +54,7 @@
     P:"du Poumon", GI:"du Gros Intestin", E:"de l'Estomac", Rt:"de la Rate",
     C:"du Cœur", IG:"de l'Intestin Grêle", V:"de la Vessie", Rn:"du Rein",
     EC:"de l'Enveloppe du Cœur", TF:"des Trois Foyers", VB:"de la Vésicule Biliaire", F:"du Foie",
-    RM:"du Vaisseau Conception", DM:"du Vaisseau Gouverneur"
+    RM:"du Rèn Mài", DM:"du Dū Mài"
   };
 
   function canalOfPoint(point){
@@ -100,23 +100,42 @@
   }
 
   // Certaines catégories groupent des points dont le rôle catégoriel
-  // n'appartient PAS à leur propre canal (préfixe du code) : un point
-  // xì-crevasse peut être physiquement sur un canal régulier mais être en
-  // réalité le xì-crevasse d'un des 4 vaisseaux extraordinaires qiāo/wéi
-  // (ex. VB35 est bien sur le canal de la vésicule biliaire, mais c'est le
-  // xì-crevasse du yáng wéi mài, pas de la vésicule biliaire) — même chose
-  // pour les points d'ouverture des merveilleux vaisseaux (ex. P7 ouvre le
-  // rèn mài, ce n'est pas "le point d'ouverture du poumon"). Dans ces deux
-  // cas précis, 04-03-core-game.js expose déjà getContextLabelForPoint(),
-  // utilisée pour l'étiquette sous la tuile — on la réutilise ici pour ne
-  // pas répéter la question avec le mauvais canal.
-  const CONTEXTUAL_CANAL_GROUPS = ["Points_Xi_Crevasse", "Points_d_ouverture_des_merveilleux_vaisseaux"];
+  // n'appartient PAS à leur propre canal (préfixe du code) :
+  // - un point xì-crevasse peut être physiquement sur un canal régulier
+  //   mais être en réalité le xì-crevasse d'un des 4 vaisseaux
+  //   extraordinaires qiāo/wéi (ex. VB35 est bien sur le canal de la
+  //   vésicule biliaire, mais c'est le xì-crevasse du yáng wéi mài) ;
+  // - même chose pour les points d'ouverture des merveilleux vaisseaux
+  //   (ex. P7 ouvre le rèn mài, ce n'est pas "le point d'ouverture du
+  //   poumon") ;
+  // - et pour les points xià hé-réunion inférieure, "empruntés" au canal
+  //   de l'estomac ou de la vessie pour représenter l'intestin grêle, les
+  //   trois foyers ou le gros intestin (ex. E39 est sur le canal de
+  //   l'estomac, mais c'est le xià hé-réunion inférieure de l'intestin
+  //   grêle).
+  // Dans ces trois cas précis, 04-03-core-game.js expose déjà
+  // getContextLabelForPoint(), utilisée pour l'étiquette sous la tuile —
+  // on la réutilise ici pour ne pas répéter la question avec le mauvais
+  // canal. Les vaisseaux extraordinaires prennent tous "du" ; les noms
+  // d'organe ont des prépositions variables (de la Rate, de l'Estomac,
+  // des Trois Foyers…), donc on réutilise directement les formulations
+  // déjà correctes de CANAL_PHRASES plutôt que de deviner l'article.
+  const CONTEXTUAL_VESSEL_GROUPS = ["Points_Xi_Crevasse", "Points_d_ouverture_des_merveilleux_vaisseaux"];
+  const CONTEXTUAL_ORGAN_GROUPS = ["Points_Xia_He_Reunion_inferieure"];
+  const ORGAN_LABEL_PHRASES = {
+    "Intestin Grêle": CANAL_PHRASES.IG,
+    "Trois Foyers": CANAL_PHRASES.TF,
+    "Gros Intestin": CANAL_PHRASES.GI
+  };
   function contextualCanalPhrase(groupKey, point){
-    if(!CONTEXTUAL_CANAL_GROUPS.includes(groupKey)) return "";
+    const isVesselGroup = CONTEXTUAL_VESSEL_GROUPS.includes(groupKey);
+    const isOrganGroup = CONTEXTUAL_ORGAN_GROUPS.includes(groupKey);
+    if(!isVesselGroup && !isOrganGroup) return "";
     if(typeof window.getContextLabelForPoint !== "function") return "";
     try{
       const label = cleanText(window.getContextLabelForPoint(groupKey, point));
-      return label ? "du " + label : "";
+      if(!label) return "";
+      return isVesselGroup ? "du " + label : (ORGAN_LABEL_PHRASES[label] || "");
     }catch(error){ return ""; }
   }
 
