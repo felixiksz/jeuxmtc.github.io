@@ -5126,6 +5126,23 @@ function getContextLabelForPoint(groupKey, point){
     return beiShuExtra[point] || "";
   }
 
+  if(groupKey === "Points_Xia_He_Reunion_inferieure"){
+    // Contrairement au Bèi-Shù (tous sur le canal de la vessie, l'organe
+    // traité est une info en plus), les points xià hé-réunion inférieure
+    // sont "empruntés" au canal de l'estomac ou de la vessie pour Intestin
+    // Grêle / Trois Foyers / Gros Intestin : leur canal propre EST donc
+    // différent de l'organe fǔ qu'ils représentent dans cette catégorie.
+    // V40 (Vessie), VB34 (Vésicule Biliaire) et E36 (Estomac) coïncident
+    // avec leur propre canal et n'ont pas besoin d'être listés ici.
+    const xiaHeExtra = {
+      "E39":"Intestin Grêle",
+      "V39":"Trois Foyers",
+      "E37":"Gros Intestin"
+    };
+
+    return xiaHeExtra[point] || "";
+  }
+
   return "";
 }
 

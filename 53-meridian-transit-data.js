@@ -26,7 +26,7 @@
     P:"Poumon", GI:"Gros Intestin", E:"Estomac", Rt:"Rate",
     C:"Cœur", IG:"Intestin Grêle", V:"Vessie", Rn:"Rein",
     EC:"Enveloppe du Cœur", TF:"Trois Foyers", VB:"Vésicule Biliaire", F:"Foie",
-    RM:"Vaisseau Conception", DM:"Vaisseau Gouverneur"
+    RM:"Rèn Mài", DM:"Dū Mài"
   };
 
   function stopsOf(channel){
@@ -114,8 +114,8 @@
     {id:"TF5", channel:"TF", name:"Bus Trois Foyers → Enveloppe du Cœur", from:"TF5", to:"EC9"},
     {id:"VB37",channel:"VB", name:"Bus Vésicule Biliaire → Foie",      from:"VB37",to:"F1"},
     {id:"F5",  channel:"F",  name:"Bus Foie → Vésicule Biliaire",      from:"F5",  to:"VB44"},
-    {id:"RM15",channel:"RM", name:"Bus Vaisseau Conception (abdomen)", from:"RM15",to:"RM1", special:"se diffuse dans l'abdomen"},
-    {id:"DM1", channel:"DM", name:"Bus Vaisseau Gouverneur (dos/tête)",from:"DM1", to:"DM20", special:"se diffuse dans le dos et la tête"},
+    {id:"RM15",channel:"RM", name:"Bus Rèn Mài (abdomen)", from:"RM15",to:"RM1", special:"se diffuse dans l'abdomen"},
+    {id:"DM1", channel:"DM", name:"Bus Dū Mài (dos/tête)",from:"DM1", to:"DM20", special:"se diffuse dans le dos et la tête"},
     {id:"Rt21",channel:"Rt", name:"Grand luò de la Rate",              from:"Rt21",to:"Rt1", special:"grand luò : poitrine et flancs, rassemble le sang de tous les luò"},
     {id:"E18", channel:"E",  name:"Grand luò de l'Estomac (xū lǐ)",    from:"E18", to:"RM17", special:"grand luò unilatéral gauche : cœur, poumon, diaphragme"}
   ];
