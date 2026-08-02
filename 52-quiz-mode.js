@@ -13,8 +13,17 @@
   const state = {
     mode:"text",
     questions:[],
-    index:0
+    index:0,
+    gridSignature:""
   };
+
+  // Sert à savoir si state.questions correspond encore à la grille
+  // actuellement affichée (ouvrir/fermer une fiche de point, par exemple,
+  // ne doit pas repartir de zéro : on ne reconstruit le quiz que si la
+  // grille a changé entre-temps).
+  function gridSignatureFor(points){
+    return points.map(item => item.point).slice().sort().join(",");
+  }
 
   function byId(id){ return document.getElementById(id); }
   function isPharma(){ return document.documentElement.getAttribute("data-study-domain") === "pharmacology"; }
@@ -235,6 +244,16 @@
       return;
     }
     setOverlayVisible(true);
+
+    const resumable =
+      state.questions.length > 0 &&
+      state.gridSignature === gridSignatureFor(points);
+
+    if(resumable){
+      renderCurrentQuestion();
+      return;
+    }
+
     if(hasAnyLocalImage(points.map(item => item.point))) renderModeChoice();
     else startQuiz("text");
   }
@@ -267,6 +286,7 @@
     state.mode = mode;
     state.questions = questions;
     state.index = 0;
+    state.gridSignature = gridSignatureFor(currentGridPoints());
     renderCurrentQuestion();
   }
   function restartQuiz(){
