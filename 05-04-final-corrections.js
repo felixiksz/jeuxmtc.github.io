@@ -565,15 +565,35 @@
         "Points_Xi_Crevasse",
         "Points_Luo_Liaison"
       ].includes(key)){
-        html += section(
-          title,
-          canalOrder.map(canal =>
-            line(
-              labelForCanalOrVessel(canal),
-              flattenLocal(value).filter(p => canalOfPoint(p) === canal)
-            )
+        const allPointsForKey = flattenLocal(value);
+        const overrideRows = new Map();
+        const regularPoints = [];
+
+        allPointsForKey.forEach(point=>{
+          const override = typeof getContextLabelForPoint === "function"
+            ? getContextLabelForPoint(key, point)
+            : "";
+
+          if(override){
+            if(!overrideRows.has(override)) overrideRows.set(override, []);
+            overrideRows.get(override).push(point);
+          }else{
+            regularPoints.push(point);
+          }
+        });
+
+        const rows = canalOrder.map(canal =>
+          line(
+            labelForCanalOrVessel(canal),
+            regularPoints.filter(p => canalOfPoint(p) === canal)
           )
         );
+
+        overrideRows.forEach((points, overrideLabel)=>{
+          rows.push(line(overrideLabel, points));
+        });
+
+        html += section(title, rows);
       }else{
         html += section(title, simplePointLines(value));
       }
