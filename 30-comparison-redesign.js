@@ -1842,6 +1842,25 @@
     }
   }
 
+  // Position de la boîte de suggestions : ancrée sur le caret lui-même
+  // (via Range.getClientRects()), pas sur le cadre entier du champ.
+  // Sinon, dans un champ Associations multi-ligne déjà rempli, la boîte
+  // se plaçait sous le BAS du champ entier au lieu de sous le mot en
+  // cours de saisie, la faisant apparaître par-dessus le texte existant.
+  function caretClientRect(editable){
+    try{
+      const selection = window.getSelection && window.getSelection();
+      if(!selection || !selection.rangeCount) return null;
+      const range = selection.getRangeAt(0);
+      if(!editable || !editable.contains(range.endContainer)) return null;
+      const rects = range.getClientRects();
+      if(rects && rects.length) return rects[rects.length - 1];
+      const rect = range.getBoundingClientRect();
+      if(rect && (rect.width || rect.height || rect.top)) return rect;
+      return null;
+    }catch(error){ return null; }
+  }
+
   function selectionOffsetInEditable(editable){
     if(!editable) return -1;
     const selection = window.getSelection && window.getSelection();
@@ -1858,8 +1877,21 @@
     if(!editable || !document.createRange || !window.getSelection) return;
     editable.focus();
     const range = document.createRange();
-    range.selectNodeContents(editable);
-    range.collapse(false);
+    // Collapser sur le dernier NŒUD TEXTE (pas juste "après le dernier
+    // enfant" au niveau de l'élément) : un range collapsé dont le
+    // container est l'élément lui-même renvoie souvent des
+    // getClientRects() vides dans les navigateurs, ce qui rendait le
+    // caret introuvable pour positionner la boîte de suggestions.
+    const walker = document.createTreeWalker(editable, NodeFilter.SHOW_TEXT, null);
+    let lastTextNode = null;
+    while(walker.nextNode()) lastTextNode = walker.currentNode;
+    if(lastTextNode){
+      range.setStart(lastTextNode, lastTextNode.textContent.length);
+      range.collapse(true);
+    }else{
+      range.selectNodeContents(editable);
+      range.collapse(false);
+    }
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
@@ -1965,7 +1997,7 @@
       box.dataset.targetId = editable.dataset.acuPointId || "";
       box.dataset.targetField = editable.dataset.acuCompareEdit || "";
     }
-    const rect = editable.getBoundingClientRect();
+    const rect = caretClientRect(editable) || editable.getBoundingClientRect();
     box.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - 260))}px`;
     box.style.top = `${Math.min(window.innerHeight - 80, rect.bottom + 6)}px`;
     box.classList.add("open");
