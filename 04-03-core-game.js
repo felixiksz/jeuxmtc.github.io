@@ -3153,14 +3153,14 @@ function startTour(){
 
   const sharedSteps = [
     {
-      selector: ".topbar-row button[onclick='newGame()']",
+      selector: ".topbar-row button[onclick*='newGame()']",
       title: "Nouvelle partie",
       text: isPharmaTour
         ? "Ce bouton relance une grille PHARMA avec 4 classes de SM."
         : "Ce bouton relance une grille ACU avec 4 catégories de points."
     },
     {
-      selector: ".topbar-row button[onclick='toggleSettings()']",
+      selector: ".topbar-row button[onclick*='toggleSettings()']",
       title: "Affichage",
       text: isPharmaTour
         ? "Ici tu peux ajuster les couleurs, le halo, la taille du texte et l’affichage des noms communs au survol."
