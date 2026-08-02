@@ -1985,15 +1985,42 @@ function renderCheatsheetPanel(){
       "Points_Luo_Liaison"
     ].includes(key)){
 
-      html += section(
-        title,
-        canalOrder.map(canal =>
-          line(
-            labelForCanalOrVessel(canal),
-            flattenLocal(value).filter(p => canalOfPoint(p) === canal)
-          )
+      // Certains points de cette catégorie n'appartiennent en réalité pas à
+      // leur propre canal (préfixe du code) mais à un vaisseau extraordinaire
+      // ou à un autre repère précis (ex. Rn8 est le xì-crevasse du yīn qiāo
+      // mài, pas du canal du Rein ; RM15/RM6 sont les points « yuán-source »
+      // du Gāo/Huāng, pas du Rèn Mài). getContextLabelForPoint() connaît déjà
+      // ces exceptions — on les regroupe sous leur propre étiquette plutôt
+      // que sous le canal physique du point pour ne pas induire en erreur.
+      const allPoints = flattenLocal(value);
+      const overrideRows = new Map();
+      const regularPoints = [];
+
+      allPoints.forEach(point=>{
+        const override = typeof getContextLabelForPoint === "function"
+          ? getContextLabelForPoint(key, point)
+          : "";
+
+        if(override){
+          if(!overrideRows.has(override)) overrideRows.set(override, []);
+          overrideRows.get(override).push(point);
+        }else{
+          regularPoints.push(point);
+        }
+      });
+
+      const rows = canalOrder.map(canal =>
+        line(
+          labelForCanalOrVessel(canal),
+          regularPoints.filter(p => canalOfPoint(p) === canal)
         )
       );
+
+      overrideRows.forEach((points, label)=>{
+        rows.push(line(label, points));
+      });
+
+      html += section(title, rows);
 
     }else{
 
