@@ -50,7 +50,7 @@
 
     patchStep(
       steps,
-      ".topbar-row button[onclick='newGame()']",
+      ".topbar-row button[onclick*='newGame()']",
       pharma
         ? "Ce bouton relance une grille avec 4 classes de SM."
         : "Ce bouton relance une grille avec 4 catégories de points."
@@ -58,7 +58,7 @@
 
     patchStep(
       steps,
-      ".topbar-row button[onclick='toggleSettings()']",
+      ".topbar-row button[onclick*='toggleSettings()']",
       pharma
         ? "Ici tu peux ajuster les couleurs, le halo, la taille du texte et l’affichage des noms communs au survol"
         : "Ici tu peux ajuster les couleurs, le halo et la taille du texte pour que la grille soit confortable."
@@ -116,7 +116,7 @@
       "#studyDomainSelect",
       "ACU / PHARMA",
       "Ici tu peux changer de matiere en cours de route.",
-      ".topbar-row button[onclick='newGame()']"
+      ".topbar-row button[onclick*='newGame()']"
     );
 
     insertStepOnce(
