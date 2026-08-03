@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260803-pinyin-canal-names";
+const MTC_OFFLINE_VERSION = "20260803-mobile-topbar-menu";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -66,6 +66,8 @@ const CORE_ASSETS = [
   "48-offline-pwa.js",
   "57-daily-reminder.css",
   "57-daily-reminder.js",
+  "58-mobile-topbar-menu.css",
+  "58-mobile-topbar-menu.js",
   "Import_tableau pharma_pro(1).json",
   "README_HORS_CONNEXION.txt",
   "README_PUBLICATION.txt",
