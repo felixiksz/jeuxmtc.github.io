@@ -116,6 +116,7 @@
 <link href="46-memo-mode.css?v=20260728-quiz-image-merge" rel="stylesheet"/>
 <link href="52-quiz-mode.css?v=20260802-progress-bar" rel="stylesheet"/>
 <link href="48-offline-pwa.css?v=20260726-layout-fixes2" rel="stylesheet"/>
+<link href="57-daily-reminder.css?v=20260803-v1" rel="stylesheet"/>
 </head>
 <body>
 
@@ -139,6 +140,7 @@
 <div class="topbar-row topbar-main-row">
 <div class="topbar-main-buttons">
 <span aria-label="Série de jours consécutifs joués" class="daily-streak-badge" id="dailyStreakBadge" style="display:none;" title="Série de jours consécutifs joués"></span>
+<button aria-pressed="false" id="mtcDailyReminderButton" title="Activer un rappel si tu n'as pas encore joué aujourd'hui" type="button"><svg aria-hidden="true" fill="none" height="1.05em" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="1.05em"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
 <button onclick="if(window.confirmNewGame){confirmNewGame()}else{newGame()}">⟳ Nouvelle partie</button>
 <button onclick="toggleSettings()">⚆ Affichage</button>
 <button onclick="startTour()">? Aide</button>
@@ -364,5 +366,6 @@
 <script src="50-grid-lock.js?v=20260728-svg-icon"></script>
 <script src="51-daily-streak.js?v=20260726-icons-v1"></script>
 <script src="48-offline-pwa.js?v=20260722-updateviacache-none"></script>
+<script src="57-daily-reminder.js?v=20260803-v1"></script>
 </body>
 </html>

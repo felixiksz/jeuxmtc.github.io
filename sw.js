@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260802-quiz-auto-resume";
+const MTC_OFFLINE_VERSION = "20260803-daily-reminder";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -64,6 +64,8 @@ const CORE_ASSETS = [
   "51-daily-streak.js",
   "48-offline-pwa.css",
   "48-offline-pwa.js",
+  "57-daily-reminder.css",
+  "57-daily-reminder.js",
   "Import_tableau pharma_pro(1).json",
   "README_HORS_CONNEXION.txt",
   "README_PUBLICATION.txt",
@@ -573,6 +575,66 @@ self.addEventListener("activate", event => {
     const names = await caches.keys();
     await Promise.all(names.map(name => name.startsWith("connections-mtc-") && name !== MTC_CACHE_NAME ? caches.delete(name) : null));
     await self.clients.claim();
+  })());
+});
+
+// Rappel quotidien "best effort" (Periodic Background Sync, Chrome/Android
+// PWA installée uniquement) : le navigateur décide lui-même s'il réveille
+// le service worker ce jour-là, aucune garantie d'heure ni de fréquence.
+// localStorage n'est pas accessible ici — 57-daily-reminder.js y mirrore
+// la date de dernière partie jouée dans IndexedDB pour qu'on puisse la
+// lire depuis ce contexte sans réseau ni serveur.
+const MTC_REMINDER_DB_NAME = "mtc_reminder_db";
+const MTC_REMINDER_STORE_NAME = "state";
+const MTC_REMINDER_TAG = "mtc-daily-reminder";
+
+function mtcTodayLocalDateString(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function mtcReadLastPlayedDateFromIndexedDb(){
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(MTC_REMINDER_DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if(!db.objectStoreNames.contains(MTC_REMINDER_STORE_NAME)) db.createObjectStore(MTC_REMINDER_STORE_NAME);
+    };
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction(MTC_REMINDER_STORE_NAME, "readonly");
+      const getRequest = tx.objectStore(MTC_REMINDER_STORE_NAME).get("lastPlayedDate");
+      getRequest.onsuccess = () => resolve(getRequest.result || "");
+      getRequest.onerror = () => reject(getRequest.error);
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+self.addEventListener("periodicsync", event => {
+  if(event.tag !== MTC_REMINDER_TAG) return;
+  event.waitUntil((async () => {
+    try{
+      const lastPlayed = await mtcReadLastPlayedDateFromIndexedDb();
+      if(lastPlayed === mtcTodayLocalDateString()) return;
+      await self.registration.showNotification("🔔 Pas encore joué aujourd'hui !", {
+        body:"Une petite partie de Connections MTC pour garder ta série ?",
+        icon:"favicon.svg",
+        tag:MTC_REMINDER_TAG
+      });
+    }catch(error){}
+  })());
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const clientsList = await self.clients.matchAll({type:"window", includeUncontrolled:true});
+    if(clientsList.length){
+      clientsList[0].focus();
+    }else{
+      self.clients.openWindow("./");
+    }
   })());
 });
 
