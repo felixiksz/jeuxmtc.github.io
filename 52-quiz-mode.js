@@ -225,14 +225,24 @@
     document.body.classList.toggle("mtc-quiz-open", Boolean(visible));
   }
   function content(){ ensureOverlay(); return byId("mtcQuizContent"); }
-  function headerHtml(title, subtitle){
+  function headerHtml(title, subtitle, progressPercent){
+    const hasProgress = typeof progressPercent === "number" && isFinite(progressPercent);
+    const clamped = hasProgress ? Math.max(0, Math.min(100, progressPercent)) : 0;
+    const progressHtml = hasProgress
+      ? '<div class="mtc-quiz-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(clamped) + '" aria-label="Avancement du quiz">' +
+          '<div class="mtc-quiz-progress-fill" style="width:' + clamped + '%"></div>' +
+        '</div>'
+      : '';
     return '' +
       '<div class="mtc-quiz-header">' +
-        '<div>' +
-          '<h2>' + escapeHtml(title) + '</h2>' +
-          (subtitle ? '<p>' + escapeHtml(subtitle) + '</p>' : '') +
+        '<div class="mtc-quiz-header-row">' +
+          '<div>' +
+            '<h2>' + escapeHtml(title) + '</h2>' +
+            (subtitle ? '<p>' + escapeHtml(subtitle) + '</p>' : '') +
+          '</div>' +
+          '<button type="button" class="mtc-quiz-close" data-quiz-action="close" aria-label="Fermer le quiz">×</button>' +
         '</div>' +
-        '<button type="button" class="mtc-quiz-close" data-quiz-action="close" aria-label="Fermer le quiz">×</button>' +
+        progressHtml +
       '</div>';
   }
   function closeQuiz(){ setOverlayVisible(false); }
@@ -362,7 +372,7 @@
     const promptHtml = isImageMode
       ? '<div class="mtc-quiz-question-image"><img src="' + escapeHtml(getPointImage(question.point)) + '" alt="Quel est ce point ?" loading="lazy"></div><p class="mtc-quiz-prompt">Quel est ce point ?</p>'
       : '<p class="mtc-quiz-prompt">' + escapeHtml('Quel est le point ' + question.categoryPhrase + ' ' + question.canalPhrase + ' ?') + '</p>';
-    content().innerHTML = headerHtml("Quiz", "Question " + (state.index + 1) + " / " + total) +
+    content().innerHTML = headerHtml("Quiz", "Question " + (state.index + 1) + " / " + total, (state.index / total) * 100) +
       '<div class="mtc-quiz-card">' +
         promptHtml +
         (question.revealed
@@ -375,7 +385,7 @@
       '</div>';
   }
   function renderCompletion(){
-    content().innerHTML = headerHtml("Quiz terminé", state.questions.length + " points passés en revue.") +
+    content().innerHTML = headerHtml("Quiz terminé", state.questions.length + " points passés en revue.", 100) +
       '<div class="mtc-quiz-card mtc-quiz-done">' +
         '<p class="mtc-quiz-prompt">Quiz terminé !</p>' +
       '</div>' +
