@@ -3153,6 +3153,11 @@ function startTour(){
 
   const sharedSteps = [
     {
+      selector: "#mtcDailyReminderButton",
+      title: "🔔 Rappel quotidien",
+      text: "Active cette cloche pour recevoir une notification les jours où tu n'as pas encore joué. Reclique dessus pour la désactiver."
+    },
+    {
       selector: ".topbar-row button[onclick*='newGame()']",
       title: "Nouvelle partie",
       text: isPharmaTour
