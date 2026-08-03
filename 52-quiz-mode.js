@@ -434,9 +434,32 @@
     goNext();
   }
 
+  // Le quiz se ferme pour laisser voir la fiche/la comparaison (leur
+  // z-index est bien en dessous de l'overlay quiz) — mais l'utilisatrice
+  // ne devrait pas avoir à recliquer sur "quiz" pour reprendre là où
+  // elle en était. On note quel panneau on vient d'ouvrir et on
+  // rouvre le quiz automatiquement dès que CE panneau se referme
+  // (surveillé par le même MutationObserver que ensureQuizButton).
+  let quizPendingResumePanelId = "";
+
+  function armQuizResumeAfterPanel(panelId){
+    quizPendingResumePanelId = panelId;
+  }
+
+  function maybeResumeQuizAfterPanelClose(){
+    if(!quizPendingResumePanelId) return;
+    const panel = byId(quizPendingResumePanelId);
+    if(panel && panel.classList.contains("open")) return;
+    quizPendingResumePanelId = "";
+    openQuiz();
+  }
+
   function handleAction(action, button){
     const point = button && button.getAttribute("data-point");
-    if(action === "close") closeQuiz();
+    if(action === "close"){
+      quizPendingResumePanelId = "";
+      closeQuiz();
+    }
     else if(action === "reveal") revealCurrent();
     else if(action === "prev") goPrev();
     else if(action === "next") goNext();
@@ -453,11 +476,13 @@
     }
     else if(action === "open-comparison"){
       if(typeof window.openComparisonPanel === "function"){
+        armQuizResumeAfterPanel("comparisonPanel");
         closeQuiz();
         window.openComparisonPanel();
       }
     }
     else if(action === "open-fiche" && point){
+      armQuizResumeAfterPanel("pointPanel");
       closeQuiz();
       if(typeof window.openPointPanelDirect === "function") window.openPointPanelDirect(point);
     }
@@ -499,6 +524,7 @@
     const observer = new MutationObserver(() => {
       ensureQuizButton();
       removeQuizButtonIfNeeded();
+      maybeResumeQuizAfterPanelClose();
     });
     observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
     window.setTimeout(ensureQuizButton, 400);
