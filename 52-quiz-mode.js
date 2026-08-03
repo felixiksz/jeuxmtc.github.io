@@ -48,30 +48,23 @@
     return copy;
   }
 
-  // Aucune table préfixe → nom français d'organe n'existe ailleurs dans le
-  // code (CANAL_LABELS de 04-03-core-game.js donne les noms pinyin classiques,
-  // pas les noms français). Les 6 vaisseaux extraordinaires restants
-  // (ChongMai, DaiMai, YinQiaoMai, YangQiaoMai, YinWeiMai, YangWeiMai) n'ont
-  // pas de points qui leur soient propres : un point du plateau aura toujours
-  // l'un des préfixes ci-dessous comme canal.
-  //
-  // La phrase complète (avec préposition/article) est stockée directement au
-  // lieu d'un simple nom, pour éviter un "du" générique fautif : Estomac et
-  // Intestin Grêle commencent par une voyelle (élision "de l'"), Rate/Vessie/
-  // Vésicule Biliaire sont féminins ("de la"), Trois Foyers est pluriel ("des").
-  const CANAL_PHRASES = {
-    P:"du Poumon", GI:"du Gros Intestin", E:"de l'Estomac", Rt:"de la Rate",
-    C:"du Cœur", IG:"de l'Intestin Grêle", V:"de la Vessie", Rn:"du Rein",
-    EC:"de l'Enveloppe du Cœur", TF:"des Trois Foyers", VB:"de la Vésicule Biliaire", F:"du Foie",
-    RM:"du Rèn Mài", DM:"du Dū Mài"
-  };
+  // Le quiz nomme le canal par son nom pinyin classique (ex. "Zú Shǎo
+  // Yīn"), pas par le nom français de l'organe (ex. "Rein") : CANAL_LABELS,
+  // déjà exposé par 04-03-core-game.js (identifiant top-level partagé
+  // entre scripts classiques, pas un window.CANAL_LABELS), sert de source
+  // unique — pas de table dupliquée ici. Tous ces noms commencent par une
+  // consonne (Shǒu/Zú/Rèn/Dū), donc "du " s'applique uniformément, sans
+  // les soucis d'élision/de genre qu'avaient les noms français.
+  function canalLabel(canal){
+    return (typeof CANAL_LABELS === "object" && CANAL_LABELS && CANAL_LABELS[canal]) || canal;
+  }
 
   function canalOfPoint(point){
     const match = String(point || "").match(/^[A-Za-z]+/);
     return match ? match[0] : "";
   }
   function canalPhrase(canal){
-    return CANAL_PHRASES[canal] || ("du " + canal);
+    return "du " + canalLabel(canal);
   }
   function detailsForPoint(point){
     return (window.POINT_DETAILS && window.POINT_DETAILS[point]) || {};
@@ -125,16 +118,16 @@
   // Dans ces trois cas précis, 04-03-core-game.js expose déjà
   // getContextLabelForPoint(), utilisée pour l'étiquette sous la tuile —
   // on la réutilise ici pour ne pas répéter la question avec le mauvais
-  // canal. Les vaisseaux extraordinaires prennent tous "du" ; les noms
-  // d'organe ont des prépositions variables (de la Rate, de l'Estomac,
-  // des Trois Foyers…), donc on réutilise directement les formulations
-  // déjà correctes de CANAL_PHRASES plutôt que de deviner l'article.
+  // canal. getContextLabelForPoint() renvoie encore le nom français de
+  // l'organe traité (ex. "Intestin Grêle") pour ce groupe précis ; on le
+  // fait passer par canalPhrase() pour retomber sur le nom pinyin du
+  // canal correspondant, comme partout ailleurs dans le quiz.
   const CONTEXTUAL_VESSEL_GROUPS = ["Points_Xi_Crevasse", "Points_d_ouverture_des_merveilleux_vaisseaux"];
   const CONTEXTUAL_ORGAN_GROUPS = ["Points_Xia_He_Reunion_inferieure"];
   const ORGAN_LABEL_PHRASES = {
-    "Intestin Grêle": CANAL_PHRASES.IG,
-    "Trois Foyers": CANAL_PHRASES.TF,
-    "Gros Intestin": CANAL_PHRASES.GI
+    "Intestin Grêle": canalPhrase("IG"),
+    "Trois Foyers": canalPhrase("TF"),
+    "Gros Intestin": canalPhrase("GI")
   };
   function contextualCanalPhrase(groupKey, point){
     const isVesselGroup = CONTEXTUAL_VESSEL_GROUPS.includes(groupKey);
