@@ -3155,7 +3155,8 @@ function startTour(){
     {
       selector: "#mtcDailyReminderButton",
       title: "🔔 Rappel quotidien",
-      text: "Active cette cloche pour recevoir une notification les jours où tu n'as pas encore joué. Reclique dessus pour la désactiver."
+      text: "Active cette cloche pour recevoir une notification les jours où tu n'as pas encore joué. Reclique dessus pour la désactiver.",
+      before: () => { if(typeof window.mtcOpenTopbarMoreMenu === "function") window.mtcOpenTopbarMoreMenu(); }
     },
     {
       selector: ".topbar-row button[onclick*='newGame()']",
@@ -3169,11 +3170,13 @@ function startTour(){
       title: "Affichage",
       text: isPharmaTour
         ? "Ici tu peux ajuster les couleurs, le halo, la taille du texte et l’affichage des noms communs au survol."
-        : "Ici tu peux ajuster les couleurs, le halo et la taille du texte pour que la grille soit confortable."
+        : "Ici tu peux ajuster les couleurs, le halo et la taille du texte pour que la grille soit confortable.",
+      before: () => { if(typeof window.mtcOpenTopbarMoreMenu === "function") window.mtcOpenTopbarMoreMenu(); }
     },
     {
       selector: ".practice-row .mode-switch",
       title: "Auto / Manuel",
+      before: () => { if(typeof window.mtcCloseTopbarMoreMenu === "function") window.mtcCloseTopbarMoreMenu(); },
       text: isPharmaTour
         ? "En Auto, le jeu choisit les classes. En Manuel, tu choisis les classes de SM à réviser, avec une option pour privilégier les SM essentielles. Plus tu joues, plus le tirage peut s’adapter à tes lacunes."
         : "En Auto, le jeu choisit les catégories. En Manuel, tu choisis ce que tu veux réviser. Le curseur Facile / Difficile aide aussi le jeu à adapter le tirage à tes besoins."

@@ -24,7 +24,7 @@
     if(step) step.text = text;
   }
 
-  function insertStepOnce(steps, selector, title, text, afterSelector){
+  function insertStepOnce(steps, selector, title, text, afterSelector, beforeFn){
     if(!Array.isArray(steps) || steps.some(item => item && item.selector === selector)) return;
     const step = {
       selector,
@@ -33,6 +33,7 @@
       fallback:() => document.querySelector(selector) || document.querySelector("#footerTitle") || document.querySelector("#grid"),
       position:"aboveBottom"
     };
+    if(typeof beforeFn === "function") step.before = beforeFn;
     const afterIndex = steps.findIndex(item => item && item.selector === afterSelector);
     if(afterIndex >= 0){
       steps.splice(afterIndex + 1, 0, step);
@@ -124,7 +125,8 @@
       "#fullscreenToggleButton",
       "Plein écran",
       "Ici tu peux mettre le jeu en plein écran",
-      "#studyDomainSelect"
+      "#studyDomainSelect",
+      () => { if(typeof window.mtcOpenTopbarMoreMenu === "function") window.mtcOpenTopbarMoreMenu(); }
     );
 
     insertStepOnce(

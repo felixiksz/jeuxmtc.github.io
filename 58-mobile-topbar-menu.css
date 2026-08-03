@@ -1,0 +1,51 @@
+/* 58 — Menu "plus d'options" sur mobile : voir 58-mobile-topbar-menu.js */
+#mtcTopbarMoreButton{
+  display:none;
+}
+
+@media(max-width:699px){
+  /* Ancrage commun : #fullscreenToggleButton est un enfant direct de
+     .topbar-row.topbar-main-row (pas de .topbar-main-buttons comme les
+     3 autres boutons repliés), donc c'est CETTE ligne qu'il faut rendre
+     positionnée pour que tous partagent le même bloc de référence en
+     position:absolute et se superposent proprement en pile. */
+  .topbar-row.topbar-main-row{
+    position:relative;
+  }
+
+  #mtcTopbarMoreButton{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:34px;
+    line-height:1;
+    font-size:1.15em;
+    font-weight:800;
+    letter-spacing:.02em;
+  }
+
+  .mtc-topbar-collapsible{
+    display:none !important;
+  }
+
+  body.mtc-topbar-more-open .mtc-topbar-collapsible{
+    display:flex !important;
+    position:absolute !important;
+    right:0 !important;
+    left:auto !important;
+    width:min(220px, 70vw) !important;
+    justify-content:flex-start !important;
+    z-index:2147483050;
+    background:var(--page-bg, #fff);
+    box-shadow:0 10px 24px rgba(0,0,0,.2);
+  }
+
+  /* Empilées sous la ligne, dans l'ordre où elles apparaissaient avant
+     (Affichage, Aide, Rappel, Plein écran) — décalage fixe par item
+     plutôt qu'un pourcentage, qui se résoudrait contre la largeur du
+     bloc de référence pour margin/top et casserait l'empilement. */
+  body.mtc-topbar-more-open .topbar-row.topbar-main-row button[onclick*="toggleSettings()"]{ top:calc(100% + 6px) !important; }
+  body.mtc-topbar-more-open .topbar-row.topbar-main-row button[onclick*="startTour()"]{ top:calc(100% + 50px) !important; }
+  body.mtc-topbar-more-open #mtcDailyReminderButton{ top:calc(100% + 94px) !important; }
+  body.mtc-topbar-more-open #fullscreenToggleButton{ top:calc(100% + 138px) !important; }
+}
