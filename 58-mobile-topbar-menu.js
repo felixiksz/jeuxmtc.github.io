@@ -19,12 +19,24 @@
     return document.body.classList.contains(OPEN_CLASS);
   }
 
+  function updateToggleButtonState(){
+    const toggleButton = document.getElementById("mtcTopbarMoreButton");
+    if(toggleButton) toggleButton.setAttribute("aria-expanded", isOpen() ? "true" : "false");
+  }
+
+  function openMenu(){
+    document.body.classList.add(OPEN_CLASS);
+    updateToggleButtonState();
+  }
+
   function closeMenu(){
     document.body.classList.remove(OPEN_CLASS);
+    updateToggleButtonState();
   }
 
   function toggleMenu(){
-    document.body.classList.toggle(OPEN_CLASS);
+    if(isOpen()) closeMenu();
+    else openMenu();
   }
 
   const COLLAPSIBLE_SELECTORS = [
@@ -36,7 +48,9 @@
 
   function tagCollapsibleButtons(){
     COLLAPSIBLE_SELECTORS.forEach(selector => {
-      document.querySelectorAll(selector).forEach(el => el.classList.add("mtc-topbar-collapsible"));
+      document.querySelectorAll(selector).forEach(el => {
+        if(!el.classList.contains("mtc-topbar-collapsible")) el.classList.add("mtc-topbar-collapsible");
+      });
     });
   }
 
@@ -79,18 +93,11 @@
     if(event.key === "Escape" && isOpen()) closeMenu();
   });
 
-  new MutationObserver(() => {
-    document.body.classList.toggle("mtc-topbar-more-active", isOpen());
-    const toggleButton = document.getElementById("mtcTopbarMoreButton");
-    if(toggleButton) toggleButton.setAttribute("aria-expanded", isOpen() ? "true" : "false");
-    tagCollapsibleButtons();
-  }).observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
-
   // Utilisé par le before() de certaines étapes de la visite guidée
   // (Affichage, Aide, Rappel, Plein écran) : sur mobile, ces boutons
   // sont invisibles tant que ce menu n'est pas ouvert.
   window.mtcOpenTopbarMoreMenu = function(){
-    if(window.innerWidth <= 699) document.body.classList.add(OPEN_CLASS);
+    if(window.innerWidth <= 699) openMenu();
   };
   window.mtcCloseTopbarMoreMenu = closeMenu;
 
