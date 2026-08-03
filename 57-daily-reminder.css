@@ -1,0 +1,23 @@
+/* 57 — Rappel quotidien : cloche dans la barre du haut */
+#mtcDailyReminderButton{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  padding:5px 8px;
+}
+#mtcDailyReminderButton svg{
+  flex:none;
+  opacity:.68;
+}
+#mtcDailyReminderButton:hover svg,
+#mtcDailyReminderButton:focus-visible svg{
+  opacity:.9;
+}
+#mtcDailyReminderButton.mtc-reminder-on{
+  color:var(--shadow-color, #4b63ff);
+  border-color:color-mix(in srgb, var(--shadow-color, #4b63ff) 55%, transparent);
+}
+#mtcDailyReminderButton.mtc-reminder-on svg{
+  opacity:1;
+}
