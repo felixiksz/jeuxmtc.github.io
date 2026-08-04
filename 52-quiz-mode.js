@@ -114,20 +114,36 @@
   //   de l'estomac ou de la vessie pour représenter l'intestin grêle, les
   //   trois foyers ou le gros intestin (ex. E39 est sur le canal de
   //   l'estomac, mais c'est le xià hé-réunion inférieure de l'intestin
-  //   grêle).
-  // Dans ces trois cas précis, 04-03-core-game.js expose déjà
+  //   grêle) ;
+  // - le mù-collecteur et le bèi-shù-transport du dos sont carrément DÉFINIS
+  //   par l'organe qu'ils traitent, pas par leur canal physique (ex. RM12,
+  //   mù-collecteur de l'Estomac, est sur le Rèn Mài ; tout le Bèi-Shù est
+  //   sur le canal de la Vessie quel que soit l'organe représenté).
+  // Dans ces cas précis, 04-03-core-game.js expose déjà
   // getContextLabelForPoint(), utilisée pour l'étiquette sous la tuile —
   // on la réutilise ici pour ne pas répéter la question avec le mauvais
   // canal. getContextLabelForPoint() renvoie encore le nom français de
-  // l'organe traité (ex. "Intestin Grêle") pour ce groupe précis ; on le
+  // l'organe traité (ex. "Intestin Grêle") pour ces groupes précis ; on le
   // fait passer par canalPhrase() pour retomber sur le nom pinyin du
-  // canal correspondant, comme partout ailleurs dans le quiz.
+  // canal correspondant, comme partout ailleurs dans le quiz. Certains
+  // points Bèi-Shù (Os, Sacrum…) ne représentent aucun organe/canal réel :
+  // sans entrée dans ORGAN_LABEL_PHRASES, ils retombent sur leur propre
+  // canal (Vessie), ce qui reste juste puisqu'ils y sont tous physiquement.
   const CONTEXTUAL_VESSEL_GROUPS = ["Points_Xi_Crevasse", "Points_d_ouverture_des_merveilleux_vaisseaux"];
-  const CONTEXTUAL_ORGAN_GROUPS = ["Points_Xia_He_Reunion_inferieure"];
+  const CONTEXTUAL_ORGAN_GROUPS = ["Points_Xia_He_Reunion_inferieure", "Points_Mu_Collecteur", "Points_Bei_Shu_Transport_du_dos"];
   const ORGAN_LABEL_PHRASES = {
+    "Poumon": canalPhrase("P"),
+    "Gros Intestin": canalPhrase("GI"),
+    "Estomac": canalPhrase("E"),
+    "Rate": canalPhrase("Rt"),
+    "Cœur": canalPhrase("C"),
     "Intestin Grêle": canalPhrase("IG"),
+    "Vessie": canalPhrase("V"),
+    "Rein": canalPhrase("Rn"),
+    "Enveloppe du Cœur": canalPhrase("EC"),
     "Trois Foyers": canalPhrase("TF"),
-    "Gros Intestin": canalPhrase("GI")
+    "Vésicule Biliaire": canalPhrase("VB"),
+    "Foie": canalPhrase("F")
   };
   function contextualCanalPhrase(groupKey, point){
     const isVesselGroup = CONTEXTUAL_VESSEL_GROUPS.includes(groupKey);
