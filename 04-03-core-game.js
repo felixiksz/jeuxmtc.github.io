@@ -5161,6 +5161,31 @@ function getContextLabelForPoint(groupKey, point){
     return beiShuExtra[point] || "";
   }
 
+  if(groupKey === "Points_Mu_Collecteur"){
+    // Comme le Bèi-Shù, le Mù-Collecteur est une catégorie définie par
+    // l'organe qu'il traite, pas par le canal où il se trouve physiquement
+    // (ex. RM12, le mù-collecteur de l'Estomac, est sur le Rèn Mài ; E25,
+    // celui du Gros Intestin, est sur le canal de l'Estomac). Contrairement
+    // au Bèi-Shù, les 12 points sont chacun sur un canal différent — tous
+    // ont donc besoin de cette étiquette, aucun ne coïncide par hasard.
+    const muExtra = {
+      "RM4":"Intestin Grêle",
+      "RM3":"Vessie",
+      "RM5":"Trois Foyers",
+      "VB24":"Vésicule Biliaire",
+      "E25":"Gros Intestin",
+      "RM12":"Estomac",
+      "P1":"Poumon",
+      "F13":"Rate",
+      "RM14":"Cœur",
+      "VB25":"Rein",
+      "RM17":"Enveloppe du Cœur",
+      "F14":"Foie"
+    };
+
+    return muExtra[point] || "";
+  }
+
   if(groupKey === "Points_Xia_He_Reunion_inferieure"){
     // Contrairement au Bèi-Shù (tous sur le canal de la vessie, l'organe
     // traité est une info en plus), les points xià hé-réunion inférieure
