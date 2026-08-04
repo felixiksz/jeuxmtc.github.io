@@ -102,36 +102,34 @@
   }
 
   // Certaines catégories groupent des points dont le rôle catégoriel
-  // n'appartient PAS à leur propre canal (préfixe du code) :
-  // - un point xì-crevasse peut être physiquement sur un canal régulier
-  //   mais être en réalité le xì-crevasse d'un des 4 vaisseaux
-  //   extraordinaires qiāo/wéi (ex. VB35 est bien sur le canal de la
-  //   vésicule biliaire, mais c'est le xì-crevasse du yáng wéi mài) ;
-  // - même chose pour les points d'ouverture des merveilleux vaisseaux
-  //   (ex. P7 ouvre le rèn mài, ce n'est pas "le point d'ouverture du
-  //   poumon") ;
-  // - et pour les points xià hé-réunion inférieure, "empruntés" au canal
-  //   de l'estomac ou de la vessie pour représenter l'intestin grêle, les
-  //   trois foyers ou le gros intestin (ex. E39 est sur le canal de
-  //   l'estomac, mais c'est le xià hé-réunion inférieure de l'intestin
-  //   grêle) ;
-  // - le mù-collecteur et le bèi-shù-transport du dos sont carrément DÉFINIS
-  //   par l'organe qu'ils traitent, pas par leur canal physique (ex. RM12,
-  //   mù-collecteur de l'Estomac, est sur le Rèn Mài ; tout le Bèi-Shù est
-  //   sur le canal de la Vessie quel que soit l'organe représenté).
-  // Dans ces cas précis, 04-03-core-game.js expose déjà
-  // getContextLabelForPoint(), utilisée pour l'étiquette sous la tuile —
-  // on la réutilise ici pour ne pas répéter la question avec le mauvais
-  // canal. getContextLabelForPoint() renvoie encore le nom français de
-  // l'organe traité (ex. "Intestin Grêle") pour ces groupes précis ; on le
-  // fait passer par canalPhrase() pour retomber sur le nom pinyin du
-  // canal correspondant, comme partout ailleurs dans le quiz. Certains
-  // points Bèi-Shù (Os, Sacrum…) ne représentent aucun organe/canal réel :
-  // sans entrée dans ORGAN_LABEL_PHRASES, ils retombent sur leur propre
-  // canal (Vessie), ce qui reste juste puisqu'ils y sont tous physiquement.
+  // n'appartient PAS à leur propre canal (préfixe du code) — mais pas
+  // toutes de la même façon. getContextLabelForPoint() (04-03-core-game.js,
+  // partagée avec l'étiquette sous la tuile) renvoie une étiquette pour
+  // chacune ; ce qu'on EN FAIT diffère selon ce que l'étiquette représente :
+  // - vaisseau (Points_Xi_Crevasse, Points_d_ouverture_des_merveilleux_
+  //   vaisseaux) : l'étiquette EST déjà un nom de vaisseau pinyin complet
+  //   (ex. "Yáng Wéi Mài" pour VB35) — on ajoute juste "du ".
+  // - canal emprunté (Points_Xia_He_Reunion_inferieure) : l'étiquette est
+  //   le nom français de l'organe fǔ représenté (ex. "Intestin Grêle" pour
+  //   E39), mais la théorie en parle comme du CANAL emprunté ("le xià
+  //   hé-réunion inférieure DU CANAL de l'intestin grêle"), pas de
+  //   l'organe — on fait donc passer cette étiquette par canalPhrase() du
+  //   code du canal correspondant pour retomber sur le nom pinyin, comme
+  //   le reste du quiz.
+  // - organe (Points_Mu_Collecteur, Points_Bei_Shu_Transport_du_dos) :
+  //   l'étiquette est aussi un nom français d'organe (ex. "Estomac" pour
+  //   RM12), mais ici la théorie en parle TOUJOURS comme de l'organe
+  //   lui-même ("le mù-collecteur du Foie", jamais "du canal du Foie") —
+  //   on garde donc l'étiquette telle quelle, en français, jamais un nom
+  //   de canal (pinyin ou pas).
+  // Certains points Bèi-Shù (Os, Sacrum…) ne représentent aucun organe
+  // réel : sans entrée dans ORGAN_PHRASES, ils retombent sur leur propre
+  // canal (Vessie, en pinyin comme le reste du quiz), ce qui reste juste
+  // puisqu'ils y sont tous physiquement.
   const CONTEXTUAL_VESSEL_GROUPS = ["Points_Xi_Crevasse", "Points_d_ouverture_des_merveilleux_vaisseaux"];
-  const CONTEXTUAL_ORGAN_GROUPS = ["Points_Xia_He_Reunion_inferieure", "Points_Mu_Collecteur", "Points_Bei_Shu_Transport_du_dos"];
-  const ORGAN_LABEL_PHRASES = {
+  const CONTEXTUAL_CHANNEL_BORROW_GROUPS = ["Points_Xia_He_Reunion_inferieure"];
+  const CONTEXTUAL_ORGAN_GROUPS = ["Points_Mu_Collecteur", "Points_Bei_Shu_Transport_du_dos"];
+  const CHANNEL_BORROW_LABEL_PHRASES = {
     "Poumon": canalPhrase("P"),
     "Gros Intestin": canalPhrase("GI"),
     "Estomac": canalPhrase("E"),
@@ -145,15 +143,32 @@
     "Vésicule Biliaire": canalPhrase("VB"),
     "Foie": canalPhrase("F")
   };
+  const ORGAN_PHRASES = {
+    "Poumon": "du Poumon",
+    "Gros Intestin": "du Gros Intestin",
+    "Estomac": "de l'Estomac",
+    "Rate": "de la Rate",
+    "Cœur": "du Cœur",
+    "Intestin Grêle": "de l'Intestin Grêle",
+    "Vessie": "de la Vessie",
+    "Rein": "du Rein",
+    "Enveloppe du Cœur": "de l'Enveloppe du Cœur",
+    "Trois Foyers": "des Trois Foyers",
+    "Vésicule Biliaire": "de la Vésicule Biliaire",
+    "Foie": "du Foie"
+  };
   function contextualCanalPhrase(groupKey, point){
     const isVesselGroup = CONTEXTUAL_VESSEL_GROUPS.includes(groupKey);
+    const isChannelBorrowGroup = CONTEXTUAL_CHANNEL_BORROW_GROUPS.includes(groupKey);
     const isOrganGroup = CONTEXTUAL_ORGAN_GROUPS.includes(groupKey);
-    if(!isVesselGroup && !isOrganGroup) return "";
+    if(!isVesselGroup && !isChannelBorrowGroup && !isOrganGroup) return "";
     if(typeof window.getContextLabelForPoint !== "function") return "";
     try{
       const label = cleanText(window.getContextLabelForPoint(groupKey, point));
       if(!label) return "";
-      return isVesselGroup ? "du " + label : (ORGAN_LABEL_PHRASES[label] || "");
+      if(isVesselGroup) return "du " + label;
+      if(isChannelBorrowGroup) return CHANNEL_BORROW_LABEL_PHRASES[label] || "";
+      return ORGAN_PHRASES[label] || "";
     }catch(error){ return ""; }
   }
 
