@@ -139,6 +139,11 @@
     button.title = on
       ? "Rappels quotidiens activés — clique pour désactiver"
       : "Activer un rappel si tu n'as pas encore joué aujourd'hui";
+    // Le texte dit explicitement l'état : un simple changement de
+    // couleur ne se voit pas sur tous les thèmes (ex. thème tout en
+    // rouge, où "activé" et "désactivé" avaient l'air identiques).
+    const label = document.getElementById("mtcDailyReminderLabel");
+    if(label) label.textContent = on ? "Rappel : activé" : "Rappel : désactivé";
   }
 
   async function toggleReminder(button){
