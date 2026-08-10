@@ -362,6 +362,7 @@
           <label><input type="checkbox" name="advancedSearchScope" value="notes" ${searchScopeChecked(currentFilters.scopes,"notes")} onchange="renderAdvancedSearchResults()"> notes</label>
           <label><input type="checkbox" name="advancedSearchScope" value="precautions" ${searchScopeChecked(currentFilters.scopes,"precautions")} onchange="renderAdvancedSearchResults()"> précautions</label>
           <label><input type="checkbox" name="advancedSearchScope" value="formules" ${searchScopeChecked(currentFilters.scopes,"formules")} onchange="renderAdvancedSearchResults()"> formules</label>
+          <label><input type="checkbox" name="advancedSearchScope" value="associations" ${searchScopeChecked(currentFilters.scopes,"associations")} onchange="renderAdvancedSearchResults()"> associations</label>
         </div>
 
         <div class="search-control search-correspondence-control">
