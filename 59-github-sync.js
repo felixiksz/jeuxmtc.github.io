@@ -46,11 +46,9 @@
     return Boolean(cfg.token && cfg.owner && cfg.repo);
   }
 
-  // L'autre app a décrit l'emplacement des fichiers de deux façons
-  // contradictoires ("data/reference/points_canaux/..." puis "à la racine
-  // du dépôt, pas sous data/") — on essaie les deux plutôt que de deviner,
-  // pour ne pas dépendre d'un aller-retour de clarification avant de tester.
-  const CHANNEL_PATH_CANDIDATES = ["data/reference/points_canaux", "reference/points_canaux"];
+  // Chemin confirmé côté Assistant Diagnostic via `git ls-tree` sur leur dépôt :
+  // pas de dossier "data/" à la racine.
+  const CHANNEL_PATH_CANDIDATES = ["reference/points_canaux"];
 
   function apiBaseFor(cfg, relativePath){
     return `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${relativePath}`;
