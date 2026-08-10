@@ -43,7 +43,8 @@
     ".topbar-row.topbar-main-row button[onclick*='toggleSettings()']",
     ".topbar-row.topbar-main-row button[onclick*='startTour()']",
     "#mtcDailyReminderButton",
-    "#fullscreenToggleButton"
+    "#fullscreenToggleButton",
+    "#mtcGithubSyncButton"
   ];
 
   function tagCollapsibleButtons(){

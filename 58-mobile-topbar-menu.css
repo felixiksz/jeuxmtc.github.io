@@ -48,4 +48,5 @@
   body.mtc-topbar-more-open .topbar-row.topbar-main-row button[onclick*="startTour()"]{ top:calc(100% + 50px) !important; }
   body.mtc-topbar-more-open #mtcDailyReminderButton{ top:calc(100% + 94px) !important; }
   body.mtc-topbar-more-open #fullscreenToggleButton{ top:calc(100% + 138px) !important; }
+  body.mtc-topbar-more-open #mtcGithubSyncButton{ top:calc(100% + 182px) !important; }
 }

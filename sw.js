@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260809-manual-mode-and-search-fixes";
+const MTC_OFFLINE_VERSION = "20260810-github-sync";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -68,6 +68,8 @@ const CORE_ASSETS = [
   "57-daily-reminder.js",
   "58-mobile-topbar-menu.css",
   "58-mobile-topbar-menu.js",
+  "59-github-sync.css",
+  "59-github-sync.js",
   "Import_tableau pharma_pro(1).json",
   "README_HORS_CONNEXION.txt",
   "README_PUBLICATION.txt",
