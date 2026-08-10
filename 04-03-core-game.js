@@ -966,7 +966,7 @@ function pointCategoryNames(point){
     .map(cat => cat.name || DISPLAY_NAMES[cat.key] || displayLabel(cat.key));
 }
 
-const MTC_SEARCH_SCOPES = ["name", "functions", "indications", "notes", "precautions", "formules"];
+const MTC_SEARCH_SCOPES = ["name", "functions", "indications", "notes", "precautions", "formules", "associations"];
 
 function pointNameSearchText(point){
   const details = POINT_DETAILS[point] || {};
@@ -1019,6 +1019,15 @@ function pointFormulesSearchText(point){
   return pointLocalStorageText("mtc_point_formules_", point) || details.formules || details.formulas || details.formule || "";
 }
 
+// Même principe que les notes/précautions/formules : les associations
+// d'un point sont éditables (12-10-fullscreen-links.js,
+// mtc_point_associations_<point> dans localStorage) et cette correction
+// doit être cherchable, pas seulement le texte d'origine de la fiche.
+function pointAssociationsSearchText(point){
+  const details = POINT_DETAILS[point] || {};
+  return pointLocalStorageText("mtc_point_associations_", point) || details.associations || "";
+}
+
 function pointSearchTextForScope(point, scope){
   if(scope === "name") return pointNameSearchText(point);
   if(scope === "functions") return pointFunctionsSearchText(point);
@@ -1026,6 +1035,7 @@ function pointSearchTextForScope(point, scope){
   if(scope === "notes") return pointNotesSearchText(point);
   if(scope === "precautions") return pointPrecautionsSearchText(point);
   if(scope === "formules") return pointFormulesSearchText(point);
+  if(scope === "associations") return pointAssociationsSearchText(point);
 
   return [
     pointNameSearchText(point),
@@ -1034,6 +1044,7 @@ function pointSearchTextForScope(point, scope){
     pointNotesSearchText(point),
     pointPrecautionsSearchText(point),
     pointFormulesSearchText(point),
+    pointAssociationsSearchText(point),
     pointCategoryNames(point).join(" "),
     CANAL_LABELS[canalOfPoint(point)] || ""
   ].join(" ");
@@ -1407,6 +1418,7 @@ function renderAdvancedSearchPanel(){
         <label><input type="checkbox" name="advancedSearchScope" value="notes" ${searchScopeChecked(currentFilters.scopes,"notes")} onchange="renderAdvancedSearchResults()"> notes</label>
         <label><input type="checkbox" name="advancedSearchScope" value="precautions" ${searchScopeChecked(currentFilters.scopes,"precautions")} onchange="renderAdvancedSearchResults()"> précautions</label>
         <label><input type="checkbox" name="advancedSearchScope" value="formules" ${searchScopeChecked(currentFilters.scopes,"formules")} onchange="renderAdvancedSearchResults()"> formules</label>
+        <label><input type="checkbox" name="advancedSearchScope" value="associations" ${searchScopeChecked(currentFilters.scopes,"associations")} onchange="renderAdvancedSearchResults()"> associations</label>
       </div>
 
       <label class="search-control">
@@ -2669,7 +2681,31 @@ function chooseManualCategories(){
   return shuffle(selectedCats).slice(0,4);
 }
 
+function manualModeStorageKey(){
+  const domain = document.documentElement.getAttribute("data-study-domain") === "pharmacology" ? "pharma" : "acu";
+  return "mtc_manual_mode_" + domain;
+}
+
+function saveManualModePreference(){
+  try{ localStorage.setItem(manualModeStorageKey(), modeToggle.checked ? "1" : "0"); }catch(error){}
+}
+
+// Le verrouillage de grille (50-grid-lock.js) fige déjà les 16 points/
+// catégories d'une partie manuelle à travers les rechargements, mais pas
+// la position du bouton Auto/Manuel lui-même : au rechargement, le
+// bascule revenait toujours à Auto par défaut alors que la grille
+// affichée restait bien celle choisie en Manuel — incohérence entre ce
+// que montre l'interface et ce qui est réellement chargé.
+function restoreManualModePreference(){
+  try{
+    const saved = localStorage.getItem(manualModeStorageKey());
+    if(saved !== null) modeToggle.checked = saved === "1";
+  }catch(error){}
+}
+
 function toggleManualMode(){
+  saveManualModePreference();
+
   pool = buildPool();
   fillManualSelectors();
 
@@ -7054,12 +7090,17 @@ fontSizeSlider.oninput = e => {
     .setProperty("--ui-font-size", size + "px");
 };
 
+restoreManualModePreference();
 pool = buildPool();
 applySettings();
 fillManualSelectors();
 renderStatsPanel();
 updateBasketCount();
 updateComparisonButtonLabel();
+if(currentMode() === "manual"){
+  manualEditButton.style.display = "inline-block";
+  manualControls.style.display = "flex";
+}
 newGame();
 
 
@@ -7068,6 +7109,18 @@ window.addEventListener("mtc-study-domain-changed", event=>{
 
   if(domain === "acupuncture" || domain === "pharmacology"){
     maybeStartTutorialForCurrentDomain(domain === "pharmacology" ? 360 : 180);
+  }
+
+  // Le mode Auto/Manuel est mémorisé par matière (mtc_manual_mode_acu vs
+  // _pharma) : en changeant de matière, on doit reprendre CETTE matière-là
+  // où on l'avait laissée, pas garder le réglage de la précédente.
+  restoreManualModePreference();
+  if(currentMode() === "manual"){
+    manualEditButton.style.display = "inline-block";
+    manualControls.style.display = "flex";
+  }else{
+    manualEditButton.style.display = "none";
+    manualControls.style.display = "none";
   }
 });
 
