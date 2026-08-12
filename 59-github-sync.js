@@ -186,7 +186,89 @@
     updateLastSyncLabel();
   }
 
+  // --- Réparation ponctuelle (bug corrigé : la clé poussée était "notes" au
+  // lieu de "note", créant une clé fantôme au lieu de mettre à jour la vraie) --
+
+  async function repairDuplicateNoteKeys(){
+    if(!isConfigured()){
+      setStatus("Configure un token, un propriétaire et un dépôt d'abord.");
+      return;
+    }
+    if(syncInFlight) return;
+    syncInFlight = true;
+    setBusy(true);
+    setStatus("Réparation en cours…");
+
+    const cfg = config();
+    const repairedPoints = [];
+    const failedChannels = [];
+
+    for(const code of CHANNEL_CODES){
+      try{
+        const file = await fetchChannelFile(cfg, code);
+        if(!file || !Array.isArray(file.data)) continue;
+        let changed = false;
+        file.data.forEach(entry => {
+          if(entry && Object.prototype.hasOwnProperty.call(entry, "notes")){
+            entry.note = entry.notes;
+            delete entry.notes;
+            changed = true;
+            repairedPoints.push(entry.point);
+            rememberBaseline("note", entry.point, entry.note);
+          }
+        });
+        if(changed){
+          await putChannelFile(cfg, file.path, file.data, file.sha, "Jeu MTC : réparation clé notes -> note");
+        }
+      }catch(error){
+        failedChannels.push(code);
+      }
+    }
+
+    syncInFlight = false;
+    setBusy(false);
+
+    const failSuffix = failedChannels.length
+      ? ` (${failedChannels.length} canal/canaux en erreur : ${failedChannels.join(", ")})`
+      : "";
+    setStatus(
+      repairedPoints.length > 0
+        ? `Réparé : ${repairedPoints.length} point(s) (${repairedPoints.join(", ")})${failSuffix}.`
+        : `Aucune clé "notes" fantôme trouvée${failSuffix}.`
+    );
+  }
+
   // --- Écriture --------------------------------------------------------------
+
+  // Le champ ciblé (note/associations/precautions) est partagé par tout le
+  // monde ayant accès au dépôt (l'utilisatrice sur plusieurs appareils,
+  // potentiellement d'autres personnes) — un simple `entry[field] = value`
+  // écraserait silencieusement ce qu'un autre appareil/personne aurait écrit
+  // entretemps. On garde donc, par point+champ, la dernière valeur qu'ON a
+  // nous-même écrite ; si la valeur distante actuelle ne correspond plus à
+  // cette dernière valeur connue, quelqu'un d'autre l'a modifiée depuis :
+  // on ajoute notre contenu à la suite plutôt que de le remplacer.
+  function baselineKey(field, point){
+    return `mtc_github_sync_baseline_${field}_${point}`;
+  }
+
+  function resolveFieldValue(entry, field, point, newValue){
+    const remote = entry[field];
+    const remoteText = remote == null ? "" : String(remote);
+    const baseline = storageGet(baselineKey(field, point));
+    if(!remoteText || remoteText === baseline || remoteText === newValue){
+      return newValue;
+    }
+    // Divergence détectée : le contenu distant n'est ni vide, ni ce qu'on a
+    // nous-même écrit en dernier, ni déjà identique à notre nouvelle valeur —
+    // quelqu'un d'autre a modifié ce champ entretemps. On concatène pour ne
+    // rien perdre, plutôt que d'écraser sa contribution.
+    return remoteText + "\n\n— autre contribution —\n\n" + newValue;
+  }
+
+  function rememberBaseline(field, point, finalValue){
+    storageSet(baselineKey(field, point), finalValue == null ? "" : String(finalValue));
+  }
 
   async function pushPointFieldToGithub(point, field, value){
     if(!isConfigured()) return;
@@ -201,9 +283,11 @@
       const entry = file.data.find(item => item && item.point === point);
       if(!entry) return; // le point n'existe pas encore côté Assistant : rien à mettre à jour
 
-      entry[field] = value;
+      const finalValue = resolveFieldValue(entry, field, point, value);
+      entry[field] = finalValue;
 
       await putChannelFile(cfg, file.path, file.data, file.sha, `Jeu MTC : mise à jour ${field} de ${point}`);
+      rememberBaseline(field, point, finalValue);
     }catch(error){
       // Une seule retentative en cas de conflit (SHA périmé par une écriture
       // concurrente côté Assistant) ; l'écriture locale a de toute façon déjà
@@ -214,8 +298,10 @@
         if(retryFile && Array.isArray(retryFile.data)){
           const retryEntry = retryFile.data.find(item => item && item.point === point);
           if(retryEntry){
-            retryEntry[field] = value;
+            const retryFinalValue = resolveFieldValue(retryEntry, field, point, value);
+            retryEntry[field] = retryFinalValue;
             await putChannelFile(cfg, retryFile.path, retryFile.data, retryFile.sha, `Jeu MTC : mise à jour ${field} de ${point}`);
+            rememberBaseline(field, point, retryFinalValue);
           }
         }
       }catch(retryError){}
@@ -235,7 +321,7 @@
       headers: Object.assign({"Content-Type": "application/json"}, apiHeaders(cfg)),
       body: JSON.stringify(body)
     });
-    if(!response.ok) throw new Error(`PUT ${code}.json a échoué (${response.status})`);
+    if(!response.ok) throw new Error(`PUT ${relativePath} a échoué (${response.status})`);
   }
 
   function wrapWithGithubPush(name, field, valueReader){
@@ -350,6 +436,7 @@
         <div class="mtc-github-sync-actions">
           <button type="button" data-github-save>Enregistrer</button>
           <button type="button" data-github-sync-now>Synchroniser maintenant</button>
+          <button type="button" class="secondary" data-github-repair title="Corrige les points où une ancienne version du Jeu a écrit la note sous une mauvaise clé, invisible côté Assistant.">Réparer les notes dupliquées</button>
           <button type="button" class="secondary" data-github-close>Fermer</button>
         </div>
         <div class="mtc-github-sync-status" id="mtcGithubSyncStatus"></div>
@@ -365,6 +452,10 @@
     modal.querySelector("[data-github-sync-now]").addEventListener("click", () => {
       saveConfigFromModal();
       syncFromGitHub();
+    });
+    modal.querySelector("[data-github-repair]").addEventListener("click", () => {
+      saveConfigFromModal();
+      repairDuplicateNoteKeys();
     });
 
     updateLastSyncLabel();
