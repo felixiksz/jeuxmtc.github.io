@@ -257,7 +257,9 @@
 
   function installWriteHooks(){
     // Notes : savePointNoteFromTextarea(textarea) — 12-10-fullscreen-links.js
-    wrapWithGithubPush("savePointNoteFromTextarea", "notes", {
+    // Champ "note" (singulier) côté Assistant, confirmé par leur backfill —
+    // pas "notes", qui créerait une clé séparée au lieu de mettre à jour la leur.
+    wrapWithGithubPush("savePointNoteFromTextarea", "note", {
       point: args => args[0] && args[0].dataset && args[0].dataset.point,
       value: args => args[0] && args[0].value
     });
@@ -283,7 +285,7 @@
   function installAcuEditableHook(){
     const original = window.saveAcuEditable;
     if(typeof original !== "function" || original.__githubAcuEditableWrapped) return;
-    const FIELD_MAP = {notes: "notes", associations: "associations", precaution: "precautions"};
+    const FIELD_MAP = {notes: "note", associations: "associations", precaution: "precautions"};
     const wrapped = function(editable){
       const result = original.apply(this, arguments);
       try{
