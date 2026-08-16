@@ -328,7 +328,26 @@ body.mtc-quiz-open [aria-label="Choix rapide de matière"]{
   }
   .mtc-quiz-shell{
     width:100vw;
-    padding:8px 8px calc(env(safe-area-inset-bottom, 0px) + 36px);
+    padding:8px 8px calc(env(safe-area-inset-bottom, 0px) + 96px);
+  }
+  /* Bouton "Réponse" ancré en bas de l'écran, pleine largeur, pour rester
+     accessible au pouce en tenant le téléphone à une main. Le padding-bottom
+     du shell ci-dessus garantit que le contenu scrollable (dont Précédent/
+     Suivant) ne se retrouve jamais caché derrière ce bouton fixe. */
+  .mtc-quiz-reveal-button{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:2147483001;
+    display:block;
+    width:100%;
+    margin:0;
+    border-radius:0;
+    border-width:1px 0 0;
+    padding:16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    font-size:1.05rem;
+    box-shadow:0 -4px 14px color-mix(in srgb, var(--shadow-color, #4b63ff) 18%, transparent);
   }
   .mtc-quiz-header h2{
     font-size:1rem;
