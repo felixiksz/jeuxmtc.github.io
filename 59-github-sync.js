@@ -92,6 +92,53 @@
     return value.map(item => String(item)).join("\n");
   }
 
+  // Champs Assistant qui ont soit déjà un mapping explicite ci-dessus, soit
+  // sont volontairement ignorés à la lecture (images : mécanisme différent ;
+  // correspondances/note/associations : champs Jeu-only rétro-poussés dans
+  // leurs fichiers, on ne les relit jamais pour ne pas se réécraser soi-même).
+  const KNOWN_ASSISTANT_FIELDS = new Set([
+    "point", "pinyin", "hanzi", "nom_fr", "localisation", "methode_localisation",
+    "methode_travail", "categories_point", "indications", "actions", "images",
+    "correspondances", "note", "associations"
+  ]);
+
+  // Libellés lisibles pour des noms de champs snake_case sans accents — sert
+  // de repli générique pour toute nouvelle section ajoutée côté Assistant
+  // sans qu'il faille toucher ce fichier à chaque fois ; complété par une
+  // poignée de corrections pour les mots français qui perdent leurs accents
+  // une fois en snake_case (une prettification générique ne peut pas deviner
+  // "émotionnelles" à partir de "emotionnelles").
+  const EXTRA_FIELD_LABEL_OVERRIDES = {
+    indications_psycho_emotionnelles: "Indications psycho-émotionnelles",
+    indications_psycho_emotionnelle: "Indications psycho-émotionnelles"
+  };
+
+  function labelForUnknownField(key){
+    if(EXTRA_FIELD_LABEL_OVERRIDES[key]) return EXTRA_FIELD_LABEL_OVERRIDES[key];
+    const words = String(key).split(/[_\s]+/).filter(Boolean);
+    if(!words.length) return key;
+    return words.map((word, index) => index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word).join(" ");
+  }
+
+  // Schéma inconnu par définition (nouveau champ jamais vu) : on essaie de
+  // produire un texte lisible plutôt que "[object Object]", sans savoir à
+  // l'avance la forme exacte (string, array de strings, array d'objets...).
+  function stringifyUnknownValue(value){
+    if(Array.isArray(value)){
+      return value
+        .map(item => (item != null && typeof item === "object")
+          ? Object.values(item).filter(v => typeof v === "string" && v).join(" — ")
+          : String(item == null ? "" : item))
+        .filter(Boolean)
+        .map(line => "•  " + line)
+        .join("\n");
+    }
+    if(value != null && typeof value === "object"){
+      return Object.entries(value).map(([k, v]) => k + " : " + v).join("\n");
+    }
+    return String(value == null ? "" : value);
+  }
+
   function translateAssistantPoint(entry){
     const out = {};
     if(entry.pinyin != null) out.pinyin = entry.pinyin;
@@ -105,14 +152,44 @@
     if(entry.actions != null) out.actions = joinActions(entry.actions);
     // entry.images[] : hors scope, le Jeu gère ses images via MTC_IMAGE_STORE
     // (IndexedDB), un mécanisme complètement différent — pas de fusion ici.
+
+    // Passage générique : toute nouvelle section ajoutée côté Assistant sans
+    // mapping explicite ci-dessus est récupérée quand même, avec un libellé
+    // lisible — plutôt que de rester invisible jusqu'à ce que quelqu'un
+    // pense à l'ajouter ici. Rendue dans la fiche point par 04-03-core-game.js
+    // via details.__githubExtraFields (voir renderPointPanelContent).
+    const extraFields = [];
+    Object.keys(entry).forEach(key => {
+      if(KNOWN_ASSISTANT_FIELDS.has(key)) return;
+      const raw = entry[key];
+      if(raw == null || raw === "") return;
+      const value = stringifyUnknownValue(raw);
+      if(!value) return;
+      extraFields.push({key, label:labelForUnknownField(key), value});
+    });
+    if(extraFields.length) out.__githubExtraFields = extraFields;
+
     return out;
+  }
+
+  // Le Jeu stocke ses points sans espace ("P1", "Rn24"...) — formatPointCode()
+  // n'ajoute l'espace qu'à l'affichage. Les fichiers Assistant utilisent "P 1"
+  // AVEC un espace dans leur champ "point" (confirmé par leur exemple réel).
+  // Sans cette normalisation, chaque sync créait une entrée fantôme sous
+  // "P 1" à côté de la vraie "P1" — jamais lue par l'interface du Jeu, donc
+  // aucune donnée synchronisée n'apparaissait jamais dans les fiches malgré
+  // une synchro "réussie" en apparence (bug racine, présent depuis le début
+  // de cette fonctionnalité, découvert en testant l'ajout des indications
+  // psycho-émotionnelles).
+  function normalizePointCode(code){
+    return String(code == null ? "" : code).replace(/\s+/g, "").trim();
   }
 
   function mergeChannelIntoPointDetails(channelEntries){
     if(!Array.isArray(channelEntries)) return 0;
     let merged = 0;
     channelEntries.forEach(entry => {
-      const code = entry && entry.point;
+      const code = normalizePointCode(entry && entry.point);
       if(!code) return;
       const translated = translateAssistantPoint(entry);
       if(!window.POINT_DETAILS[code]) window.POINT_DETAILS[code] = {point: code};
@@ -214,7 +291,7 @@
             delete entry.notes;
             changed = true;
             repairedPoints.push(entry.point);
-            rememberBaseline("note", entry.point, entry.note);
+            rememberBaseline("note", normalizePointCode(entry.point), entry.note);
           }
         });
         if(changed){
@@ -280,7 +357,7 @@
       const file = await fetchChannelFile(cfg, code[0]);
       if(!file || !Array.isArray(file.data)) return;
 
-      const entry = file.data.find(item => item && item.point === point);
+      const entry = file.data.find(item => item && normalizePointCode(item.point) === normalizePointCode(point));
       if(!entry) return; // le point n'existe pas encore côté Assistant : rien à mettre à jour
 
       const finalValue = resolveFieldValue(entry, field, point, value);
@@ -296,7 +373,7 @@
       try{
         const retryFile = await fetchChannelFile(cfg, code[0]);
         if(retryFile && Array.isArray(retryFile.data)){
-          const retryEntry = retryFile.data.find(item => item && item.point === point);
+          const retryEntry = retryFile.data.find(item => item && normalizePointCode(item.point) === normalizePointCode(point));
           if(retryEntry){
             const retryFinalValue = resolveFieldValue(retryEntry, field, point, value);
             retryEntry[field] = retryFinalValue;

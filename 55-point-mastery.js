@@ -13,6 +13,20 @@
   const MAX_LEVEL = 5;
   const CATEGORY_TIMER_KEY = "__mtcCategorySolveStarts";
 
+  // Répétition espacée à intervalles fixes (façon SM-2 simplifié) : "à
+  // revoir" ramène au premier palier, "je maîtrise" avance d'un palier.
+  // Pas de FSRS ni d'optimisation automatique (demanderait des centaines
+  // de révisions par point pour être fiable) — juste une échelle de délais
+  // qui grandit à mesure qu'un point est effectivement su.
+  const REVIEW_INTERVALS_MS = [
+    10 * 60 * 1000,            // 10 minutes
+    24 * 60 * 60 * 1000,       // 1 jour
+    3 * 24 * 60 * 60 * 1000,   // 3 jours
+    7 * 24 * 60 * 60 * 1000,   // 7 jours
+    14 * 24 * 60 * 60 * 1000,  // 14 jours
+    30 * 24 * 60 * 60 * 1000   // 30 jours
+  ];
+
   function loadRecord(point){
     try{
       const raw = localStorage.getItem(STORAGE_PREFIX + point);
@@ -27,7 +41,7 @@
   }
 
   function ensureRecord(point){
-    return loadRecord(point) || {level:0, seen:0, correctStreak:0, lastResponseMs:null, lastSeenAt:null};
+    return loadRecord(point) || {level:0, seen:0, correctStreak:0, lastResponseMs:null, lastSeenAt:null, dueAt:null, intervalIndex:-1};
   }
 
   function clampLevel(level){
@@ -45,11 +59,29 @@
     if(rating === "again"){
       record.level = clampLevel((record.level || 0) - 2);
       record.correctStreak = 0;
+      record.intervalIndex = 0;
     }else if(rating === "good"){
       record.level = clampLevel((record.level || 0) + 1);
       record.correctStreak = (record.correctStreak || 0) + 1;
+      record.intervalIndex = Math.min((record.intervalIndex ?? -1) + 1, REVIEW_INTERVALS_MS.length - 1);
     }
+    record.dueAt = new Date(Date.now() + REVIEW_INTERVALS_MS[record.intervalIndex]).toISOString();
     saveRecord(point, record);
+  }
+
+  function dueAt(point){
+    return ensureRecord(point).dueAt || null;
+  }
+
+  function isDue(point){
+    const due = dueAt(point);
+    return Boolean(due) && new Date(due).getTime() <= Date.now();
+  }
+
+  // Uniquement les points déjà notés une fois au quiz (dueAt posé par
+  // recordQuizRating) — un point jamais interrogé n'a rien "à revoir".
+  function duePoints(){
+    return allTrackedPoints().filter(isDue);
   }
 
   // Signal doux issu de la grille : une catégorie résolue rapidement,
@@ -123,7 +155,10 @@
     getTier,
     tierLabel,
     getStatsSummary,
-    weightFor
+    weightFor,
+    dueAt,
+    isDue,
+    duePoints
   };
 
   // --- Hook grille : la partie ACU ne pose pas de question par point
