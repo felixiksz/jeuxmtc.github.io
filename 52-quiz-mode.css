@@ -1,4 +1,35 @@
 /* 52 — Quiz de fin de partie */
+#mtcDueReviewButton{
+  appearance:none;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 36%, transparent);
+  border-radius:999px;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 8%, var(--page-bg, #fff));
+  color:var(--text-color, currentColor);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:5px 10px;
+  font-family:"Archivo", system-ui, sans-serif;
+  font-size:.92rem;
+  font-weight:650;
+  cursor:pointer;
+}
+#mtcDueReviewButton .mtc-due-review-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:1.3em;
+  height:1.3em;
+  padding:0 .3em;
+  border-radius:999px;
+  background:var(--shadow-color, #4b63ff);
+  color:#fff;
+  font-size:.72rem;
+  font-weight:700;
+  line-height:1;
+}
+
 #mtcQuizStartButton{
   appearance:none;
   border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 36%, transparent);
@@ -154,6 +185,15 @@ body.mtc-quiz-open [aria-label="Choix rapide de matière"]{
 .mtc-quiz-reveal-button{
   display:block;
   margin:0 auto;
+  /* 5x l'épaisseur verticale du bouton pill de base (9px -> 45px) : cible
+     tactile volontairement énorme, c'est le bouton principal de l'écran.
+     !important nécessaire : mtc-styles.css:3104 impose "button{padding:5px
+     9px !important}" globalement, sinon ce padding est silencieusement
+     ignoré (constaté en test — la spécificité seule ne suffit pas face à
+     un !important existant). */
+  padding-top:45px !important;
+  padding-bottom:45px !important;
+  font-size:1.1rem;
 }
 .mtc-quiz-nav{
   display:flex;
@@ -328,7 +368,7 @@ body.mtc-quiz-open [aria-label="Choix rapide de matière"]{
   }
   .mtc-quiz-shell{
     width:100vw;
-    padding:8px 8px calc(env(safe-area-inset-bottom, 0px) + 96px);
+    padding:8px 8px calc(env(safe-area-inset-bottom, 0px) + 225px);
   }
   /* Bouton "Réponse" ancré en bas de l'écran, pleine largeur, pour rester
      accessible au pouce en tenant le téléphone à une main. Le padding-bottom
@@ -345,8 +385,12 @@ body.mtc-quiz-open [aria-label="Choix rapide de matière"]{
     margin:0;
     border-radius:0;
     border-width:1px 0 0;
-    padding:16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
-    font-size:1.05rem;
+    /* 5x l'épaisseur du padding d'origine (16px -> 80px), même logique que
+       la version desktop ci-dessus : cible tactile volontairement énorme.
+       !important nécessaire face à mtc-styles.css:3104, voir commentaire
+       de la règle de base plus haut dans ce fichier. */
+    padding:80px 16px calc(env(safe-area-inset-bottom, 0px) + 80px) !important;
+    font-size:1.2rem;
     box-shadow:0 -4px 14px color-mix(in srgb, var(--shadow-color, #4b63ff) 18%, transparent);
   }
   .mtc-quiz-header h2{

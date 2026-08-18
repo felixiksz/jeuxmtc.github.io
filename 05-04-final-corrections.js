@@ -43,7 +43,7 @@
   }
 
   function mtcSectionsForPoint(details){
-    return [
+    const sections = [
       ["Localisation", details.localisation],
       ["Méthode de localisation", details.methode_localisation],
       ["Méthode de travail", details.methode_travail],
@@ -54,6 +54,16 @@
       ["Associations", details.associations],
       ["Notes", details.notes]
     ];
+
+    // Champs ajoutés côté Assistant Diagnostic (sync GitHub, voir
+    // 59-github-sync.js) sans mapping explicite connu à l'avance — le
+    // libellé est déjà calculé au moment de la synchro, donc n'importe
+    // quelle nouvelle section ajoutée là-bas apparaît ici automatiquement.
+    (Array.isArray(details.__githubExtraFields) ? details.__githubExtraFields : []).forEach(field => {
+      if(field && field.label && field.value) sections.push([field.label, field.value]);
+    });
+
+    return sections;
   }
 
   function mtcCategoryExplanationItems(key){

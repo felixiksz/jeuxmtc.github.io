@@ -193,6 +193,42 @@
     });
     return list;
   }
+  // Points "à revoir" (répétition espacée, voir 55-point-mastery.js),
+  // indépendamment de la grille actuellement affichée — contrairement à
+  // currentGridPoints(), ils peuvent venir de n'importe quelle partie
+  // jouée par le passé. Pas de rôle catégoriel connu pour ce contexte
+  // précis (celui de la grille où le point a été appris a pu changer) :
+  // on en redérive un générique via pointCategoryKeys, déjà utilisé pour
+  // le filtre "Catégorie" de la recherche avancée, donc valable pour
+  // n'importe quel point hors contexte de grille.
+  function dueReviewItems(){
+    if(typeof window.MTC_QUIZ_MASTERY !== "object" || !window.MTC_QUIZ_MASTERY) return [];
+    const points = window.MTC_QUIZ_MASTERY.duePoints() || [];
+    return points.map(code => {
+      const canal = canalOfPoint(code);
+      const keys = typeof window.pointCategoryKeys === "function" ? window.pointCategoryKeys(code) : [];
+      const key = Array.isArray(keys) && keys.length ? keys[0] : "";
+      const category = key && typeof window.categoryDisplayNameFromSearchKey === "function"
+        ? cleanText(window.categoryDisplayNameFromSearchKey(key))
+        : "";
+      const contextualPhrase = key ? contextualCanalPhrase(key, code) : "";
+      // Certains points (généraux, sans catégorie répertoriée) n'ont pas de
+      // rôle à faire deviner : on retombe sur leur nom français entre
+      // guillemets comme indice, plutôt qu'une question "Quel est le point
+      // du canal X ?" bien trop vague pour être un vrai exercice de rappel.
+      const categoryPhrase = category
+        ? questionCategoryPhrase(category)
+        : (detailsForPoint(code).nom_francais ? '« ' + cleanText(detailsForPoint(code).nom_francais) + ' »' : "");
+      return {
+        point:code,
+        category,
+        categoryPhrase,
+        canal,
+        canalPhrase:contextualPhrase || canalPhrase(canal)
+      };
+    });
+  }
+
   // Échantillonnage pondéré (sans remise) : plus le poids d'un élément est
   // grand, plus il a de chances de sortir tôt. Utilisé pour faire revenir
   // en priorité les points les moins maîtrisés (voir 55-point-mastery.js),
@@ -321,10 +357,35 @@
     state.questions = questions;
     state.index = 0;
     state.gridSignature = gridSignatureFor(currentGridPoints());
+    state.isDueReview = false;
     renderCurrentQuestion();
   }
   function restartQuiz(){
-    startQuiz(state.mode);
+    if(state.isDueReview) startDueReviewQuiz();
+    else startQuiz(state.mode);
+  }
+
+  // Session de révision indépendante de la grille affichée : construite à
+  // partir des points "à revoir" (répétition espacée, voir dueReviewItems),
+  // pas de state.gridSignature de grille réelle donc jamais confondue avec
+  // une reprise de quiz normal par openQuiz().
+  function startDueReviewQuiz(){
+    const items = dueReviewItems();
+    const questions = weightedOrder(
+      shuffle(items).map(item => Object.assign({revealed:false, mode:"text", retryCount:0}, item)),
+      masteryWeight
+    );
+    if(!questions.length){
+      alert("Aucun point à revoir pour l'instant.");
+      return;
+    }
+    setOverlayVisible(true);
+    state.mode = "text";
+    state.questions = questions;
+    state.index = 0;
+    state.gridSignature = "__DUE_REVIEW__";
+    state.isDueReview = true;
+    renderCurrentQuestion();
   }
 
   function comparisonButtonHtml(point){
@@ -449,6 +510,7 @@
     if(window.MTC_QUIZ_MASTERY && typeof window.MTC_QUIZ_MASTERY.recordQuizRating === "function"){
       try{ window.MTC_QUIZ_MASTERY.recordQuizRating(question.point, rating === "again" ? "again" : "good"); }catch(error){}
     }
+    ensureDueReviewButton();
     if(rating === "again" && (question.retryCount || 0) < MAX_RETRIES_PER_POINT){
       const respawn = Object.assign({}, question, {revealed:false, shownAt:null, retryCount:(question.retryCount || 0) + 1, lastResponseMs:responseMs});
       const spacing = 3 + Math.floor(Math.random() * 3);
@@ -536,6 +598,42 @@
   }
   function removeQuizButtonIfNeeded(){ if(!isFinished()) byId("mtcQuizStartButton")?.remove(); }
 
+  // Bouton "Réviser" permanent dans la barre du haut (pas limité à une
+  // grille terminée, contrairement au bouton quiz ci-dessus) : n'apparaît
+  // que s'il y a au moins un point à revoir (répétition espacée), avec le
+  // nombre en pastille. Retiré du DOM dès que ce nombre retombe à zéro.
+  function ensureDueReviewButton(){
+    if(isPharma()){ byId("mtcDueReviewButton")?.remove(); return; }
+    const count = typeof window.MTC_QUIZ_MASTERY === "object" && window.MTC_QUIZ_MASTERY
+      ? (window.MTC_QUIZ_MASTERY.duePoints() || []).length
+      : 0;
+    let btn = byId("mtcDueReviewButton");
+    if(!count){
+      if(btn) btn.remove();
+      return;
+    }
+    if(!btn){
+      const host = document.querySelector(".topbar-row.topbar-main-row .topbar-main-buttons");
+      if(!host) return;
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = "mtcDueReviewButton";
+      btn.title = "Réviser les points à revoir (répétition espacée)";
+      btn.innerHTML = '<span aria-hidden="true">🔁</span> <span>Réviser</span> <span class="mtc-due-review-badge" id="mtcDueReviewBadge"></span>';
+      btn.addEventListener("click", event => {
+        event.preventDefault();
+        startDueReviewQuiz();
+      });
+      host.appendChild(btn);
+    }
+    // textContent= remplace toujours le noeud texte, même avec une valeur
+    // identique : sans ce garde, la MutationObserver du module (childList,
+    // subtree) se redéclencherait elle-même à l'infini à chaque appel.
+    const badge = byId("mtcDueReviewBadge");
+    const nextLabel = String(count);
+    if(badge && badge.textContent !== nextLabel) badge.textContent = nextLabel;
+  }
+
   function install(){
     document.addEventListener("click", event => {
       const actionButton = event.target && event.target.closest ? event.target.closest("[data-quiz-action]") : null;
@@ -548,11 +646,17 @@
     const observer = new MutationObserver(() => {
       ensureQuizButton();
       removeQuizButtonIfNeeded();
+      ensureDueReviewButton();
       maybeResumeQuizAfterPanelClose();
     });
     observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
     window.setTimeout(ensureQuizButton, 400);
-    window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, startQuiz, hasAnyLocalImage, currentGridPoints, rateCurrent, state};
+    window.setTimeout(ensureDueReviewButton, 400);
+    // Un point peut devenir "à revoir" en restant simplement ouvert (le
+    // délai s'écoule sans qu'aucune mutation DOM ne survienne) : l'observer
+    // seul ne suffit pas, il faut aussi une vérification périodique.
+    window.setInterval(ensureDueReviewButton, 60000);
+    window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, startQuiz, startDueReviewQuiz, hasAnyLocalImage, currentGridPoints, rateCurrent, state};
   }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
   else install();
