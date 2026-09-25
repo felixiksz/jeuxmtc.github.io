@@ -1,0 +1,276 @@
+/* 60 — Cartes de révision imprimables : bouton du pied de page + fenêtre de réglage.
+   (Le document imprimé lui-même est autonome : son CSS est dans 60-pharma-cards.js.) */
+
+/* Même gabarit que les autres icônes du pied de page (export, import, mail,
+   goutte) ; !important nécessaire car mtc-styles.css impose "button{padding:5px 9px !important}". */
+#pharmaCardsButton{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:30px !important;
+  height:30px !important;
+  min-width:30px !important;
+  min-height:30px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:none !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:var(--text-color) !important;
+  font-size:1.35em !important;
+  line-height:1 !important;
+  box-shadow:none !important;
+  transform:none !important;
+  cursor:pointer;
+}
+#pharmaCardsButton:hover,
+#pharmaCardsButton:focus-visible{
+  text-shadow:0 0 8px var(--shadow-color) !important;
+}
+@media(max-width:699px){
+  #pharmaCardsButton{
+    width:28px !important;
+    height:28px !important;
+    min-width:28px !important;
+    min-height:28px !important;
+    font-size:1.3em !important;
+  }
+}
+
+body.mtc-cards-open{
+  overflow:hidden;
+}
+.mtc-cards-modal{
+  position:fixed;
+  inset:0;
+  z-index:2147482600;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  box-sizing:border-box;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 18%, rgba(0,0,0,.28));
+  color:var(--text-color, #111);
+  font-family:"Archivo", system-ui, sans-serif;
+}
+.mtc-cards-modal.visible{display:flex;}
+.mtc-cards-card{
+  width:min(780px, 100%);
+  max-height:94vh;
+  display:flex;
+  flex-direction:column;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 28%, transparent);
+  border-radius:22px;
+  background:var(--page-bg, #fff);
+  box-shadow:0 18px 48px color-mix(in srgb, var(--shadow-color, #4b63ff) 24%, transparent);
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.mtc-cards-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:14px 18px 8px;
+}
+.mtc-cards-head h2{
+  margin:0;
+  font-size:1.1rem;
+  line-height:1.15;
+}
+.mtc-cards-x{
+  appearance:none;
+  width:36px !important;
+  height:36px !important;
+  min-width:36px !important;
+  padding:0 !important;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 34%, transparent) !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:inherit;
+  font-size:1.4rem !important;
+  line-height:1 !important;
+  cursor:pointer;
+}
+.mtc-cards-scroll{
+  flex:1 1 auto;
+  overflow:auto;
+  padding:0 18px 12px;
+  -webkit-overflow-scrolling:touch;
+}
+.mtc-cards-scroll section{
+  margin-top:14px;
+  padding-top:10px;
+  border-top:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 18%, transparent);
+}
+.mtc-cards-scroll h3{
+  margin:0 0 8px;
+  font-size:.95rem;
+}
+.mtc-cards-intro,
+.mtc-cards-note{
+  margin:0 0 8px;
+  font-size:.82rem;
+  line-height:1.4;
+  opacity:.8;
+}
+.mtc-cards-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin-bottom:8px;
+}
+.mtc-cards-filters input[type="search"]{
+  flex:1 1 220px;
+}
+.mtc-cards-modal input[type="search"],
+.mtc-cards-modal input[type="number"],
+.mtc-cards-modal select{
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 28%, transparent);
+  border-radius:10px;
+  background:var(--page-bg, #fff);
+  color:inherit;
+  padding:7px 9px !important;
+  font:500 .88rem/1.3 "Archivo", system-ui, sans-serif;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+  max-width:100%;
+}
+.mtc-cards-options select,
+.mtc-cards-options input[type="number"]{
+  width:100%;
+  box-sizing:border-box;
+}
+.mtc-cards-inline{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:.85rem;
+}
+.mtc-cards-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:8px;
+}
+.mtc-cards-buttons button,
+.mtc-cards-foot button{
+  appearance:none;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 32%, transparent) !important;
+  border-radius:999px !important;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 9%, var(--page-bg, #fff)) !important;
+  color:inherit;
+  padding:8px 12px !important;
+  font:650 .8rem/1 "Archivo", system-ui, sans-serif !important;
+  cursor:pointer;
+}
+.mtc-cards-foot button.mtc-cards-primary{
+  background:var(--shadow-color, #4b63ff) !important;
+  color:#fff !important;
+  border-color:var(--shadow-color, #4b63ff) !important;
+}
+.mtc-cards-list{
+  max-height:min(300px, 38vh);
+  overflow:auto;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 20%, transparent);
+  border-radius:12px;
+  padding:4px 8px;
+}
+.mtc-cards-group[hidden],
+.mtc-cards-herb[hidden]{display:none;}
+.mtc-cards-group-head{
+  position:sticky;
+  top:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 0;
+  background:var(--page-bg, #fff);
+  font-size:.82rem;
+}
+.mtc-cards-count{
+  margin-left:auto;
+  opacity:.55;
+  font-size:.75rem;
+}
+.mtc-cards-herb{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  padding:3px 0 3px 22px;
+  font-size:.84rem;
+  line-height:1.3;
+}
+.mtc-cards-herb-code{
+  flex:none;
+  min-width:2.6em;
+  font-weight:700;
+  opacity:.65;
+  font-size:.75rem;
+}
+.mtc-cards-herb-name em{
+  opacity:.65;
+  font-style:italic;
+}
+.mtc-cards-fields{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.84rem;
+}
+.mtc-cards-fields th,
+.mtc-cards-fields td{
+  padding:4px 6px;
+  border-bottom:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 12%, transparent);
+  text-align:center;
+}
+.mtc-cards-fields th:first-child,
+.mtc-cards-fields td:first-child{
+  text-align:left;
+}
+.mtc-cards-options{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:10px 14px;
+}
+.mtc-cards-options label{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:.8rem;
+  font-weight:650;
+}
+.mtc-cards-options label.mtc-cards-inline{
+  flex-direction:row;
+  align-items:center;
+  font-weight:500;
+}
+.mtc-cards-preview{
+  display:block;
+  width:100%;
+  min-height:0;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 20%, transparent);
+  border-radius:12px;
+  background:#f4f4f4;
+}
+.mtc-cards-foot{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  padding:10px 18px 14px;
+  border-top:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 20%, transparent);
+}
+.mtc-cards-summary{
+  flex:1 1 200px;
+  font-size:.82rem;
+  opacity:.85;
+}
+@media(max-width:699px){
+  .mtc-cards-modal{padding:0;align-items:flex-end;}
+  .mtc-cards-card{max-height:96vh;border-radius:18px 18px 0 0;}
+  .mtc-cards-head,
+  .mtc-cards-scroll,
+  .mtc-cards-foot{padding-left:12px;padding-right:12px;}
+  .mtc-cards-foot button{flex:1 1 auto;}
+}
