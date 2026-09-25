@@ -277,3 +277,31 @@ body.mtc-cards-open{
 }
 
 .mtc-cards-title-icon{display:inline-flex;vertical-align:-0.12em;margin-right:.2em}
+
+/* Onglets Substances / Points */
+.mtc-cards-tabs{
+  display:flex;
+  gap:6px;
+  margin:6px 0 10px;
+  padding:4px;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 24%, transparent);
+  border-radius:999px;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 6%, var(--page-bg, #fff));
+}
+.mtc-cards-tabs button{
+  flex:1 1 0;
+  appearance:none;
+  border:none !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:inherit;
+  padding:8px 10px !important;
+  font:650 .84rem/1.1 "Archivo", system-ui, sans-serif !important;
+  text-transform:none !important;
+  cursor:pointer;
+}
+.mtc-cards-tabs button.active{
+  background:var(--shadow-color, #4b63ff) !important;
+  color:#fff !important;
+}
+.mtc-cards-inline[hidden]{display:none;}
