@@ -4,6 +4,7 @@
 /* Même gabarit que les autres icônes du pied de page (export, import, mail,
    goutte) ; !important nécessaire car mtc-styles.css impose "button{padding:5px 9px !important}". */
 #pharmaCardsButton{
+  order:4 !important; /* mail et goutte ont order:3 dans mtc-styles.css : à droite de la goutte */
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -274,3 +275,5 @@ body.mtc-cards-open{
   .mtc-cards-foot{padding-left:12px;padding-right:12px;}
   .mtc-cards-foot button{flex:1 1 auto;}
 }
+
+.mtc-cards-title-icon{display:inline-flex;vertical-align:-0.12em;margin-right:.2em}
