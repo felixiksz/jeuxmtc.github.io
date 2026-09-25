@@ -28,14 +28,14 @@
 
   // Ordre = ordre d'apparition sur la carte.
   const FIELDS = [
-    {key:"code", label:"Code (ex. A5)", kind:"code"},
+    {key:"code", label:"Code (ex. AF3), en gris dans le coin", kind:"code"},
     {key:"classe", label:"Classe", kind:"classe"},
     {key:"hanzi", label:"Hanzi", kind:"hanzi"},
     {key:"pinyin", label:"Pinyin", kind:"pinyin"},
     {key:"nom", label:"Nom français", kind:"nom"},
-    {key:"nature", label:"Nature — formes à colorier", kind:"shapes", shape:"circle", title:"Nature"},
-    {key:"saveur", label:"Saveur — formes à colorier", kind:"shapes", shape:"drop", title:"Saveur"},
-    {key:"tropisme", label:"Tropisme — formes à colorier", kind:"shapes", shape:"hex", title:"Tropisme"},
+    {key:"nature", label:"Nature (rectangles à colorier)", kind:"shapes", title:"Nature"},
+    {key:"saveur", label:"Saveur (rectangles à colorier)", kind:"shapes", title:"Saveur"},
+    {key:"tropisme", label:"Tropisme (nomenclature en cercle)", kind:"shapes", title:"Tropisme"},
     {key:"posologie", label:"Posologie", kind:"inline", title:"Posologie"},
     {key:"actions", label:"Actions", kind:"list", title:"Actions"},
     {key:"esprit", label:"Esprit", kind:"block", title:"Esprit"},
@@ -197,27 +197,77 @@
       if(/toxi/i.test(rest)) toxicity.push(cap(rest));
       else nature.push(cap(rest));
     });
+    // "Neutre / Equilibré" est UNE seule nature (le jeu l'affiche en deux
+    // morceaux) : un seul rectangle, pas deux à colorier.
+    for(let i = 0; i < nature.length - 1; i++){
+      if(/^neutre$/i.test(nature[i]) && /^[eé]quilibr/i.test(nature[i + 1])){
+        nature.splice(i, 2, "Neutre / Équilibré");
+      }
+    }
     return {nature, toxicity};
   }
 
+  // Tropisme : on retrouve chaque organe cité (même écrit de façons variées :
+  // "Rein", "Reins", "Esto.", "(GI)", "[canaux VB"…) et on l'affiche par sa
+  // nomenclature (P, GI, E, Rt, C, IG, V, Rn, EC, TF, VB, F). Ordre d'apparition.
+  const TROPISM_PATTERNS = [
+    ["EC", "enveloppe du coeur|maitre du coeur|pericarde|\\bec\\b"],
+    ["TF", "triple rechauffeur|trois foyers|san jiao|\\btf\\b"],
+    ["VB", "vesicule biliaire|\\bvb\\b"],
+    ["GI", "gros intestins?|\\bgi\\b"],
+    ["IG", "intestin gr[eê]le|\\big\\b"],
+    ["P", "poumons?|\\bp\\b"],
+    ["E", "estomac|esto\\b\\.?|\\be\\b"],
+    ["Rt", "rate|\\brt\\b"],
+    ["C", "coeur|\\bc\\b"],
+    ["V", "vessie|\\bv\\b"],
+    ["Rn", "reins?|\\brn\\b"],
+    ["F", "foie|\\bf\\b"]
+  ];
+  const TROPISM_REGEX = new RegExp(TROPISM_PATTERNS.map(item => "(" + item[1] + ")").join("|"), "g");
+
+  function tropismCodes(text){
+    const plain = String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/œ/g, "oe").replace(/Œ/g, "oe").toLowerCase();
+    const codes = [];
+    for(const match of plain.matchAll(TROPISM_REGEX)){
+      const index = match.slice(1).findIndex(group => group !== undefined);
+      const code = TROPISM_PATTERNS[index][0];
+      if(!codes.includes(code)) codes.push(code);
+    }
+    return codes;
+  }
+
+  // Nature et saveur : un rectangle avec le texte dedans (à colorier). La
+  // toxicité, saisie dans le même champ que la nature, a un rectangle en
+  // pointillés pour se distinguer. Tropisme : la nomenclature dans un cercle.
   function shapesFor(field, record){
     if(field.key === "nature"){
       const parts = splitNature(record.nature);
-      return parts.nature.map(label => ({shape:"circle", label}))
-        .concat(parts.toxicity.map(label => ({shape:"tri", label})));
+      return parts.nature.map(label => ({kind:"rect", label}))
+        .concat(parts.toxicity.map(label => ({kind:"rect", label, tox:true})));
     }
     if(field.key === "saveur"){
-      return splitSaveur(record.saveur).map(label => ({shape:"drop", label}));
+      return splitSaveur(record.saveur).map(label => ({kind:"rect", label}));
     }
-    return splitTopLevel(record.tropisme).map(cap).map(label => ({shape:"hex", label}));
+    // Pris élément par élément : les organes deviennent des cercles (sans
+    // doublon), un élément qui n'est pas un organe (ex. le niveau "Shào yīn"
+    // que le jeu ajoute après les codes) reste un rectangle.
+    const seen = new Set();
+    const orbs = [];
+    const extras = [];
+    splitTopLevel(record.tropisme).forEach(token => {
+      const codes = tropismCodes(token);
+      if(codes.length){
+        codes.forEach(code => {
+          if(!seen.has(code)){ seen.add(code); orbs.push({kind:"orb", label:code}); }
+        });
+      }else{
+        const label = cap(token.replace(/[\[\]()]/g, "").trim());
+        if(label) extras.push({kind:"rect", label});
+      }
+    });
+    return orbs.concat(extras);
   }
-
-  const SHAPE_SVG = {
-    circle:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.6"/></svg>',
-    drop:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8C9 6.3 4.3 10.8 4.3 15.4a7.7 7.7 0 0 0 15.4 0C19.7 10.8 15 6.3 12 1.8z"/></svg>',
-    hex:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6l9.4 5.4v10L12 22.4 2.6 17V7z"/></svg>',
-    tri:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4l10.2 18.2H1.8z"/></svg>'
-  };
 
   // --- Rendu d'une carte -----------------------------------------------------
 
@@ -236,36 +286,38 @@
     const has = key => identity.some(field => field.key === key);
 
     const classeHtml = has("classe") ? '<div class="classe">' + esc(record.classe) + "</div>" : "";
-    const codeHtml = has("code") ? '<span class="code">' + esc(record.code) + "</span>" : "";
+    const cornerHtml = has("code") ? '<span class="corner">' + esc(record.code) + "</span>" : "";
     const hanziHtml = has("hanzi") ? '<span class="hanzi">' + esc(record.hanzi) + "</span>" : "";
     const pinyinHtml = has("pinyin") ? '<span class="pinyin">' + esc(record.pinyin) + "</span>" : "";
     const nomHtml = has("nom") ? '<div class="nom">' + esc(record.nom) + "</div>" : "";
+    const cornerClass = cornerHtml ? " has-corner" : "";
 
     // Recto "d'identité" seule (ex. pinyin + hanzi) : contenu centré et grand.
     if(!details.length){
-      return '<div class="card-inner ident-only">' + classeHtml +
+      return '<div class="card-inner ident-only' + cornerClass + '">' + cornerHtml + classeHtml +
         (hanziHtml ? '<div class="hanzi-big">' + esc(record.hanzi) + "</div>" : "") +
         (pinyinHtml ? '<div class="pinyin-big">' + esc(record.pinyin) + "</div>" : "") +
-        nomHtml +
-        (codeHtml ? '<div class="code-wrap">' + codeHtml + "</div>" : "") +
-        "</div>";
+        nomHtml + "</div>";
     }
 
-    let html = '<div class="card-inner">';
-    if(classeHtml || codeHtml) html += '<div class="hd"><div>' + classeHtml + "</div>" + codeHtml + "</div>";
+    let html = '<div class="card-inner' + cornerClass + '">' + cornerHtml;
+    if(classeHtml) html += '<div class="hd">' + classeHtml + "</div>";
     if(pinyinHtml || hanziHtml) html += '<div class="ident">' + pinyinHtml + hanziHtml + "</div>";
     html += nomHtml;
-    if(identity.length) html += '<div class="rule"></div>';
+    if(identity.some(field => field.key !== "code")) html += '<div class="rule"></div>';
 
-    // Formes à colorier : nature / saveur / tropisme regroupées sur une ligne.
-    const shapeFields = details.filter(field => field.kind === "shapes");
-    if(shapeFields.length){
-      html += '<div class="shape-groups">' + shapeFields.map(field => {
-        return '<div class="shape-group"><div class="lbl">' + esc(field.title) + '</div><div class="shape-row">' +
-          shapesFor(field, record).map(item =>
-            '<div class="shape">' + SHAPE_SVG[item.shape] + "<span>" + esc(item.label) + "</span></div>"
-          ).join("") + "</div></div>";
-      }).join("") + "</div>";
+    // Nature / saveur : rectangles avec le texte dedans ; tropisme : la
+    // nomenclature dans un cercle — à colorier. Tout sur une même ligne
+    // (qui passe à la suivante si besoin) pour gagner de la place.
+    const tagFields = details.filter(field => field.kind === "shapes");
+    if(tagFields.length){
+      html += '<div class="tags">' + tagFields.map(field =>
+        '<div class="tag-group"><div class="lbl">' + esc(field.title) + '</div><div class="tag-row">' +
+        shapesFor(field, record).map(item => item.kind === "orb"
+          ? '<span class="orb' + (item.label.length > 3 ? " long" : "") + '">' + esc(item.label) + "</span>"
+          : '<span class="rect' + (item.tox ? " tox" : "") + '">' + esc(item.label) + "</span>"
+        ).join("") + "</div></div>"
+      ).join("") + "</div>";
     }
 
     details.filter(field => field.kind !== "shapes").forEach(field => {
@@ -273,7 +325,7 @@
       if(field.kind === "inline"){
         html += '<div class="inline"><span class="lbl">' + esc(field.title) + "</span> " + esc(value) + "</div>";
       }else if(field.kind === "list"){
-        html += '<div class="blk"><div class="lbl">' + esc(field.title) + '</div><ul class="lst">' +
+        html += '<div class="blk"><div class="lbl">' + esc(field.title) + '</div><ul class="lst' + (value.length >= 5 ? " cols" : "") + '">' +
           value.map(item => "<li>" + esc(item) + "</li>").join("") + "</ul></div>";
       }else if(field.kind === "image"){
         html += '<img class="pic" alt="" src="' + esc(value) + '">';
@@ -325,7 +377,7 @@
   function sheetHtml(slots, side, opts, cardFn){
     const cells = slots.map(item => {
       if(!item) return '<div class="slot empty"></div>';
-      return '<div class="slot"><div class="card" data-fs="9">' + cardFn(item, side) + "</div></div>";
+      return '<div class="slot"><div class="card" data-fs="12">' + cardFn(item, side) + "</div></div>";
     }).join("");
     const cuts = side === "recto" && opts.cutlines ? cutLinesHtml() : "";
     const shift = side === "verso"
@@ -368,35 +420,38 @@
     ".cut.h{left:0;width:100%;border-top-width:.2mm}",
     ".card{position:absolute;inset:var(--m,4.5mm);border:.35mm solid #000;border-radius:3.2mm;padding:2.6mm 3.2mm;font-size:var(--fs,9pt);line-height:1.25;overflow:hidden}",
     ".card.overflow{border-style:dashed}",
-    ".card-inner{height:100%;display:flex;flex-direction:column;gap:.4em;overflow:hidden}",
+    ".card-inner{position:relative;height:100%;display:flex;flex-direction:column;gap:.4em;overflow:hidden}",
     ".card-inner>*{flex:none;min-width:0}",
     ".hd{display:flex;justify-content:space-between;align-items:flex-start;gap:.5em}",
     ".classe,.lbl{font-family:Archivo,Arial,sans-serif;font-weight:800;letter-spacing:.07em;text-transform:uppercase;font-size:.6em}",
-    ".code{font-family:Archivo,Arial,sans-serif;font-weight:700;font-size:.7em;border:.25mm solid #000;border-radius:99px;padding:.05em .6em;white-space:nowrap}",
+    ".corner{position:absolute;top:0;right:0;font-family:Archivo,Arial,sans-serif;font-weight:700;font-size:.72em;color:#8a8a8a;letter-spacing:.03em}",
+    ".has-corner .hd,.has-corner .ident{padding-right:3.6em}",
     ".ident{display:flex;flex-wrap:wrap;align-items:baseline;gap:.05em .6em}",
     ".pinyin{font-weight:700;font-size:1.5em;line-height:1.1}",
     ".hanzi{font-family:'Noto Serif SC','Noto Serif CJK SC','Songti SC','SimSun','Source Han Serif SC',serif;font-size:1.45em;line-height:1.1}",
     ".nom{font-style:italic;font-size:.95em}",
     ".rule{border-top:.2mm solid #000;opacity:.45}",
-    ".shape-groups{display:flex;flex-wrap:wrap;gap:.5em 1.4em;align-items:flex-start}",
-    ".shape-group .lbl{margin-bottom:.25em}",
-    ".shape-row{display:flex;flex-wrap:wrap;gap:.35em .8em;align-items:flex-start}",
-    ".shape{display:flex;flex-direction:column;align-items:center;max-width:23mm;text-align:center}",
-    ".shape svg{width:max(5.2mm,calc(var(--fs,9pt)*2.5));height:max(5.2mm,calc(var(--fs,9pt)*2.5));fill:none;stroke:#000;stroke-width:1.3;stroke-linejoin:round}",
-    ".shape span{font-family:Archivo,Arial,sans-serif;font-size:.62em;line-height:1.1;margin-top:.15em}",
+    ".tags{display:flex;flex-wrap:wrap;gap:.25em 1em;align-items:flex-end}",
+    ".tag-group{display:flex;flex-direction:column;gap:.15em}",
+    ".tag-group .lbl{font-size:.5em;opacity:.75}",
+    ".tag-row{display:flex;flex-wrap:wrap;gap:.3em;align-items:center}",
+    ".rect{display:inline-block;max-width:42mm;border:.3mm solid #000;border-radius:1mm;padding:.2em .6em;font-family:Archivo,Arial,sans-serif;font-size:.82em;line-height:1.15}",
+    ".rect.tox{border-style:dashed}",
+    ".orb{display:inline-flex;align-items:center;justify-content:center;width:2.1em;height:2.1em;border:.3mm solid #000;border-radius:50%;font-family:Archivo,Arial,sans-serif;font-weight:700;font-size:.8em;line-height:1}",
+    ".orb.long{width:auto;min-width:2.1em;padding:0 .6em;border-radius:99px}",
     ".inline{font-size:.9em}",
     ".inline .lbl{margin-right:.4em}",
     ".blk .txt{white-space:pre-line;font-size:.9em}",
     ".blk .lbl{margin-bottom:.15em}",
     ".lst{list-style:none;margin:0;padding:0;font-size:.9em}",
-    ".lst li{position:relative;padding-left:1em}",
+    ".lst.cols{column-count:2;column-gap:1.2em}",
+    ".lst li{position:relative;padding-left:1em;break-inside:avoid}",
     ".lst li::before{content:'\\2022';position:absolute;left:.15em}",
     ".pic{display:block;align-self:center;max-width:100%;height:calc(var(--fs,9pt)*4.5);object-fit:contain}",
     ".ident-only{justify-content:center;align-items:center;text-align:center;gap:.3em}",
     ".hanzi-big{font-family:'Noto Serif SC','Noto Serif CJK SC','Songti SC','SimSun','Source Han Serif SC',serif;font-size:3.6em;line-height:1.05}",
     ".pinyin-big{font-weight:700;font-size:2.1em;line-height:1.1}",
     ".ident-only .nom{font-size:1.15em}",
-    ".code-wrap{margin-top:.3em}",
     ".toolbar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #999;padding:10px 14px;font:14px/1.4 Archivo,Arial,sans-serif;display:flex;gap:14px;align-items:center;flex-wrap:wrap}",
     ".toolbar button{font:700 14px Archivo,Arial,sans-serif;padding:9px 16px;border:1.5px solid #000;border-radius:99px;background:#fff;cursor:pointer}",
     ".toolbar .tip{flex:1 1 320px;font-size:13px;color:#333}",
@@ -573,7 +628,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle">🃏 Cartes de révision à imprimer</h2>' +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon"><svg viewBox="0 0 100 100" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(-15 50 50)"><rect x="22" y="14" width="40" height="58" rx="6"/></g><g transform="rotate(11 50 50)"><rect x="36" y="26" width="40" height="58" rx="6" style="fill:var(--page-bg,#fff)"/><path d="M47 47h18M47 60h10"/></g></svg></span> Cartes de révision à imprimer</h2>' +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<p class="mtc-cards-intro">8 cartes par feuille A4, noir et blanc. Nature, saveur et tropisme sont des formes vides à colorier soi-même.</p>' +
