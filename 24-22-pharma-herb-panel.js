@@ -653,6 +653,46 @@
     return herb ? getHerbEsprit(herb) : "";
   };
 
+  // Fiche complète d'une substance, avec les mêmes valeurs "effectives"
+  // que le panneau (données publiées + ajouts locaux fusionnés) — utilisée
+  // par 60-pharma-cards.js pour imprimer des cartes sans recopier ici la
+  // logique de fusion de chaque champ (les getters ci-dessus sont privés).
+  window.getPharmaHerbCardRecord = function(herbId){
+    const herb = getHerbById(herbId);
+    if(!herb) return null;
+    const natureRaw = [getDisplayFieldLabels("nature", herb, herb.nature), getDisplayFieldLabels("toxicity", herb, "")]
+      .map(value => String(value || "").trim())
+      .filter(Boolean)
+      .join(", ");
+    return {
+      id:herb.id,
+      code:herb.code || herb.id,
+      classe:herb.classe || "",
+      pinyin:getHerbLabel(herb),
+      hanzi:getHerbHanzi(herb),
+      nom:herb.nom || "",
+      nature:natureRaw,
+      saveur:normalizeMultiline(getDisplayFieldLabels("saveur", herb, herb.saveur)),
+      tropisme:normalizeMultiline(getDisplayFieldLabels("tropism", herb, herb.tropisme)),
+      posologie:normalizeMultiline(herb.posologie),
+      actions:Array.isArray(herb.actions) ? herb.actions.map(item => normalizeMultiline(item)).filter(Boolean) : [],
+      esprit:normalizeMultiline(getHerbEsprit(herb)),
+      indications:getHerbIndicationsLocales(herb),
+      contre_indications:getHerbContreIndicationsLocales(herb),
+      precaution:normalizeMultiline(getHerbPrecaution(herb)),
+      associations:normalizeMultiline(getHerbAssociations(herb)),
+      vs:normalizeMultiline(getHerbVs(herb)),
+      formules:normalizeMultiline(getHerbFormules(herb)),
+      synonymes:normalizeMultiline(getHerbSynonymes(herb)),
+      synthese:normalizeMultiline(getHerbSynthese(herb)),
+      ingredients:normalizeMultiline(getHerbIngredients(herb)),
+      recherches_modernes:normalizeMultiline(getHerbRecherchesModernes(herb)),
+      preparation:getHerbPreparationLocale(herb),
+      notes:normalizeMultiline(getHerbNotes(herb)),
+      image:(window.MTC_IMAGE_STORE && getHerbImage(herb)) || ""
+    };
+  };
+
   window.openPharmaHerbPanel = openPharmaHerbPanel;
   window.refreshCurrentPharmaHerbPanel = function(){
     if(!isPharmaDomain() || !currentOpenHerbId) return;

@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260813-extra-fields-real-path";
+const MTC_OFFLINE_VERSION = "20260925-pharma-cards-v5";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -70,6 +70,8 @@ const CORE_ASSETS = [
   "58-mobile-topbar-menu.js",
   "59-github-sync.css",
   "59-github-sync.js",
+  "60-pharma-cards.css",
+  "60-pharma-cards.js",
   "Import_tableau pharma_pro(1).json",
   "README_HORS_CONNEXION.txt",
   "README_PUBLICATION.txt",
