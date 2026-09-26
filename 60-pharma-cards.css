@@ -402,3 +402,7 @@ body.mtc-cards-open{
   background:var(--shadow-color, #4b63ff) !important;
   color:#fff !important;
 }
+
+.mtc-cards-mk.zoomed .mtc-cards-mk-views{flex-wrap:nowrap;justify-content:flex-start;overflow:auto;}
+.mtc-cards-mk.zoomed .mtc-cards-mk-views canvas{max-width:none;}
+.mtc-cards-mk.zoomed .mtc-cards-mk-views > div{flex:0 0 auto;}
