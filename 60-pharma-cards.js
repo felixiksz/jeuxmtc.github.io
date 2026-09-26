@@ -324,6 +324,7 @@
   const HD_FIELDS = [
     {key:"catphrases", label:"Catégorie(s) du point, avec le canal", kind:"shapes", title:"Catégories", big:true, tags:record => rects(record.catphrases)},
     {key:"actions", label:"Actions", kind:"list", title:"Actions"},
+    {key:"psycho", label:"Indications psycho-émotionnelles (privé)", kind:"list", title:"Indications psycho-émotionnelles", adminOnly:true},
     {key:"code", label:"Nomenclature (ex. E 34)", kind:"code"},
     {key:"hanzi", label:"Nom chinois — hanzi", kind:"hanzi"},
     {key:"pinyin", label:"Nom chinois — pinyin", kind:"pinyin"},
@@ -1477,7 +1478,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v15</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v16</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
