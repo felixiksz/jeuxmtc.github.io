@@ -6058,7 +6058,7 @@ const POINT_DETAILS = {
   "KS": {
     "point": "KS",
     "canal": "P",
-    "pinyin": "Kàshān",
+    "pinyin": "Kào shān",
     "hanzi": "靠山",
     "nom_francais": "adossé à la montagne",
     "localisation": "Ce point se situe à l’extrémité du bord radial du pli du poignet, à la racine du métacarpien\ndu pouce.",
