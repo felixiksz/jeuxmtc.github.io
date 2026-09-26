@@ -656,6 +656,15 @@
     // délai s'écoule sans qu'aucune mutation DOM ne survienne) : l'observer
     // seul ne suffit pas, il faut aussi une vérification périodique.
     window.setInterval(ensureDueReviewButton, 60000);
+    // Formulation catégorie + canal d'un point, identique à celle des questions
+    // du quiz (réutilisée par 60-pharma-cards.js pour les cartes imprimables).
+    window.mtcQuizPointPhrases = function(groupKey, groupName, point){
+      const code = String(point || "");
+      return {
+        categoryPhrase:questionCategoryPhrase(cleanText(groupName || groupKey || "")),
+        canalPhrase:contextualCanalPhrase(groupKey, code) || canalPhrase(canalOfPoint(code))
+      };
+    };
     window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, startQuiz, startDueReviewQuiz, hasAnyLocalImage, currentGridPoints, rateCurrent, state};
   }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", install, {once:true});
