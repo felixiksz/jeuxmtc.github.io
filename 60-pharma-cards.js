@@ -550,7 +550,8 @@
       if(!this.urlCache.has(entry.name)) this.urlCache.set(entry.name, URL.createObjectURL(entry.blob));
       return this.urlCache.get(entry.name);
     },
-    get(id){
+    processed:new Map(), // clé (fichier + réglages + repères) -> adresse de l'image optimisée
+    chosenEntries(id){
       const items = this.entries.get(String(id)) || [];
       if(!items.length) return [];
       const wanted = HD_IMAGE_PRIORITY[id];
@@ -561,7 +562,20 @@
       }else{
         chosen = [items[0]];
       }
-      return chosen.map(entry => this.urlOf(entry));
+      return chosen;
+    },
+    bwKey(entry){
+      return entry.name + "|" + settings.hdBWLevel + "|" + JSON.stringify(hdMarkers.get(entry.name));
+    },
+    get(id){
+      const useBW = Boolean(settings && settings.hdBW);
+      return this.chosenEntries(id).map(entry => {
+        if(useBW){
+          const optimized = this.processed.get(this.bwKey(entry));
+          if(optimized) return optimized;
+        }
+        return this.urlOf(entry);
+      });
     },
     size(){ return this.entries.size; }
   };
@@ -673,6 +687,53 @@
     }catch(error){ return false; }
   }
 
+  // --- Repères des points (cliqués par l'utilisatrice) -----------------------
+  // Fichier -> [[x, y], ...] en fractions de la largeur/hauteur de l'image,
+  // donc indépendants de la résolution.
+  const HD_MARKERS_KEY = "mtc_cards_hd_markers_v1";
+  const hdMarkers = {
+    data:null,
+    load(){
+      if(!this.data) this.data = readJson(HD_MARKERS_KEY, {}) || {};
+      return this.data;
+    },
+    get(name){ return this.load()[name] || []; },
+    set(name, list){
+      const data = this.load();
+      if(list && list.length) data[name] = list; else delete data[name];
+      try{ localStorage.setItem(HD_MARKERS_KEY, JSON.stringify(data)); }catch(error){}
+    },
+    count(){ return Object.keys(this.load()).length; }
+  };
+
+  async function hdEntryBlob(entry){
+    if(entry.blob) return entry.blob;
+    return (await fetch(entry.url)).blob();
+  }
+
+  // Optimise (noir et blanc) les images des points donnés, si l'option est
+  // active ; résultat gardé en mémoire pour ne pas refaire le travail.
+  async function hdPrepareBW(ids, onProgress){
+    if(!settings || !settings.hdBW || !window.MTCCardsBW) return;
+    const jobs = [];
+    ids.forEach(id => HD_IMAGES.chosenEntries(id).forEach(entry => {
+      const key = HD_IMAGES.bwKey(entry);
+      if(!HD_IMAGES.processed.has(key)) jobs.push({entry, key});
+    }));
+    let done = 0;
+    for(const job of jobs){
+      try{
+        const blob = await window.MTCCardsBW.process(await hdEntryBlob(job.entry), {level:settings.hdBWLevel, markers:hdMarkers.get(job.entry.name)});
+        HD_IMAGES.processed.set(job.key, URL.createObjectURL(blob));
+      }catch(error){
+        HD_IMAGES.processed.set(job.key, HD_IMAGES.urlOf(job.entry));
+      }
+      done++;
+      if(onProgress) onProgress(done, jobs.length);
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+  }
+
   function hdRecord(id){
     const base = pointRecord(id);
     if(!base) return null;
@@ -772,6 +833,8 @@
     merged.margin = Number(src.margin) || DEFAULT_OPTIONS.margin;
     merged.hdUncat = Boolean(src.hdUncat);
     merged.hdOnlyImage = src.hdOnlyImage === undefined ? true : Boolean(src.hdOnlyImage);
+    merged.hdBW = src.hdBW === undefined ? true : Boolean(src.hdBW);
+    merged.hdBWLevel = ["none", "light", "medium", "strong"].includes(src.hdBWLevel) ? src.hdBWLevel : "medium";
     merged.dataset = DATASETS[src.dataset] ? src.dataset : "herbs";
     // Ancien format (avant les points) : selected/recto/verso à la racine = substances.
     merged.herbs = normalizeDatasetSettings(src.herbs || (src.selected ? src : null), DATASETS.herbs);
@@ -1171,23 +1234,33 @@
     return buildDocument(built.html, Object.assign({}, opts, {preview, autoprint:!preview, title:"Feuille test — cartes"}));
   }
 
-  function openForPrint(html){
-    let url = "";
-    try{
-      url = URL.createObjectURL(new Blob([html], {type:"text/html"}));
-    }catch(error){ url = ""; }
-    const win = url ? window.open(url, "_blank") : null;
-    if(win) return true;
+  function openForPrint(source){
+    const ready = Promise.resolve(source);
+    // La fenêtre doit s'ouvrir pendant le clic, avant tout travail asynchrone.
+    const win = window.open("", "_blank");
+    if(win){
+      try{
+        win.document.write('<!doctype html><meta charset="utf-8"><title>Préparation…</title><p style="font:16px sans-serif;padding:24px">Préparation des cartes…</p>');
+      }catch(error){}
+      ready.then(html => {
+        let url = "";
+        try{ url = URL.createObjectURL(new Blob([html], {type:"text/html"})); }catch(error){}
+        if(url) win.location.href = url;
+      }).catch(() => { try{ win.close(); }catch(error){} });
+      return true;
+    }
 
     // Fenêtre bloquée : impression via un cadre caché (moins fiable sur mobile).
-    const frame = document.createElement("iframe");
-    frame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
-    document.body.appendChild(frame);
-    frame.onload = () => {
-      try{ frame.contentWindow.focus(); frame.contentWindow.print(); }catch(error){}
-      setTimeout(() => frame.remove(), 60000);
-    };
-    frame.srcdoc = html;
+    ready.then(html => {
+      const frame = document.createElement("iframe");
+      frame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+      document.body.appendChild(frame);
+      frame.onload = () => {
+        try{ frame.contentWindow.focus(); frame.contentWindow.print(); }catch(error){}
+        setTimeout(() => frame.remove(), 60000);
+      };
+      frame.srcdoc = html;
+    });
     return false;
   }
 
@@ -1263,6 +1336,17 @@
               '<input type="file" id="mtcCardsHdFolder" webkitdirectory multiple hidden>' +
               '<input type="file" id="mtcCardsHdFiles" accept="image/*" multiple hidden>' +
               '<p class="mtc-cards-note" id="mtcCardsHdStatus"></p>' +
+              '<div class="mtc-cards-options mtc-cards-bw">' +
+                '<label class="mtc-cards-inline"><input type="checkbox" id="mtcCardsHdBW"> optimiser les images pour l\'impression noir et blanc</label>' +
+                '<label>Aplats de couleur<select id="mtcCardsHdLevel">' +
+                  '<option value="none">inchangés</option>' +
+                  '<option value="light">un peu plus clairs</option>' +
+                  '<option value="medium">plus clairs (recommandé)</option>' +
+                  '<option value="strong">très clairs</option>' +
+                "</select></label>" +
+                '<button type="button" data-cards-act="hd-markers">Repérer les points…</button>' +
+              "</div>" +
+              '<p class="mtc-cards-note" id="mtcCardsMkStatus"></p>' +
             "</div>" +
             '<div class="mtc-cards-filters">' +
               '<input type="search" id="mtcCardsSearch" placeholder="Rechercher (pinyin, hanzi, nom, code)…" autocomplete="off">' +
@@ -1372,6 +1456,8 @@
     byId("mtcCardsCut").checked = Boolean(settings.cutlines);
     byId("mtcCardsUncat").checked = Boolean(settings.hdUncat);
     byId("mtcCardsHasImage").checked = Boolean(settings.hdOnlyImage);
+    byId("mtcCardsHdBW").checked = Boolean(settings.hdBW);
+    byId("mtcCardsHdLevel").value = settings.hdBWLevel;
     updateGroupBoxes();
   }
 
@@ -1424,12 +1510,16 @@
     settings.cutlines = byId("mtcCardsCut").checked;
     settings.hdUncat = byId("mtcCardsUncat").checked;
     settings.hdOnlyImage = byId("mtcCardsHasImage").checked;
+    settings.hdBW = byId("mtcCardsHdBW").checked;
+    settings.hdBWLevel = byId("mtcCardsHdLevel").value;
   }
 
   function updateHdStatus(){
     const node = byId("mtcCardsHdStatus");
     if(!node) return;
     const total = HD_IMAGES.size();
+    const mk = byId("mtcCardsMkStatus");
+    if(mk) mk.textContent = hdMarkers.count() + " image(s) avec point(s) repéré(s) (liseré blanc et noir autour du point à l'impression).";
     if(hdMessage){ node.textContent = hdMessage; return; }
     node.textContent = total
       ? total + " point(s) avec image (dossier mémorisé dans ce navigateur)."
@@ -1463,7 +1553,9 @@
     previewTimer = window.setTimeout(renderPreview, 350);
   }
 
-  function renderPreview(){
+  let previewToken = 0;
+
+  async function renderPreview(){
     const frame = byId("mtcCardsPreview");
     const note = byId("mtcCardsPreviewNote");
     if(!frame || !modal || !modal.classList.contains("visible")) return;
@@ -1472,6 +1564,15 @@
       frame.srcdoc = "";
       frame.style.height = "0";
       return;
+    }
+    const token = ++previewToken;
+    if(ds().id === "acuhd" && settings.hdBW){
+      const ids = selectedRecords().slice(0, CARDS_PER_SHEET).map(record => record.id);
+      note.textContent = "Optimisation des images pour le noir et blanc…";
+      await hdPrepareBW(ids, (done, total) => {
+        if(token === previewToken) note.textContent = "Optimisation des images pour le noir et blanc… " + done + "/" + total;
+      });
+      if(token !== previewToken) return;
     }
     const doc = buildRealDocument(true);
     const shown = Math.min(CARDS_PER_SHEET, doc.records.length);
@@ -1509,6 +1610,9 @@
     }else if(action === "hd-pick-files"){
       byId("mtcCardsHdFiles").click();
       return;
+    }else if(action === "hd-markers"){
+      openMarkerTool();
+      return;
     }else if(action === "hd-forget"){
       hdForget().then(() => { hdMessage = "Images oubliées."; populateDataset(); updateHdStatus(); });
       return;
@@ -1517,7 +1621,14 @@
       if(!cur().selected.length){ window.alert("Coche au moins un élément."); return; }
       if(ds().id === "acuhd" && !HD_IMAGES.size() && !window.confirm("Aucune image n'est chargée : les versos auront un cadre vide. Continuer ?")) return;
       onChange();
-      openForPrint(buildRealDocument(false).html);
+      openForPrint((async () => {
+        if(ds().id === "acuhd" && settings.hdBW){
+          const ids = selectedRecords().map(record => record.id);
+          await hdPrepareBW(ids, (done, total) => { byId("mtcCardsSummary").textContent = "Optimisation des images… " + done + "/" + total; });
+          updateSummary();
+        }
+        return buildRealDocument(false).html;
+      })());
       return;
     }else if(action === "test"){
       onChange();
@@ -1534,6 +1645,191 @@
     settings.dataset = id;
     saveSettings();
     populateDataset();
+  }
+
+  // --- Outil de repérage des points (noir et blanc) -----------------------------
+  // On clique sur la pastille du point dans l'image en couleur ; à droite, le
+  // résultat noir et blanc avec le liseré. Les repères sont mémorisés par
+  // fichier (fractions de la largeur/hauteur).
+
+  let mkEl = null;
+  let mkState = null;
+  let mkRenderToken = 0;
+
+  function mkEnsure(){
+    if(mkEl) return mkEl;
+    mkEl = document.createElement("div");
+    mkEl.className = "mtc-cards-mk";
+    mkEl.id = "mtcCardsMk";
+    mkEl.innerHTML =
+      '<div class="mtc-cards-mk-card" role="dialog" aria-modal="true">' +
+        '<header class="mtc-cards-mk-head"><strong id="mtcMkTitle">Repérage des points</strong>' +
+        '<button type="button" class="mtc-cards-x" data-mk="close" aria-label="Fermer">×</button></header>' +
+        '<p class="mtc-cards-note">Clique au centre de chaque pastille du point à mettre en évidence (une ou plusieurs). Reclique sur un repère pour le retirer. À droite : le résultat en noir et blanc.</p>' +
+        '<div class="mtc-cards-mk-views">' +
+          '<div><div class="mtc-cards-mk-cap">Original — clique ici</div><canvas id="mtcMkCanvas"></canvas></div>' +
+          '<div><div class="mtc-cards-mk-cap">Noir et blanc</div><canvas id="mtcMkPreview"></canvas></div>' +
+        "</div>" +
+        '<footer class="mtc-cards-mk-foot">' +
+          '<button type="button" data-mk="prev">◀ Précédent</button>' +
+          '<span id="mtcMkCount" class="mtc-cards-summary"></span>' +
+          '<button type="button" data-mk="next">Suivant ▶</button>' +
+          '<label class="mtc-cards-inline"><input type="checkbox" id="mtcMkOnlyFills" checked> seulement les images à aplats de couleur</label>' +
+          '<button type="button" data-mk="clear">Effacer les repères</button>' +
+          '<button type="button" data-mk="close" class="mtc-cards-primary">Terminer</button>' +
+        "</footer>" +
+      "</div>";
+    document.body.appendChild(mkEl);
+    mkEl.addEventListener("click", event => {
+      const action = event.target.closest("[data-mk]");
+      if(action){
+        const name = action.getAttribute("data-mk");
+        if(name === "close") mkClose();
+        else if(name === "prev") mkGo(-1);
+        else if(name === "next") mkGo(1);
+        else if(name === "clear") mkClear();
+      }
+    });
+    mkEl.querySelector("#mtcMkCanvas").addEventListener("click", mkCanvasClick);
+    mkEl.querySelector("#mtcMkOnlyFills").addEventListener("change", () => { mkApplyFilter(); mkShow(); });
+    document.addEventListener("keydown", event => {
+      if(!mkEl || !mkEl.classList.contains("visible")) return;
+      if(event.key === "ArrowLeft") mkGo(-1);
+      else if(event.key === "ArrowRight") mkGo(1);
+    });
+    return mkEl;
+  }
+
+  function mkAllEntries(){
+    const seen = new Set();
+    const list = [];
+    ds().items().forEach(item => HD_IMAGES.chosenEntries(item.id).forEach(entry => {
+      if(seen.has(entry.name)) return;
+      seen.add(entry.name);
+      list.push({entry, code:item.code});
+    }));
+    return list;
+  }
+
+  function mkApplyFilter(){
+    const only = byId("mtcMkOnlyFills").checked;
+    const currentName = mkState.filtered[mkState.index] && mkState.filtered[mkState.index].entry.name;
+    mkState.filtered = mkState.all.filter(item => {
+      if(!only) return true;
+      const cover = mkState.coverage.get(item.entry.name);
+      return cover === undefined || cover >= 0.04 || hdMarkers.get(item.entry.name).length > 0;
+    });
+    const keep = mkState.filtered.findIndex(item => item.entry.name === currentName);
+    mkState.index = keep >= 0 ? keep : 0;
+  }
+
+  async function openMarkerTool(){
+    if(!HD_IMAGES.size()){ window.alert("Charge d'abord le dossier d'images."); return; }
+    if(!window.MTCCardsBW){ window.alert("Le module d'optimisation d'image n'est pas chargé."); return; }
+    mkEnsure().classList.add("visible");
+    mkState = {all:mkAllEntries(), filtered:[], index:0, coverage:new Map()};
+    const title = byId("mtcMkTitle");
+    for(let i = 0; i < mkState.all.length; i++){
+      const item = mkState.all[i];
+      title.textContent = "Analyse des images… " + (i + 1) + "/" + mkState.all.length;
+      try{ mkState.coverage.set(item.entry.name, await window.MTCCardsBW.coverage(await hdEntryBlob(item.entry))); }
+      catch(error){ mkState.coverage.set(item.entry.name, 1); }
+      if(i % 6 === 5) await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    mkApplyFilter();
+    mkShow();
+  }
+
+  function mkClose(){
+    if(!mkEl) return;
+    mkEl.classList.remove("visible");
+    updateHdStatus();
+    schedulePreview();
+  }
+
+  function mkGo(step){
+    if(!mkState || !mkState.filtered.length) return;
+    mkState.index = (mkState.index + step + mkState.filtered.length) % mkState.filtered.length;
+    mkShow();
+  }
+
+  function mkClear(){
+    const item = mkState && mkState.filtered[mkState.index];
+    if(!item) return;
+    hdMarkers.set(item.entry.name, []);
+    mkShow();
+  }
+
+  async function mkShow(){
+    const item = mkState.filtered[mkState.index];
+    const title = byId("mtcMkTitle");
+    const count = byId("mtcMkCount");
+    const left = byId("mtcMkCanvas");
+    const right = byId("mtcMkPreview");
+    if(!item){
+      title.textContent = "Repérage des points";
+      count.textContent = "Aucune image à repérer avec ce filtre.";
+      left.width = left.height = right.width = right.height = 1;
+      return;
+    }
+    const token = ++mkRenderToken;
+    title.textContent = item.code + " — " + item.entry.name;
+    count.textContent = (mkState.index + 1) + " / " + mkState.filtered.length + " · " + hdMarkers.get(item.entry.name).length + " repère(s)";
+    const blob = await hdEntryBlob(item.entry);
+    const bitmap = await createImageBitmap(blob);
+    if(token !== mkRenderToken) return;
+    const maxW = Math.max(240, Math.min(560, Math.floor((window.innerWidth - 60) / 2)));
+    const maxH = Math.max(240, Math.floor(window.innerHeight * 0.55));
+    const scale = Math.min(maxW / bitmap.width, maxH / bitmap.height);
+    const w = Math.max(1, Math.round(bitmap.width * scale));
+    const h = Math.max(1, Math.round(bitmap.height * scale));
+    left.width = w; left.height = h;
+    right.width = w; right.height = h;
+    mkState.bitmap = bitmap;
+    mkState.size = {w, h};
+    mkDrawLeft();
+    // Aperçu noir et blanc (avec repères) — un peu différé pendant les clics.
+    window.clearTimeout(mkState.timer);
+    mkState.timer = window.setTimeout(async () => {
+      const level = settings.hdBWLevel === "none" ? "none" : settings.hdBWLevel;
+      const canvas = await window.MTCCardsBW.render(blob, {level, markers:hdMarkers.get(item.entry.name), maxSide:900});
+      if(token !== mkRenderToken) return;
+      const ctx = right.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(canvas, 0, 0, w, h);
+    }, 120);
+  }
+
+  function mkDrawLeft(){
+    const item = mkState.filtered[mkState.index];
+    const left = byId("mtcMkCanvas");
+    const ctx = left.getContext("2d");
+    const {w, h} = mkState.size;
+    ctx.drawImage(mkState.bitmap, 0, 0, w, h);
+    hdMarkers.get(item.entry.name).forEach(marker => {
+      const x = marker[0] * w, y = marker[1] * h;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#e0201b";
+      ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x - 14, y); ctx.lineTo(x + 14, y); ctx.moveTo(x, y - 14); ctx.lineTo(x, y + 14); ctx.stroke();
+    });
+  }
+
+  function mkCanvasClick(event){
+    const item = mkState && mkState.filtered[mkState.index];
+    if(!item || !mkState.size) return;
+    const canvas = event.currentTarget;
+    const rect = canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.left) * canvas.width / rect.width;
+    const y = (event.clientY - rect.top) * canvas.height / rect.height;
+    const {w, h} = mkState.size;
+    const list = hdMarkers.get(item.entry.name).slice();
+    const near = list.findIndex(marker => Math.hypot(marker[0] * w - x, marker[1] * h - y) < 14);
+    if(near >= 0) list.splice(near, 1);
+    else list.push([Number((x / w).toFixed(5)), Number((y / h).toFixed(5))]);
+    hdMarkers.set(item.entry.name, list);
+    mkShow();
   }
 
   function wireModal(){
@@ -1572,6 +1868,7 @@
     byId("mtcCardsHdFiles").addEventListener("change", event => onHdFilesChosen(event.target));
     ["mtcCardsDx", "mtcCardsDy"].forEach(id => byId(id).addEventListener("input", onChange));
     document.addEventListener("keydown", event => {
+      if(event.key === "Escape" && mkEl && mkEl.classList.contains("visible")){ mkClose(); return; }
       if(event.key === "Escape" && modal.classList.contains("visible")) closeModal();
     });
     window.addEventListener("message", event => {
@@ -1609,7 +1906,7 @@
     window.MTCPharmaCards = {
       open:openModal, close:closeModal, datasets:DATASETS, slotsFor, backSlotSource,
       splitNature, splitSaveur, splitTopLevel, tropismCodes, linesOf, pointRecord,
-      cardInnerHtml, buildDocument, buildPagesHtml, hdImages:HD_IMAGES, hdCategoryIndex, hdMatchFileName, hdLoadFiles, hdRestore
+      cardInnerHtml, buildDocument, buildPagesHtml, hdImages:HD_IMAGES, hdMarkers, hdPrepareBW, hdCategoryIndex, hdMatchFileName, hdLoadFiles, hdRestore
     };
   }
 
