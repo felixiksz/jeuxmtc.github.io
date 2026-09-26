@@ -1432,7 +1432,10 @@
                   '<option value="medium">plus clairs (recommandé)</option>' +
                   '<option value="strong">très clairs</option>' +
                 "</select></label>" +
-                (isAdmin() ? '<button type="button" data-cards-act="hd-markers">Vérifier les points…</button>' : "") +
+                (isAdmin() ? '<button type="button" data-cards-act="hd-markers">Vérifier les points…</button>' +
+                  '<button type="button" data-cards-act="hd-export">Exporter mes corrections</button>' +
+                  '<button type="button" data-cards-act="hd-import">Importer des corrections…</button>' +
+                  '<input type="file" id="mtcCardsMkImport" accept="application/json,.json" hidden>' : "") +
               "</div>" +
               (isAdmin() ? '<p class="mtc-cards-note" id="mtcCardsMkStatus"></p>' : "") +
             "</div>" +
@@ -1714,6 +1717,12 @@
     }else if(action === "hd-markers"){
       openMarkerTool();
       return;
+    }else if(action === "hd-export"){
+      hdExportMarkers();
+      return;
+    }else if(action === "hd-import"){
+      byId("mtcCardsMkImport").click();
+      return;
     }else if(action === "hd-forget"){
       hdForget().then(() => { hdMessage = "Images oubliées."; populateDataset(); updateHdStatus(); });
       return;
@@ -1836,6 +1845,40 @@
     });
     const keep = mkState.filtered.findIndex(item => item.entry.name === currentName);
     mkState.index = keep >= 0 ? keep : 0;
+  }
+
+  // Export / import des corrections (pour passer d'un navigateur à l'autre).
+  function hdExportMarkers(){
+    if(!isAdmin()) return;
+    const payload = {type:"mtc-cards-hd-markers", version:1, markers:hdMarkers.load()};
+    const blob = new Blob([JSON.stringify(payload, null, 1)], {type:"application/json"});
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "corrections-points-hd.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+  }
+
+  async function hdImportMarkers(file){
+    if(!isAdmin() || !file) return;
+    let payload;
+    try{ payload = JSON.parse(await file.text()); }catch(error){ window.alert("Fichier illisible."); return; }
+    const source = payload && payload.type === "mtc-cards-hd-markers" ? payload.markers : null;
+    if(!source || typeof source !== "object"){ window.alert("Ce fichier ne contient pas de corrections de points."); return; }
+    let count = 0;
+    Object.keys(source).forEach(name => {
+      const raw = source[name];
+      const value = Array.isArray(raw) ? {add:raw, hide:[]} : {add:(raw && raw.add) || [], hide:(raw && raw.hide) || []};
+      if(!value.add.length && !value.hide.length) return;
+      hdMarkers.set(name, value);
+      count++;
+    });
+    HD_IMAGES.processed.clear();
+    updateHdStatus();
+    schedulePreview();
+    window.alert(count + " image(s) avec corrections importée(s).");
   }
 
   async function openMarkerTool(){
@@ -2037,6 +2080,8 @@
     byId("mtcCardsClass").addEventListener("change", applyFilters);
     byId("mtcCardsPriority").addEventListener("change", applyFilters);
     byId("mtcCardsHasImage").addEventListener("change", applyFilters);
+    const importInput = byId("mtcCardsMkImport");
+    if(importInput) importInput.addEventListener("change", () => { hdImportMarkers(importInput.files && importInput.files[0]); importInput.value = ""; });
     byId("mtcCardsPsycho").addEventListener("change", applyFilters);
     byId("mtcCardsHdFolder").addEventListener("change", event => onHdFilesChosen(event.target));
     byId("mtcCardsHdFiles").addEventListener("change", event => onHdFilesChosen(event.target));
