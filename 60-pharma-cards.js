@@ -1738,7 +1738,7 @@
       '<div class="mtc-cards-mk-card" role="dialog" aria-modal="true">' +
         '<header class="mtc-cards-mk-head"><strong id="mtcMkTitle">Vérification des points</strong>' +
         '<button type="button" class="mtc-cards-x" data-mk="close" aria-label="Fermer">×</button></header>' +
-        '<p class="mtc-cards-note">Cercles <b style="color:#1c5fd0">bleus</b> : points détectés automatiquement. <b style="color:#e0201b">Rouge</b> : ajouté par toi. Clique sur une zone vide pour <b>ajouter</b> un point manquant, sur un cercle pour le <b>retirer</b> (reclique pour le rétablir). À droite : le résultat en noir et blanc.</p>' +
+        '<p class="mtc-cards-note">Cercles <b style="color:#1c5fd0">bleus</b> : points détectés automatiquement. <b style="color:#e0201b">Rouge</b> : ajouté par toi. Clique sur une zone vide pour <b>ajouter</b> un point manquant, sur un cercle pour le <b>retirer</b> (reclique pour le rétablir). Deux points très proches : utilise le <b>zoom</b>, ou maintiens <b>Maj</b> en cliquant pour forcer l\'ajout. À droite : le résultat en noir et blanc.</p>' +
         '<div class="mtc-cards-mk-views">' +
           '<div><div class="mtc-cards-mk-cap">Original — clique ici</div><canvas id="mtcMkCanvas"></canvas></div>' +
           '<div><div class="mtc-cards-mk-cap">Noir et blanc</div><canvas id="mtcMkPreview"></canvas></div>' +
@@ -1752,6 +1752,7 @@
             '<option value="fills">Images à aplats de couleur</option>' +
             '<option value="none">Aucun point détecté</option>' +
           "</select>" +
+          '<select id="mtcMkZoom" title="Zoom"><option value="1">Zoom ×1</option><option value="2">Zoom ×2</option><option value="3">Zoom ×3</option></select>' +
           '<button type="button" data-mk="clear">Réinitialiser cette image</button>' +
           '<button type="button" data-mk="close" class="mtc-cards-primary">Terminer</button>' +
         "</footer>" +
@@ -1769,6 +1770,7 @@
     });
     mkEl.querySelector("#mtcMkCanvas").addEventListener("click", mkCanvasClick);
     mkEl.querySelector("#mtcMkFilter").addEventListener("change", () => { mkApplyFilter(); mkShow(); });
+    mkEl.querySelector("#mtcMkZoom").addEventListener("change", () => mkShow());
     document.addEventListener("keydown", event => {
       if(!mkEl || !mkEl.classList.contains("visible")) return;
       if(event.key === "ArrowLeft") mkGo(-1);
@@ -1885,7 +1887,9 @@
     count.textContent = (mkState.index + 1) + " / " + mkState.filtered.length + " · " + auto.length + " détecté(s), " + saved.add.length + " ajouté(s), " + saved.hide.length + " retiré(s)";
     const maxW = Math.max(240, Math.min(560, Math.floor((window.innerWidth - 60) / 2)));
     const maxH = Math.max(240, Math.floor(window.innerHeight * 0.55));
-    const scale = Math.min(maxW / bitmap.width, maxH / bitmap.height);
+    const zoom = Number(byId("mtcMkZoom").value) || 1;
+    mkEl.classList.toggle("zoomed", zoom > 1);
+    const scale = Math.min(maxW / bitmap.width, maxH / bitmap.height) * zoom;
     const w = Math.max(1, Math.round(bitmap.width * scale));
     const h = Math.max(1, Math.round(bitmap.height * scale));
     left.width = w; left.height = h;
@@ -1946,19 +1950,26 @@
     const fy = Number((y / h).toFixed(5));
     const distPx = marker => Math.hypot(marker[0] * w - x, marker[1] * h - y);
 
-    const addIndex = saved.add.findIndex(marker => distPx(marker) < 14);
-    if(addIndex >= 0){
-      saved.add.splice(addIndex, 1);
+    // cible la plus proche dont le cercle contient le clic (Maj = ajout forcé)
+    let target = null;
+    if(!event.shiftKey){
+      saved.add.forEach((marker, index) => {
+        const d = distPx(marker);
+        if(d <= 9 && (!target || d < target.d)) target = {d, kind:"add", index};
+      });
+      (mkState.auto || []).forEach(a => {
+        const d = distPx(a);
+        if(d <= Math.max(6, (a[2] || 0.01) * side) + 4 && (!target || d < target.d)) target = {d, kind:"auto", a};
+      });
+    }
+    if(target && target.kind === "add"){
+      saved.add.splice(target.index, 1);
+    }else if(target){
+      const hideIndex = saved.hide.findIndex(hide => hdNear(target.a, hide, 0.02));
+      if(hideIndex >= 0) saved.hide.splice(hideIndex, 1);
+      else saved.hide.push([target.a[0], target.a[1]]);
     }else{
-      const autoIndex = (mkState.auto || []).findIndex(a => distPx(a) < Math.max(12, (a[2] || 0.01) * side + 6));
-      if(autoIndex >= 0){
-        const a = mkState.auto[autoIndex];
-        const hideIndex = saved.hide.findIndex(hide => hdNear(a, hide, 0.02));
-        if(hideIndex >= 0) saved.hide.splice(hideIndex, 1);
-        else saved.hide.push([a[0], a[1]]);
-      }else{
-        saved.add.push([fx, fy]);
-      }
+      saved.add.push([fx, fy]);
     }
     hdMarkers.set(item.entry.name, saved);
     mkShow();
