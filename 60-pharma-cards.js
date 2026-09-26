@@ -693,6 +693,10 @@
   // manqué s'ajoute d'un clic, un faux point se retire d'un clic). Les
   // corrections sont mémorisées par fichier : {add:[[x,y],...], hide:[[x,y],...]}
   // en fractions de la largeur/hauteur. (Ancien format : simple liste = add.)
+  // L'outil de vérification n'est proposé qu'avec ?admin=1 dans l'adresse.
+  function isAdmin(){
+    try{ return new URLSearchParams(window.location.search).get("admin") === "1"; }catch(error){ return false; }
+  }
   const HD_MARKERS_KEY = "mtc_cards_hd_markers_v1";
   const HD_DOTS_KEY = "mtc_cards_hd_dots_v3";
   const hdMarkers = {
@@ -1414,9 +1418,9 @@
                   '<option value="medium">plus clairs (recommandé)</option>' +
                   '<option value="strong">très clairs</option>' +
                 "</select></label>" +
-                '<button type="button" data-cards-act="hd-markers">Vérifier les points…</button>' +
+                (isAdmin() ? '<button type="button" data-cards-act="hd-markers">Vérifier les points…</button>' : "") +
               "</div>" +
-              '<p class="mtc-cards-note" id="mtcCardsMkStatus"></p>' +
+              (isAdmin() ? '<p class="mtc-cards-note" id="mtcCardsMkStatus"></p>' : "") +
             "</div>" +
             '<div class="mtc-cards-filters">' +
               '<input type="search" id="mtcCardsSearch" placeholder="Rechercher (pinyin, hanzi, nom, code)…" autocomplete="off">' +
@@ -1810,6 +1814,7 @@
   }
 
   async function openMarkerTool(){
+    if(!isAdmin()) return;
     if(!HD_IMAGES.size()){ window.alert("Charge d'abord le dossier d'images."); return; }
     if(!window.MTCCardsBW){ window.alert("Le module d'optimisation d'image n'est pas chargé."); return; }
     mkEnsure().classList.add("visible");
