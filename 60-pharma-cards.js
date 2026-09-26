@@ -720,6 +720,9 @@
   function isAdmin(){
     try{ return new URLSearchParams(window.location.search).get("admin") === "1"; }catch(error){ return false; }
   }
+  // Sous ce plus grand côté (en pixels), une image est floue à l'impression
+  // sur une carte (~100 mm de large à 300 dpi : environ 1100 px).
+  const HD_LOW_RES_PX = 1000;
   const HD_MARKERS_KEY = "mtc_cards_hd_markers_v1";
   const HD_DOTS_KEY = "mtc_cards_hd_dots_v3";
   const hdMarkers = {
@@ -1478,7 +1481,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v16</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v17</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
@@ -1886,6 +1889,7 @@
             '<option value="all">Toutes les images</option>' +
             '<option value="fills">Images à aplats de couleur</option>' +
             '<option value="none">Aucun point détecté</option>' +
+            '<option value="low">Basse résolution (moins de 1000 px)</option>' +
           "</select>" +
           '<select id="mtcMkZoom" title="Zoom"><option value="1">Zoom ×1</option><option value="2">Zoom ×2</option><option value="3">Zoom ×3</option></select>' +
           '<button type="button" data-mk="clear">Réinitialiser cette image</button>' +
@@ -1938,6 +1942,10 @@
         const auto = hdAuto.peek(name);
         return auto !== undefined && auto.length === 0;
       }
+      if(mode === "low"){
+        const size = mkState.dims.get(name);
+        return Boolean(size) && Math.max(size[0], size[1]) < HD_LOW_RES_PX;
+      }
       return true;
     });
     const keep = mkState.filtered.findIndex(item => item.entry.name === currentName);
@@ -1983,14 +1991,20 @@
     if(!HD_IMAGES.size()){ window.alert("Charge d'abord le dossier d'images."); return; }
     if(!window.MTCCardsBW){ window.alert("Le module d'optimisation d'image n'est pas chargé."); return; }
     mkEnsure().classList.add("visible");
-    mkState = {all:mkAllEntries(), filtered:[], index:0, coverage:new Map(), run:++mkRenderToken};
+    mkState = {all:mkAllEntries(), filtered:[], index:0, coverage:new Map(), dims:new Map(), run:++mkRenderToken};
     const runId = mkState.run;
     const progress = byId("mtcMkProgress");
     const title = byId("mtcMkTitle");
     for(let i = 0; i < mkState.all.length; i++){
       const item = mkState.all[i];
       title.textContent = "Analyse des images… " + (i + 1) + "/" + mkState.all.length;
-      try{ mkState.coverage.set(item.entry.name, await window.MTCCardsBW.coverage(await hdEntryBlob(item.entry))); }
+      try{
+        const blob = await hdEntryBlob(item.entry);
+        const probe = await createImageBitmap(blob);
+        mkState.dims.set(item.entry.name, [probe.width, probe.height]);
+        if(probe.close) probe.close();
+        mkState.coverage.set(item.entry.name, await window.MTCCardsBW.coverage(blob));
+      }
       catch(error){ mkState.coverage.set(item.entry.name, 1); }
       if(i % 6 === 5) await new Promise(resolve => setTimeout(resolve, 0));
     }
@@ -2047,7 +2061,9 @@
     }
     const token = ++mkRenderToken;
     mkState.run = mkState.run;
-    title.textContent = item.code + " — " + item.entry.name;
+    const size = mkState.dims.get(item.entry.name);
+    const lowRes = size && Math.max(size[0], size[1]) < HD_LOW_RES_PX;
+    title.textContent = item.code + " — " + item.entry.name + (size ? " · " + size[0] + "×" + size[1] + " px" + (lowRes ? " ⚠ basse résolution" : "") : "");
     const blob = await hdEntryBlob(item.entry);
     const bitmap = await createImageBitmap(blob);
     const auto = await hdAuto.get(item.entry);
