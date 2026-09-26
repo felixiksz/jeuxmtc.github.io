@@ -281,6 +281,7 @@
     {key:"methode_travail", label:"Méthode de travail", kind:"block", title:"Méthode de travail"},
     {key:"actions", label:"Actions", kind:"list", title:"Actions"},
     {key:"indications", label:"Indications", kind:"list", title:"Indications"},
+    {key:"psycho", label:"Indications psycho-émotionnelles (privé)", kind:"list", title:"Indications psycho-émotionnelles", adminOnly:true},
     {key:"esprit", label:"Esprit", kind:"block", title:"Esprit"},
     {key:"associations", label:"Associations", kind:"block", title:"Associations"},
     {key:"vs", label:"VS.", kind:"block", title:"VS."},
@@ -397,8 +398,9 @@
     const extras = Array.isArray(details.__githubExtraFields)
       ? details.__githubExtraFields
         .filter(field => field && field.label && field.value)
-        .map(field => ({label:String(field.label), value:cleanText(field.value)}))
+        .map(field => ({key:String(field.key || ""), label:String(field.label), value:cleanText(field.value)}))
       : [];
+    const psychoField = extras.find(field => /psycho/i.test(field.key));
     return {
       id,
       code:pointCode(id),
@@ -413,6 +415,7 @@
       methode_travail:cleanText(details.methode_travail),
       actions:linesOf(details.actions),
       indications:linesOf(details.indications),
+      psycho:psychoField ? linesOf(psychoField.value) : [],
       esprit:cleanText(storedOr("mtc_point_esprit_", id, details.esprit || "")),
       associations:cleanText(storedOr("mtc_point_associations_", id, details.associations || "")),
       vs:cleanText(storedOr("mtc_point_vs_", id, details.vs || details.comparaison || "")),
@@ -455,6 +458,7 @@
           title:(d.pinyin || pointCode(id)) + (d.hanzi ? " · " + d.hanzi : ""),
           sub:d.nom_francais || d.nom_complet || "",
           priority:false,
+          psycho:Array.isArray(d.__githubExtraFields) && d.__githubExtraFields.some(field => field && /psycho/i.test(field.key || "") && field.value),
           search:normalizeSearch([pointCode(id), id, d.pinyin, d.hanzi, d.nom_francais, d.nom_complet, labels[canal]].join(" "))
         });
       });
@@ -1355,7 +1359,7 @@
 
   function itemRowHtml(item){
     return '<label class="mtc-cards-herb" data-item-row="' + esc(item.id) + '" data-group-code="' + esc(item.group) + '" data-search="' + esc(item.search) +
-      '" data-priority="' + (item.priority ? "1" : "0") + '" data-noimg="' + (item.noimg ? "1" : "0") + '"><input type="checkbox" data-item-id="' + esc(item.id) + '">' +
+      '" data-priority="' + (item.priority ? "1" : "0") + '" data-noimg="' + (item.noimg ? "1" : "0") + '" data-psycho="' + (item.psycho ? "1" : "0") + '"><input type="checkbox" data-item-id="' + esc(item.id) + '">' +
       '<span class="mtc-cards-herb-code">' + esc(item.code) + "</span>" +
       '<span class="mtc-cards-herb-name">' + esc(item.title) + (item.sub ? " <em>" + esc(item.sub) + "</em>" : "") +
       (item.noimg ? ' <span class="mtc-cards-noimg">sans image</span>' : "") + "</span></label>";
@@ -1388,7 +1392,7 @@
 
   function fieldsTableHtml(fields){
     return '<table class="mtc-cards-fields"><thead><tr><th>Champ</th><th>Recto</th><th>Verso</th></tr></thead><tbody>' +
-      fields.map(field =>
+      fields.filter(field => !field.adminOnly || isAdmin()).map(field =>
         "<tr><td>" + esc(field.label) + '</td><td><input type="checkbox" data-field-side="recto" data-field="' + field.key +
         '"></td><td><input type="checkbox" data-field-side="verso" data-field="' + field.key + '"></td></tr>'
       ).join("") + "</tbody></table>";
@@ -1437,6 +1441,7 @@
               '<select id="mtcCardsClass"></select>' +
               '<label class="mtc-cards-inline" id="mtcCardsPriorityWrap"><input type="checkbox" id="mtcCardsPriority"> prioritaires</label>' +
               '<label class="mtc-cards-inline" id="mtcCardsHasImageWrap"><input type="checkbox" id="mtcCardsHasImage"> seulement avec image</label>' +
+              '<label class="mtc-cards-inline" id="mtcCardsPsychoWrap" hidden><input type="checkbox" id="mtcCardsPsycho"> seulement avec indications psycho-émotionnelles</label>' +
               '<label class="mtc-cards-inline" id="mtcCardsUncatWrap"><input type="checkbox" id="mtcCardsUncat"> inclure les points sans catégorie</label>' +
             "</div>" +
             '<div class="mtc-cards-buttons">' +
@@ -1505,6 +1510,8 @@
     const isHd = dataset.id === "acuhd";
     byId("mtcCardsHdPanel").hidden = !isHd;
     byId("mtcCardsHasImageWrap").hidden = !isHd;
+    byId("mtcCardsPsychoWrap").hidden = !(isAdmin() && dataset.id !== "herbs");
+    if(byId("mtcCardsPsychoWrap").hidden) byId("mtcCardsPsycho").checked = false;
     byId("mtcCardsUncatWrap").hidden = !isHd;
     byId("mtcCardsCategorizedBtn").hidden = !isHd;
     updateHdStatus();
@@ -1565,11 +1572,13 @@
     const group = byId("mtcCardsClass").value;
     const priorityOnly = byId("mtcCardsPriority").checked;
     const imageOnly = ds().id === "acuhd" && byId("mtcCardsHasImage").checked;
+    const psychoOnly = isAdmin() && ds().id !== "herbs" && byId("mtcCardsPsycho").checked;
     modal.querySelectorAll("[data-item-row]").forEach(row => {
       const ok = (!term || row.getAttribute("data-search").includes(term)) &&
         (!group || row.getAttribute("data-group-code") === group) &&
         (!priorityOnly || row.getAttribute("data-priority") === "1") &&
-        (!imageOnly || row.getAttribute("data-noimg") !== "1");
+        (!imageOnly || row.getAttribute("data-noimg") !== "1") &&
+        (!psychoOnly || row.getAttribute("data-psycho") === "1");
       row.hidden = !ok;
     });
     modal.querySelectorAll("[data-group]").forEach(groupEl => {
@@ -2028,6 +2037,7 @@
     byId("mtcCardsClass").addEventListener("change", applyFilters);
     byId("mtcCardsPriority").addEventListener("change", applyFilters);
     byId("mtcCardsHasImage").addEventListener("change", applyFilters);
+    byId("mtcCardsPsycho").addEventListener("change", applyFilters);
     byId("mtcCardsHdFolder").addEventListener("change", event => onHdFilesChosen(event.target));
     byId("mtcCardsHdFiles").addEventListener("change", event => onHdFilesChosen(event.target));
     ["mtcCardsDx", "mtcCardsDy"].forEach(id => byId(id).addEventListener("input", onChange));

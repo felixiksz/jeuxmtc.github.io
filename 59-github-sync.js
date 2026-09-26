@@ -127,7 +127,10 @@
     if(Array.isArray(value)){
       return value
         .map(item => (item != null && typeof item === "object")
-          ? Object.values(item).filter(v => typeof v === "string" && v).join(" — ")
+          ? (typeof item.indication === "string" && item.indication
+              // {indication, source, auteur_lignee…} : le texte, puis la source entre parenthèses
+              ? item.indication.trim() + (item.source ? " (" + item.source + ")" : "")
+              : Object.values(item).filter(v => typeof v === "string" && v).join(" — "))
           : String(item == null ? "" : item))
         .filter(Boolean)
         .map(line => "•  " + line)
