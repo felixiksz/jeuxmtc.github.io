@@ -985,7 +985,14 @@
     }
 
     const cornerHtml = has("code") ? '<span class="corner">' + esc(record.code) + "</span>" : "";
-    let html = '<div class="card-inner' + (cornerHtml ? " has-corner" : "") + '">' + cornerHtml;
+    // Une image est présente : elle prend toute la place restante, le reste
+    // du contenu est compacté (voir .has-pic dans la feuille de style).
+    const hasPic = details.some(field => field.kind === "image");
+    // Identité seule + image : l'en-tête peut passer en colonne à gauche
+    // quand l'image (portrait) y gagne de la place (choix fait à l'impression).
+    const picIdent = hasPic && details.every(field => field.kind === "image");
+    let picHtml = "";
+    let html = "";
     if(classeHtml || canalHtml) html += '<div class="hd">' + classeHtml + canalHtml + "</div>";
     if(pinyinHtml || hanziHtml) html += '<div class="ident">' + pinyinHtml + hanziHtml + "</div>";
     html += nomHtml;
@@ -1014,12 +1021,13 @@
           html += '<div class="blk"><div class="lbl">' + esc(extra.label) + '</div><div class="txt">' + esc(extra.value) + "</div></div>";
         });
       }else if(field.kind === "image"){
-        html += '<img class="pic" alt="" src="' + esc(value) + '">';
+        picHtml += '<img class="pic" alt="" src="' + esc(value) + '">';
       }else{
         html += '<div class="blk"><div class="lbl">' + esc(field.title) + '</div><div class="txt">' + esc(value) + "</div></div>";
       }
     });
-    return html + "</div>";
+    return '<div class="card-inner' + (cornerHtml ? " has-corner" : "") + (hasPic ? " has-pic" : "") + (picIdent ? " pic-ident" : "") + '">' + cornerHtml +
+      (hasPic ? '<div class="pic-info">' + html + "</div>" + picHtml : html) + "</div>";
   }
 
   // Verso image : bandeau (ou colonne) de nomenclature + noms, et l'image de
@@ -1151,6 +1159,28 @@
     ".lst li{position:relative;padding-left:1em;break-inside:avoid}",
     ".lst li::before{content:'\\2022';position:absolute;left:.15em}",
     ".pic{display:block;align-self:center;max-width:100%;height:calc(var(--fs,9pt)*4.5);object-fit:contain}",
+    ".has-pic{gap:.2em}",
+    ".has-pic .pinyin{font-size:1.1em}",
+    ".has-pic .hanzi{font-size:1.05em}",
+    ".has-pic .nom{font-size:.8em;line-height:1.1}",
+    ".has-pic .rule{display:none}",
+    ".has-pic .blk .txt,.has-pic .lst{font-size:.78em;line-height:1.15}",
+    ".has-pic .lbl{font-size:.48em;margin-bottom:0}",
+    ".has-pic .tag-group .lbl{font-size:.45em}",
+    ".has-pic .tags{gap:.1em .6em}",
+    ".has-pic .corner{font-size:.6em}",
+    ".has-pic.has-corner .hd,.has-pic.has-corner .ident{padding-right:3em}",
+    ".has-pic>.pic{flex:1 1 0;min-height:0;width:100%;height:auto;align-self:stretch;object-fit:contain}",
+    ".pic-info{display:flex;flex-direction:column;gap:.2em;min-width:0}",
+    ".pic-side{flex-direction:row;gap:1.6mm}",
+    ".pic-side>.pic-info{flex:0 0 32%;width:32%;padding-top:1.3em}",
+    ".pic-side>.pic{width:auto;height:100%;min-width:0;min-height:0;flex:1 1 0}",
+    ".has-pic.pic-side .corner{left:0;right:auto}",
+    ".has-pic.pic-side .ident,.has-pic.pic-side .hd{padding-right:0}",
+    ".pic-side .ident{flex-direction:column;align-items:flex-start;gap:.05em}",
+    ".pic-ident:not(.pic-side)>.pic-info{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:0 .6em;padding-right:3em}",
+    ".pic-ident:not(.pic-side) .ident,.pic-ident:not(.pic-side) .hd{padding-right:0}",
+    ".pic-ident:not(.pic-side) .nom{margin-left:.1em}",
     ".ident-only{justify-content:center;align-items:center;text-align:center;gap:.3em}",
     ".hanzi-big{font-family:'Noto Serif SC','Noto Serif CJK SC','Songti SC','SimSun','Source Han Serif SC',serif;font-size:3.6em;line-height:1.05}",
     ".pinyin-big{font-weight:700;font-size:2.1em;line-height:1.1}",
@@ -1189,8 +1219,11 @@
     "function fit(card){",
     " var inner=card.querySelector('.card-inner');if(!inner)return false;",
     " var fs=parseFloat(card.getAttribute('data-fs'))||9;",
+    " var pic=inner.classList.contains('has-pic')?inner.querySelector('.pic'):null;",
+    " if(pic)fs=Math.min(fs,8);",
     " card.style.setProperty('--fs',fs+'pt');",
-    " while(inner.scrollHeight>inner.clientHeight+1&&fs>5.4){fs-=0.25;card.style.setProperty('--fs',fs+'pt');}",
+    " function bad(){return inner.scrollHeight>inner.clientHeight+1||(pic&&pic.clientHeight<inner.clientHeight*0.62);}",
+    " while(bad()&&fs>5.4){fs-=0.25;card.style.setProperty('--fs',fs+'pt');}",
     " var over=inner.scrollHeight>inner.clientHeight+1;",
     " if(over)card.classList.add('overflow');",
     " return over;",
@@ -1206,7 +1239,10 @@
     "}",
     "function hdPrepare(card){",
     " var v=card.querySelector('.hd-verso');",
-    " if(!v)return Promise.resolve();",
+    " if(!v)return Promise.all(Array.prototype.slice.call(card.querySelectorAll('.has-pic .pic')).map(function(im){return new Promise(function(res){",
+    "  if(im.complete){res();return;}",
+    "  im.addEventListener('load',res);im.addEventListener('error',res);",
+    " });}));",
     " card.classList.add('hd-card');card.setAttribute('data-fs','10');card.style.setProperty('--fs','10pt');",
     " var imgs=Array.prototype.slice.call(v.querySelectorAll('.hd-imgs img'));",
     " return Promise.all(imgs.map(function(im){return new Promise(function(res){",
@@ -1229,9 +1265,19 @@
     " v.className='card-inner hd-verso layout-'+best.mode+' arr-'+(best.arr==='col'?'col':'row');",
     " imgs.forEach(function(im,i){im.style.flexGrow=(best.arr==='col'?1/asp[i]:asp[i]);});",
     "}",
+    "function picLayout(card){",
+    " var inner=card.querySelector('.card-inner.pic-ident');if(!inner)return;",
+    " var im=inner.querySelector('.pic');if(!im||!im.naturalWidth)return;",
+    " var info=inner.querySelector('.pic-info');if(!info)return;",
+    " card.style.setProperty('--fs','8pt');inner.classList.remove('pic-side');",
+    " var asp=im.naturalWidth/im.naturalHeight,iw=inner.clientWidth,ih=inner.clientHeight;",
+    " var s1=Math.min(iw/asp,Math.max(0,ih-info.offsetHeight-4)),a1=s1*s1*asp;",
+    " var s2=Math.min(Math.max(0,iw*0.68-4)/asp,ih),a2=s2*s2*asp;",
+    " if(a2>a1*1.08)inner.classList.add('pic-side');",
+    "}",
     "function finish(cards){",
     " var over=0;",
-    " cards.forEach(function(card){hdLayout(card);if(fit(card))over++;});",
+    " cards.forEach(function(card){hdLayout(card);picLayout(card);if(fit(card))over++;});",
     " var warn=document.getElementById('warn');",
     " if(warn&&over){warn.hidden=false;warn.textContent=over+' carte(s) trop remplie(s) (cadre en pointillés) : du texte est coupé. Retirez un champ dans la fenêtre de réglage.';}",
     " if(document.body.classList.contains('preview')){",
@@ -1405,7 +1451,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v11</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v13</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
