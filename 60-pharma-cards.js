@@ -521,7 +521,17 @@
     GI20:[2],
     Rt10:[2],
     Rt15:[2],
-    VB31:[1, 2]
+    VB31:[1, 2],
+    C7:[1],
+    EC3:[1],
+    EC8:[1],
+    EC9:[1, 2],
+    F4:[1, 2],
+    GI11:[1],
+    IG3:[2],
+    Rt9:[1, 2],
+    V28:[1],
+    VB30:[1, 2]
   };
   const HD_DB_NAME = "mtc_cards_hd_images";
   const HD_IMAGE_EXT = /\.(jpe?g|png|webp|gif|bmp)$/i;
