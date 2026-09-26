@@ -1405,7 +1405,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v10</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
@@ -1452,6 +1452,7 @@
               '<button type="button" data-cards-act="uncheck-visible">Décocher les affichées</button>' +
               '<button type="button" data-cards-act="basket">Ajouter le panier de révision</button>' +
               '<button type="button" data-cards-act="hd-categorized" id="mtcCardsCategorizedBtn">Sélectionner uniquement les points avec catégorie</button>' +
+              (isAdmin() ? '<button type="button" data-cards-act="psycho-only" id="mtcCardsPsychoBtn">Sélectionner uniquement les points avec indications psycho-émotionnelles</button>' : "") +
               '<button type="button" data-cards-act="clear">Tout vider</button>' +
             "</div>" +
             '<div class="mtc-cards-list" id="mtcCardsList"></div>' +
@@ -1517,6 +1518,7 @@
     if(byId("mtcCardsPsychoWrap").hidden) byId("mtcCardsPsycho").checked = false;
     byId("mtcCardsUncatWrap").hidden = !isHd;
     byId("mtcCardsCategorizedBtn").hidden = !isHd;
+    if(byId("mtcCardsPsychoBtn")) byId("mtcCardsPsychoBtn").hidden = dataset.id === "herbs";
     updateHdStatus();
     if(isHd && !hdRestoreTried){
       hdRestoreTried = true;
@@ -1700,6 +1702,12 @@
       setChecked("[data-item-id]", box => !box.closest("[data-item-row]").hidden, action === "check-visible");
     }else if(action === "clear"){
       setChecked("[data-item-id]", () => true, false);
+    }else if(action === "psycho-only"){
+      if(!isAdmin()) return;
+      setChecked("[data-item-id]", () => true, false);
+      setChecked("[data-item-id]", box => box.closest("[data-item-row]").getAttribute("data-psycho") === "1", true);
+      const found = modal.querySelectorAll('[data-item-id]:checked').length;
+      if(!found) window.alert("Aucun point avec indications psycho-émotionnelles : lance d'abord la synchro GitHub (bouton de synchronisation du site), puis rouvre cette fenêtre.");
     }else if(action === "hd-categorized"){
       const index = hdCategoryIndex();
       setChecked("[data-item-id]", () => true, false);
