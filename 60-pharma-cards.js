@@ -565,7 +565,7 @@
       return chosen;
     },
     bwKey(entry){
-      return entry.name + "|" + settings.hdBWLevel + "|" + JSON.stringify(hdMarkers.get(entry.name));
+      return entry.name + "|" + settings.hdBWLevel + "|" + (settings.hdDots ? "d" : "n") + "|" + hdMarkers.signature(entry.name);
     },
     get(id){
       const useBW = Boolean(settings && settings.hdBW);
@@ -687,28 +687,92 @@
     }catch(error){ return false; }
   }
 
-  // --- Repères des points (cliqués par l'utilisatrice) -----------------------
-  // Fichier -> [[x, y], ...] en fractions de la largeur/hauteur de l'image,
-  // donc indépendants de la résolution.
+  // --- Points des images : détection automatique + corrections -------------------
+  // Chaque point est redessiné (contour noir, remplissage blanc). Les points
+  // sont d'abord détectés automatiquement (précision privilégiée : un point
+  // manqué s'ajoute d'un clic, un faux point se retire d'un clic). Les
+  // corrections sont mémorisées par fichier : {add:[[x,y],...], hide:[[x,y],...]}
+  // en fractions de la largeur/hauteur. (Ancien format : simple liste = add.)
   const HD_MARKERS_KEY = "mtc_cards_hd_markers_v1";
+  const HD_DOTS_KEY = "mtc_cards_hd_dots_v3";
   const hdMarkers = {
     data:null,
     load(){
       if(!this.data) this.data = readJson(HD_MARKERS_KEY, {}) || {};
       return this.data;
     },
-    get(name){ return this.load()[name] || []; },
-    set(name, list){
+    get(name){
+      const raw = this.load()[name];
+      if(!raw) return {add:[], hide:[]};
+      if(Array.isArray(raw)) return {add:raw, hide:[]};
+      return {add:raw.add || [], hide:raw.hide || []};
+    },
+    set(name, value){
       const data = this.load();
-      if(list && list.length) data[name] = list; else delete data[name];
+      if(value && (value.add.length || value.hide.length)) data[name] = value; else delete data[name];
       try{ localStorage.setItem(HD_MARKERS_KEY, JSON.stringify(data)); }catch(error){}
     },
+    signature(name){ return JSON.stringify(this.get(name)); },
     count(){ return Object.keys(this.load()).length; }
   };
 
   async function hdEntryBlob(entry){
     if(entry.blob) return entry.blob;
     return (await fetch(entry.url)).blob();
+  }
+
+  // Points détectés automatiquement, gardés en mémoire et dans le navigateur
+  // (la détection prend environ 0,3 s par image).
+  const hdAuto = {
+    data:null,
+    pending:new Map(),
+    load(){
+      if(!this.data) this.data = readJson(HD_DOTS_KEY, {}) || {};
+      return this.data;
+    },
+    peek(name){ return this.load()[name]; },
+    get(entry){
+      const cached = this.peek(entry.name);
+      if(cached) return Promise.resolve(cached);
+      if(!window.MTCCardsBW) return Promise.resolve([]);
+      if(this.pending.has(entry.name)) return this.pending.get(entry.name);
+      const job = (async () => {
+        let list = [];
+        try{ list = await window.MTCCardsBW.detect(await hdEntryBlob(entry)); }catch(error){ list = []; }
+        this.load()[entry.name] = list;
+        this.pending.delete(entry.name);
+        this.persistSoon();
+        return list;
+      })();
+      this.pending.set(entry.name, job);
+      return job;
+    },
+    persistSoon(){
+      window.clearTimeout(this.timer);
+      this.timer = window.setTimeout(() => {
+        try{ localStorage.setItem(HD_DOTS_KEY, JSON.stringify(this.load())); }catch(error){}
+      }, 800);
+    }
+  };
+
+  function hdNear(a, b, tolerance){
+    return Math.abs(a[0] - b[0]) <= tolerance && Math.abs(a[1] - b[1]) <= tolerance;
+  }
+
+  // Points à dessiner : détectés (sauf ceux que l'utilisatrice a retirés) +
+  // ajoutés à la main ; un ajout tombant sur un point détecté reprend sa
+  // position et sa taille exactes.
+  function hdEffectiveMarkers(name, auto){
+    const saved = hdMarkers.get(name);
+    const useAuto = !settings || settings.hdDots !== false;
+    const autos = useAuto ? (auto || []).filter(a => !saved.hide.some(hide => hdNear(a, hide, 0.02))) : [];
+    const used = new Set();
+    const adds = saved.add.map(m => {
+      const index = autos.findIndex((a, i) => !used.has(i) && hdNear(a, m, Math.max(0.015, (a[2] || 0.01) * 1.6)));
+      if(index >= 0){ used.add(index); return autos[index]; }
+      return m;
+    });
+    return autos.filter((a, i) => !used.has(i)).concat(adds);
   }
 
   // Optimise (noir et blanc) les images des points donnés, si l'option est
@@ -723,7 +787,11 @@
     let done = 0;
     for(const job of jobs){
       try{
-        const blob = await window.MTCCardsBW.process(await hdEntryBlob(job.entry), {level:settings.hdBWLevel, markers:hdMarkers.get(job.entry.name)});
+        const auto = settings.hdDots ? await hdAuto.get(job.entry) : [];
+        const blob = await window.MTCCardsBW.process(await hdEntryBlob(job.entry), {
+          level:settings.hdBWLevel,
+          markers:hdEffectiveMarkers(job.entry.name, auto)
+        });
         HD_IMAGES.processed.set(job.key, URL.createObjectURL(blob));
       }catch(error){
         HD_IMAGES.processed.set(job.key, HD_IMAGES.urlOf(job.entry));
@@ -834,6 +902,7 @@
     merged.hdUncat = Boolean(src.hdUncat);
     merged.hdOnlyImage = src.hdOnlyImage === undefined ? true : Boolean(src.hdOnlyImage);
     merged.hdBW = src.hdBW === undefined ? true : Boolean(src.hdBW);
+    merged.hdDots = src.hdDots === undefined ? true : Boolean(src.hdDots);
     merged.hdBWLevel = ["none", "light", "medium", "strong"].includes(src.hdBWLevel) ? src.hdBWLevel : "medium";
     merged.dataset = DATASETS[src.dataset] ? src.dataset : "herbs";
     // Ancien format (avant les points) : selected/recto/verso à la racine = substances.
@@ -1338,13 +1407,14 @@
               '<p class="mtc-cards-note" id="mtcCardsHdStatus"></p>' +
               '<div class="mtc-cards-options mtc-cards-bw">' +
                 '<label class="mtc-cards-inline"><input type="checkbox" id="mtcCardsHdBW"> optimiser les images pour l\'impression noir et blanc</label>' +
+                '<label class="mtc-cards-inline"><input type="checkbox" id="mtcCardsHdDots"> points : contour noir, remplissage blanc (à colorier)</label>' +
                 '<label>Aplats de couleur<select id="mtcCardsHdLevel">' +
                   '<option value="none">inchangés</option>' +
                   '<option value="light">un peu plus clairs</option>' +
                   '<option value="medium">plus clairs (recommandé)</option>' +
                   '<option value="strong">très clairs</option>' +
                 "</select></label>" +
-                '<button type="button" data-cards-act="hd-markers">Repérer les points…</button>' +
+                '<button type="button" data-cards-act="hd-markers">Vérifier les points…</button>' +
               "</div>" +
               '<p class="mtc-cards-note" id="mtcCardsMkStatus"></p>' +
             "</div>" +
@@ -1457,6 +1527,7 @@
     byId("mtcCardsUncat").checked = Boolean(settings.hdUncat);
     byId("mtcCardsHasImage").checked = Boolean(settings.hdOnlyImage);
     byId("mtcCardsHdBW").checked = Boolean(settings.hdBW);
+    byId("mtcCardsHdDots").checked = Boolean(settings.hdDots);
     byId("mtcCardsHdLevel").value = settings.hdBWLevel;
     updateGroupBoxes();
   }
@@ -1511,6 +1582,7 @@
     settings.hdUncat = byId("mtcCardsUncat").checked;
     settings.hdOnlyImage = byId("mtcCardsHasImage").checked;
     settings.hdBW = byId("mtcCardsHdBW").checked;
+    settings.hdDots = byId("mtcCardsHdDots").checked;
     settings.hdBWLevel = byId("mtcCardsHdLevel").value;
   }
 
@@ -1519,7 +1591,7 @@
     if(!node) return;
     const total = HD_IMAGES.size();
     const mk = byId("mtcCardsMkStatus");
-    if(mk) mk.textContent = hdMarkers.count() + " image(s) avec point(s) repéré(s) (liseré blanc et noir autour du point à l'impression).";
+    if(mk) mk.textContent = hdMarkers.count() + " image(s) avec corrections manuelles (points détectés automatiquement : contour noir, remplissage blanc).";
     if(hdMessage){ node.textContent = hdMessage; return; }
     node.textContent = total
       ? total + " point(s) avec image (dossier mémorisé dans ce navigateur)."
@@ -1647,10 +1719,11 @@
     populateDataset();
   }
 
-  // --- Outil de repérage des points (noir et blanc) -----------------------------
-  // On clique sur la pastille du point dans l'image en couleur ; à droite, le
-  // résultat noir et blanc avec le liseré. Les repères sont mémorisés par
-  // fichier (fractions de la largeur/hauteur).
+  // --- Outil de vérification des points (noir et blanc) --------------------------
+  // À gauche l'image en couleur : cercles bleus = points détectés, rouges =
+  // ajoutés à la main, gris pointillés = détectés mais retirés. Un clic sur
+  // une zone vide ajoute un point, un clic sur un point le retire (ou le
+  // rétablit). À droite : le résultat noir et blanc.
 
   let mkEl = null;
   let mkState = null;
@@ -1663,9 +1736,9 @@
     mkEl.id = "mtcCardsMk";
     mkEl.innerHTML =
       '<div class="mtc-cards-mk-card" role="dialog" aria-modal="true">' +
-        '<header class="mtc-cards-mk-head"><strong id="mtcMkTitle">Repérage des points</strong>' +
+        '<header class="mtc-cards-mk-head"><strong id="mtcMkTitle">Vérification des points</strong>' +
         '<button type="button" class="mtc-cards-x" data-mk="close" aria-label="Fermer">×</button></header>' +
-        '<p class="mtc-cards-note">Clique au centre de chaque pastille du point à mettre en évidence (une ou plusieurs). Reclique sur un repère pour le retirer. À droite : le résultat en noir et blanc.</p>' +
+        '<p class="mtc-cards-note">Cercles <b style="color:#1c5fd0">bleus</b> : points détectés automatiquement. <b style="color:#e0201b">Rouge</b> : ajouté par toi. Clique sur une zone vide pour <b>ajouter</b> un point manquant, sur un cercle pour le <b>retirer</b> (reclique pour le rétablir). À droite : le résultat en noir et blanc.</p>' +
         '<div class="mtc-cards-mk-views">' +
           '<div><div class="mtc-cards-mk-cap">Original — clique ici</div><canvas id="mtcMkCanvas"></canvas></div>' +
           '<div><div class="mtc-cards-mk-cap">Noir et blanc</div><canvas id="mtcMkPreview"></canvas></div>' +
@@ -1674,24 +1747,28 @@
           '<button type="button" data-mk="prev">◀ Précédent</button>' +
           '<span id="mtcMkCount" class="mtc-cards-summary"></span>' +
           '<button type="button" data-mk="next">Suivant ▶</button>' +
-          '<label class="mtc-cards-inline"><input type="checkbox" id="mtcMkOnlyFills" checked> seulement les images à aplats de couleur</label>' +
-          '<button type="button" data-mk="clear">Effacer les repères</button>' +
+          '<select id="mtcMkFilter">' +
+            '<option value="all">Toutes les images</option>' +
+            '<option value="fills">Images à aplats de couleur</option>' +
+            '<option value="none">Aucun point détecté</option>' +
+          "</select>" +
+          '<button type="button" data-mk="clear">Réinitialiser cette image</button>' +
           '<button type="button" data-mk="close" class="mtc-cards-primary">Terminer</button>' +
         "</footer>" +
+        '<p class="mtc-cards-note" id="mtcMkProgress"></p>' +
       "</div>";
     document.body.appendChild(mkEl);
     mkEl.addEventListener("click", event => {
       const action = event.target.closest("[data-mk]");
-      if(action){
-        const name = action.getAttribute("data-mk");
-        if(name === "close") mkClose();
-        else if(name === "prev") mkGo(-1);
-        else if(name === "next") mkGo(1);
-        else if(name === "clear") mkClear();
-      }
+      if(!action) return;
+      const name = action.getAttribute("data-mk");
+      if(name === "close") mkClose();
+      else if(name === "prev") mkGo(-1);
+      else if(name === "next") mkGo(1);
+      else if(name === "clear") mkClear();
     });
     mkEl.querySelector("#mtcMkCanvas").addEventListener("click", mkCanvasClick);
-    mkEl.querySelector("#mtcMkOnlyFills").addEventListener("change", () => { mkApplyFilter(); mkShow(); });
+    mkEl.querySelector("#mtcMkFilter").addEventListener("change", () => { mkApplyFilter(); mkShow(); });
     document.addEventListener("keydown", event => {
       if(!mkEl || !mkEl.classList.contains("visible")) return;
       if(event.key === "ArrowLeft") mkGo(-1);
@@ -1712,12 +1789,19 @@
   }
 
   function mkApplyFilter(){
-    const only = byId("mtcMkOnlyFills").checked;
+    const mode = byId("mtcMkFilter").value;
     const currentName = mkState.filtered[mkState.index] && mkState.filtered[mkState.index].entry.name;
     mkState.filtered = mkState.all.filter(item => {
-      if(!only) return true;
-      const cover = mkState.coverage.get(item.entry.name);
-      return cover === undefined || cover >= 0.04 || hdMarkers.get(item.entry.name).length > 0;
+      const name = item.entry.name;
+      if(mode === "fills"){
+        const cover = mkState.coverage.get(name);
+        return cover === undefined || cover >= 0.04 || hdMarkers.count() && hdMarkers.get(name).add.length > 0;
+      }
+      if(mode === "none"){
+        const auto = hdAuto.peek(name);
+        return auto !== undefined && auto.length === 0;
+      }
+      return true;
     });
     const keep = mkState.filtered.findIndex(item => item.entry.name === currentName);
     mkState.index = keep >= 0 ? keep : 0;
@@ -1727,7 +1811,9 @@
     if(!HD_IMAGES.size()){ window.alert("Charge d'abord le dossier d'images."); return; }
     if(!window.MTCCardsBW){ window.alert("Le module d'optimisation d'image n'est pas chargé."); return; }
     mkEnsure().classList.add("visible");
-    mkState = {all:mkAllEntries(), filtered:[], index:0, coverage:new Map()};
+    mkState = {all:mkAllEntries(), filtered:[], index:0, coverage:new Map(), run:++mkRenderToken};
+    const runId = mkState.run;
+    const progress = byId("mtcMkProgress");
     const title = byId("mtcMkTitle");
     for(let i = 0; i < mkState.all.length; i++){
       const item = mkState.all[i];
@@ -1738,11 +1824,26 @@
     }
     mkApplyFilter();
     mkShow();
+    // Détection des points de toutes les images, en arrière-plan (mémorisée).
+    let detected = 0;
+    for(const item of mkState.all){
+      if(!mkEl.classList.contains("visible") || !mkState || mkState.run !== runId) return;
+      if(hdAuto.peek(item.entry.name) === undefined){
+        progress.textContent = "Détection des points… " + detected + "/" + mkState.all.length;
+        await hdAuto.get(item.entry);
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+      detected++;
+    }
+    progress.textContent = "Détection terminée : " + mkState.all.length + " image(s) analysée(s).";
+    if(byId("mtcMkFilter").value === "none"){ mkApplyFilter(); mkShow(); }
   }
 
   function mkClose(){
     if(!mkEl) return;
     mkEl.classList.remove("visible");
+    if(mkState) mkState.run = -1;
+    hdAuto.persistSoon();
     updateHdStatus();
     schedulePreview();
   }
@@ -1756,7 +1857,7 @@
   function mkClear(){
     const item = mkState && mkState.filtered[mkState.index];
     if(!item) return;
-    hdMarkers.set(item.entry.name, []);
+    hdMarkers.set(item.entry.name, {add:[], hide:[]});
     mkShow();
   }
 
@@ -1767,17 +1868,21 @@
     const left = byId("mtcMkCanvas");
     const right = byId("mtcMkPreview");
     if(!item){
-      title.textContent = "Repérage des points";
-      count.textContent = "Aucune image à repérer avec ce filtre.";
+      title.textContent = "Vérification des points";
+      count.textContent = "Aucune image avec ce filtre.";
       left.width = left.height = right.width = right.height = 1;
       return;
     }
     const token = ++mkRenderToken;
+    mkState.run = mkState.run;
     title.textContent = item.code + " — " + item.entry.name;
-    count.textContent = (mkState.index + 1) + " / " + mkState.filtered.length + " · " + hdMarkers.get(item.entry.name).length + " repère(s)";
     const blob = await hdEntryBlob(item.entry);
     const bitmap = await createImageBitmap(blob);
+    const auto = await hdAuto.get(item.entry);
     if(token !== mkRenderToken) return;
+    mkState.auto = auto;
+    const saved = hdMarkers.get(item.entry.name);
+    count.textContent = (mkState.index + 1) + " / " + mkState.filtered.length + " · " + auto.length + " détecté(s), " + saved.add.length + " ajouté(s), " + saved.hide.length + " retiré(s)";
     const maxW = Math.max(240, Math.min(560, Math.floor((window.innerWidth - 60) / 2)));
     const maxH = Math.max(240, Math.floor(window.innerHeight * 0.55));
     const scale = Math.min(maxW / bitmap.width, maxH / bitmap.height);
@@ -1788,11 +1893,10 @@
     mkState.bitmap = bitmap;
     mkState.size = {w, h};
     mkDrawLeft();
-    // Aperçu noir et blanc (avec repères) — un peu différé pendant les clics.
     window.clearTimeout(mkState.timer);
     mkState.timer = window.setTimeout(async () => {
-      const level = settings.hdBWLevel === "none" ? "none" : settings.hdBWLevel;
-      const canvas = await window.MTCCardsBW.render(blob, {level, markers:hdMarkers.get(item.entry.name), maxSide:900});
+      const level = settings.hdBWLevel;
+      const canvas = await window.MTCCardsBW.render(blob, {level, markers:hdEffectiveMarkers(item.entry.name, auto), maxSide:900});
       if(token !== mkRenderToken) return;
       const ctx = right.getContext("2d");
       ctx.fillStyle = "#fff";
@@ -1806,8 +1910,20 @@
     const left = byId("mtcMkCanvas");
     const ctx = left.getContext("2d");
     const {w, h} = mkState.size;
+    const side = Math.max(w, h);
     ctx.drawImage(mkState.bitmap, 0, 0, w, h);
-    hdMarkers.get(item.entry.name).forEach(marker => {
+    const saved = hdMarkers.get(item.entry.name);
+    (mkState.auto || []).forEach(a => {
+      const hidden = saved.hide.some(hide => hdNear(a, hide, 0.02));
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = hidden ? "#888" : "#1c5fd0";
+      ctx.setLineDash(hidden ? [4, 3] : []);
+      ctx.beginPath();
+      ctx.arc(a[0] * w, a[1] * h, Math.max(6, (a[2] || 0.01) * side) + 3, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    saved.add.forEach(marker => {
       const x = marker[0] * w, y = marker[1] * h;
       ctx.lineWidth = 2;
       ctx.strokeStyle = "#e0201b";
@@ -1824,11 +1940,27 @@
     const x = (event.clientX - rect.left) * canvas.width / rect.width;
     const y = (event.clientY - rect.top) * canvas.height / rect.height;
     const {w, h} = mkState.size;
-    const list = hdMarkers.get(item.entry.name).slice();
-    const near = list.findIndex(marker => Math.hypot(marker[0] * w - x, marker[1] * h - y) < 14);
-    if(near >= 0) list.splice(near, 1);
-    else list.push([Number((x / w).toFixed(5)), Number((y / h).toFixed(5))]);
-    hdMarkers.set(item.entry.name, list);
+    const side = Math.max(w, h);
+    const saved = hdMarkers.get(item.entry.name);
+    const fx = Number((x / w).toFixed(5));
+    const fy = Number((y / h).toFixed(5));
+    const distPx = marker => Math.hypot(marker[0] * w - x, marker[1] * h - y);
+
+    const addIndex = saved.add.findIndex(marker => distPx(marker) < 14);
+    if(addIndex >= 0){
+      saved.add.splice(addIndex, 1);
+    }else{
+      const autoIndex = (mkState.auto || []).findIndex(a => distPx(a) < Math.max(12, (a[2] || 0.01) * side + 6));
+      if(autoIndex >= 0){
+        const a = mkState.auto[autoIndex];
+        const hideIndex = saved.hide.findIndex(hide => hdNear(a, hide, 0.02));
+        if(hideIndex >= 0) saved.hide.splice(hideIndex, 1);
+        else saved.hide.push([a[0], a[1]]);
+      }else{
+        saved.add.push([fx, fy]);
+      }
+    }
+    hdMarkers.set(item.entry.name, saved);
     mkShow();
   }
 
