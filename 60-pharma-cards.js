@@ -686,7 +686,12 @@
 
   // Dossier (ou fichiers) choisi par l'utilisatrice : on garde les images
   // reconnues, chacune sous son nom de fichier ; le reste est ignoré.
-  async function hdLoadFiles(fileList){
+  // merge = true : les nouvelles images s'ajoutent à la bibliothèque (une image
+  // du même nom la remplace) ; sinon la bibliothèque est entièrement remplacée.
+  // Les repères de points sont en proportions de l'image : ils restent valables
+  // sur une version plus grande du même cadrage. On signale les images dont
+  // le cadrage (proportions) a changé.
+  async function hdLoadFiles(fileList, merge){
     const files = Array.from(fileList || []).filter(file => HD_IMAGE_EXT.test(file.name));
     const list = [];
     let ignored = 0;
@@ -695,10 +700,52 @@
       if(match) list.push({id:match.id, variant:match.variant, name:file.name, blob:file});
       else ignored++;
     });
-    HD_IMAGES.setEntries(list);
+
+    // proportions des anciennes images qui ont des repères
+    const before = {};
+    for(const items of Array.from(HD_IMAGES.entries.values())){
+      for(const entry of items){
+        if(!hdMarkers.resolveKey(entry.name)) continue;
+        try{
+          const bitmap = await createImageBitmap(await hdEntryBlob(entry));
+          before[hdMarkers.norm(entry.name)] = bitmap.width / bitmap.height;
+          if(bitmap.close) bitmap.close();
+        }catch(error){}
+      }
+    }
+
+    let finalList = list;
+    if(merge){
+      const byName = new Map();
+      HD_IMAGES.entries.forEach(items => items.forEach(entry => byName.set(entry.name.toLowerCase(), entry)));
+      list.forEach(entry => byName.set(entry.name.toLowerCase(), entry));
+      finalList = Array.from(byName.values());
+    }
+    HD_IMAGES.urlCache.forEach(url => { try{ URL.revokeObjectURL(url); }catch(error){} });
+    HD_IMAGES.urlCache.clear();
+    HD_IMAGES.processed.clear();
+    HD_IMAGES.setEntries(finalList);
+
+    // points détectés automatiquement : à refaire sur les nouvelles images
+    if(merge) list.forEach(entry => { delete hdAuto.load()[entry.name]; });
+    else hdAuto.data = {};
+    hdAuto.persistSoon();
+
     let saved = true;
-    try{ await hdSaveEntries(list); }catch(error){ saved = false; }
-    return {matched:list.length, ignored, saved};
+    try{ await hdSaveEntries(finalList); }catch(error){ saved = false; }
+
+    const mismatched = [];
+    for(const entry of list){
+      const ratio = before[hdMarkers.norm(entry.name)];
+      if(ratio === undefined) continue;
+      try{
+        const bitmap = await createImageBitmap(entry.blob);
+        const now = bitmap.width / bitmap.height;
+        if(bitmap.close) bitmap.close();
+        if(Math.abs(now / ratio - 1) > 0.02) mismatched.push(entry.name);
+      }catch(error){}
+    }
+    return {matched:list.length, ignored, saved, mismatched};
   }
 
   async function hdRestore(){
@@ -731,14 +778,24 @@
       if(!this.data) this.data = readJson(HD_MARKERS_KEY, {}) || {};
       return this.data;
     },
+    norm(name){ return String(name).replace(/\.[^.]+$/, "").toLowerCase(); },
+    resolveKey(name){
+      const data = this.load();
+      if(data[name]) return name;
+      const wanted = this.norm(name);
+      return Object.keys(data).find(key => this.norm(key) === wanted) || null;
+    },
     get(name){
-      const raw = this.load()[name];
+      const key = this.resolveKey(name);
+      const raw = key ? this.load()[key] : null;
       if(!raw) return {add:[], hide:[]};
       if(Array.isArray(raw)) return {add:raw, hide:[]};
       return {add:raw.add || [], hide:raw.hide || []};
     },
     set(name, value){
       const data = this.load();
+      const oldKey = this.resolveKey(name);
+      if(oldKey && oldKey !== name) delete data[oldKey];
       if(value && (value.add.length || value.hide.length)) data[name] = value; else delete data[name];
       try{ localStorage.setItem(HD_MARKERS_KEY, JSON.stringify(data)); }catch(error){}
     },
@@ -1481,7 +1538,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v17</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v18</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
@@ -1714,14 +1771,15 @@
       : "Aucune image chargée : choisis le dossier « localisation de points » (une seule fois, il est ensuite mémorisé).";
   }
 
-  async function onHdFilesChosen(input){
+  async function onHdFilesChosen(input, merge){
     hdMessage = "Lecture des images…";
     updateHdStatus();
-    const result = await hdLoadFiles(input.files);
+    const result = await hdLoadFiles(input.files, merge);
     input.value = "";
     hdMessage = result.matched + " image(s) reconnue(s)" +
       (result.ignored ? ", " + result.ignored + " ignorée(s) (nom non reconnu)" : "") +
-      (result.saved ? " — mémorisées dans ce navigateur." : " — non mémorisées (stockage indisponible).");
+      (result.saved ? " — mémorisées dans ce navigateur." : " — non mémorisées (stockage indisponible).") +
+      (result.mismatched.length ? " ⚠ Cadrage différent de l'ancienne version (repères à revérifier) : " + result.mismatched.join(", ") + "." : "");
     populateDataset();
     updateHdStatus();
   }
@@ -2196,8 +2254,8 @@
     const importInput = byId("mtcCardsMkImport");
     if(importInput) importInput.addEventListener("change", () => { hdImportMarkers(importInput.files && importInput.files[0]); importInput.value = ""; });
     byId("mtcCardsPsycho").addEventListener("change", applyFilters);
-    byId("mtcCardsHdFolder").addEventListener("change", event => onHdFilesChosen(event.target));
-    byId("mtcCardsHdFiles").addEventListener("change", event => onHdFilesChosen(event.target));
+    byId("mtcCardsHdFolder").addEventListener("change", event => onHdFilesChosen(event.target, false));
+    byId("mtcCardsHdFiles").addEventListener("change", event => onHdFilesChosen(event.target, true));
     ["mtcCardsDx", "mtcCardsDy"].forEach(id => byId(id).addEventListener("input", onChange));
     document.addEventListener("keydown", event => {
       if(event.key === "Escape" && mkEl && mkEl.classList.contains("visible")){ mkClose(); return; }
