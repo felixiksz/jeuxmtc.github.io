@@ -18,9 +18,9 @@
 
   const FILL_LEVELS = {
     none:0,
-    light:178,
-    medium:203,
-    strong:222
+    light:208,
+    medium:226,
+    strong:240
   };
 
   // --- Décodage ---------------------------------------------------------------
@@ -177,7 +177,7 @@
     const {w, h, rgba} = img;
     const side = Math.max(w, h);
     const minR = Math.max(3, side * 0.006);
-    const maxR = side * 0.03;
+    const maxR = side * 0.02;
     const px = Math.round(cx), py = Math.round(cy);
     const at = (x, y) => {
       const p = (Math.min(h - 1, Math.max(0, y)) * w + Math.min(w - 1, Math.max(0, x))) * 4;
@@ -191,7 +191,7 @@
       for(; r < maxR; r += 0.5){
         const c = at(Math.round(px + dx * r), Math.round(py + dy * r));
         const d = Math.abs(c[0] - c0[0]) + Math.abs(c[1] - c0[1]) + Math.abs(c[2] - c0[2]);
-        if(d > 70) break;
+        if(d > 48) break;
       }
       radii.push(r);
     }
@@ -200,25 +200,161 @@
     return Math.min(maxR, Math.max(minR, median));
   }
 
+  // Chaque point est redessiné à sa taille exacte : contour noir, remplissage
+  // blanc (à colorier). marker = [x, y, rayon] en fractions (rayon en fraction
+  // du plus grand côté, facultatif : sinon estimé d'après la couleur).
   function drawMarkers(ctx, img, markers){
+    const side = Math.max(img.w, img.h);
     (markers || []).forEach(marker => {
       const cx = marker[0] * img.w;
       const cy = marker[1] * img.h;
-      const r = markerRadius(img, cx, cy);
-      const white = Math.max(2, r * 0.5);
-      const black = Math.max(1.6, r * 0.28);
-      ctx.lineCap = "round";
+      const r = Math.max(3, marker[2] ? marker[2] * side : markerRadius(img, cx, cy));
+      const lw = Math.max(1.6, r * 0.2);
       ctx.beginPath();
-      ctx.arc(cx, cy, r + white / 2, 0, Math.PI * 2);
-      ctx.lineWidth = white;
-      ctx.strokeStyle = "#fff";
-      ctx.stroke();
+      ctx.arc(cx, cy, r * 1.08, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
       ctx.beginPath();
-      ctx.arc(cx, cy, r + white + black / 2, 0, Math.PI * 2);
-      ctx.lineWidth = black;
+      ctx.arc(cx, cy, r * 1.08 + lw * 0.1, 0, Math.PI * 2);
+      ctx.lineWidth = lw;
       ctx.strokeStyle = "#000";
       ctx.stroke();
     });
+  }
+
+  // --- Détection automatique des points ----------------------------------------
+  // Transformée de Hough sur les bords de couleur (vote dans la direction du
+  // gradient) : les points sont des disques pleins de couleur unie, de taille
+  // à peu près constante. Un candidat n'est gardé que si son intérieur est
+  // uni et nettement différent de son voisinage (ce qui écarte les lettres
+  // "o", les chiffres et les graduations). Précision privilégiée : mieux vaut
+  // manquer un point (à ajouter d'un clic) que d'en inventer un.
+  async function detect(blob){
+    const img = await decode(blob, 1000);
+    const {w, h, rgba} = img;
+    const side = Math.max(w, h);
+    const n = w * h;
+
+    // gradient de couleur : on garde, pixel par pixel, le canal le plus fort
+    const gx = new Float32Array(n);
+    const gy = new Float32Array(n);
+    for(let c = 0; c < 3; c++){
+      const plane = new Float32Array(n);
+      for(let i = 0, p = c; i < n; i++, p += 4) plane[i] = rgba[p];
+      const sm = boxBlur(plane, w, h, 1);
+      for(let y = 1; y < h - 1; y++){
+        for(let x = 1; x < w - 1; x++){
+          const i = y * w + x;
+          const dx = sm[i + 1] - sm[i - 1];
+          const dy = sm[i + w] - sm[i - w];
+          if(dx * dx + dy * dy > gx[i] * gx[i] + gy[i] * gy[i]){ gx[i] = dx; gy[i] = dy; }
+        }
+      }
+    }
+    const ex = [], ey = [], ux = [], uy = [];
+    for(let i = 0; i < n; i++){
+      const m = Math.hypot(gx[i], gy[i]);
+      if(m > 22){ ex.push(i % w); ey.push((i / w) | 0); ux.push(gx[i] / m); uy.push(gy[i] / m); }
+    }
+
+    const rmin = Math.max(3, Math.round(side * 0.0055));
+    const rmax = Math.max(rmin + 2, Math.round(side * 0.022));
+    const step = Math.max(1, Math.floor((rmax - rmin) / 9));
+    const best = new Float32Array(n);
+    const bestR = new Int16Array(n);
+    for(let r = rmin; r <= rmax; r += step){
+      const acc = new Float32Array(n);
+      for(let k = 0; k < ex.length; k++){
+        for(let sign = -1; sign <= 1; sign += 2){
+          const cx = Math.round(ex[k] + sign * ux[k] * r);
+          const cy = Math.round(ey[k] + sign * uy[k] * r);
+          if(cx >= 0 && cx < w && cy >= 0 && cy < h) acc[cy * w + cx] += 1;
+        }
+      }
+      const norm = 9 / (2 * Math.PI * r);
+      const smooth = boxBlur(acc, w, h, 1);
+      for(let i = 0; i < n; i++){
+        const v = smooth[i] * norm;
+        if(v > best[i]){ best[i] = v; bestR[i] = r; }
+      }
+    }
+
+    const cands = [];
+    for(let i = 0; i < n; i++){
+      if(best[i] >= 1.4){
+        const r = bestR[i];
+        if(r >= side * 0.0075){
+          cands.push({x:i % w, y:(i / w) | 0, r, s:best[i]});
+        }
+      }
+    }
+    cands.sort((a, b) => b.s - a.s);
+
+    const found = [];
+    for(const c of cands){
+      if(found.some(f => (c.x - f.x) ** 2 + (c.y - f.y) ** 2 < (1.6 * Math.max(c.r, f.r)) ** 2)) continue;
+      // intérieur / anneau extérieur
+      const inner = [0, 0, 0], ringVals = [[], [], []], edge = [0, 0, 0], innerSq = [0, 0, 0];
+      let ni = 0, nr = 0, ne = 0;
+      const y0 = Math.max(0, c.y - 3 * c.r), y1 = Math.min(h - 1, c.y + 3 * c.r);
+      const x0 = Math.max(0, c.x - 3 * c.r), x1 = Math.min(w - 1, c.x + 3 * c.r);
+      for(let y = y0; y <= y1; y++){
+        for(let x = x0; x <= x1; x++){
+          const d = Math.hypot(y - c.y, x - c.x);
+          const p = (y * w + x) * 4;
+          if(d <= c.r * 0.7){
+            for(let k = 0; k < 3; k++){ inner[k] += rgba[p + k]; innerSq[k] += rgba[p + k] * rgba[p + k]; }
+            ni++;
+          }else if(d >= c.r * 0.75 && d <= c.r * 0.95){
+            for(let k = 0; k < 3; k++) edge[k] += rgba[p + k];
+            ne++;
+          }else if(d >= c.r * 1.35 && d <= c.r * 2.1){
+            for(let k = 0; k < 3; k++) ringVals[k].push(rgba[p + k]);
+            nr++;
+          }
+        }
+      }
+      if(!ni || !nr || !ne) continue;
+      let diff = 0, std = 0, solid = 0;
+      for(let k = 0; k < 3; k++){
+        const sorted = ringVals[k].sort((a, b) => a - b);
+        const mi = inner[k] / ni, mr = sorted[sorted.length >> 1]; // médiane : le fond, pas les lettres voisines
+        diff += Math.abs(mi - mr) / 3;
+        solid += Math.abs(mi - edge[k] / ne) / 3;
+        std += Math.sqrt(Math.max(0, innerSq[k] / ni - mi * mi)) / 3;
+      }
+      // disque plein : l'intérieur a la même couleur que le bord (une lettre "o" ou "c" a un intérieur vide)
+      if(diff < 22 || std > 28 || solid > 30) continue;
+      // uniformité : au moins 85 % du disque a la couleur de son centre (une lettre
+      // "o" ou "c" a un vide au milieu)
+      const core = [0, 0, 0];
+      let nc = 0;
+      for(let y = y0; y <= y1; y++){
+        for(let x = x0; x <= x1; x++){
+          if(Math.hypot(y - c.y, x - c.x) <= c.r * 0.5){
+            const p = (y * w + x) * 4;
+            for(let k = 0; k < 3; k++) core[k] += rgba[p + k];
+            nc++;
+          }
+        }
+      }
+      if(!nc) continue;
+      for(let k = 0; k < 3; k++) core[k] /= nc;
+      let match = 0, total = 0;
+      for(let y = y0; y <= y1; y++){
+        for(let x = x0; x <= x1; x++){
+          if(Math.hypot(y - c.y, x - c.x) <= c.r * 0.85){
+            const p = (y * w + x) * 4;
+            const dist = Math.abs(rgba[p] - core[0]) + Math.abs(rgba[p + 1] - core[1]) + Math.abs(rgba[p + 2] - core[2]);
+            if(dist < 45) match++;
+            total++;
+          }
+        }
+      }
+      if(!total || match / total < 0.85) continue;
+      found.push(c);
+    }
+    return found.map(c => [Number((c.x / w).toFixed(5)), Number((c.y / h).toFixed(5)), Number((c.r / side).toFixed(5))]);
   }
 
   // Blob d'entrée -> canvas optimisé (niveaux de gris + repères).
@@ -250,5 +386,5 @@
     });
   }
 
-  window.MTCCardsBW = {process, render, coverage, FILL_LEVELS};
+  window.MTCCardsBW = {process, render, coverage, detect, FILL_LEVELS};
 })();
