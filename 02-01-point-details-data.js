@@ -1035,7 +1035,7 @@ const POINT_DETAILS = {
   },
   "E34": {
     "point": "E34",
-    "pinyin": "Liáng qīu",
+    "pinyin": "Liáng qiū",
     "hanzi": "梁丘",
     "nom_francais": "Arête de la colline",
     "localisation": "Sur la face antérieure de la cuisse, sur une ligne reliant le bord supéro-latéral de la patella et l’épine iliaque antéro-supérieure, 2 cùn en direction proximale du bord supéro-latéral de la patella, dans un creux situé entre le muscle droit antérieur et le muscle vaste latéral.",
@@ -2655,7 +2655,7 @@ const POINT_DETAILS = {
   },
   "TF5": {
     "point": "TF5",
-    "pinyin": "WàI guān",
+    "pinyin": "Wài guān",
     "hanzi": "外关",
     "nom_francais": "barrière externe",
     "localisation": "2 cùn au-dessus du pli transverse du poignet, sur la ligne reliant TF 4  et l’olécrâne.\n\nPalper l’avant-bras et le bord externe du muscle extenseur commun des doigts. Le point est entre le radius et l’ulna (cubitus), au même niveau qu’EC 6 (nèi guān 内关) son opposé sur la face antérieure de l’avant-bras.",
@@ -2667,7 +2667,7 @@ const POINT_DETAILS = {
     "notes": "Ouverture du yáng wéi mài : il doit être couplé avec VB 41.\n\nEn tant que point jiāo huì-intersection et d’ouverture du yáng wéi mài, TF 5 permet de s’occuper des parties yáng du corps, donc de la surface.",
     "associations": "Altération ouie et surdité : TF 5 + TF 7\nAcouphène et surdité : TF 5 + lG 16\nDouleur tete et yeux : TF 5 + IG 3",
     "canal": "TF",
-    "nom_complet": "WàI guān 外关 barrière externe",
+    "nom_complet": "Wài guān 外关 barrière externe",
     "_source_sheet": "TF",
     "_source_row": 6
   },
@@ -2865,7 +2865,7 @@ const POINT_DETAILS = {
   },
   "TF18": {
     "point": "TF18",
-    "pinyin": "Chì màI",
+    "pinyin": "Chì mài",
     "hanzi": "瘈脈",
     "nom_francais": "vaisseau des convulsions",
     "localisation": "Sur la tête, en arrière de l’oreille sur la mastoïde. Joindre le tiers moyen et le tiers inférieur le long de l’hélix sur la ligne reliant TF 17 et TF 20.\n\nLocaliser TF 20 et TF 17. Tracer une ligne droite imaginaire entre ces deux\npoints. Suivre la courbe de l’oreille en allant jusqu’à croiser cette ligne. Le point est au niveau de la\nmastoïde.",
@@ -2873,7 +2873,7 @@ const POINT_DETAILS = {
     "actions": "➢ Éteint le vent et arrête les convulsions",
     "indications": "- Maux de tête, vertiges, surdité.\n- Convulsions infantiles",
     "canal": "TF",
-    "nom_complet": "Chì màI 瘈脈 vaisseau des convulsions",
+    "nom_complet": "Chì mài 瘈脈 vaisseau des convulsions",
     "_source_sheet": "TF",
     "_source_row": 19
   },
@@ -3076,7 +3076,7 @@ const POINT_DETAILS = {
   },
   "VB8": {
     "point": "VB8",
-    "pinyin": "ShuàI gǔ",
+    "pinyin": "Shuài gǔ",
     "hanzi": "率谷",
     "nom_francais": "commande les vallées",
     "localisation": "Au-dessus de l’apex de l’oreille à 1,5 cùn.\n\nLocaliser l’apex de l’oreille en repliant l’oreille sur elle-même puis directement au-dessus et à 1,5 cùn se trouve dans une dépression osseuse, VB 8.",
@@ -3088,7 +3088,7 @@ const POINT_DETAILS = {
     "notes": "ATTENTION SI PSYCHOSE IMPORTANTE AVEC ENVIE SUICIDAIRE NE PAS PIQUER, \nsurtout pas vers l'arriere CAR FAVORISE LE PASSAGE A L'ACTE\n\nAddiction: puncture vers l'arriere",
     "associations": "Cephalee unilaterale type vent VB 8 + TF 23\nVomissements glaires type froid diaphragme estomac VB 8 + V 17",
     "canal": "VB",
-    "nom_complet": "ShuàI gǔ 率谷 commande les vallées",
+    "nom_complet": "Shuài gǔ 率谷 commande les vallées",
     "_source_sheet": "VB",
     "_source_row": 9
   },
@@ -3112,7 +3112,7 @@ const POINT_DETAILS = {
   },
   "VB10": {
     "point": "VB10",
-    "pinyin": "Fú báI",
+    "pinyin": "Fú bái",
     "hanzi": "浮白",
     "nom_francais": "blanc superficiel",
     "localisation": "Sur la courbe reliant VB 9 à VB 12 à la jonction du tiers supérieur et\ndes deux tiers inférieurs.\n\nLocaliser VB 9 et VB 12 puis sur la courbe reliant ces deux points diviser en trois, VB 10 se trouve à la jonction du tiers supérieur et des deux tiers inférieurs.",
@@ -3123,7 +3123,7 @@ const POINT_DETAILS = {
     "indications": "- Céphalée.\n- Dentalgie.\n- Acouphènes et surdité.\n- Goitre, obstruction douloureuse de la gorge.\n- Sensation de plénitude au thorax, toux avec dyspnée, bronchite.\n- Douleur et raideur de la nuque.\n- Paralysie ou flaccidité des membres inférieurs",
     "associations": "Carie dentaire: VB 10 + VB 12",
     "canal": "VB",
-    "nom_complet": "Fú báI 浮白 blanc superficiel",
+    "nom_complet": "Fú bái 浮白 blanc superficiel",
     "_source_sheet": "VB",
     "_source_row": 11
   },
@@ -3180,7 +3180,7 @@ const POINT_DETAILS = {
   },
   "VB14": {
     "point": "VB14",
-    "pinyin": "Yáng báI",
+    "pinyin": "Yáng bái",
     "hanzi": "阳白",
     "nom_francais": "clarté yáng",
     "localisation": "Sur la ligne imaginaire passant par la pupille du patient qui regarde droit devant lui, à 1 cùn du bord supérieur du milieu du sourcil, à la jonction de l’éminence frontale et de l’arcade sourcilière.\n\nEntre la ligne des cheveux et le milieu du sourcil diviser en 3, VB 14 se trouve au premier\ntiers au-dessus du milieu du sourcil, sur la ligne passant par le centre de la pupille lorsque le patient regarde droit devant lui.",
@@ -3191,7 +3191,7 @@ const POINT_DETAILS = {
     "indications": "- Douleur du front.\n- Céphalée, céphalée frontale.\n- Tics des paupières, ptose des paupières (puncture vers le milieu du sourcil), fermeture\nincomplète de la paupière, contraction de la paupière.\n- Déviation de la bouche et des yeux, paralysie faciale.\n- Douleur, rougeur et gonflement des yeux, conjonctivite, vision trouble, héméralopie (= cécité\nnocturne), glaucome.",
     "associations": "Vent de la tete avec douleurs entre sourcil et œil: VB 14 + GI 4 + E 41",
     "canal": "VB",
-    "nom_complet": "Yáng báI 阳白 clarté yáng",
+    "nom_complet": "Yáng bái 阳白 clarté yáng",
     "_source_sheet": "VB",
     "_source_row": 15
   },
@@ -3385,7 +3385,7 @@ const POINT_DETAILS = {
   },
   "VB26": {
     "point": "VB26",
-    "pinyin": "DàI màI",
+    "pinyin": "Dài mài",
     "hanzi": "带脉",
     "nom_francais": "vaisseau ceinture",
     "localisation": "Au croisement des lignes imaginaires passant par l’ombilic et le bord libre de la 11ème côte, à 1,8 cùn de F 13 .\n\nSuivre la ligne horizontale de l’ombilic et celle, verticale, qui passe par l’extrémité libre de la 11ème côte.\nLà, où se croisent ces lignes se trouvent le point VB 26.",
@@ -3397,7 +3397,7 @@ const POINT_DETAILS = {
     "notes": "Surtout pour tableaux feminins",
     "associations": "Règles irrégulières (stag qi F): VB 26 + Rt 10\nLeucorrhées rouges et blanches: VB 26 + RM 4 + RM 6 + Rt 6 + V 30 + EC 5\nDouleur et dureté hypogastre: VB 26 + VB 43",
     "canal": "VB",
-    "nom_complet": "DàI màI 带脉 vaisseau ceinture",
+    "nom_complet": "Dài mài 带脉 vaisseau ceinture",
     "_source_sheet": "VB",
     "_source_row": 27
   },
@@ -3421,7 +3421,7 @@ const POINT_DETAILS = {
   },
   "VB28": {
     "point": "VB28",
-    "pinyin": "WéI dào",
+    "pinyin": "Wéi dào",
     "hanzi": "维道",
     "nom_francais": "voie de liaison",
     "localisation": "Sur la face latérale de l’abdomen à 0,5 cùn en avant et en dessous de VB 27.\n \nRepérer l’épine iliaque antéro-supérieure, puis revenir sur la face latérale de l’abdomen à 0,5 cùn en avant et en dessous de celle-ci.",
@@ -3431,7 +3431,7 @@ const POINT_DETAILS = {
     "actions": "➢ Régularise le chōng et le rèn mài \n➢ Régularise le foyer inférieur \n➢ Régularise les règles et affermit les leucorrhées\n➢ Met en ordre les intestins et débloque les selles\n➢ Favoris l’écoulement de l’eau et arrête la douleur",
     "indications": "- Règles irrégulières, leucorrhées, aménorrhée, dysménorrhée, stérilité, prolapsus de l'utérus.\n- Douleurs lombaires et à la hanche, douleurs abdominales.\n- Constipation chronique, abcès intestinal, appendicite.\n- Hernie.\n- Œdème, néphrite.",
     "canal": "VB",
-    "nom_complet": "WéI dào 维道 voie de liaison",
+    "nom_complet": "Wéi dào 维道 voie de liaison",
     "_source_sheet": "VB",
     "_source_row": 29
   },
@@ -3551,7 +3551,7 @@ const POINT_DETAILS = {
   },
   "VB36": {
     "point": "VB36",
-    "pinyin": "WàI qiū",
+    "pinyin": "Wài qiū",
     "hanzi": "外丘",
     "nom_francais": "monticule externe",
     "localisation": "Sur la face externe de la jambe, au bord antérieur de la fibula, sur la ligne reliant VB 34 et la pointe de la malléole latérale, 7 cùn au-dessus du sommet de la malléole latérale, 1 cùn en avant du VB 35.\n\nDiviser en deux la ligne qui relie la tête de la fibula et le sommet de la malléole latérale. VB 35 se trouve 7 cùn au-dessus de la malléole. En avant de VB 35  sur le bord\nantérieur de la fibula.",
@@ -3560,7 +3560,7 @@ const POINT_DETAILS = {
     "actions": "➢ Détend le foie et favorise la vésicule biliaire\n➢ Détend la poitrine et met en ordre le qì \n➢ Désobstrue les canaux et active les liaisons\n➢ Clarifie la chaleur et calme l’esprit \n➢ Chasse la toxicité",
     "indications": "- Atrophie par obstruction du membre inférieur, douleur de la face externe de la\njambe, douleur au genou.\n- Douleur de distension dans la poitrine et l'hypocondre.\n- Troubles mentaux tels que psychose diān kuáng\n- Toxine par blessure de chien enragé.",
     "canal": "VB",
-    "nom_complet": "WàI qiū 外丘 monticule externe",
+    "nom_complet": "Wài qiū 外丘 monticule externe",
     "_source_sheet": "VB",
     "_source_row": 37
   },
@@ -3724,7 +3724,7 @@ const POINT_DETAILS = {
   },
   "F3": {
     "point": "F3",
-    "pinyin": "TàI chōng",
+    "pinyin": "Tài chōng",
     "hanzi": "太冲",
     "nom_francais": "grand battement",
     "localisation": "Sur la face dorsale du pied, entre le 1er et le 2ème métatarsien, distal du point de jonction entre le 1er et le 2ème métatarsien.\n\nDepuis F 2, faire glisser le doigt en direction proximale entre 1 er et 2ème métatarsien,\njusqu’à sentir là où la dépression est plus importante.",
@@ -3735,7 +3735,7 @@ const POINT_DETAILS = {
     "notes": "Pour tout type de vent",
     "associations": "Douleur de la gorge: DM 20 puis F 3 + Rn 6 + Rt 6\nGorge seche avec désir boire: F 3 + F 2\nSaignement utérin abondants et incessant: F 3 + Rt 6\nGros vide chronique du foie (fatigue dés le matin): aig.tiede / moxa F 3 +E 36\nStag qi F + vide Rt, alternance constipation/diarrhée: F 3 + F 13\nObstruction douleureuse avec mélange froid / chaleur: F 3 + GI 4",
     "canal": "F",
-    "nom_complet": "TàI chōng 太冲 grand battement",
+    "nom_complet": "Tài chōng 太冲 grand battement",
     "_source_sheet": "F",
     "_source_row": 4
   },
@@ -3861,7 +3861,7 @@ const POINT_DETAILS = {
   },
   "F12": {
     "point": "F12",
-    "pinyin": "Jí màI",
+    "pinyin": "Jí mài",
     "hanzi": "急脉",
     "nom_francais": "vaisseau rapide",
     "localisation": "Dans le pli inguinal, 1 cùn distal de la symphyse pubienne et 2,5 cùn latéral de la ligne médiane antérieure.\n\nMesurer 2,5 cùn latéral de la ligne médiane et 1 cùn distal du bord supérieur de la symphyse pubienne.\nRemarque : le faisceau neurovasculaire est relativement superficiel, d’autant plus si on fait faire une flexion et rotation latérale de la hanche, et le pouls de l’artère fémorale peut être perçu facilement.",
@@ -3869,7 +3869,7 @@ const POINT_DETAILS = {
     "actions": "➢ Régularise le foie et met en ordre le qì\n➢ Régularise le foyer inférieur et arrête la douleur",
     "indications": "- Douleur à l'abdomen inférieur.\n- Hernie.\n- Névralgie de la région périnéale, douleur aux organes génitaux externes, douleur à la vulve,\ndouleur au pénis, douleur aux testicules, prolapsus de l'utérus.\n- Douleur à la face interne de la cuisse.",
     "canal": "F",
-    "nom_complet": "Jí màI 急脉 vaisseau rapide",
+    "nom_complet": "Jí mài 急脉 vaisseau rapide",
     "_source_sheet": "F",
     "_source_row": 13
   },
@@ -3942,7 +3942,7 @@ const POINT_DETAILS = {
   },
   "V3": {
     "point": "V3",
-    "pinyin": "MéI chōng",
+    "pinyin": "Méi chōng",
     "hanzi": "眉冲",
     "nom_francais": "Assaut des sourcils/carrefour en bordure [de la ligne antérieure des cheveux",
     "localisation": "Juste au-dessus, à la verticale du canthus interne de l’œil, 0,5 cùn en arrière de la ligne antérieure des cheveux",
@@ -4096,7 +4096,7 @@ const POINT_DETAILS = {
   },
   "V13": {
     "point": "V13",
-    "pinyin": "FèI shù",
+    "pinyin": "Fèi shù",
     "hanzi": "肺俞",
     "nom_francais": "Shù du poumon",
     "localisation": "Sur le haut du dos, 1,5 cùn en dehors de la ligne médiane postérieure, sur la ligne passant par le\nbord inférieur du processus épineux de D3.",
@@ -4146,7 +4146,7 @@ const POINT_DETAILS = {
     "point": "V16",
     "pinyin": "Dū shù",
     "hanzi": "督俞",
-    "nom_francais": "Shù du dū màI",
+    "nom_francais": "Shù du dū mài",
     "localisation": "Sur le milieu du dos, 1,5 cùn en dehors de la ligne médiane postérieure, sur la ligne passant par le\nbord inférieur du processus épineux de D6 (T6).",
     "methode_localisation": "Localiser C7, D6 (T6) se trouve 5 processus épineux en dessous, palper le processus épineux de D4 (T4) et son bord inférieur. Mesurer 1,5 cùn en dehors de la ligne médiane postérieure, V 16 se trouve au sommet de la musculature paravertébrale, au même niveau que DM 10.",
     "methode_travail": "Puncture oblique vers la colonne ou horizontale vers le bas.\nProfondeur : 0,5 à 0,8 cùn\n\nAttention : puncture profonde dangereuse, risque de blessure du poumon.",
@@ -4226,7 +4226,7 @@ const POINT_DETAILS = {
   },
   "V21": {
     "point": "V21",
-    "pinyin": "WèI shù",
+    "pinyin": "Wèi shù",
     "hanzi": "胃俞",
     "nom_francais": "Shù de l’estomac",
     "localisation": "Sur le milieu/ bas du dos, 1,5 cùn en dehors de la ligne médiane postérieure, sur la ligne passant\npar le bord inférieur du processus épineux de D12 (T12).",
@@ -4275,7 +4275,7 @@ const POINT_DETAILS = {
   },
   "V24": {
     "point": "V24",
-    "pinyin": "Qì hǎI shù",
+    "pinyin": "Qì hǎi shù",
     "hanzi": "气海俞",
     "nom_francais": "Shù de la mer du qì",
     "localisation": "Sur la zone lombaire, 1,5 cùn en dehors de la ligne médiane postérieure, sur la ligne passant par\nle bord inférieur du processus épineux de L3.",
@@ -4368,7 +4368,7 @@ const POINT_DETAILS = {
   },
   "V30": {
     "point": "V30",
-    "pinyin": "BáI huán shù",
+    "pinyin": "Bái huán shù",
     "hanzi": "白环俞",
     "nom_francais": "Shù de l’anneau blanc",
     "localisation": "Sur la zone sacrée, 1,5 cùn en dehors de la ligne médiane postérieure, au niveau du 4ème foramen\nsacral",
@@ -4510,7 +4510,7 @@ const POINT_DETAILS = {
   },
   "V39": {
     "point": "V39",
-    "pinyin": "WěI yáng",
+    "pinyin": "Wěi yáng",
     "hanzi": "委阳",
     "nom_francais": "[du côté] Yáng du pli de flexion",
     "localisation": "À l’arrière du genou, à l’extrémité du pli poplité, sur le bord médial du tendon du chef long du biceps\nfémoral. 1 cùn à l’extérieur de V 40.",
@@ -4526,7 +4526,7 @@ const POINT_DETAILS = {
   },
   "V40": {
     "point": "V40",
-    "pinyin": "WěI zhōng",
+    "pinyin": "Wěi zhōng",
     "hanzi": "委中",
     "nom_francais": "Centre du pli de flexion",
     "localisation": "À l’arrière du genou, situé au centre du creux poplité entre les\ntendons des muscles semitendineux et biceps fémoral.",
@@ -4683,7 +4683,7 @@ const POINT_DETAILS = {
   },
   "V50": {
     "point": "V50",
-    "pinyin": "WèI cāng",
+    "pinyin": "Wèi cāng",
     "hanzi": "胃仓",
     "nom_francais": "Grenier de l’estomac",
     "localisation": "3 cùn en dehors de la ligne médiane postérieure sur la ligne passant par le bord inférieur du\nprocessus épineux de D12.",
@@ -4804,7 +4804,7 @@ const POINT_DETAILS = {
   },
   "V58": {
     "point": "V58",
-    "pinyin": "FēI yáng",
+    "pinyin": "Fēi yáng",
     "hanzi": "飞扬",
     "nom_francais": "S’élève et monte",
     "localisation": "1 cùn en dessous et vers l’extérieur de V 57.\n7 cùn en dessus de V 60.",
@@ -4866,9 +4866,9 @@ const POINT_DETAILS = {
   },
   "V62": {
     "point": "V62",
-    "pinyin": "Shēn màI",
+    "pinyin": "Shēn mài",
     "hanzi": "申脉",
-    "nom_francais": "[yáng qiāo] MàI s’y déploie/vaisseau du déploiement/vaisseau de\nL’heure shēn",
+    "nom_francais": "[yáng qiāo] Mài s’y déploie/vaisseau du déploiement/vaisseau de\nL’heure shēn",
     "localisation": "Dans le creux formé par l’articulation du talus et du calcanéus directement sous le sommet de la\nmalléole externe.",
     "methode_localisation": "Localisation traditionnelle : localiser le sommet de la malléole externe puis dans la dépression sous le bord inférieur de la malléole externe là où s’articulent le talus et le calcanéus.\n\nLocalisation moderne : localiser le sommet de la malléole externe puis descendre jusqu’aux tissus mous, sur le calcanéus, jusqu’à sentir une dépression, sous la trochlée fibulaire",
     "methode_travail": "Puncture perpendiculaire. Profondeur : 0,3 à 0,5 cùn",
