@@ -43,6 +43,8 @@
   let settings = null;
   let modal = null;
   let previewTimer = 0;
+  let hdRestoreTried = false;
+  let hdMessage = "";
 
   // --- Utilitaires ----------------------------------------------------------
 
@@ -307,6 +309,27 @@
     }
   };
 
+  // Cartes "catégorie / image HD" : recto = catégorie(s) du point + actions,
+  // verso = image de localisation la plus grande possible + nomenclature et
+  // noms. Une carte par point appartenant à au moins une catégorie du jeu.
+  const HD_FIELDS = [
+    {key:"catphrases", label:"Catégorie(s) du point, avec le canal", kind:"shapes", title:"Catégories", big:true, tags:record => rects(record.catphrases)},
+    {key:"actions", label:"Actions", kind:"list", title:"Actions"},
+    {key:"code", label:"Nomenclature (ex. E 34)", kind:"code"},
+    {key:"hanzi", label:"Nom chinois — hanzi", kind:"hanzi"},
+    {key:"pinyin", label:"Nom chinois — pinyin", kind:"pinyin"},
+    {key:"nom", label:"Nom français", kind:"nom"},
+    {key:"image_hd", label:"Image de localisation (HD, dossier local)", kind:"hdimage"}
+  ];
+
+  const HD_PRESETS = {
+    std:{
+      label:"Catégorie + actions → image et noms",
+      recto:["catphrases", "actions"],
+      verso:["code", "hanzi", "pinyin", "nom", "image_hd"]
+    }
+  };
+
   // --- Jeu de données : substances ---------------------------------------------
 
   function allHerbs(){
@@ -451,6 +474,225 @@
     return Array.isArray(list) ? list.map(String) : [];
   }
 
+  // --- Cartes catégorie / image HD --------------------------------------------
+
+  // Libellé de chaque appartenance à une catégorie, formulé comme dans le quiz
+  // ("Xì-Crevasse du Zú yáng míng") mais avec "Point" devant et le singulier
+  // pour les catégories nommées au pluriel.
+  const HD_CATEGORY_OVERRIDES = {
+    Points_generaux:"Point général",
+    Les_4_mers:"Point des 4 mers",
+    Points_fantomes_de_Sun_Si_Miao:"Point fantôme de Sūn Sī Miǎo"
+  };
+
+  let hdCategoryCache = null;
+
+  // Index point -> lignes de catégorie, calculé depuis les catégories du jeu
+  // (buildPool, la même source que la grille et le quiz).
+  function hdCategoryIndex(){
+    if(hdCategoryCache) return hdCategoryCache;
+    const index = {};
+    let pool = [];
+    try{ pool = typeof buildPool === "function" ? buildPool() : []; }catch(error){ pool = []; }
+    pool.forEach(category => {
+      (category.points || []).forEach(point => {
+        const phrases = typeof window.mtcQuizPointPhrases === "function"
+          ? window.mtcQuizPointPhrases(category.key, category.name, point)
+          : {categoryPhrase:String(category.name || ""), canalPhrase:""};
+        const canal = phrases.canalPhrase ? " " + phrases.canalPhrase : "";
+        const line = HD_CATEGORY_OVERRIDES[category.key]
+          ? HD_CATEGORY_OVERRIDES[category.key] + canal
+          : "Point " + phrases.categoryPhrase + canal;
+        (index[point] = index[point] || []).push(line);
+      });
+    });
+    hdCategoryCache = index;
+    return index;
+  }
+
+  // Choix de l'image quand un point en a plusieurs (fichiers "E18_1.jpg",
+  // "E18_2.jpg"…) : une seule image par défaut (la n°1), sauf indication
+  // contraire ci-dessous — numéros des images à garder, dans l'ordre.
+  const HD_IMAGE_PRIORITY = {
+    E1:[1],
+    E18:[2],
+    GI15:[1],
+    GI19:[1],
+    GI20:[2],
+    Rt10:[2],
+    Rt15:[2],
+    VB31:[1, 2]
+  };
+  const HD_DB_NAME = "mtc_cards_hd_images";
+  const HD_IMAGE_EXT = /\.(jpe?g|png|webp|gif|bmp)$/i;
+
+  const HD_IMAGES = {
+    entries:new Map(),   // id -> [{variant, name, blob|url}]
+    urlCache:new Map(),  // name -> adresse d'objet (blob:)
+    setEntries(list){
+      this.entries = new Map();
+      (list || []).forEach(entry => {
+        if(!this.entries.has(entry.id)) this.entries.set(entry.id, []);
+        this.entries.get(entry.id).push(entry);
+      });
+      this.entries.forEach(items => items.sort((a, b) => a.variant - b.variant));
+    },
+    // Outil de test : {id: [adresses]}.
+    setUrls(object){
+      const list = [];
+      Object.keys(object || {}).forEach(id => {
+        [].concat(object[id]).forEach((url, index) => list.push({id, variant:index + 1, name:id + "_" + index, url}));
+      });
+      this.setEntries(list);
+    },
+    urlOf(entry){
+      if(entry.url) return entry.url;
+      if(!this.urlCache.has(entry.name)) this.urlCache.set(entry.name, URL.createObjectURL(entry.blob));
+      return this.urlCache.get(entry.name);
+    },
+    get(id){
+      const items = this.entries.get(String(id)) || [];
+      if(!items.length) return [];
+      const wanted = HD_IMAGE_PRIORITY[id];
+      let chosen;
+      if(wanted){
+        chosen = wanted.map(variant => items.find(entry => entry.variant === variant)).filter(Boolean);
+        if(!chosen.length) chosen = [items[0]];
+      }else{
+        chosen = [items[0]];
+      }
+      return chosen.map(entry => this.urlOf(entry));
+    },
+    size(){ return this.entries.size; }
+  };
+
+  // Nom de fichier -> point : "E34.jpg", "rt10_2.jpg" (sans tenir compte des
+  // majuscules) ou, pour les points hors méridien, le pinyin sans accents ni
+  // espaces ("AnMian.jpg" -> Ān mián).
+  let hdNameIndex = null;
+
+  function hdKey(text){
+    return String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+
+  function hdBuildNameIndex(){
+    const ids = {};
+    const pinyin = {};
+    const details = pointDetails();
+    Object.keys(details).forEach(id => {
+      ids[id.toLowerCase()] = id;
+      const key = hdKey(details[id].pinyin);
+      if(key && !pinyin[key]) pinyin[key] = id;
+    });
+    hdNameIndex = {ids, pinyin};
+  }
+
+  function hdMatchFileName(fileName){
+    if(!hdNameIndex) hdBuildNameIndex();
+    const base = String(fileName).replace(/\.[^.]+$/, "");
+    const match = base.match(/^(.*?)(?:_(\d+))?$/);
+    const key = match[1];
+    const id = hdNameIndex.ids[key.toLowerCase()] || (!POINT_CODE_REGEX.test(key) ? hdNameIndex.pinyin[hdKey(key)] : "");
+    return id ? {id, variant:match[2] ? Number(match[2]) : 0} : null;
+  }
+
+  // --- Mémorisation dans le navigateur (IndexedDB) : le dossier n'est à
+  // choisir qu'une fois, pas à chaque ouverture. ---------------------------
+
+  function hdOpenDb(){
+    return new Promise((resolve, reject) => {
+      if(typeof indexedDB === "undefined"){ reject(new Error("IndexedDB indisponible")); return; }
+      const request = indexedDB.open(HD_DB_NAME, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore("images", {keyPath:"name"});
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function hdSaveEntries(list){
+    const db = await hdOpenDb();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction("images", "readwrite");
+      const store = tx.objectStore("images");
+      store.clear();
+      list.forEach(entry => store.put({name:entry.name, id:entry.id, variant:entry.variant, blob:entry.blob}));
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+  }
+
+  async function hdLoadEntries(){
+    const db = await hdOpenDb();
+    const list = await new Promise((resolve, reject) => {
+      const request = db.transaction("images", "readonly").objectStore("images").getAll();
+      request.onsuccess = () => resolve(request.result || []);
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    return list;
+  }
+
+  async function hdForget(){
+    try{
+      const db = await hdOpenDb();
+      await new Promise(resolve => {
+        const tx = db.transaction("images", "readwrite");
+        tx.objectStore("images").clear();
+        tx.oncomplete = resolve;
+        tx.onerror = resolve;
+      });
+      db.close();
+    }catch(error){}
+    HD_IMAGES.setEntries([]);
+  }
+
+  // Dossier (ou fichiers) choisi par l'utilisatrice : on garde les images
+  // reconnues, chacune sous son nom de fichier ; le reste est ignoré.
+  async function hdLoadFiles(fileList){
+    const files = Array.from(fileList || []).filter(file => HD_IMAGE_EXT.test(file.name));
+    const list = [];
+    let ignored = 0;
+    files.forEach(file => {
+      const match = hdMatchFileName(file.name);
+      if(match) list.push({id:match.id, variant:match.variant, name:file.name, blob:file});
+      else ignored++;
+    });
+    HD_IMAGES.setEntries(list);
+    let saved = true;
+    try{ await hdSaveEntries(list); }catch(error){ saved = false; }
+    return {matched:list.length, ignored, saved};
+  }
+
+  async function hdRestore(){
+    if(HD_IMAGES.size()) return true;
+    try{
+      const list = await hdLoadEntries();
+      if(list.length) HD_IMAGES.setEntries(list);
+      return list.length > 0;
+    }catch(error){ return false; }
+  }
+
+  function hdRecord(id){
+    const base = pointRecord(id);
+    if(!base) return null;
+    return Object.assign({}, base, {
+      catphrases:hdCategoryIndex()[id] || [],
+      hdImages:HD_IMAGES.get(id)
+    });
+  }
+
+  // Points appartenant à au moins une catégorie du jeu ; en option, aussi ceux
+  // qui n'en ont pas mais dont une image existe dans le dossier.
+  function hdItems(){
+    const index = hdCategoryIndex();
+    const uncategorized = Boolean(settings && settings.hdUncat);
+    const librarySize = HD_IMAGES.size();
+    return pointItems()
+      .filter(item => index[item.id] || (uncategorized && HD_IMAGES.entries.has(item.id)))
+      .map(item => Object.assign({}, item, {noimg:librarySize > 0 && !HD_IMAGES.entries.has(item.id)}));
+  }
+
   const DATASETS = {
     herbs:{
       id:"herbs",
@@ -483,6 +725,22 @@
       items:pointItems,
       record:pointRecord,
       basketIds:pointBasketIds
+    },
+    acuhd:{
+      id:"acuhd",
+      tab:"Points · image HD",
+      nouns:"point(s)",
+      listTitle:"Points appartenant à une catégorie",
+      docTitle:"Cartes points — catégories et image HD",
+      intro:"Une carte par point appartenant à une catégorie du jeu. Recto : catégorie(s) et actions. Verso : image de localisation en grand, nomenclature et noms.",
+      groupsLabel:"Tous les canaux",
+      hasPriority:false,
+      fields:HD_FIELDS,
+      presets:HD_PRESETS,
+      defaultPreset:"std",
+      items:hdItems,
+      record:hdRecord,
+      basketIds:pointBasketIds
     }
   };
 
@@ -512,10 +770,13 @@
     merged.dx = Number(src.dx) || 0;
     merged.dy = Number(src.dy) || 0;
     merged.margin = Number(src.margin) || DEFAULT_OPTIONS.margin;
+    merged.hdUncat = Boolean(src.hdUncat);
+    merged.hdOnlyImage = src.hdOnlyImage === undefined ? true : Boolean(src.hdOnlyImage);
     merged.dataset = DATASETS[src.dataset] ? src.dataset : "herbs";
     // Ancien format (avant les points) : selected/recto/verso à la racine = substances.
     merged.herbs = normalizeDatasetSettings(src.herbs || (src.selected ? src : null), DATASETS.herbs);
     merged.points = normalizeDatasetSettings(src.points, DATASETS.points);
+    merged.acuhd = normalizeDatasetSettings(src.acuhd, DATASETS.acuhd);
     return merged;
   }
 
@@ -546,6 +807,7 @@
   function cardInnerHtml(record, selectedKeys, fields){
     const fieldList = fields || HERB_FIELDS;
     const selected = new Set(selectedKeys);
+    if(selected.has("image_hd") && fieldList.some(field => field.key === "image_hd")) return hdVersoHtml(record, selected);
     const chosen = fieldList.filter(field => selected.has(field.key) && fieldHasData(field, record));
     const identity = chosen.filter(field => IDENTITY_KEYS.includes(field.key));
     const details = chosen.filter(field => !IDENTITY_KEYS.includes(field.key));
@@ -584,7 +846,7 @@
     // si besoin) pour gagner de la place.
     const tagFields = details.filter(field => typeof field.tags === "function");
     if(tagFields.length){
-      html += '<div class="tags">' + tagFields.map(field =>
+      html += '<div class="tags' + (tagFields.some(field => field.big) ? ' big' : '') + '">' + tagFields.map(field =>
         '<div class="tag-group"><div class="lbl">' + esc(field.title) + '</div><div class="tag-row">' +
         field.tags(record).map(tagHtml).join("") + "</div></div>"
       ).join("") + "</div>";
@@ -608,6 +870,23 @@
       }
     });
     return html + "</div>";
+  }
+
+  // Verso image : bandeau (ou colonne) de nomenclature + noms, et l'image de
+  // localisation la plus grande possible. Le choix bandeau/colonne et
+  // l'arrangement des images sont faits à l'impression selon leurs
+  // proportions réelles (voir hdLayout dans le script du document).
+  function hdVersoHtml(record, selected){
+    const has = key => selected.has(key);
+    const parts = [];
+    if(has("code") && record.code) parts.push('<span class="hd-code">' + esc(record.code) + '</span>');
+    if(has("hanzi") && record.hanzi) parts.push('<span class="hd-hanzi">' + esc(record.hanzi) + '</span>');
+    if(has("pinyin") && record.pinyin) parts.push('<span class="hd-pinyin">' + esc(record.pinyin) + '</span>');
+    if(has("nom") && record.nom) parts.push('<span class="hd-nom">' + esc(record.nom) + '</span>');
+    const images = (record.hdImages || []).map(src => '<img alt="" src="' + esc(src) + '">').join("");
+    return '<div class="card-inner hd-verso layout-top">' +
+      (parts.length ? '<div class="hd-head">' + parts.join("") + '</div>' : "") +
+      '<div class="hd-imgs">' + (images || '<span class="hd-noimg">image à ajouter</span>') + '</div></div>';
   }
 
   function testCardInnerHtml(n, side){
@@ -727,6 +1006,23 @@
     ".pinyin-big{font-weight:700;font-size:2.1em;line-height:1.1}",
     ".code-big{font-weight:700;font-size:3.6em;line-height:1.05}",
     ".ident-only .nom{font-size:1.15em}",
+    ".tags.big .tag-row{flex-direction:column;align-items:flex-start;gap:.35em}",
+    ".tags.big .rect{font-size:1.05em;font-weight:700;max-width:100%;padding:.3em .7em}",
+    ".card.hd-card{padding:1.8mm 2mm}",
+    ".hd-verso{display:flex;gap:1.4mm}",
+    ".hd-verso.layout-top{flex-direction:column}",
+    ".hd-verso.layout-side{flex-direction:row}",
+    ".hd-head{flex:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .55em;line-height:1.15}",
+    ".layout-side .hd-head{flex-direction:column;flex-wrap:nowrap;width:26mm;align-items:flex-start;gap:.2em}",
+    ".hd-code{font-weight:700;font-size:1.55em;line-height:1.05}",
+    ".hd-hanzi{font-family:'Noto Serif SC','Noto Serif CJK SC','Songti SC','SimSun','Source Han Serif SC',serif;font-size:1.3em}",
+    ".hd-pinyin{font-weight:700;font-size:.92em}",
+    ".hd-nom{font-style:italic;font-size:.8em}",
+    ".layout-top .hd-nom{margin-left:auto}",
+    ".hd-imgs{flex:1 1 0;min-width:0;min-height:0;display:flex;gap:1mm;align-items:stretch;justify-content:center}",
+    ".hd-verso.arr-col .hd-imgs{flex-direction:column}",
+    ".hd-imgs img{flex:1 1 0;min-width:0;min-height:0;object-fit:contain}",
+    ".hd-noimg{align-self:center;margin:auto;font:italic .7em Archivo,Arial,sans-serif;color:#888}",
     ".toolbar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #999;padding:10px 14px;font:14px/1.4 Archivo,Arial,sans-serif;display:flex;gap:14px;align-items:center;flex-wrap:wrap}",
     ".toolbar button{font:700 14px Archivo,Arial,sans-serif;padding:9px 16px;border:1.5px solid #000;border-radius:99px;background:#fff;cursor:pointer}",
     ".toolbar .tip{flex:1 1 320px;font-size:13px;color:#333}",
@@ -749,9 +1045,43 @@
     " if(over)card.classList.add('overflow');",
     " return over;",
     "}",
-    "function run(){",
+    "function bestFit(bw,bh,asp){",
+    " var gap=4,i,sumA=0,sumInv=0;",
+    " if(asp.length===1){var s=Math.min(bw/asp[0],bh);return {area:s*asp[0]*s,arr:'row'};}",
+    " for(i=0;i<asp.length;i++){sumA+=asp[i];sumInv+=1/asp[i];}",
+    " var g=gap*(asp.length-1);",
+    " var hRow=Math.max(0,Math.min(bh,(bw-g)/sumA)),aRow=hRow*hRow*sumA;",
+    " var wCol=Math.max(0,Math.min(bw,(bh-g)/sumInv)),aCol=wCol*wCol*sumInv;",
+    " return aRow>=aCol?{area:aRow,arr:'row'}:{area:aCol,arr:'col'};",
+    "}",
+    "function hdPrepare(card){",
+    " var v=card.querySelector('.hd-verso');",
+    " if(!v)return Promise.resolve();",
+    " card.classList.add('hd-card');card.setAttribute('data-fs','10');card.style.setProperty('--fs','10pt');",
+    " var imgs=Array.prototype.slice.call(v.querySelectorAll('.hd-imgs img'));",
+    " return Promise.all(imgs.map(function(im){return new Promise(function(res){",
+    "  if(im.complete){res();return;}",
+    "  im.addEventListener('load',res);im.addEventListener('error',res);",
+    " });}));",
+    "}",
+    "function hdLayout(card){",
+    " var v=card.querySelector('.hd-verso');if(!v)return;",
+    " var imgs=Array.prototype.slice.call(v.querySelectorAll('.hd-imgs img')).filter(function(im){return im.naturalWidth>0;});",
+    " if(!imgs.length)return;",
+    " var asp=imgs.map(function(im){return im.naturalWidth/im.naturalHeight;});",
+    " var best=null;",
+    " ['top','side'].forEach(function(mode){",
+    "  v.className='card-inner hd-verso layout-'+mode;",
+    "  var box=v.querySelector('.hd-imgs');",
+    "  var f=bestFit(box.clientWidth,box.clientHeight,asp);",
+    "  if(!best||f.area>best.area+1)best={area:f.area,mode:mode,arr:f.arr};",
+    " });",
+    " v.className='card-inner hd-verso layout-'+best.mode+' arr-'+(best.arr==='col'?'col':'row');",
+    " imgs.forEach(function(im,i){im.style.flexGrow=(best.arr==='col'?1/asp[i]:asp[i]);});",
+    "}",
+    "function finish(cards){",
     " var over=0;",
-    " Array.prototype.forEach.call(document.querySelectorAll('.card'),function(card){if(fit(card))over++;});",
+    " cards.forEach(function(card){hdLayout(card);if(fit(card))over++;});",
     " var warn=document.getElementById('warn');",
     " if(warn&&over){warn.hidden=false;warn.textContent=over+' carte(s) trop remplie(s) (cadre en pointillés) : du texte est coupé. Retirez un champ dans la fenêtre de réglage.';}",
     " if(document.body.classList.contains('preview')){",
@@ -762,6 +1092,10 @@
     "  try{parent.postMessage({mtcCardsPreviewHeight:(1121+12)*z},'*');}catch(e){}",
     " }",
     " if(window.__MTC_AUTOPRINT)setTimeout(function(){window.print();},350);",
+    "}",
+    "function run(){",
+    " var cards=Array.prototype.slice.call(document.querySelectorAll('.card'));",
+    " Promise.all(cards.map(hdPrepare)).then(function(){finish(cards);},function(){finish(cards);});",
     "}",
     "var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();",
     "ready.then(run,run);",
@@ -865,9 +1199,10 @@
 
   function itemRowHtml(item){
     return '<label class="mtc-cards-herb" data-item-row="' + esc(item.id) + '" data-group-code="' + esc(item.group) + '" data-search="' + esc(item.search) +
-      '" data-priority="' + (item.priority ? "1" : "0") + '"><input type="checkbox" data-item-id="' + esc(item.id) + '">' +
+      '" data-priority="' + (item.priority ? "1" : "0") + '" data-noimg="' + (item.noimg ? "1" : "0") + '"><input type="checkbox" data-item-id="' + esc(item.id) + '">' +
       '<span class="mtc-cards-herb-code">' + esc(item.code) + "</span>" +
-      '<span class="mtc-cards-herb-name">' + esc(item.title) + (item.sub ? " <em>" + esc(item.sub) + "</em>" : "") + "</span></label>";
+      '<span class="mtc-cards-herb-name">' + esc(item.title) + (item.sub ? " <em>" + esc(item.sub) + "</em>" : "") +
+      (item.noimg ? ' <span class="mtc-cards-noimg">sans image</span>' : "") + "</span></label>";
   }
 
   function listHtml(items){
@@ -919,10 +1254,22 @@
           '<p class="mtc-cards-intro" id="mtcCardsIntro"></p>' +
 
           '<section><h3 id="mtcCardsListTitle">1 · Sélection</h3>' +
+            '<div class="mtc-cards-hd" id="mtcCardsHdPanel" hidden>' +
+              '<div class="mtc-cards-buttons">' +
+                '<button type="button" data-cards-act="hd-pick-folder">Choisir le dossier d\'images…</button>' +
+                '<button type="button" data-cards-act="hd-pick-files">Ajouter des images…</button>' +
+                '<button type="button" data-cards-act="hd-forget">Oublier les images</button>' +
+              "</div>" +
+              '<input type="file" id="mtcCardsHdFolder" webkitdirectory multiple hidden>' +
+              '<input type="file" id="mtcCardsHdFiles" accept="image/*" multiple hidden>' +
+              '<p class="mtc-cards-note" id="mtcCardsHdStatus"></p>' +
+            "</div>" +
             '<div class="mtc-cards-filters">' +
               '<input type="search" id="mtcCardsSearch" placeholder="Rechercher (pinyin, hanzi, nom, code)…" autocomplete="off">' +
               '<select id="mtcCardsClass"></select>' +
               '<label class="mtc-cards-inline" id="mtcCardsPriorityWrap"><input type="checkbox" id="mtcCardsPriority"> prioritaires</label>' +
+              '<label class="mtc-cards-inline" id="mtcCardsHasImageWrap"><input type="checkbox" id="mtcCardsHasImage"> seulement avec image</label>' +
+              '<label class="mtc-cards-inline" id="mtcCardsUncatWrap"><input type="checkbox" id="mtcCardsUncat"> inclure les points sans catégorie</label>' +
             "</div>" +
             '<div class="mtc-cards-buttons">' +
               '<button type="button" data-cards-act="check-visible">Cocher les affichées</button>' +
@@ -986,6 +1333,20 @@
     byId("mtcCardsSearch").value = "";
     byId("mtcCardsPriority").checked = false;
     byId("mtcCardsPriorityWrap").hidden = !dataset.hasPriority;
+    const isHd = dataset.id === "acuhd";
+    byId("mtcCardsHdPanel").hidden = !isHd;
+    byId("mtcCardsHasImageWrap").hidden = !isHd;
+    byId("mtcCardsUncatWrap").hidden = !isHd;
+    updateHdStatus();
+    if(isHd && !hdRestoreTried){
+      hdRestoreTried = true;
+      hdRestore().then(restored => {
+        if(restored && modal && modal.classList.contains("visible") && ds().id === "acuhd"){
+          hdMessage = "";
+          populateDataset();
+        }
+      });
+    }
     byId("mtcCardsList").innerHTML = listHtml(items);
     byId("mtcCardsPresets").innerHTML = Object.keys(dataset.presets)
       .map(key => '<button type="button" data-cards-preset="' + key + '">' + esc(dataset.presets[key].label) + "</button>").join("");
@@ -1009,6 +1370,8 @@
     byId("mtcCardsDx").value = String(settings.dx);
     byId("mtcCardsDy").value = String(settings.dy);
     byId("mtcCardsCut").checked = Boolean(settings.cutlines);
+    byId("mtcCardsUncat").checked = Boolean(settings.hdUncat);
+    byId("mtcCardsHasImage").checked = Boolean(settings.hdOnlyImage);
     updateGroupBoxes();
   }
 
@@ -1028,10 +1391,12 @@
     const term = normalizeSearch(byId("mtcCardsSearch").value).trim();
     const group = byId("mtcCardsClass").value;
     const priorityOnly = byId("mtcCardsPriority").checked;
+    const imageOnly = ds().id === "acuhd" && byId("mtcCardsHasImage").checked;
     modal.querySelectorAll("[data-item-row]").forEach(row => {
       const ok = (!term || row.getAttribute("data-search").includes(term)) &&
         (!group || row.getAttribute("data-group-code") === group) &&
-        (!priorityOnly || row.getAttribute("data-priority") === "1");
+        (!priorityOnly || row.getAttribute("data-priority") === "1") &&
+        (!imageOnly || row.getAttribute("data-noimg") !== "1");
       row.hidden = !ok;
     });
     modal.querySelectorAll("[data-group]").forEach(groupEl => {
@@ -1057,6 +1422,30 @@
     settings.dx = Number(byId("mtcCardsDx").value) || 0;
     settings.dy = Number(byId("mtcCardsDy").value) || 0;
     settings.cutlines = byId("mtcCardsCut").checked;
+    settings.hdUncat = byId("mtcCardsUncat").checked;
+    settings.hdOnlyImage = byId("mtcCardsHasImage").checked;
+  }
+
+  function updateHdStatus(){
+    const node = byId("mtcCardsHdStatus");
+    if(!node) return;
+    const total = HD_IMAGES.size();
+    if(hdMessage){ node.textContent = hdMessage; return; }
+    node.textContent = total
+      ? total + " point(s) avec image (dossier mémorisé dans ce navigateur)."
+      : "Aucune image chargée : choisis le dossier « localisation de points » (une seule fois, il est ensuite mémorisé).";
+  }
+
+  async function onHdFilesChosen(input){
+    hdMessage = "Lecture des images…";
+    updateHdStatus();
+    const result = await hdLoadFiles(input.files);
+    input.value = "";
+    hdMessage = result.matched + " image(s) reconnue(s)" +
+      (result.ignored ? ", " + result.ignored + " ignorée(s) (nom non reconnu)" : "") +
+      (result.saved ? " — mémorisées dans ce navigateur." : " — non mémorisées (stockage indisponible).");
+    populateDataset();
+    updateHdStatus();
   }
 
   function updateSummary(){
@@ -1114,9 +1503,19 @@
       const ids = new Set(ds().basketIds());
       if(!ids.size){ window.alert("Le panier de révision est vide."); return; }
       setChecked("[data-item-id]", box => ids.has(box.getAttribute("data-item-id")), true);
+    }else if(action === "hd-pick-folder"){
+      byId("mtcCardsHdFolder").click();
+      return;
+    }else if(action === "hd-pick-files"){
+      byId("mtcCardsHdFiles").click();
+      return;
+    }else if(action === "hd-forget"){
+      hdForget().then(() => { hdMessage = "Images oubliées."; populateDataset(); updateHdStatus(); });
+      return;
     }else if(action === "print"){
       collectSelection();
       if(!cur().selected.length){ window.alert("Coche au moins un élément."); return; }
+      if(ds().id === "acuhd" && !HD_IMAGES.size() && !window.confirm("Aucune image n'est chargée : les versos auront un cadre vide. Continuer ?")) return;
       onChange();
       openForPrint(buildRealDocument(false).html);
       return;
@@ -1163,10 +1562,14 @@
         });
       }
       onChange();
+      if(event.target.id === "mtcCardsUncat"){ populateDataset(); }
     });
     byId("mtcCardsSearch").addEventListener("input", applyFilters);
     byId("mtcCardsClass").addEventListener("change", applyFilters);
     byId("mtcCardsPriority").addEventListener("change", applyFilters);
+    byId("mtcCardsHasImage").addEventListener("change", applyFilters);
+    byId("mtcCardsHdFolder").addEventListener("change", event => onHdFilesChosen(event.target));
+    byId("mtcCardsHdFiles").addEventListener("change", event => onHdFilesChosen(event.target));
     ["mtcCardsDx", "mtcCardsDy"].forEach(id => byId(id).addEventListener("input", onChange));
     document.addEventListener("keydown", event => {
       if(event.key === "Escape" && modal.classList.contains("visible")) closeModal();
@@ -1206,7 +1609,7 @@
     window.MTCPharmaCards = {
       open:openModal, close:closeModal, datasets:DATASETS, slotsFor, backSlotSource,
       splitNature, splitSaveur, splitTopLevel, tropismCodes, linesOf, pointRecord,
-      cardInnerHtml, buildDocument, buildPagesHtml
+      cardInnerHtml, buildDocument, buildPagesHtml, hdImages:HD_IMAGES, hdCategoryIndex, hdMatchFileName, hdLoadFiles, hdRestore
     };
   }
 

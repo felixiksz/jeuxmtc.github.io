@@ -305,3 +305,15 @@ body.mtc-cards-open{
   color:#fff !important;
 }
 .mtc-cards-inline[hidden]{display:none;}
+
+/* Cartes point · image HD : panneau de chargement du dossier d'images */
+.mtc-cards-hd{margin-bottom:8px;}
+.mtc-cards-hd[hidden]{display:none;}
+.mtc-cards-noimg{
+  font-size:.72rem;
+  font-weight:650;
+  opacity:.7;
+  border:1px dashed currentColor;
+  border-radius:99px;
+  padding:0 .5em;
+}
