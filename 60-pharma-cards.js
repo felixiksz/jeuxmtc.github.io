@@ -1405,7 +1405,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v10</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v11</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
@@ -1447,6 +1447,7 @@
               '<label class="mtc-cards-inline" id="mtcCardsPsychoWrap" hidden><input type="checkbox" id="mtcCardsPsycho"> seulement avec indications psycho-émotionnelles</label>' +
               '<label class="mtc-cards-inline" id="mtcCardsUncatWrap"><input type="checkbox" id="mtcCardsUncat"> inclure les points sans catégorie</label>' +
             "</div>" +
+            '<p class="mtc-cards-note" id="mtcCardsPsychoInfo" hidden></p>' +
             '<div class="mtc-cards-buttons">' +
               '<button type="button" data-cards-act="check-visible">Cocher les affichées</button>' +
               '<button type="button" data-cards-act="uncheck-visible">Décocher les affichées</button>' +
@@ -1516,6 +1517,15 @@
     byId("mtcCardsHasImageWrap").hidden = !isHd;
     byId("mtcCardsPsychoWrap").hidden = !(isAdmin() && dataset.id !== "herbs");
     if(byId("mtcCardsPsychoWrap").hidden) byId("mtcCardsPsycho").checked = false;
+    const psychoInfo = byId("mtcCardsPsychoInfo");
+    psychoInfo.hidden = byId("mtcCardsPsychoWrap").hidden;
+    if(!psychoInfo.hidden){
+      const total = items.filter(item => item.psycho).length;
+      psychoInfo.innerHTML = total
+        ? total + " point(s) de cette liste ont des indications psycho-émotionnelles dans ce navigateur."
+        : "Aucune indication psycho-émotionnelle trouvée dans ce navigateur : la synchro GitHub n'a pas (encore) rempli les fiches ici. " +
+          '<button type="button" data-cards-act="open-sync">Ouvrir la synchro GitHub</button>';
+    }
     byId("mtcCardsUncatWrap").hidden = !isHd;
     byId("mtcCardsCategorizedBtn").hidden = !isHd;
     if(byId("mtcCardsPsychoBtn")) byId("mtcCardsPsychoBtn").hidden = dataset.id === "herbs";
@@ -1702,6 +1712,12 @@
       setChecked("[data-item-id]", box => !box.closest("[data-item-row]").hidden, action === "check-visible");
     }else if(action === "clear"){
       setChecked("[data-item-id]", () => true, false);
+    }else if(action === "open-sync"){
+      const syncButton = byId("mtcGithubSyncButton");
+      if(!syncButton){ window.alert("Le bouton de synchronisation GitHub est introuvable dans la barre du site."); return; }
+      closeModal();
+      syncButton.click();
+      return;
     }else if(action === "psycho-only"){
       if(!isAdmin()) return;
       setChecked("[data-item-id]", () => true, false);
