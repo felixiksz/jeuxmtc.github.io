@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260926-pinyin-fixes";
+const MTC_OFFLINE_VERSION = "20260927-cards-bw-3";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -72,6 +72,7 @@ const CORE_ASSETS = [
   "59-github-sync.js",
   "60-pharma-cards.css",
   "60-pharma-cards.js",
+  "61-cards-bw-image.js",
   "Import_tableau pharma_pro(1).json",
   "README_HORS_CONNEXION.txt",
   "README_PUBLICATION.txt",
