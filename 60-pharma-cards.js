@@ -87,6 +87,14 @@
   }
 
   // Une ligne par élément, sans les puces/émojis de tête ("•", "➢", "-", "🖇️"…).
+  // Les fiches notent parfois « Aucune. » quand il n'y a rien : ce n'est pas
+  // une vraie valeur, le champ est alors traité comme vide (et non imprimé).
+  const EMPTY_PLACEHOLDER = /^(aucune?|néant|neant|nulle?|sans|n\/a|[-–—])(\s+(correspondance|catégorie|categorie)s?)?\s*\.?$/i;
+
+  function realLines(value){
+    return linesOf(value).filter(line => !EMPTY_PLACEHOLDER.test(line.trim()));
+  }
+
   function linesOf(value){
     return cleanText(value)
       .split("\n")
@@ -408,8 +416,8 @@
       pinyin:cleanText(details.pinyin),
       hanzi:cleanText(details.hanzi),
       nom:cleanText(details.nom_francais || details.nom_complet),
-      categories:linesOf(details.categories_du_point),
-      correspondances:linesOf(details.correspondances),
+      categories:realLines(details.categories_du_point),
+      correspondances:realLines(details.correspondances),
       localisation:cleanText(details.localisation),
       methode_localisation:cleanText(details.methode_localisation),
       methode_travail:cleanText(details.methode_travail),
@@ -1265,6 +1273,23 @@
     " v.className='card-inner hd-verso layout-'+best.mode+' arr-'+(best.arr==='col'?'col':'row');",
     " imgs.forEach(function(im,i){im.style.flexGrow=(best.arr==='col'?1/asp[i]:asp[i]);});",
     "}",
+    "function picRotate(card){",
+    " var inner=card.querySelector('.card-inner.has-pic');if(!inner)return Promise.resolve();",
+    " var ims=Array.prototype.slice.call(inner.querySelectorAll('.pic'));if(ims.length!==1)return Promise.resolve();",
+    " var im=ims[0];if(!im.naturalWidth||im.naturalWidth>=im.naturalHeight*0.98)return Promise.resolve();",
+    " var info=inner.querySelector('.pic-info');",
+    " card.style.setProperty('--fs','8pt');inner.classList.remove('pic-side');",
+    " var iw=inner.clientWidth,ih=Math.max(0,inner.clientHeight-(info?info.offsetHeight+4:0)),a=im.naturalWidth/im.naturalHeight;",
+    " function fitA(w,h,asp){var s=Math.min(w/asp,h);return s*s*asp;}",
+    " if(fitA(iw,ih,1/a)<=fitA(iw,ih,a)*1.05)return Promise.resolve();",
+    " return new Promise(function(res){",
+    "  var c=document.createElement('canvas');c.width=im.naturalHeight;c.height=im.naturalWidth;",
+    "  var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.translate(0,c.height);x.rotate(-Math.PI/2);x.drawImage(im,0,0);",
+    "  var src;try{src=c.toDataURL('image/jpeg',0.95);}catch(e){res();return;}",
+    "  im.addEventListener('load',res,{once:true});im.addEventListener('error',res,{once:true});",
+    "  im.src=src;",
+    " });",
+    "}",
     "function picLayout(card){",
     " var inner=card.querySelector('.card-inner.pic-ident');if(!inner)return;",
     " var im=inner.querySelector('.pic');if(!im||!im.naturalWidth)return;",
@@ -1291,7 +1316,8 @@
     "}",
     "function run(){",
     " var cards=Array.prototype.slice.call(document.querySelectorAll('.card'));",
-    " Promise.all(cards.map(hdPrepare)).then(function(){finish(cards);},function(){finish(cards);});",
+    " function go(){finish(cards);}",
+    " Promise.all(cards.map(hdPrepare)).then(function(){return Promise.all(cards.map(picRotate));}).then(go,go);",
     "}",
     "var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();",
     "ready.then(run,run);",
@@ -1451,7 +1477,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v13</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v15</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
