@@ -1433,6 +1433,7 @@
               '<button type="button" data-cards-act="check-visible">Cocher les affichées</button>' +
               '<button type="button" data-cards-act="uncheck-visible">Décocher les affichées</button>' +
               '<button type="button" data-cards-act="basket">Ajouter le panier de révision</button>' +
+              '<button type="button" data-cards-act="hd-categorized" id="mtcCardsCategorizedBtn">Sélectionner uniquement les points avec catégorie</button>' +
               '<button type="button" data-cards-act="clear">Tout vider</button>' +
             "</div>" +
             '<div class="mtc-cards-list" id="mtcCardsList"></div>' +
@@ -1495,6 +1496,7 @@
     byId("mtcCardsHdPanel").hidden = !isHd;
     byId("mtcCardsHasImageWrap").hidden = !isHd;
     byId("mtcCardsUncatWrap").hidden = !isHd;
+    byId("mtcCardsCategorizedBtn").hidden = !isHd;
     updateHdStatus();
     if(isHd && !hdRestoreTried){
       hdRestoreTried = true;
@@ -1676,6 +1678,10 @@
       setChecked("[data-item-id]", box => !box.closest("[data-item-row]").hidden, action === "check-visible");
     }else if(action === "clear"){
       setChecked("[data-item-id]", () => true, false);
+    }else if(action === "hd-categorized"){
+      const index = hdCategoryIndex();
+      setChecked("[data-item-id]", () => true, false);
+      setChecked("[data-item-id]", box => Boolean(index[box.getAttribute("data-item-id")]), true);
     }else if(action === "basket"){
       const ids = new Set(ds().basketIds());
       if(!ids.size){ window.alert("Le panier de révision est vide."); return; }
