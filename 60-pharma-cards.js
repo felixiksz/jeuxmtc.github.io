@@ -492,11 +492,9 @@
   // Libellé de chaque appartenance à une catégorie, formulé comme dans le quiz
   // ("Xì-Crevasse du Zú yáng míng") mais avec "Point" devant et le singulier
   // pour les catégories nommées au pluriel.
-  const HD_CATEGORY_OVERRIDES = {
-    Points_generaux:"Point général",
-    Les_4_mers:"Point des 4 mers",
-    Points_fantomes_de_Sun_Si_Miao:"Point fantôme de Sūn Sī Miǎo"
-  };
+  // (Formulations précises — généraux, huì-réunion, 4 mers, ouverture,
+  // fantômes — définies dans 52-quiz-mode.js, partagées avec le quiz.)
+  const HD_CATEGORY_OVERRIDES = {};
 
   let hdCategoryCache = null;
 
@@ -1538,7 +1536,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v18</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v19</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
