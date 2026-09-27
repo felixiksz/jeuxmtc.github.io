@@ -43,6 +43,99 @@
     }
   }
 
+  // --- Cartes de révision à imprimer : étapes partagées entre le tuto
+  // complet et la bulle « Nouveau » des personnes qui l'ont déjà vu. ---
+  const CARDS_SELECTOR = "#pharmaCardsButton";
+  const CARDS_FEATURE_SEEN_KEY = "mtc_feature_tour_cards_v1";
+
+  function cardsTourSteps(pharma){
+    return [
+      {
+        key:"cards-1",
+        title:"🃏 Cartes à imprimer",
+        text:"Ce bouton crée des cartes de révision recto-verso, 8 par feuille A4, en noir et blanc : les rectangles et les cercles sont à colorier toi-même. Choisis l’onglet (substances, points, ou points avec image de localisation), puis ce qui va au recto et au verso : les modèles tout prêts sont un bon départ."
+      },
+      {
+        key:"cards-2",
+        title:"Choisir les cartes",
+        text:pharma
+          ? "Coche les SM à imprimer : filtre par classe, cherche un nom, puis « Cocher les affichées », ou ajoute d’un clic ton panier de révision. L’aperçu montre la première feuille, recto à gauche et verso à droite."
+          : "Coche les points à imprimer : filtre par canal, cherche un nom, puis « Cocher les affichées », ou ajoute d’un clic ton panier de révision. L’aperçu montre la première feuille, recto à gauche et verso à droite."
+      },
+      {
+        key:"cards-3",
+        title:"Conseils d’impression",
+        text:"Commence par la « Feuille test ». Dans la fenêtre d’impression : échelle 100 % (pas « Ajuster à la page »), marges : aucune, format A4, recto-verso en retournant sur le bord indiqué (long par défaut). Regarde la feuille test à contre-jour : si le verso est décalé, corrige le décalage dans les réglages, puis découpe le long des pointillés."
+      }
+    ];
+  }
+
+  // Personnes qui ont déjà vu le tuto complet avant l'arrivée des cartes :
+  // une courte série de bulles, une seule fois.
+  function tutorialAlreadySeen(){
+    try{
+      const domain = typeof getCurrentStudyDomainForTutorial === "function" ? getCurrentStudyDomainForTutorial() : "";
+      if(!domain) return false;
+      return typeof hasSeenTutorialForDomain === "function" && hasSeenTutorialForDomain(domain);
+    }catch(error){ return false; }
+  }
+
+  function showCardsFeatureTour(){
+    try{ if(localStorage.getItem(CARDS_FEATURE_SEEN_KEY) === "1") return; }catch(error){ return; }
+    if(!tutorialAlreadySeen()) return;
+    if(typeof window.showProgressHint !== "function" && typeof showProgressHint !== "function") return;
+    if(document.getElementById("tourBox") || !document.querySelector(CARDS_SELECTOR)) return;
+    try{ localStorage.setItem(CARDS_FEATURE_SEEN_KEY, "1"); }catch(error){}
+    const show = typeof window.showProgressHint === "function" ? window.showProgressHint : showProgressHint;
+    const steps = cardsTourSteps(isPharma());
+    steps[0] = Object.assign({}, steps[0], {title:"Nouveau : 🃏 cartes à imprimer"});
+    let index = 0;
+    const next = () => {
+      if(index >= steps.length) return;
+      const step = steps[index++];
+      show("feature_" + step.key, CARDS_SELECTOR, step.title, step.text, {position:"aboveBottom"});
+      // Bulle suivante dès que celle-ci est fermée (bouton OK).
+      const wait = window.setInterval(() => {
+        if(document.getElementById("tourBox")) return;
+        window.clearInterval(wait);
+        window.setTimeout(next, 250);
+      }, 300);
+    };
+    next();
+  }
+
+  function scheduleCardsFeatureTour(){
+    let tries = 0;
+    const attempt = () => {
+      tries++;
+      const busy = document.getElementById("tourBox") ||
+        document.querySelector(".mtc-cards-modal.visible, .study-domain-chooser.visible, #studyDomainChooser:not([hidden])");
+      if(busy){
+        if(tries < 20) window.setTimeout(attempt, 3000);
+        return;
+      }
+      showCardsFeatureTour();
+    };
+    window.setTimeout(attempt, 3500);
+  }
+
+  // Étape repérée par une clé (plusieurs étapes peuvent viser le même
+  // élément). after = clé ou sélecteur de l'étape précédente, ou un index.
+  function insertKeyedStep(steps, key, step, after){
+    if(!Array.isArray(steps) || steps.some(item => item && item.__mtcKey === key)) return;
+    const full = Object.assign({
+      fallback:() => document.querySelector(step.selector) || document.querySelector("#footerTitle") || document.querySelector("#grid")
+    }, step, {__mtcKey:key});
+    let index = -1;
+    if(typeof after === "number") index = after;
+    else index = steps.findIndex(item => item && (item.__mtcKey === after || item.selector === after));
+    if(index >= 0) steps.splice(index + 1, 0, full);
+    else{
+      const endIndex = steps.findIndex(item => item && item.selector === "#grid" && item.title === " ");
+      steps.splice(endIndex >= 0 ? endIndex : steps.length, 0, full);
+    }
+  }
+
   function applyUserTutorialTexts(){
     const steps = currentSteps();
     if(!Array.isArray(steps)) return;
@@ -101,7 +194,7 @@
       steps,
       "#advancedSearchButton",
       pharma
-        ? "Ici tu peux filtrer les SM par nom, pinyin, classe, nature, saveur, tropisme, ou rechercher dans leurs fiches. Sens-toi libre d'experimenter!"
+        ? "Ici tu peux filtrer les SM par nom, pinyin, classe, nature, saveur, tropisme, ou rechercher dans leurs fiches. Sens-toi libre d'expérimenter !"
         : "Filtre les points par mot-clé, catégorie, canal ou intersections."
     );
 
@@ -116,7 +209,7 @@
       steps,
       "#studyDomainSelect",
       "ACU / PHARMA",
-      "Ici tu peux changer de matiere en cours de route.",
+      "Ici tu peux changer de matière en cours de route.",
       ".topbar-row button[onclick*='newGame()']"
     );
 
@@ -124,10 +217,30 @@
       steps,
       "#fullscreenToggleButton",
       "Plein écran",
-      "Ici tu peux mettre le jeu en plein écran",
+      "Ici tu peux mettre le jeu en plein écran.",
       "#studyDomainSelect",
       () => { if(typeof window.mtcOpenTopbarMoreMenu === "function") window.mtcOpenTopbarMoreMenu(); }
     );
+
+    // Après la partie : mémo, quiz, révision espacée (boutons qui
+    // n'apparaissent qu'en fin de grille → bulle posée sur la grille).
+    insertKeyedStep(steps, "after-game", {
+      selector:"#grid",
+      title:"Après la partie",
+      text:pharma
+        ? "Une fois la grille terminée, deux boutons apparaissent sous la grille : le Mémo, pour revoir les SM de la grille en un coup d'œil, et le Quiz, pour vérifier ce que tu as retenu."
+        : "Une fois la grille terminée, deux boutons apparaissent sous la grille : le Mémo, pour revoir les points de la grille en un coup d'œil, et le Quiz, pour vérifier ce que tu as retenu. Les points que tu connais mal reviennent ensuite d'eux-mêmes grâce au bouton 🔁 Réviser, en haut (répétition espacée).",
+      position:"aboveBottom"
+    }, 0);
+
+    // Cartes de révision à imprimer (bouton 🃏 en bas).
+    let previous = "#suggestionMailButton";
+    cardsTourSteps(pharma).forEach(step => {
+      insertKeyedStep(steps, step.key, {selector:CARDS_SELECTOR, title:step.title, text:step.text, position:"aboveBottom"}, previous);
+      previous = step.key;
+    });
+    // Ce tuto complet contient déjà les cartes : pas de bulle « Nouveau » ensuite.
+    try{ localStorage.setItem(CARDS_FEATURE_SEEN_KEY, "1"); }catch(error){}
 
     insertStepOnce(
       steps,
@@ -185,6 +298,7 @@
   function boot(){
     wrapStartTour();
     wrapProgressHints();
+    scheduleCardsFeatureTour();
   }
 
   if(document.readyState === "loading"){
