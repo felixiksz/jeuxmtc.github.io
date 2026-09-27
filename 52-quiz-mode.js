@@ -184,24 +184,25 @@
       RM17:"Huì-Réunion du qì"
     },
     Les_4_mers:{
-      DM20:"de la mer des moelles",
-      DM16:"de la mer des moelles",
-      DM14:"de la mer du qì supérieure",
-      DM15:"de la mer du qì supérieure",
-      E9:"de la mer du qì supérieure",
-      RM6:"de la mer du qì inférieure",
-      E30:"de la mer de l’eau et des céréales",
-      E36:"de la mer de l’eau et des céréales",
-      V11:"de la mer des canaux et vaisseaux / du sang",
-      E37:"de la mer des canaux et vaisseaux / du sang",
-      E39:"de la mer des canaux et vaisseaux / du sang"
+      DM20:"mer des moelles",
+      DM16:"mer des moelles",
+      DM14:"mer du qì supérieure",
+      DM15:"mer du qì supérieure",
+      E9:"mer du qì supérieure",
+      RM6:"mer du qì inférieure",
+      E30:"mer de l’eau et des céréales",
+      E36:"mer de l’eau et des céréales",
+      V11:"mer des canaux et vaisseaux / du sang",
+      E37:"mer des canaux et vaisseaux / du sang",
+      E39:"mer des canaux et vaisseaux / du sang"
     }
   };
   const GROUP_PHRASES = {
     Points_d_ouverture_des_merveilleux_vaisseaux:"d’ouverture",
+    Points_fenetre_du_ciel:"fenêtre du ciel",
     Points_fantomes_de_Sun_Si_Miao:"fantôme de Sūn Sī Miǎo"
   };
-  const NO_CANAL_GROUPS = ["Points_generaux", "Points_Hui_Reunion", "Les_4_mers", "Points_fantomes_de_Sun_Si_Miao"];
+  const NO_CANAL_GROUPS = ["Points_generaux", "Points_Hui_Reunion", "Les_4_mers", "Points_fenetre_du_ciel", "Points_fantomes_de_Sun_Si_Miao"];
 
   // {categoryPhrase, canalPhrase} pour un point dans une catégorie donnée.
   function pointPhrases(groupKey, category, point){
