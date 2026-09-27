@@ -183,6 +183,13 @@
       P9:"Huì-Réunion des vaisseaux",
       RM17:"Huì-Réunion du qì"
     },
+    Points_Bei_Shu_Transport_du_dos:{
+      V17:"Bèi Shù-Transport du dos du diaphragme",
+      V24:"Bèi Shù-Transport du dos du qì hǎi",
+      V26:"Bèi Shù-Transport du dos du guān yuán",
+      V29:"Bèi Shù-Transport du dos du sacrum",
+      V30:"Bèi Shù-Transport du dos du cercle blanc"
+    },
     Les_4_mers:{
       DM20:"mer des moelles",
       DM16:"mer des moelles",
@@ -211,7 +218,7 @@
     const specific = ROLE_PHRASES[groupKey] && ROLE_PHRASES[groupKey][code];
     return {
       categoryPhrase:specific || GROUP_PHRASES[groupKey] || questionCategoryPhrase(category),
-      canalPhrase:NO_CANAL_GROUPS.includes(groupKey) ? "" : (contextualCanalPhrase(groupKey, code) || canalPhrase(canalOfPoint(code)))
+      canalPhrase:(specific || NO_CANAL_GROUPS.includes(groupKey)) ? "" : (contextualCanalPhrase(groupKey, code) || canalPhrase(canalOfPoint(code)))
     };
   }
 
