@@ -1,7 +1,7 @@
 {
   "name": "Connections MTC",
   "short_name": "MTC",
-  "description": "Jeu de révision acupuncture et pharmacopée chinoise.",
+  "description": "Jeu de révision acupuncture et pharmacopée chinoise : grilles, quiz, fiches, comparaisons et cartes à imprimer.",
   "lang": "fr",
   "start_url": "./index.html",
   "scope": "./",
