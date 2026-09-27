@@ -122,3 +122,8 @@
     flex:1 1 auto;
   }
 }
+
+/* Synchro en cours (automatique à l'ouverture ou manuelle) */
+#mtcGithubSyncButton.is-syncing svg{animation:mtcGithubSyncSpin 1s linear infinite}
+@keyframes mtcGithubSyncSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){#mtcGithubSyncButton.is-syncing svg{animation:none;opacity:.5}}

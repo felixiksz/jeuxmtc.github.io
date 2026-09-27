@@ -2327,7 +2327,26 @@
     document.body.classList.remove("mtc-cards-open");
   }
 
+  // Données de l'Assistant arrivées (synchro GitHub) pendant que la
+  // fenêtre est ouverte : on reconstruit la liste sans perdre la sélection,
+  // les champs cochés ni les filtres en cours.
+  function refreshAfterSync(){
+    if(!modal || !modal.classList.contains("visible")) return;
+    try{
+      collectSelection();
+      collectFields();
+      saveSettings();
+      const search = byId("mtcCardsSearch").value;
+      const group = byId("mtcCardsClass").value;
+      populateDataset();
+      byId("mtcCardsSearch").value = search;
+      byId("mtcCardsClass").value = group;
+      applyFilters();
+    }catch(error){}
+  }
+
   function boot(){
+    window.addEventListener("mtc-github-sync", refreshAfterSync);
     const button = byId("pharmaCardsButton");
     if(button && !button.dataset.mtcCardsBound){
       button.dataset.mtcCardsBound = "1";
