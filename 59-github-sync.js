@@ -209,7 +209,10 @@
     for(const basePath of CHANNEL_PATH_CANDIDATES){
       const relativePath = `${basePath}/${code}.json`;
       const url = `${apiBaseFor(cfg, relativePath)}?ref=${encodeURIComponent(cfg.branch)}`;
-      const response = await fetch(url, {headers: apiHeaders(cfg)});
+      // no-store : jamais une copie périmée du cache HTTP (l'API GitHub
+      // autorise ~60 s de cache), sinon une modif faite côté Assistant
+      // n'apparaît pas à l'ouverture suivante et la sha d'écriture est fausse.
+      const response = await fetch(url, {headers: apiHeaders(cfg), cache:"no-store"});
       if(response.status === 404) continue;
       if(!response.ok) throw new Error(`GitHub a répondu ${response.status} pour ${relativePath}`);
       const payload = await response.json();
@@ -217,6 +220,68 @@
       return {sha: payload.sha, data: JSON.parse(content), path: relativePath};
     }
     return null; // 404 sur les deux emplacements candidats : ce canal n'existe pas encore côté Assistant
+  }
+
+  function afterMerge(){
+    try{
+      if(typeof window.normalizeOldPointDetails === "function") window.normalizeOldPointDetails();
+      if(typeof window.ensurePointAssociationsField === "function") window.ensurePointAssociationsField();
+    }catch(error){}
+  }
+
+  // Les autres modules (cartes à imprimer, fiches…) peuvent se rafraîchir.
+  function announceSync(source){
+    try{ window.dispatchEvent(new CustomEvent("mtc-github-sync", {detail:{source}})); }catch(error){}
+  }
+
+  // --- Dernière synchro gardée dans CE navigateur (IndexedDB) -------------
+  // Appliquée dès l'ouverture, avant même la réponse de GitHub : les
+  // données de l'Assistant (dont les indications psycho-émotionnelles)
+  // sont disponibles tout de suite et même hors connexion. Rien n'est
+  // gardé si la synchro n'est pas configurée (site public inchangé).
+  const CACHE_DB = "mtc_github_sync_cache";
+
+  function openCacheDb(){
+    return new Promise((resolve, reject) => {
+      if(typeof indexedDB === "undefined"){ reject(new Error("IndexedDB indisponible")); return; }
+      const request = indexedDB.open(CACHE_DB, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore("channels");
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function saveCachedChannels(channels){
+    const codes = Object.keys(channels || {});
+    if(!codes.length) return;
+    try{
+      const db = await openCacheDb();
+      await new Promise(resolve => {
+        const tx = db.transaction("channels", "readwrite");
+        codes.forEach(code => tx.objectStore("channels").put(channels[code], code));
+        tx.oncomplete = resolve;
+        tx.onerror = resolve;
+      });
+      db.close();
+    }catch(error){}
+  }
+
+  async function applyCachedChannels(){
+    try{
+      const db = await openCacheDb();
+      const list = await new Promise(resolve => {
+        const request = db.transaction("channels", "readonly").objectStore("channels").getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => resolve([]);
+      });
+      db.close();
+      if(!list.length) return 0;
+      let merged = 0;
+      list.forEach(data => { merged += mergeChannelIntoPointDetails(data); });
+      afterMerge();
+      if(merged) announceSync("cache");
+      return merged;
+    }catch(error){ return 0; }
   }
 
   async function syncFromGitHub(){
@@ -227,32 +292,42 @@
     if(syncInFlight) return;
     syncInFlight = true;
     setBusy(true);
+    const syncButton = byId("mtcGithubSyncButton");
+    if(syncButton) syncButton.classList.add("is-syncing");
     setStatus("Synchronisation en cours…");
 
     const cfg = config();
     let totalPoints = 0;
     let failedChannels = [];
 
-    for(const code of CHANNEL_CODES){
-      try{
-        const file = await fetchChannelFile(cfg, code);
-        if(!file) continue; // 404 : ce canal n'existe pas encore côté Assistant
-        totalPoints += mergeChannelIntoPointDetails(file.data);
-      }catch(error){
-        failedChannels.push(code);
-      }
-    }
+    // Tous les canaux en parallèle (au lieu d'un par un) : la synchro
+    // d'ouverture est terminée en une ou deux secondes.
+    const results = await Promise.all(CHANNEL_CODES.map(code =>
+      fetchChannelFile(cfg, code).then(file => ({code, file}), () => ({code, failed:true}))
+    ));
+    const fresh = {};
+    results.forEach(result => {
+      if(result.failed){ failedChannels.push(result.code); return; }
+      if(!result.file) return; // 404 : ce canal n'existe pas encore côté Assistant
+      totalPoints += mergeChannelIntoPointDetails(result.file.data);
+      fresh[result.code] = result.file.data;
+    });
 
-    try{
-      if(typeof window.normalizeOldPointDetails === "function") window.normalizeOldPointDetails();
-      if(typeof window.ensurePointAssociationsField === "function") window.ensurePointAssociationsField();
-    }catch(error){}
+    afterMerge();
 
     syncInFlight = false;
     setBusy(false);
+    if(syncButton){
+      syncButton.classList.remove("is-syncing");
+      syncButton.title = totalPoints > 0
+        ? "Synchronisé avec l'Assistant Diagnostic à " + new Date().toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})
+        : "Synchroniser avec l'Assistant Diagnostic (GitHub)";
+    }
 
     if(totalPoints > 0){
       storageSet(LAST_SUCCESS_KEY, new Date().toISOString());
+      saveCachedChannels(fresh);
+      announceSync("github");
     }
 
     const failSuffix = failedChannels.length
@@ -594,11 +669,14 @@
     ensureButton();
     installWriteHooks();
     installAcuEditableHook();
-    // Synchro auto en arrière-plan si déjà configuré, sans jamais bloquer
-    // le chargement normal — le jeu doit être utilisable instantanément.
-    window.setTimeout(() => {
-      if(isConfigured()) syncFromGitHub();
-    }, 3000);
+    // Synchro auto à chaque ouverture si déjà configurée : la dernière
+    // synchro gardée localement s'applique aussitôt, puis GitHub est
+    // interrogé en arrière-plan — sans jamais bloquer le chargement.
+    if(isConfigured()){
+      applyCachedChannels().finally(() => {
+        window.setTimeout(() => { if(isConfigured()) syncFromGitHub(); }, 400);
+      });
+    }
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, {once:true});
