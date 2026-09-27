@@ -157,6 +157,62 @@
     "Vésicule Biliaire": "de la Vésicule Biliaire",
     "Foie": "du Foie"
   };
+  // Formulations propres à certaines catégories (tableaux de référence de
+  // l'utilisateur·ice) : le rôle précis du point remplace le nom générique de
+  // la catégorie, et le canal n'est pas précisé quand l'usage ne le fait
+  // pas (« P 7 : point général de la tête et de la nuque », « point
+  // fantôme de Sūn Sī Miǎo »). Les points d'ouverture gardent leur
+  // vaisseau (« point d'ouverture du Rèn Mài »).
+  const ROLE_PHRASES = {
+    Points_generaux:{
+      E36:"général de l’abdomen",
+      V40:"général des lombes et du dos",
+      P7:"général de la tête et de la nuque",
+      GI4:"général de la face et de la bouche",
+      EC6:"général de la poitrine et des hypocondres",
+      Rt6:"général de l’abdomen inférieur",
+      DM26:"général de réanimation"
+    },
+    Points_Hui_Reunion:{
+      RM12:"Huì-Réunion des organes fǔ",
+      F13:"Huì-Réunion des organes zàng",
+      VB34:"Huì-Réunion des tendons",
+      VB39:"Huì-Réunion de la moelle",
+      V17:"Huì-Réunion du sang et du diaphragme",
+      V11:"Huì-Réunion des os",
+      P9:"Huì-Réunion des vaisseaux",
+      RM17:"Huì-Réunion du qì"
+    },
+    Les_4_mers:{
+      DM20:"de la mer des moelles",
+      DM16:"de la mer des moelles",
+      DM14:"de la mer du qì supérieure",
+      DM15:"de la mer du qì supérieure",
+      E9:"de la mer du qì supérieure",
+      RM6:"de la mer du qì inférieure",
+      E30:"de la mer de l’eau et des céréales",
+      E36:"de la mer de l’eau et des céréales",
+      V11:"de la mer des canaux et vaisseaux / du sang",
+      E37:"de la mer des canaux et vaisseaux / du sang",
+      E39:"de la mer des canaux et vaisseaux / du sang"
+    }
+  };
+  const GROUP_PHRASES = {
+    Points_d_ouverture_des_merveilleux_vaisseaux:"d’ouverture",
+    Points_fantomes_de_Sun_Si_Miao:"fantôme de Sūn Sī Miǎo"
+  };
+  const NO_CANAL_GROUPS = ["Points_generaux", "Points_Hui_Reunion", "Les_4_mers", "Points_fantomes_de_Sun_Si_Miao"];
+
+  // {categoryPhrase, canalPhrase} pour un point dans une catégorie donnée.
+  function pointPhrases(groupKey, category, point){
+    const code = String(point || "");
+    const specific = ROLE_PHRASES[groupKey] && ROLE_PHRASES[groupKey][code];
+    return {
+      categoryPhrase:specific || GROUP_PHRASES[groupKey] || questionCategoryPhrase(category),
+      canalPhrase:NO_CANAL_GROUPS.includes(groupKey) ? "" : (contextualCanalPhrase(groupKey, code) || canalPhrase(canalOfPoint(code)))
+    };
+  }
+
   function contextualCanalPhrase(groupKey, point){
     const isVesselGroup = CONTEXTUAL_VESSEL_GROUPS.includes(groupKey);
     const isChannelBorrowGroup = CONTEXTUAL_CHANNEL_BORROW_GROUPS.includes(groupKey);
@@ -181,13 +237,13 @@
         const code = String(point || "");
         if(!code) return;
         const canal = canalOfPoint(code);
-        const contextualPhrase = contextualCanalPhrase(group && group.key, code);
+        const phrases = pointPhrases(group && group.key, category, code);
         list.push({
           point:code,
           category,
-          categoryPhrase:questionCategoryPhrase(category),
+          categoryPhrase:phrases.categoryPhrase,
           canal,
-          canalPhrase:contextualPhrase || canalPhrase(canal)
+          canalPhrase:phrases.canalPhrase
         });
       });
     });
@@ -216,15 +272,16 @@
       // rôle à faire deviner : on retombe sur leur nom français entre
       // guillemets comme indice, plutôt qu'une question "Quel est le point
       // du canal X ?" bien trop vague pour être un vrai exercice de rappel.
-      const categoryPhrase = category
-        ? questionCategoryPhrase(category)
+      const phrases = category ? pointPhrases(key, category, code) : null;
+      const categoryPhrase = phrases
+        ? phrases.categoryPhrase
         : (detailsForPoint(code).nom_francais ? '« ' + cleanText(detailsForPoint(code).nom_francais) + ' »' : "");
       return {
         point:code,
         category,
         categoryPhrase,
         canal,
-        canalPhrase:contextualPhrase || canalPhrase(canal)
+        canalPhrase:phrases ? phrases.canalPhrase : (contextualPhrase || canalPhrase(canal))
       };
     });
   }
@@ -659,11 +716,7 @@
     // Formulation catégorie + canal d'un point, identique à celle des questions
     // du quiz (réutilisée par 60-pharma-cards.js pour les cartes imprimables).
     window.mtcQuizPointPhrases = function(groupKey, groupName, point){
-      const code = String(point || "");
-      return {
-        categoryPhrase:questionCategoryPhrase(cleanText(groupName || groupKey || "")),
-        canalPhrase:contextualCanalPhrase(groupKey, code) || canalPhrase(canalOfPoint(code))
-      };
+      return pointPhrases(groupKey, cleanText(groupName || groupKey || ""), point);
     };
     window.MTCQuizTest = {open:openQuiz, close:closeQuiz, build:buildQuestions, startQuiz, startDueReviewQuiz, hasAnyLocalImage, currentGridPoints, rateCurrent, state};
   }
