@@ -1021,6 +1021,34 @@
       : '<span class="rect' + (item.tox ? " tox" : "") + '">' + esc(item.label) + "</span>";
   }
 
+  const CONFUSABLE_KEYS = ["actions", "indications", "psycho"];
+  const UNTITLED_KEYS = ["categories", "catphrases"];
+
+  // Référence finale entre parenthèses (« … (Twicken, p.126-128) »,
+  // « … (Yuen (séminaire), p.86-109) ») : affichée en petit et en gris.
+  const SOURCE_HINT = /p\.\s*\d|ch\.\s*\d|séminaire|thèse|Twicken|Sterman|Farrell|Yuen|DiPasquale|Pain|Adversity/i;
+  function splitSource(text){
+    const value = String(text).trim();
+    if(!value.endsWith(")")) return null;
+    let depth = 0;
+    for(let i = value.length - 1; i >= 0; i--){
+      if(value[i] === ")") depth++;
+      else if(value[i] === "("){
+        depth--;
+        if(depth === 0){
+          const src = value.slice(i + 1, -1);
+          const body = value.slice(0, i).trim();
+          return body && SOURCE_HINT.test(src) ? {body, src} : null;
+        }
+      }
+    }
+    return null;
+  }
+  function listItemHtml(item){
+    const parts = splitSource(item);
+    return parts ? esc(parts.body) + ' <span class="src">(' + esc(parts.src) + ")</span>" : esc(item);
+  }
+
   function cardInnerHtml(record, selectedKeys, fields){
     const fieldList = fields || HERB_FIELDS;
     const selected = new Set(selectedKeys);
@@ -1068,10 +1096,21 @@
     // Étiquettes : rectangles avec le texte dedans, nomenclatures dans un
     // cercle — à colorier. Tout sur une même ligne (qui passe à la suivante
     // si besoin) pour gagner de la place.
+    // Titres de champs : les catégories se reconnaissent seules ; actions,
+    // indications et indications psycho-émotionnelles ne sont titrées que
+    // si plusieurs d'entre elles sont sur la même face (sinon confusion
+    // impossible, et la place est précieuse).
+    const confusable = details.filter(field => CONFUSABLE_KEYS.includes(field.key)).length >= 2;
+    const lblHtml = field => {
+      if(UNTITLED_KEYS.includes(field.key)) return "";
+      if(CONFUSABLE_KEYS.includes(field.key) && !confusable) return "";
+      return '<div class="lbl">' + esc(field.title) + "</div>";
+    };
+
     const tagFields = details.filter(field => typeof field.tags === "function");
     if(tagFields.length){
       html += '<div class="tags' + (tagFields.some(field => field.big) ? ' big' : '') + '">' + tagFields.map(field =>
-        '<div class="tag-group"><div class="lbl">' + esc(field.title) + '</div><div class="tag-row">' +
+        '<div class="tag-group">' + lblHtml(field) + '<div class="tag-row">' +
         field.tags(record).map(tagHtml).join("") + "</div></div>"
       ).join("") + "</div>";
     }
@@ -1081,8 +1120,8 @@
       if(field.kind === "inline"){
         html += '<div class="inline"><span class="lbl">' + esc(field.title) + "</span> " + esc(value) + "</div>";
       }else if(field.kind === "list"){
-        html += '<div class="blk"><div class="lbl">' + esc(field.title) + '</div><ul class="lst' + (value.length >= 5 ? " cols" : "") + '">' +
-          value.map(item => "<li>" + esc(item) + "</li>").join("") + "</ul></div>";
+        html += '<div class="blk">' + lblHtml(field) + '<ul class="lst' + (value.length >= 5 ? " cols" : "") + '">' +
+          value.map(item => "<li>" + listItemHtml(item) + "</li>").join("") + "</ul></div>";
       }else if(field.kind === "extras"){
         value.forEach(extra => {
           html += '<div class="blk"><div class="lbl">' + esc(extra.label) + '</div><div class="txt">' + esc(extra.value) + "</div></div>";
@@ -1090,7 +1129,7 @@
       }else if(field.kind === "image"){
         picHtml += '<img class="pic" alt="" src="' + esc(value) + '">';
       }else{
-        html += '<div class="blk"><div class="lbl">' + esc(field.title) + '</div><div class="txt">' + esc(value) + "</div></div>";
+        html += '<div class="blk">' + lblHtml(field) + '<div class="txt">' + esc(value) + "</div></div>";
       }
     });
     return '<div class="card-inner' + (cornerHtml ? " has-corner" : "") + (hasPic ? " has-pic" : "") + (picIdent ? " pic-ident" : "") + '">' + cornerHtml +
@@ -1209,10 +1248,10 @@
     ".hanzi{font-family:'Noto Serif SC','Noto Serif CJK SC','Songti SC','SimSun','Source Han Serif SC',serif;font-size:1.45em;line-height:1.1}",
     ".nom{font-style:italic;font-size:.95em}",
     ".rule{border-top:.2mm solid #000;opacity:.45}",
-    ".tags{display:flex;flex-wrap:wrap;gap:.25em 1em;align-items:flex-end}",
-    ".tag-group{display:flex;flex-direction:column;gap:.15em}",
+    ".tags{display:flex;flex-wrap:wrap;gap:.25em 1em;align-items:flex-end;justify-content:center}",
+    ".tag-group{display:flex;flex-direction:column;align-items:center;gap:.15em}",
     ".tag-group .lbl{font-size:.5em;opacity:.75}",
-    ".tag-row{display:flex;flex-wrap:wrap;gap:.3em;align-items:center}",
+    ".tag-row{display:flex;flex-wrap:wrap;gap:.3em;align-items:center;justify-content:center}",
     ".rect{display:inline-block;max-width:42mm;border:.3mm solid #000;border-radius:1mm;padding:.2em .6em;font-family:Archivo,Arial,sans-serif;font-size:.82em;line-height:1.15}",
     ".rect.tox{border-style:dashed}",
     ".orb{display:inline-flex;align-items:center;justify-content:center;width:2.1em;height:2.1em;border:.3mm solid #000;border-radius:50%;font-family:Archivo,Arial,sans-serif;font-weight:700;font-size:.8em;line-height:1}",
@@ -1253,7 +1292,10 @@
     ".pinyin-big{font-weight:700;font-size:2.1em;line-height:1.1}",
     ".code-big{font-weight:700;font-size:3.6em;line-height:1.05}",
     ".ident-only .nom{font-size:1.15em}",
-    ".tags.big .tag-row{flex-direction:column;align-items:flex-start;gap:.35em}",
+    ".tags.big .tag-row{flex-direction:column;align-items:center;gap:.35em}",
+    ".tags.big.flow .tag-row{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:.25em .3em}",
+    ".tags.big.flow .rect{padding:.2em .55em}",
+    ".src{color:#6f6f6f;font-size:.7em;font-style:italic;white-space:normal}",
     ".tags.big .rect{font-size:1.05em;font-weight:700;max-width:100%;padding:.3em .7em}",
     ".card.hd-card{padding:1.8mm 2mm}",
     ".hd-verso{display:flex;gap:1.4mm}",
@@ -1290,6 +1332,10 @@
     " if(pic)fs=Math.min(fs,8);",
     " card.style.setProperty('--fs',fs+'pt');",
     " function bad(){return inner.scrollHeight>inner.clientHeight+1||(pic&&pic.clientHeight<inner.clientHeight*0.62);}",
+    // Catégories empilées ; si la carte déborde, on les met côte à côte
+    // (sur une ligne) avant de réduire la taille du texte.
+    " var tb=inner.querySelector('.tags.big');",
+    " if(tb&&bad())tb.classList.add('flow');",
     " while(bad()&&fs>5.4){fs-=0.25;card.style.setProperty('--fs',fs+'pt');}",
     " var over=inner.scrollHeight>inner.clientHeight+1;",
     " if(over)card.classList.add('overflow');",
@@ -1536,7 +1582,7 @@
     modal.id = "mtcCardsModal";
     modal.innerHTML =
       '<div class="mtc-cards-card" role="dialog" aria-modal="true" aria-labelledby="mtcCardsTitle">' +
-        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v19</small>' : "") + "</h2>" +
+        '<header class="mtc-cards-head"><h2 id="mtcCardsTitle"><span class="mtc-cards-title-icon">' + TITLE_ICON + "</span> Cartes de révision à imprimer" + (isAdmin() ? ' <small style="font-weight:400;opacity:.55;font-size:.55em">admin · v20</small>' : "") + "</h2>" +
         '<button type="button" class="mtc-cards-x" data-cards-close aria-label="Fermer">×</button></header>' +
         '<div class="mtc-cards-scroll">' +
           '<div class="mtc-cards-tabs" id="mtcCardsTabs" role="tablist">' +
