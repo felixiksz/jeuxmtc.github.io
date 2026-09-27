@@ -200,9 +200,10 @@
   const GROUP_PHRASES = {
     Points_d_ouverture_des_merveilleux_vaisseaux:"d’ouverture",
     Points_fenetre_du_ciel:"fenêtre du ciel",
+    Points_pour_faire_revenir_le_Yang:"pour faire revenir le yáng",
     Points_fantomes_de_Sun_Si_Miao:"fantôme de Sūn Sī Miǎo"
   };
-  const NO_CANAL_GROUPS = ["Points_generaux", "Points_Hui_Reunion", "Les_4_mers", "Points_fenetre_du_ciel", "Points_fantomes_de_Sun_Si_Miao"];
+  const NO_CANAL_GROUPS = ["Points_generaux", "Points_Hui_Reunion", "Les_4_mers", "Points_fenetre_du_ciel", "Points_pour_faire_revenir_le_Yang", "Points_fantomes_de_Sun_Si_Miao"];
 
   // {categoryPhrase, canalPhrase} pour un point dans une catégorie donnée.
   function pointPhrases(groupKey, category, point){
