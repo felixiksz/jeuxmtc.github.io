@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Trajets des canaux</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#fff; --text:#111; --accent:#2b2bff; --muted:#666; --line:#9aa0c8; --zone:#ff8a3d; --organ:#e0457b; --point:#2b2bff; }
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:"Archivo", system-ui, sans-serif; line-height:1.5; }
+  :root{ --navw:150px; }
+  header{ position:sticky; top:0; background:var(--bg); border-bottom:1px solid #ddd; padding:10px 16px; z-index:3;
+          margin-left:var(--navw); display:flex; align-items:center; gap:10px; }
+  h1{ font-size:1.1rem; margin:0; }
+  nav{ position:fixed; top:0; left:0; bottom:0; width:var(--navw); box-sizing:border-box; overflow-y:auto; z-index:6;
+       display:flex; flex-direction:column; gap:3px; padding:10px 8px; background:#f7f7fc; border-right:1px solid #ddd; }
+  nav button, .tool{ font:inherit; font-weight:700; border:1px solid #ccd; background:#f5f5ff; border-radius:999px; padding:3px 11px; cursor:pointer; }
+  nav button{ text-align:left; border-radius:8px; background:#fff; padding:3px 9px; font-size:.88rem; line-height:1.25; }
+  nav button.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  nav .nav-gap{ height:8px; flex:none; }
+  .tool{ background:#fff; color:inherit; text-decoration:none; }
+  .tool.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .tools{ margin-left:auto; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .edit-tools{ display:none; gap:6px; align-items:center; }
+  body.editing .edit-tools{ display:flex; }
+  .edit-count{ font-size:.78rem; color:var(--muted); }
+  nav .navrow{ display:flex; align-items:center; gap:5px; }
+  nav .navrow button{ flex:1; min-width:0; }
+  nav .navrow input{ flex:none; margin:0; width:15px; height:15px; accent-color:#2f9a3c; cursor:pointer; }
+  nav .navrow.done button:not(.on){ color:#2f9a3c; border-color:#9fd3a6; }
+  .check-legend{ font-size:.68rem; color:var(--muted); margin:0 0 4px; line-height:1.2; }
+  main{ margin:0 0 0 var(--navw); padding:16px 20px; }
+  @media (max-width:700px){ :root{ --navw:92px; } nav button{ font-size:.76rem; padding:3px 6px; } h1{ font-size:.95rem; } }
+  h2{ font-size:1.25rem; margin:8px 0 4px; }
+  .src{ color:var(--muted); font-size:.8rem; margin-bottom:14px; }
+  section{ border-top:1px solid #e3e3ee; padding:14px 0; scroll-margin-top:110px; }
+  h3{ font-size:1rem; margin:0 0 8px; color:var(--accent); }
+  p{ margin:0 0 8px; }
+  p.li{ padding-left:1.1em; text-indent:-1.1em; }
+  p.li::before{ content:"• "; }
+  body.editing [contenteditable="true"]{ outline:1px dashed #b9b9e6; border-radius:4px; background:#fffef4; }
+  body.editing [contenteditable="true"]:focus{ outline:2px solid var(--accent); background:#fff; }
+  .edited{ box-shadow:inset 3px 0 0 #f0a500; }
+  .plancol{ min-width:0; }
+  .stops-edit{ display:none; margin-top:8px; font-size:.78rem; color:var(--muted); }
+  body.editing .stops-edit{ display:block; }
+  .stops-edit textarea{ width:100%; box-sizing:border-box; min-height:110px; font:inherit; font-size:.8rem; color:var(--text); margin:3px 0; }
+  .rename{ display:none; gap:6px; align-items:center; margin-bottom:10px; font-size:.85rem; }
+  body.editing .rename{ display:flex; }
+  .rename input{ flex:1; font:inherit; padding:3px 6px; }
+  .crow .rm{ display:none; margin-left:auto; font:inherit; border:1px solid #e5b3b3; color:#b00; background:#fff; border-radius:999px; padding:0 8px; cursor:pointer; }
+  body.editing .crow .rm{ display:inline-block; }
+  sup a{ color:var(--accent); text-decoration:none; font-weight:700; font-size:.75em; }
+  :root{ --canal:#8a3fd1; }
+  .cols{ display:grid; grid-template-columns:minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, max-content); gap:18px; align-items:start; }
+  .desc{ min-width:0; }
+  .imgs{ display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .imgs img{ width:100%; height:auto; border:1px solid #eee; border-radius:8px; background:#fff; }
+  @media (max-width:1100px){ .cols{ grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); } .cols .plan{ grid-column:1 / -1; } }
+  @media (max-width:760px){ .cols{ grid-template-columns:minmax(0, 1fr); } }
+  .plan{ flex:0 1 auto; max-width:100%; min-width:200px; border:1px solid #e6e6f3; border-radius:10px; padding:8px 10px; background:#fbfbff; }
+  .plan h4{ margin:0 0 4px; font-size:.85rem; color:var(--muted); }
+  .plan-scroll{ overflow-x:auto; }
+  .plan svg{ display:block; }
+  .plan .br-label{ font-size:10px; fill:var(--muted); font-weight:700; }
+  .node{ cursor:pointer; }
+  .node text{ font-size:10.5px; fill:#222; }
+  .node:hover circle, .node.sel circle{ stroke:#000; stroke-width:2.5; }
+  .legend{ font-size:.72rem; color:var(--muted); display:flex; gap:12px; margin-top:4px; }
+  .legend i{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:4px; vertical-align:-1px; }
+  details{ font-size:.82rem; color:#444; }
+  details li{ margin-bottom:4px; scroll-margin-top:120px; }
+  details li:target{ background:#fff6c8; }
+  /* panneau des correspondances */
+  #corr{ position:fixed; top:0; right:0; bottom:0; width:min(560px, calc(100vw - var(--navw))); background:#fff; border-left:1px solid #ddd;
+         box-shadow:-8px 0 24px rgba(0,0,0,.12); transform:translateX(105%); transition:transform .18s ease; z-index:5; display:flex; flex-direction:column; }
+  #corr.open{ transform:none; }
+  #corr header{ position:static; margin-left:0; display:flex; align-items:center; gap:8px; }
+  #corr h2{ margin:0; font-size:1.05rem; }
+  #corr .x{ margin-left:auto; font:inherit; font-size:1.3rem; border:0; background:none; cursor:pointer; }
+  #corrBody{ overflow:auto; padding:10px 16px 20px; }
+  .orb-gap{ flex:none; width:2.1em; }
+  .crow{ display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:3px 6px; border-radius:8px; cursor:pointer; font-size:1rem; }
+  .crow:hover{ background:#f3f3fa; }
+  .cname{ font-weight:800; }
+  .cname small{ font-weight:600; font-size:.72em; color:#777; -webkit-text-stroke:0; margin-left:.3em; }
+  .el-terre{ color:#d9a400; }
+  .el-bois{ color:#2f9a3c; }
+  .el-feu{ color:#e0261b; }
+  .el-eau{ color:#1f5fd6; }
+  .el-metal{ color:#fff; -webkit-text-stroke:.7px #000; paint-order:stroke fill; }
+  .el-none{ color:#222; }
+  .orb{ flex:none; display:inline-flex; align-items:center; justify-content:center; min-width:2.1em; height:2.1em; padding:0 .2em; box-sizing:border-box;
+        border:2px solid currentColor; border-radius:999px; font-weight:800; font-size:.8rem; background:#fff; }
+  .orb.el-metal{ color:#000; -webkit-text-stroke:0; }
+  .cgap{ height:10px; }
+  /* survol d'un lieu du plan : autres canaux qui y passent */
+  #tip{ position:fixed; z-index:20; pointer-events:none; max-width:340px; background:#fff; border:1px solid #d6d6ea; border-radius:10px;
+        box-shadow:0 6px 20px rgba(0,0,0,.14); padding:8px 10px; font-size:.82rem; display:none; }
+  #tip b{ display:block; margin-bottom:4px; }
+  #tip .crow{ font-size:.85rem; padding:1px 0; cursor:default; }
+  #tip .orb{ font-size:.68rem; }
+  #tip .none{ color:var(--muted); }
+  .places-index h3{ margin:14px 0 4px; color:var(--text); font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; }
+  .places-index button{ font:inherit; font-size:.85rem; border:1px solid #dde; background:#fafaff; border-radius:999px; padding:1px 9px; margin:2px; cursor:pointer; }
+</style>
+</head>
+<body>
+<nav id="nav" aria-label="Canaux"></nav>
+<header>
+  <a class="tool" href="../index.html?admin=1" title="Retour au jeu">← Jeu</a>
+  <h1>Trajets des canaux</h1>
+  <div class="tools">
+    <span class="edit-tools">
+      <span class="edit-count" id="editCount"></span>
+      <button type="button" class="tool" id="exportEdits" title="Télécharger un fichier de sauvegarde de toutes tes corrections">Exporter</button>
+      <button type="button" class="tool" id="importEdits" title="Recharger un fichier de corrections exporté">Importer</button>
+      <button type="button" class="tool" id="resetEdits" title="Revenir au texte d'origine (les cases « vérifié » restent)">Tout annuler</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </span>
+    <button type="button" class="tool" id="editToggle" aria-pressed="false">✎ Modifier</button>
+    <button type="button" class="tool" id="allPlaces">Correspondances…</button>
+  </div>
+</header>
+<main id="main"></main>
+<aside id="corr" aria-hidden="true">
+  <header><h2 id="corrTitle"></h2><button type="button" class="x" id="corrClose" aria-label="Fermer">×</button></header>
+  <div id="corrBody"></div>
+</aside>
+<div id="tip" role="tooltip"></div>
+<script src="trajets-data.js"></script>
+<script>
+  // accès admin seulement (lien proposé dans le jeu avec ?admin=1)
+  if(new URLSearchParams(location.search).get("admin") !== "1"){
+    document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
+    throw new Error("trajets : accès admin requis");
+  }
+  const data = window.MTC_TRAJETS || [];
+  const PLACES = window.MTC_TRAJETS_PLACES || {};
+  const nav = document.getElementById("nav");
+  const main = document.getElementById("main");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  // ---- corrections faites dans la page (gardées dans ce navigateur, exportables) ----
+  const EDIT_KEY = "mtc_trajets_edits_v1";
+  const ORIG = JSON.parse(JSON.stringify({data, PLACES}));
+  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}});
+  let edits = loadEdits();
+  let editing = false;
+  function loadEdits(){
+    try{ return Object.assign(emptyEdits(), JSON.parse(localStorage.getItem(EDIT_KEY) || "{}")); }catch(e){ return emptyEdits(); }
+  }
+  function saveEdits(){
+    try{ localStorage.setItem(EDIT_KEY, JSON.stringify(edits)); }catch(e){}
+    updateEditCount();
+  }
+  function updateEditCount(){
+    const n = Object.keys(edits.paras).length + Object.keys(edits.notes).length + Object.keys(edits.branches).length + Object.keys(edits.places).length;
+    const el = document.getElementById("editCount");
+    if(el) el.textContent = n ? n + " correction" + (n > 1 ? "s" : "") : "aucune correction";
+  }
+  function applyEdits(){
+    data.forEach((c, ci) => c.sections.forEach((s, si) => {
+      const o = ORIG.data[ci].sections[si];
+      s.paragraphs = o.paragraphs.map((p, pi) => edits.paras[c.code + "|" + si + "|" + pi] ?? p);
+      s.notes = o.notes.map((n, ni) => ({...n, text:edits.notes[c.code + "|" + si + "|" + ni] ?? n.text}));
+      const eb = edits.branches[c.code + "|" + si];
+      s.branches = eb ? eb.map((places, bi) => ({...(o.branches[bi] || {}), places:places.slice()}))
+                      : (o.branches || []).map(b => ({...b, places:b.places.slice()}));
+    }));
+    Object.keys(PLACES).forEach(k => delete PLACES[k]);
+    Object.assign(PLACES, JSON.parse(JSON.stringify(ORIG.PLACES)));
+    Object.entries(edits.places).forEach(([pid, v]) => { PLACES[pid] = {...(PLACES[pid] || {group:"ajoutés"}), ...v}; });
+  }
+  // texte d'un paragraphe modifié : les appels de note redeviennent [[nN]]
+  function serializeEditable(el){
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll("sup").forEach(sup => sup.replaceWith("[[n" + sup.textContent.trim() + "]]"));
+    return clone.textContent.replace(/\s+/g, " ").trim();
+  }
+  const CODE_CASE = {rm:"RM", dm:"DM", gi:"GI", ig:"IG", rt:"Rt", rn:"Rn", ec:"EC", tf:"TF", vb:"VB", p:"P", e:"E", c:"C", v:"V", f:"F"};
+  const normLabel = x => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  function addPlace(pid, info){ PLACES[pid] = info; edits.places[pid] = {...(edits.places[pid] || {}), ...info}; }
+  // nom d'arrêt tapé → lieu : « Rt 4 » (point), « Canal GI », un lieu existant, sinon un nouveau lieu
+  function labelToPid(label){
+    const L = label.trim();
+    if(!L) return null;
+    let m = /^(rm|dm|gi|ig|rt|rn|ec|tf|vb|p|e|c|v|f)\s*(\d{1,2})$/i.exec(L);
+    if(m){
+      const code = CODE_CASE[m[1].toLowerCase()], lab = code + " " + Number(m[2]), pid = "pt:" + lab;
+      if(!PLACES[pid]) addPlace(pid, {label:lab, group:"points"});
+      return pid;
+    }
+    m = /^canal\s+(\S+)$/i.exec(L);
+    if(m && CODE_CASE[m[1].toLowerCase()]){
+      const code = CODE_CASE[m[1].toLowerCase()], pid = "c:" + code;
+      if(!PLACES[pid]) addPlace(pid, {label:"Canal " + code, group:"canaux"});
+      return pid;
+    }
+    const n = normLabel(L);
+    const hit = Object.keys(PLACES).find(pid => normLabel(PLACES[pid].label) === n);
+    if(hit) return hit;
+    const pid = "u:" + n.replace(/[^a-z0-9]+/g, "-");
+    addPlace(pid, {label:L, group:"ajoutés"});
+    return pid;
+  }
+  const withRefs = (text, key) => esc(text).replace(/\[\[n(\d+)\]\]/g, (m, n) => '<sup><a href="#' + key + '-n' + n + '">' + n + "</a></sup>");
+
+  // Noms des canaux pour les listes de correspondances
+  const CANAL = {
+    P:{limb:"Shǒu", layer:"TÀI YĪN", organ:"POUMON", de:"du"},
+    GI:{limb:"Shǒu", layer:"YÁNG MÍNG", organ:"GROS INTESTIN", de:"du"},
+    E:{limb:"Zù", layer:"YÁNG MÍNG", organ:"ESTOMAC", de:"de l’"},
+    Rt:{limb:"Zù", layer:"TÀI YĪN", organ:"RATE", de:"de la"},
+    C:{limb:"Shǒu", layer:"SHÀO YĪN", organ:"CŒUR", de:"du"},
+    IG:{limb:"Shǒu", layer:"TÀI YÁNG", organ:"INTESTIN GRÊLE", de:"de l’"},
+    V:{limb:"Zù", layer:"TÀI YÁNG", organ:"VESSIE", de:"de la"},
+    Rn:{limb:"Zù", layer:"SHÀO YĪN", organ:"REINS", de:"des"},
+    EC:{limb:"Shǒu", layer:"JUÉ YĪN", organ:"ENVELOPPE DU CŒUR", de:"de l’"},
+    TF:{limb:"Shǒu", layer:"SHÀO YÁNG", organ:"TROIS FOYERS", de:"du"},
+    VB:{limb:"Zù", layer:"SHÀO YÁNG", organ:"VÉSICULE BILIAIRE", de:"de la"},
+    F:{limb:"Zù", layer:"JUÉ YĪN", organ:"FOIE", de:"du"}
+  };
+  const TYPE = {
+    principal:["zhèng jīng", "Canal régulier"], luo:["luò mài", "Vaisseau liaison"], grand_luo:["dà luò", "Grand vaisseau liaison"],
+    distinct:["jīng bié", "Canal distinct"], tendineux:["jīng jīn", "Canal tendineux"], vaisseau:["", ""]
+  };
+  const TYPE_ORDER = ["principal", "luo", "grand_luo", "distinct", "tendineux", "vaisseau"];
+  // regroupement par couche (comme les listes du cours), puis les merveilleux vaisseaux
+  const CANAL_ORDER = ["P", "Rt", "GI", "E", "C", "Rn", "IG", "V", "EC", "F", "TF", "VB", "DM", "RM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"];
+  const LAYER_OF = code => CANAL[code] ? CANAL[code].layer : code;
+
+  function sectionsThrough(pid){
+    const out = [];
+    data.forEach(c => c.sections.forEach((s, si) => {
+      if(s.branches && s.branches.some(b => b.places.includes(pid))) out.push({c, s, si});
+    }));
+    // un point appartient par définition au canal régulier de son code (VB 8 → canal VB),
+    // même si le texte de ce trajet ne le cite pas
+    const pm = /^pt:(\S+) \d+$/.exec(pid);
+    const own = pm && data.find(c => c.code === pm[1]);
+    if(own){
+      const si = own.sections.findIndex(s => s.type === "principal");
+      if(si >= 0 && !out.some(o => o.c === own && o.si === si)) out.push({c:own, s:own.sections[si], si});
+    }
+    out.sort((a, b) => (CANAL_ORDER.indexOf(a.c.code) - CANAL_ORDER.indexOf(b.c.code)) || (TYPE_ORDER.indexOf(a.s.type) - TYPE_ORDER.indexOf(b.s.type)));
+    return out;
+  }
+
+  // Couleur de l'élément : terre (Rt, E) jaune, bois (F, VB) vert, feu (C, IG, EC, TF) rouge,
+  // métal (P, GI) blanc cerné de noir, eau (Rn, V) bleu.
+  const ELEMENT = {Rt:"terre", E:"terre", F:"bois", VB:"bois", C:"feu", IG:"feu", EC:"feu", TF:"feu", P:"metal", GI:"metal", Rn:"eau", V:"eau"};
+
+  function rowHtml(item){
+    const {c, s, si} = item;
+    const go = ' data-go="' + c.code + "|" + si + '"';
+    const meta = CANAL[c.code];
+    const orb = code => '<span class="orb el-' + (ELEMENT[code] || "none") + '">' + esc(code) + "</span>";
+    const rmBtn = '<button type="button" class="rm" data-rm="' + c.code + "|" + si + '" title="Retirer ce lieu de ce trajet">retirer</button>';
+    if(!meta){
+      const name = c.name.replace(/ — .*/, "") + (s.type === "luo" ? " luò mài" : "");
+      return '<div class="crow"' + go + ">" + ((c.code === "RM" || c.code === "DM") ? orb(c.code) : '<span class="orb-gap"></span>') +
+        '<span class="cname el-none">' + esc(name) + "</span>" + rmBtn + "</div>";
+    }
+    const t = TYPE[s.type] || ["", ""];
+    const name = meta.limb + " " + meta.layer.toLowerCase() + " " + t[0];
+    return '<div class="crow"' + go + ">" + orb(c.code) + '<span class="cname el-' + ELEMENT[c.code] + '">' + esc(name) +
+      ' <small>' + esc(t[1].toLowerCase()) + "</small></span>" + rmBtn + "</div>";
+  }
+
+  let corrPid = null;
+  function openCorr(pid){
+    const place = PLACES[pid] || {label:pid};
+    const items = sectionsThrough(pid);
+    document.getElementById("corrTitle").textContent = "Correspondances : " + place.label;
+    let html = "", lastLayer = null;
+    items.forEach(it => {
+      const layer = CANAL[it.c.code] ? LAYER_OF(it.c.code) : "vaisseaux";
+      if(lastLayer !== null && layer !== lastLayer) html += '<div class="cgap"></div>';
+      lastLayer = layer;
+      html += rowHtml(it);
+    });
+    document.getElementById("corrBody").innerHTML =
+      '<div class="rename"><label for="renameInput">Nom du lieu</label><input id="renameInput" data-pid="' + esc(pid) + '" value="' + esc(place.label) + '"></div>' +
+      (html || "<p>Aucun trajet.</p>");
+    corrPid = pid;
+    document.getElementById("corr").classList.add("open");
+    document.querySelectorAll(".node").forEach(n => n.classList.toggle("sel", n.dataset.pid === pid));
+  }
+
+  function openIndex(){
+    const groups = {};
+    Object.keys(PLACES).forEach(pid => {
+      const g = PLACES[pid].group || "autres";
+      (groups[g] = groups[g] || []).push(pid);
+    });
+    const order = ["tête", "membre supérieur", "tronc", "membre inférieur", "organes", "canaux", "points", "ajoutés"];
+    document.getElementById("corrTitle").textContent = "Correspondances — lieux de passage";
+    document.getElementById("corrBody").innerHTML = '<div class="places-index">' + order.filter(g => groups[g]).map(g =>
+      "<h3>" + esc(g) + "</h3>" + groups[g].sort((a, b) => PLACES[a].label.localeCompare(PLACES[b].label, "fr", {numeric:true}))
+        .map(pid => '<button type="button" data-pid="' + esc(pid) + '">' + esc(PLACES[pid].label) + " (" + sectionsThrough(pid).length + ")</button>").join("")
+    ).join("") + "</div>";
+    document.getElementById("corr").classList.add("open");
+  }
+
+  // Plan vectoriel vertical : chaque branche est une seule ligne verticale,
+  // lieux dans l'ordre du texte ; une branche secondaire part, à droite, du
+  // lieu où elle se sépare d'une branche déjà tracée.
+  // Une branche qui part d'un point non cité dans les branches précédentes
+  // (ex. « part de P 7 » alors que la branche principale cite P 5 puis P 10) :
+  // ce point est placé sur la branche précédente, entre ses voisins de
+  // numérotation, pour que la branche s'y accroche.
+  function withJunctions(branches){
+    const out = branches.map(b => ({...b, places:b.places.slice(), inferred:new Set()}));
+    const ptNum = pid => { const m = /^pt:(\S+) (\d+)$/.exec(pid); return m ? {code:m[1], n:Number(m[2])} : null; };
+    for(let bi = 1; bi < out.length; bi++){
+      const first = out[bi].places[0];
+      const fp = ptNum(first);
+      if(!fp || out.slice(0, bi).some(b => b.places.includes(first))) continue;
+      for(let pi = bi - 1; pi >= 0; pi--){
+        const pl = out[pi].places;
+        let insertAt = -1;
+        for(let i = 0; i < pl.length - 1 && insertAt < 0; i++){
+          const a = ptNum(pl[i]);
+          if(!a || a.code !== fp.code || a.n >= fp.n) continue;
+          for(let j = i + 1; j < pl.length; j++){
+            const b = ptNum(pl[j]);
+            if(b && b.code === fp.code){ if(b.n > fp.n) insertAt = j; break; }
+          }
+        }
+        if(insertAt > 0){
+          pl.splice(insertAt, 0, first);
+          out[pi].inferred.add(first);
+          break;
+        }
+      }
+    }
+    return out;
+  }
+
+  // Nom du canal / vaisseau pour une section (ex. « Zù yáng míng zhèng jīng », « Chōng mài »)
+  function sectionName(c, s){
+    const meta = CANAL[c.code];
+    if(!meta) return c.name.replace(/ — .*/, "") + (s.type === "luo" ? " luò mài" : "");
+    return meta.limb + " " + meta.layer.toLowerCase() + " " + (TYPE[s.type] || [""])[0];
+  }
+
+  function planSvg(s, title){
+    if(!s.branches || !s.branches.length) return "";
+    const branches = withJunctions(s.branches);
+    const STEP = 30, COL_W = 128, X0 = 14;
+    const drawn = [];          // {pid, x, y} des nœuds déjà placés
+    const cols = [];           // une colonne par branche
+    branches.forEach((b, bi) => {
+      let x = X0 + bi * COL_W;
+      let startY = 0, shared = false, junction = null;
+      if(bi > 0){
+        // premier lieu de la branche déjà présent dans une branche précédente = point de séparation
+        for(let k = 0; k < b.places.length && !junction; k++){
+          const hit = drawn.slice().reverse().find(n => n.pid === b.places[k]);
+          if(hit){ junction = {node:hit, k}; }
+        }
+        // aucun lieu commun : la branche part de la fin de la branche précédente
+        // (« à partir de là, deux branches se divisent… »)
+        if(!junction && cols[bi - 1]){
+          const prev = cols[bi - 1].nodes;
+          junction = {node:prev[prev.length - 1], k:-1};
+        }
+        if(junction){
+          startY = junction.node.y - junction.k * STEP;
+          shared = junction.k === 0;
+        }
+      }
+      const nodes = b.places.map((pid, i) => ({pid, x, y:startY + i * STEP, own:!(shared && i === 0), inferred:b.inferred.has(pid)}));
+      if(shared) nodes[0].x = junction.node.x, nodes[0].y = junction.node.y;
+      cols.push({bi, nodes, junction, shared});
+      nodes.forEach(n => { if(n.own) drawn.push(n); });
+    });
+    const allY = cols.flatMap(c => c.nodes.map(n => n.y));
+    const minY = Math.min(...allY), maxY = Math.max(...allY);
+    const off = 26 - minY;
+    const W = X0 + cols.length * COL_W + 10, H = maxY - minY + 52;
+    let lines = "", nodesSvg = "", labels = "";
+    cols.forEach(c => {
+      const pts = c.nodes.map(n => ({...n, y:n.y + off}));
+      const first = pts[0];
+      const colX = X0 + c.bi * COL_W;
+      labels += '<text class="br-label" x="' + (colX - 4) + '" y="12">' + (c.bi + 1) + "</text>";
+      let d = "";
+      if(c.shared){
+        // du nœud de séparation vers la colonne de la branche, puis vers le bas
+        d = "M" + first.x + "," + first.y + " H" + colX + (pts.length > 1 ? " V" + pts[pts.length - 1].y : "");
+      }else{
+        if(c.junction && c.junction.k > 0){
+          // même lieu plus loin dans la branche : trait pointillé entre les deux
+          const j = c.junction.node, jy = j.y + off, target = pts[c.junction.k];
+          lines += '<path d="M' + j.x + "," + jy + " H" + target.x + '" fill="none" stroke="var(--line)" stroke-width="1.6" stroke-dasharray="4 3"/>';
+        }else if(c.junction && c.junction.k < 0){
+          // départ depuis la fin de la branche précédente
+          const j = c.junction.node, jy = j.y + off;
+          lines += '<path d="M' + j.x + "," + jy + " H" + colX + " V" + first.y + '" fill="none" stroke="var(--line)" stroke-width="2.4"/>';
+        }
+        if(pts.length > 1) d = "M" + colX + "," + first.y + " V" + pts[pts.length - 1].y;
+      }
+      if(d) lines += '<path d="' + d + '" fill="none" stroke="var(--line)" stroke-width="2.4" stroke-linejoin="round"/>';
+      pts.forEach((p, i) => {
+        if(c.shared && i === 0) return;       // nœud déjà dessiné dans la branche mère
+        const info = PLACES[p.pid] || {label:p.pid, group:""};
+        const isPoint = p.pid.startsWith("pt:");
+        const color = isPoint ? "var(--point)" : info.group === "organes" ? "var(--organ)" : info.group === "canaux" ? "var(--canal)" : "var(--zone)";
+        const r = isPoint ? 5 : 7;
+        const title = info.label + (p.inferred ? " — non cité dans ce paragraphe, placé d'après la numérotation pour y accrocher la branche suivante" : "");
+        nodesSvg += '<g class="node" data-pid="' + esc(p.pid) + '"' + (p.inferred ? '><title>' + esc(title) + "</title>" : ">") +
+          '<circle cx="' + colX + '" cy="' + p.y + '" r="' + r + '" fill="' + (isPoint && !p.inferred ? color : "#fff") + '" stroke="' + color + '" stroke-width="2.2"' + (p.inferred ? ' stroke-dasharray="2.5 2"' : "") + "/>" +
+          '<text x="' + (colX + 11) + '" y="' + (p.y + 3.5) + '">' + esc(info.label.length > 19 ? info.label.slice(0, 18) + "…" : info.label) + "</text></g>";
+      });
+    });
+    return '<div class="plan"><h4>Plan des vaisseaux du ' + esc(title) + '</h4><div class="plan-scroll"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img">' +
+      lines + nodesSvg + labels + "</svg></div>" +
+      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span>1, 2… : branches</span></div></div>';
+  }
+
+  let current = null;
+  function show(code, sectionIndex, keepScroll){
+    const canal = data.find(c => c.code === code) || data[0];
+    current = canal.code;
+    const ce = editing ? ' contenteditable="true" spellcheck="true"' : "";
+    const scrollY = window.scrollY;
+    nav.querySelectorAll("button[data-code]").forEach(b => b.classList.toggle("on", b.dataset.code === canal.code));
+    main.innerHTML = "<h2>" + esc(canal.code) + " — " + esc(canal.name) + "</h2>" +
+      '<div class="src">Source : ' + esc(canal.source) + "</div>" +
+      canal.sections.map((s, si) => {
+        const key = canal.code + "-" + si;
+        return '<section id="sec-' + si + '"><h3>' + esc(s.label) + "</h3>" +
+          '<div class="cols"><div class="desc">' +
+            s.paragraphs.map((p, pi) => {
+              const k = canal.code + "|" + si + "|" + pi, bullet = /^- /.test(p);
+              return "<p" + (bullet ? ' class="li' : ' class="') + (k in edits.paras ? " edited" : "") + '" data-para="' + esc(k) + '"' +
+                (bullet ? ' data-bullet="1"' : "") + ce + ">" + withRefs(bullet ? p.slice(2) : p, key) + "</p>";
+            }).join("") +
+            (s.notes.length ? "<details" + (editing ? " open" : "") + "><summary>Notes (" + s.notes.length + ")</summary><ol>" +
+              s.notes.map((n, ni) => {
+                const k = canal.code + "|" + si + "|" + ni;
+                return '<li id="' + key + "-n" + n.n + '" value="' + (n.n || "") + '" data-note="' + esc(k) + '"' + (k in edits.notes ? ' class="edited"' : "") + ce + ">" + esc(n.text) + "</li>";
+              }).join("") + "</ol></details>" : "") +
+            "</div>" +
+            '<div class="imgs">' + s.images.map(i => '<img loading="lazy" alt="" src="' + esc(i.src) + '" title="page ' + i.page + '">').join("") + "</div>" +
+            '<div class="plancol">' + planSvg(s, sectionName(canal, s)) +
+              '<div class="stops-edit"><b>Arrêts du plan</b> — une ligne par branche, arrêts séparés par → (ou ->)' +
+              '<textarea data-branches="' + esc(canal.code + "|" + si) + '"' + (canal.code + "|" + si in edits.branches ? ' class="edited"' : "") + ">" +
+              esc((s.branches || []).map(b => b.places.map(pid => (PLACES[pid] || {label:pid}).label).join(" → ")).join("\n")) + "</textarea>" +
+              "Points : « Rt 4 » · canaux : « Canal GI » · sinon le nom d'un lieu existant ; un nom inconnu crée un nouveau lieu.</div>" +
+            "</div>" +
+          "</div></section>";
+      }).join("");
+    try{ history.replaceState(null, "", "#" + canal.code); }catch(e){}
+    if(keepScroll){
+      window.scrollTo(0, scrollY);
+    }else if(typeof sectionIndex === "number"){
+      const target = document.getElementById("sec-" + sectionIndex);
+      if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    }else{
+      window.scrollTo(0, 0);
+    }
+  }
+
+  applyEdits();
+  nav.insertAdjacentHTML("afterbegin", '<p class="check-legend">☑ = vérifié</p>');
+  data.forEach((c, i) => {
+    if(i && c.kind === "vaisseau" && data[i - 1].kind !== "vaisseau"){
+      const gap = document.createElement("div"); gap.className = "nav-gap"; nav.appendChild(gap);
+    }
+    const row = document.createElement("div");
+    row.className = "navrow" + (edits.verified[c.code] ? " done" : "");
+    const box = document.createElement("input");
+    box.type = "checkbox"; box.checked = !!edits.verified[c.code]; box.title = "Vérifié";
+    box.setAttribute("aria-label", "Vérifié : " + c.name);
+    box.addEventListener("change", () => {
+      if(box.checked) edits.verified[c.code] = true; else delete edits.verified[c.code];
+      row.classList.toggle("done", box.checked);
+      saveEdits();
+    });
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.code = c.code; b.textContent = c.kind === "vaisseau" ? c.name.replace(/ — .*/, "") : c.code;
+    b.title = c.name;
+    b.addEventListener("click", () => show(c.code));
+    row.append(box, b);
+    nav.appendChild(row);
+  });
+
+  document.addEventListener("click", event => {
+    const node = event.target.closest(".node, .places-index button");
+    if(node){ openCorr(node.dataset.pid); return; }
+    if(event.target.closest("[contenteditable='true'], textarea, input")) return;
+    const row = event.target.closest("[data-go]");
+    if(row){
+      const [code, si] = row.dataset.go.split("|");
+      show(code, Number(si));
+    }
+  });
+  // enregistrement d'un paragraphe / d'une note quand on quitte le champ
+  document.addEventListener("focusout", event => {
+    const el = event.target;
+    if(!(el instanceof HTMLElement) || !editing) return;
+    if(el.dataset.para){
+      const [code, si, pi] = el.dataset.para.split("|");
+      const ci = data.findIndex(c => c.code === code);
+      const text = (el.dataset.bullet ? "- " : "") + serializeEditable(el);
+      if(text === ORIG.data[ci].sections[si].paragraphs[pi]) delete edits.paras[el.dataset.para]; else edits.paras[el.dataset.para] = text;
+      el.classList.toggle("edited", el.dataset.para in edits.paras);
+      saveEdits(); applyEdits();
+    }else if(el.dataset.note){
+      const [code, si, ni] = el.dataset.note.split("|");
+      const ci = data.findIndex(c => c.code === code);
+      const text = el.textContent.replace(/\s+/g, " ").trim();
+      if(text === ORIG.data[ci].sections[si].notes[ni].text) delete edits.notes[el.dataset.note]; else edits.notes[el.dataset.note] = text;
+      el.classList.toggle("edited", el.dataset.note in edits.notes);
+      saveEdits(); applyEdits();
+    }
+  });
+  document.addEventListener("change", event => {
+    const el = event.target;
+    if(el.dataset && el.dataset.branches){
+      const lines = el.value.split(/\n+/).map(l => l.split(/\s*(?:→|->)\s*/).map(labelToPid).filter(Boolean)).filter(l => l.length);
+      edits.branches[el.dataset.branches] = lines;
+      saveEdits(); applyEdits(); show(current, undefined, true);
+      if(corrPid && document.getElementById("corr").classList.contains("open")) openCorr(corrPid);
+    }else if(el.id === "renameInput"){
+      const pid = el.dataset.pid, label = el.value.trim();
+      if(!label) return;
+      if(ORIG.PLACES[pid] && ORIG.PLACES[pid].label === label && !String(pid).startsWith("u:")) delete edits.places[pid];
+      else edits.places[pid] = {...(edits.places[pid] || {}), label};
+      saveEdits(); applyEdits(); show(current, undefined, true); openCorr(pid);
+    }
+  });
+  // « retirer » dans une liste de correspondances : enlève ce lieu du trajet
+  document.addEventListener("click", event => {
+    const b = event.target.closest(".rm");
+    if(!b) return;
+    event.stopPropagation();
+    const [code, si] = b.dataset.rm.split("|");
+    const s = data.find(c => c.code === code).sections[si];
+    edits.branches[b.dataset.rm] = s.branches.map(br => br.places.filter(pid => pid !== corrPid)).filter(l => l.length);
+    saveEdits(); applyEdits(); show(current, undefined, true); openCorr(corrPid);
+  }, true);
+  // survol d'un lieu du plan : les autres canaux qui passent par ce lieu
+  const tip = document.getElementById("tip");
+  document.addEventListener("mouseover", event => {
+    const node = event.target.closest(".node");
+    if(!node){ tip.style.display = "none"; return; }
+    const pid = node.dataset.pid;
+    const others = sectionsThrough(pid).filter(it => it.c.code !== current);
+    tip.innerHTML = "<b>" + esc((PLACES[pid] || {label:pid}).label) + " — autres canaux</b>" +
+      (others.length ? others.map(rowHtml).join("") : '<span class="none">Aucun autre trajet ne passe ici.</span>');
+    tip.querySelectorAll(".rm").forEach(b => b.remove());
+    tip.style.display = "block";
+  });
+  document.addEventListener("mousemove", event => {
+    if(tip.style.display !== "block") return;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = event.clientX + 14, y = event.clientY + 14;
+    if(x + w > innerWidth - 8) x = event.clientX - w - 14;
+    if(y + h > innerHeight - 8) y = Math.max(8, innerHeight - h - 8);
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  });
+  document.getElementById("editToggle").addEventListener("click", () => {
+    editing = !editing;
+    document.body.classList.toggle("editing", editing);
+    const t = document.getElementById("editToggle");
+    t.classList.toggle("on", editing); t.setAttribute("aria-pressed", editing);
+    t.textContent = editing ? "✓ Terminer" : "✎ Modifier";
+    show(current, undefined, true);
+    if(corrPid && document.getElementById("corr").classList.contains("open")) openCorr(corrPid);
+  });
+  document.getElementById("exportEdits").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(edits, null, 1)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "trajets-corrections-" + new Date().toISOString().slice(0, 10) + ".json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  document.getElementById("importEdits").addEventListener("click", () => document.getElementById("importFile").click());
+  document.getElementById("importFile").addEventListener("change", async event => {
+    const file = event.target.files[0];
+    if(!file) return;
+    try{
+      edits = Object.assign(emptyEdits(), JSON.parse(await file.text()));
+      saveEdits(); applyEdits(); location.reload();
+    }catch(e){ alert("Fichier de corrections illisible."); }
+  });
+  document.getElementById("resetEdits").addEventListener("click", () => {
+    if(!confirm("Annuler toutes les corrections (textes, arrêts, noms de lieux) ? Les cases « vérifié » sont gardées.")) return;
+    edits = {...emptyEdits(), verified:edits.verified};
+    saveEdits(); applyEdits(); show(current, undefined, true);
+  });
+  updateEditCount();
+  document.getElementById("corrClose").addEventListener("click", () => document.getElementById("corr").classList.remove("open"));
+  document.getElementById("allPlaces").addEventListener("click", openIndex);
+  document.addEventListener("keydown", e => { if(e.key === "Escape") document.getElementById("corr").classList.remove("open"); });
+
+  show(location.hash.slice(1) || (data[0] && data[0].code));
+  // lien direct vers une liste de correspondances : index.html?lieu=yeux
+  const lieu = new URLSearchParams(location.search).get("lieu");
+  if(lieu && PLACES[lieu]) openCorr(lieu);
+</script>
+</body>
+</html>
