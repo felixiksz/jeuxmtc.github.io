@@ -3370,6 +3370,7 @@ function showTourStep(){
   document
     .querySelectorAll(".tour-highlight")
     .forEach(el=>el.classList.remove("tour-highlight"));
+  dropTourLift();
 
   let overlay = document.getElementById("tourOverlay");
   if(!overlay){
@@ -3386,6 +3387,7 @@ function showTourStep(){
   }
 
   target.classList.add("tour-highlight");
+  liftTourAncestors(target);
 
   if(step.selector === "#supportCoffeeButton"){
     rememberSupportCoffeeReminderShown();
@@ -3433,6 +3435,26 @@ function showTourStep(){
       document.body.scrollLeft = 0;
     }catch(error){}
   });
+}
+
+// Un élément mis en évidence doit passer au-dessus du voile gris. S'il est
+// dans un conteneur qui a son propre niveau d'empilement (barre du bas,
+// panneaux…), ce conteneur est remonté le temps de la bulle, quel qu'il soit.
+function liftTourAncestors(target){
+  dropTourLift();
+  let el = target ? target.parentElement : null;
+  while(el && el !== document.body && el !== document.documentElement){
+    const cs = getComputedStyle(el);
+    const createsLayer = (cs.position !== "static" && cs.zIndex !== "auto") ||
+      cs.transform !== "none" || cs.filter !== "none" || parseFloat(cs.opacity) < 1 ||
+      cs.isolation === "isolate" || cs.willChange.includes("transform");
+    if(createsLayer) el.classList.add("mtc-tour-lift");
+    el = el.parentElement;
+  }
+}
+
+function dropTourLift(){
+  document.querySelectorAll(".mtc-tour-lift").forEach(el => el.classList.remove("mtc-tour-lift"));
 }
 
 function positionTourBox(box, rect, step = {}){
@@ -3556,6 +3578,7 @@ function showProgressHint(id, selector, title, text, options = {}){
   document
     .querySelectorAll(".tour-highlight")
     .forEach(el=>el.classList.remove("tour-highlight"));
+  dropTourLift();
 
   let overlay = document.getElementById("tourOverlay");
   if(!overlay){
@@ -3579,9 +3602,11 @@ function showProgressHint(id, selector, title, text, options = {}){
 
   document.body.appendChild(box);
   target.classList.add("tour-highlight");
+  liftTourAncestors(target);
 
   function closeHint(){
     target.classList.remove("tour-highlight");
+    dropTourLift();
     if(box) box.remove();
     if(overlay) overlay.remove();
     progressHintActive = false;
@@ -3790,6 +3815,7 @@ function showSupportCoffeeReminder(){
   document
     .querySelectorAll(".tour-highlight")
     .forEach(el=>el.classList.remove("tour-highlight"));
+  dropTourLift();
 
   let overlay = document.getElementById("tourOverlay");
   if(!overlay){
@@ -3819,9 +3845,11 @@ function showSupportCoffeeReminder(){
 
   document.body.appendChild(box);
   target.classList.add("tour-highlight");
+  liftTourAncestors(target);
 
   function closeSupportCoffeeReminder({restoreDrop = false} = {}){
     target.classList.remove("tour-highlight");
+    dropTourLift();
     if(box) box.remove();
     if(overlay) overlay.remove();
     progressHintActive = false;
@@ -4623,6 +4651,7 @@ function endTour(save){
   document
     .querySelectorAll(".tour-highlight")
     .forEach(el=>el.classList.remove("tour-highlight"));
+  dropTourLift();
 
   const overlay = document.getElementById("tourOverlay");
   const box = document.getElementById("tourBox");
