@@ -129,12 +129,30 @@
     // les anciens. Un unique rechargement automatique suffit à passer sur la
     // nouvelle version — sans jamais toucher aux notes/données personnelles,
     // qui sont dans localStorage, pas dans le cache du service worker.
+    // Mais jamais en pleine utilisation : un rechargement quelques secondes
+    // après l'ouverture fermait la recherche (ou la fiche) en cours sur
+    // téléphone. Si l'on a déjà touché la page, la mise à jour attend que
+    // l'on quitte l'onglet / l'app (ou la prochaine ouverture).
     const hadController = Boolean(navigator.serviceWorker.controller);
     let reloaded = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if(reloaded || !hadController) return;
+    let interacted = false;
+    let pending = false;
+    const markInteraction = () => { interacted = true; };
+    ["pointerdown", "keydown", "touchstart", "wheel"].forEach(type => {
+      window.addEventListener(type, markInteraction, {capture:true, passive:true, once:true});
+    });
+    const reloadNow = () => {
+      if(reloaded) return;
       reloaded = true;
       window.location.reload();
+    };
+    document.addEventListener("visibilitychange", () => {
+      if(pending && document.visibilityState === "hidden") reloadNow();
+    });
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if(reloaded || !hadController) return;
+      if(!interacted && document.visibilityState === "visible") reloadNow();
+      else pending = true;
     });
   }
 
