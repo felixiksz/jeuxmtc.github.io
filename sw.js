@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260928-tour-lift-1";
+const MTC_OFFLINE_VERSION = "20260928-trajets-1";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -75,6 +75,7 @@ const CORE_ASSETS = [
   "61-cards-bw-image.js",
   "62-opening-glow.js",
   "63-settings-popover.js",
+  "64-admin-trajets.js",
   "Import_tableau pharma_pro(1).json",
   "README_HORS_CONNEXION.txt",
   "README_PUBLICATION.txt",
@@ -693,6 +694,8 @@ self.addEventListener("fetch", event => {
   if(!requestUrl.pathname.startsWith(scopeUrl.pathname)) return;
 
   if(request.mode === "navigate"){
+    const relativePath = requestUrl.pathname.slice(scopeUrl.pathname.length);
+    const isGamePage = relativePath === "" || relativePath === "index.html";
     event.respondWith((async () => {
       try{
         // no-store : le cache HTTP du navigateur ne doit jamais servir une
@@ -702,9 +705,12 @@ self.addEventListener("fetch", event => {
         // ce qui a déjà fait croire à des correctifs "pas appliqués".
         const response = await fetch(request, {cache:"no-store"});
         const cache = await caches.open(MTC_CACHE_NAME);
-        await cache.put(scopedUrl("index.html"), response.clone());
+        // seule la page du jeu est rangée sous « index.html » ; une autre page
+        // (trajets/index.html…) garde sa propre adresse dans le cache
+        await cache.put(isGamePage ? scopedUrl("index.html") : withoutSearch(request.url), response.clone());
         return response;
       }catch(error){
+        if(!isGamePage) return (await caches.match(withoutSearch(request.url))) || Response.error();
         return (await caches.match(scopedUrl("index.html"))) || (await caches.match(scopedUrl("./"))) || Response.error();
       }
     })());
