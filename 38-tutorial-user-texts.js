@@ -144,12 +144,6 @@
 
     patchStep(
       steps,
-      "#mtcDailyReminderButton",
-      "La cloche programme un rappel quotidien à l’heure de ton choix : ajoute-le à ton agenda (le plus fiable, sur tous les appareils) ou active la notification du navigateur."
-    );
-
-    patchStep(
-      steps,
       ".topbar-row button[onclick*='newGame()']",
       pharma
         ? "Ce bouton relance une grille avec 4 classes de SM."
