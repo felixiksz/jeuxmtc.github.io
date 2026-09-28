@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260927-no-favicon-1";
+const MTC_OFFLINE_VERSION = "20260928-reminder-2";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -627,7 +627,7 @@ self.addEventListener("periodicsync", event => {
       if(lastPlayed === mtcTodayLocalDateString()) return;
       await self.registration.showNotification("🔔 Pas encore joué aujourd'hui !", {
         body:"Une petite partie de Connections MTC pour garder ta série ?",
-        icon:"favicon.svg",
+        icon:"icon-192.png",
         tag:MTC_REMINDER_TAG
       });
     }catch(error){}
