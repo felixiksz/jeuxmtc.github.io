@@ -3420,6 +3420,11 @@ function showTourStep(){
     </div>
   `;
 
+  [350, 800].forEach(delay => setTimeout(()=>{
+    if(!box.isConnected || !target.isConnected) return;
+    positionTourBox(box, target.getBoundingClientRect(), step);
+  }, delay));
+
   requestAnimationFrame(()=>{
     const rect = target.getBoundingClientRect();
     positionTourBox(box, rect, step);
@@ -3457,8 +3462,19 @@ function positionTourBox(box, rect, step = {}){
   // un bouton, la bulle se place juste à côté de lui (dessous s'il est
   // en haut de l'écran, dessus s'il est en bas), flèche pointée dessus.
   const bigTarget = rect.height > window.innerHeight * 0.4;
+  const gridEl = document.getElementById("grid");
+  const gridRect = gridEl ? gridEl.getBoundingClientRect() : null;
+  const isGrid = Boolean(gridRect) && Math.abs(gridRect.top - rect.top) < 2 && Math.abs(gridRect.left - rect.left) < 2;
 
-  if(step.position === "aboveBottom" && !bigTarget){
+  if(bigTarget && !isGrid){
+    // Grand panneau (recherche, stats, panier, comparaison…) : la bulle se
+    // pose en haut de sa partie visible, sans flèche (elle viserait le vide).
+    const visLeft = Math.max(0, rect.left);
+    const visRight = Math.min(window.innerWidth, rect.right);
+    left = (visLeft + visRight) / 2 - boxWidth / 2;
+    top = Math.max(margin, rect.top) + 16;
+    placement = "inside";
+  }else if(step.position === "aboveBottom" && !bigTarget){
     left = rect.left + rect.width / 2 - boxWidth / 2;
     const targetCenterY = rect.top + rect.height / 2;
     if(targetCenterY > window.innerHeight / 2){
@@ -3595,10 +3611,12 @@ function showProgressHint(id, selector, title, text, options = {}){
     });
   }catch(error){}
 
-  setTimeout(()=>{
-    const rect = target.getBoundingClientRect();
-    positionTourBox(box, rect, options);
-  }, 120);
+  // Repositionnement répété : le panneau visé peut être encore en train de
+  // s'ouvrir (animation) ou la page en train de défiler vers lui.
+  [120, 450, 900].forEach(delay => setTimeout(()=>{
+    if(!box.isConnected) return;
+    positionTourBox(box, target.getBoundingClientRect(), options);
+  }, delay));
 }
 
 function showProgressHintSoon(id, selector, title, text, options = {}, delay = 260){

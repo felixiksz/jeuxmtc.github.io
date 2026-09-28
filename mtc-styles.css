@@ -7136,3 +7136,10 @@ body.tour-active{
   overflow:visible !important;
   max-height:none !important;
 }
+
+/* Zone mise en évidence par le tutoriel : fond de page, pour que le voile
+   gris du tutoriel ne transparaisse pas à l'intérieur du cadre. */
+body.tour-active .tour-highlight,
+body:has(#tourOverlay) .tour-highlight{
+  background-color:var(--page-bg, #fff) !important;
+}
