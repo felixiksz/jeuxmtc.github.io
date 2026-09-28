@@ -3453,7 +3453,22 @@ function positionTourBox(box, rect, step = {}){
   let top;
   let placement = "bottom";
 
-  if(step.position === "aboveBottom"){
+  // « aboveBottom » ne sert plus qu'aux grandes zones (la grille) : pour
+  // un bouton, la bulle se place juste à côté de lui (dessous s'il est
+  // en haut de l'écran, dessus s'il est en bas), flèche pointée dessus.
+  const bigTarget = rect.height > window.innerHeight * 0.4;
+
+  if(step.position === "aboveBottom" && !bigTarget){
+    left = rect.left + rect.width / 2 - boxWidth / 2;
+    const targetCenterY = rect.top + rect.height / 2;
+    if(targetCenterY > window.innerHeight / 2){
+      top = rect.top - boxHeight - 14;
+      placement = "top";
+    }else{
+      top = rect.bottom + 14;
+      placement = "bottom";
+    }
+  }else if(step.position === "aboveBottom"){
     const bottomBlock =
       document.querySelector(".bottom-actions") ||
       document.querySelector("#jokerBubble");
