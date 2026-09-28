@@ -7127,3 +7127,12 @@ body.tour-active{
     margin-right:auto !important;
   }
 }
+
+/* === Bulles du tutoriel : pas de barres de défilement ===
+   La flèche (::after, décalée de 9 px hors de la bulle) faisait déborder
+   le contenu et affichait des ascenseurs même pour un texte très court.
+   Les textes tiennent tous : la bulle s'adapte à leur hauteur. */
+#tourBox{
+  overflow:visible !important;
+  max-height:none !important;
+}

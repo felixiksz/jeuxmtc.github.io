@@ -21,3 +21,38 @@
 #mtcDailyReminderButton.mtc-reminder-on svg{
   opacity:1;
 }
+
+/* Fenêtre de réglage du rappel (agenda + notification) */
+.mtc-reminder-panel{
+  position:fixed;
+  z-index:2147482600;
+  box-sizing:border-box;
+  padding:12px 14px 10px;
+  border-radius:16px;
+  background:var(--page-bg, #fff);
+  color:var(--text-color, #111);
+  box-shadow:0 8px 26px var(--shadow-color, #4b63ff);
+  font-family:"Archivo", system-ui, sans-serif;
+  font-size:.86rem;
+  line-height:1.35;
+}
+.mtc-reminder-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.mtc-reminder-x{padding:0 6px !important;font-size:1.2em;line-height:1;border:0 !important;background:none !important;cursor:pointer}
+.mtc-reminder-time{display:flex;align-items:center;gap:8px;font-weight:700}
+.mtc-reminder-time input{font:inherit;padding:3px 6px;border-radius:8px;border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 40%, transparent)}
+.mtc-reminder-lead{margin:9px 0 6px}
+.mtc-reminder-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mtc-reminder-actions button,.mtc-reminder-link{
+  padding:5px 11px !important;
+  border-radius:999px !important;
+  border:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 45%, transparent) !important;
+  background:color-mix(in srgb, var(--shadow-color, #4b63ff) 10%, var(--page-bg, #fff)) !important;
+  color:inherit;
+  font:inherit;
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+}
+.mtc-reminder-small{margin:6px 0 0;font-size:.82em;opacity:.72}
+.mtc-reminder-panel hr{border:0;border-top:1px solid color-mix(in srgb, var(--shadow-color, #4b63ff) 25%, transparent);margin:10px 0 8px}
+.mtc-reminder-check{display:flex;align-items:center;gap:7px;font-weight:700}
