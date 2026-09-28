@@ -3420,10 +3420,7 @@ function showTourStep(){
     </div>
   `;
 
-  [350, 800].forEach(delay => setTimeout(()=>{
-    if(!box.isConnected || !target.isConnected) return;
-    positionTourBox(box, target.getBoundingClientRect(), step);
-  }, delay));
+  followTarget(box, target, step);
 
   requestAnimationFrame(()=>{
     const rect = target.getBoundingClientRect();
@@ -3611,12 +3608,29 @@ function showProgressHint(id, selector, title, text, options = {}){
     });
   }catch(error){}
 
-  // Repositionnement répété : le panneau visé peut être encore en train de
-  // s'ouvrir (animation) ou la page en train de défiler vers lui.
-  [120, 450, 900].forEach(delay => setTimeout(()=>{
-    if(!box.isConnected) return;
-    positionTourBox(box, target.getBoundingClientRect(), options);
-  }, delay));
+  followTarget(box, target, options);
+}
+
+// La bulle suit sa cible tant qu'elle bouge : un panneau peut mettre plus
+// d'une seconde à glisser depuis le bas, ou la page à défiler vers lui.
+function followTarget(box, target, options){
+  let last = "";
+  let stable = 0;
+  const started = Date.now();
+  const tick = () => {
+    if(!box.isConnected || !target.isConnected) return;
+    const rect = target.getBoundingClientRect();
+    const key = Math.round(rect.left) + "," + Math.round(rect.top) + "," + Math.round(rect.width) + "," + Math.round(rect.height);
+    if(key !== last){
+      positionTourBox(box, rect, options);
+      last = key;
+      stable = 0;
+    }else{
+      stable++;
+    }
+    if(stable < 6 && Date.now() - started < 4000) setTimeout(tick, 120);
+  };
+  setTimeout(tick, 60);
 }
 
 function showProgressHintSoon(id, selector, title, text, options = {}, delay = 260){

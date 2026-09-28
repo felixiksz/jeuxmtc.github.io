@@ -7143,3 +7143,10 @@ body.tour-active .tour-highlight,
 body:has(#tourOverlay) .tour-highlight{
   background-color:var(--page-bg, #fff) !important;
 }
+
+/* Cible dans un panneau (recherche, stats, panier…) : le panneau passe
+   au-dessus du voile gris le temps de la bulle, sinon la zone visée reste
+   grisée malgré son cadre. */
+body:has(#tourOverlay) :is(.advanced-search-panel, .stats-panel, .review-basket-panel, .comparison-panel, .cheatsheet-panel, .point-panel, .bottom-actions, #settingsPanel):has(.tour-highlight){
+  z-index:10001 !important;
+}
