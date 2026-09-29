@@ -22,6 +22,9 @@
   .tool{ background:#fff; color:inherit; text-decoration:none; }
   .tool.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
   .tools{ margin-left:auto; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .typefilter{ display:flex; flex-wrap:wrap; gap:4px 10px; font-size:.8rem; color:var(--muted); }
+  .typefilter label{ display:inline-flex; align-items:center; gap:3px; cursor:pointer; white-space:nowrap; }
+  .typefilter input{ margin:0; accent-color:var(--accent); }
   .edit-tools{ display:none; gap:6px; align-items:center; }
   body.editing .edit-tools{ display:flex; }
   .edit-count{ font-size:.78rem; color:var(--muted); }
@@ -29,6 +32,8 @@
   nav .navrow button{ flex:1; min-width:0; }
   nav .navrow input{ flex:none; margin:0; width:15px; height:15px; accent-color:#2f9a3c; cursor:pointer; }
   nav .navrow.done button:not(.on){ color:#2f9a3c; border-color:#9fd3a6; }
+  body.hide-checks nav .navrow input{ display:none; }
+  .linkish{ font:inherit; font-size:inherit; border:0; background:none; padding:0; color:var(--accent); text-decoration:underline; cursor:pointer; }
   .check-legend{ font-size:.68rem; color:var(--muted); margin:0 0 4px; line-height:1.2; }
   main{ margin:0 0 0 var(--navw); padding:16px 20px; }
   @media (max-width:700px){ :root{ --navw:92px; } nav button{ font-size:.76rem; padding:3px 6px; } h1{ font-size:.95rem; } }
@@ -66,6 +71,7 @@
   .plan .br-label{ font-size:10px; fill:var(--muted); font-weight:700; }
   .node{ cursor:pointer; }
   .node text{ font-size:10.5px; fill:#222; }
+  .node text.xfer{ font-size:8.5px; font-weight:800; letter-spacing:.02em; }
   .node:hover circle, .node.sel circle{ stroke:#000; stroke-width:2.5; }
   .legend{ font-size:.72rem; color:var(--muted); display:flex; gap:12px; margin-top:4px; }
   .legend i{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:4px; vertical-align:-1px; }
@@ -95,6 +101,7 @@
         border:2px solid currentColor; border-radius:999px; font-weight:800; font-size:.8rem; background:#fff; }
   .orb.el-metal{ color:#000; -webkit-text-stroke:0; }
   .cgap{ height:10px; }
+  .crow small.jh{ font-size:.68rem; color:#8a6d00; background:#fff6d6; border-radius:999px; padding:0 6px; white-space:nowrap; }
   ::highlight(mtc-mention){ background-color:#ffd84d; color:#000; }
   mark.mtc-mention{ background:#ffd84d; color:#000; border-radius:3px; }
   /* survol d'un lieu du plan : autres canaux qui y passent */
@@ -113,6 +120,13 @@
 <header>
   <a class="tool" href="../index.html?admin=1" title="Retour au jeu">← Jeu</a>
   <h1>Trajets des canaux</h1>
+  <div class="typefilter" id="typeFilter" role="group" aria-label="Types de trajets affichés">
+    <label><input type="checkbox" data-type="principal"> régulier</label>
+    <label><input type="checkbox" data-type="luo"> luo</label>
+    <label><input type="checkbox" data-type="distinct"> distinct</label>
+    <label><input type="checkbox" data-type="tendineux"> tendineux</label>
+    <label><input type="checkbox" data-type="vaisseau"> merveilleux vaisseaux</label>
+  </div>
   <div class="tools">
     <span class="edit-tools">
       <span class="edit-count" id="editCount"></span>
@@ -166,6 +180,7 @@
     if(await loadScript("trajets-data.js")){
       await loadScript("trajets-places-rx.js");
       await loadScript("trajets-complements.js");
+      await loadScript("trajets-jiaohui.js");
       return;
     }
     const c = syncCfg();
@@ -175,6 +190,7 @@
     new Function(code)();
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-places-rx.js")).text())(); }catch(e){}
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-complements.js")).text())(); }catch(e){}
+    try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-jiaohui.js")).text())(); }catch(e){}
   }
   // images : directes en local, lues dans le dépôt privé sinon
   const imageCache = new Map();
@@ -318,6 +334,9 @@
 
   // ---- familles de lieux : les plans restent au mot près, mais les listes de correspondances
   // regroupent les lieux voisins (« Yeux » = œil, canthus, paupières, orbite…) ----
+  // Pas de famille aux extrémités (main, poignet, coude, jambe, malléoles, pied, orteils) : là, le
+  // côté et l'os comptent (bord interne du 1er métatarsien ≠ entre 1er et 2e métatarsiens), et ce
+  // sont les points qui donnent le passage exact des canaux principaux.
   const FAMILIES = {
     "fam:yeux":{label:"Yeux (tout l’œil)", members:["yeux", "oculaire", "canthus-int", "canthus-ext", "paupiere-inf", "paupiere-sup", "orbite", "sous-orbitaire", "sus-orbitaire"]},
     "fam:oreille":{label:"Oreille (tout autour)", members:["oreille", "devant-oreille", "derriere-oreille", "autour-oreille", "dessus-oreille", "apex-oreille", "supant-oreille"]},
@@ -340,14 +359,7 @@
     "fam:omoplate":{label:"Omoplate (scapula)", members:["omoplate", "supraep", "infraep"]},
     "fam:clavicule":{label:"Clavicule", members:["clavicule", "zone-clav"]},
     "fam:aisselle":{label:"Aisselle", members:["aisselle", "pli-axill"]},
-    "fam:coude":{label:"Coude", members:["coude", "pli-coude", "olecrane"]},
-    "fam:poignet":{label:"Poignet", members:["poignet", "dos-poignet", "cun-kou", "styloide-rad", "styloide-uln", "pisiforme"]},
-    "fam:main":{label:"Main", members:["main", "paume", "dos-main", "metacarpe", "thenar"]},
     "fam:hanche":{label:"Hanche", members:["hanche", "trochanter", "coxo"]},
-    "fam:jambe":{label:"Jambe", members:["jambe", "tibia", "fibula", "gastrocnemien"]},
-    "fam:malleole":{label:"Malléoles", members:["malleole", "malleole-int", "malleole-ext"]},
-    "fam:pied":{label:"Pied", members:["dos-pied", "plante", "metatarse", "tarse", "naviculaire"]},
-    "fam:orteils":{label:"Orteils", members:["orteils", "hallux", "petit-orteil"]},
     "fam:coeur":{label:"Cœur (et système du cœur)", members:["o-coeur", "o-systeme-coeur"]},
     "fam:poumon":{label:"Poumon (et système pulmonaire)", members:["o-poumon", "o-systeme-poumon"]}
   };
@@ -357,6 +369,14 @@
   // lieu à utiliser pour les correspondances d'un arrêt : sa famille s'il en a une
   const corrKey = pid => FAMILY_OF[pid] || pid;
 
+  // types de trajets affichés (cases en haut) : plans et correspondances
+  const TYPES_KEY = "mtc_trajets_types_v1";
+  const typeGroup = type => (type === "grand_luo" ? "luo" : type);
+  let TYPES_ON = {principal:true, luo:true, distinct:true, tendineux:true, vaisseau:true};
+  try{ Object.assign(TYPES_ON, JSON.parse(localStorage.getItem(TYPES_KEY) || "{}")); }catch(e){}
+  const typeShown = s => TYPES_ON[typeGroup(s.type)] !== false;
+
+  const JIAOHUI = window.MTC_TRAJETS_JIAOHUI || {};
   function sectionsThrough(pid){
     const ms = membersOf(pid);
     const out = [];
@@ -371,8 +391,21 @@
       const si = own.sections.findIndex(s => s.type === "principal");
       if(si >= 0 && !out.some(o => o.c === own && o.si === si)) out.push({c:own, s:own.sections[si], si});
     }
+    // point d'intersection (jiāo huì) : les canaux du tableau s'y rejoignent (gris = selon certains auteurs)
+    const jh = pm && JIAOHUI[pid.slice(3)];
+    if(jh){
+      [["canaux", false], ["certains", true]].forEach(([k, certain]) => (jh[k] || []).forEach(code => {
+        const c = data.find(x => x.code === code);
+        if(!c) return;
+        const si = c.sections.findIndex(s => s.type === "principal" || s.type === "vaisseau");
+        if(si < 0) return;
+        const had = out.find(o => o.c === c && o.si === si);
+        if(had) had.jh = true;
+        else out.push({c, s:c.sections[si], si, jh:true, certain});
+      }));
+    }
     out.sort((a, b) => (CANAL_ORDER.indexOf(a.c.code) - CANAL_ORDER.indexOf(b.c.code)) || (TYPE_ORDER.indexOf(a.s.type) - TYPE_ORDER.indexOf(b.s.type)));
-    return out;
+    return out.filter(it => typeShown(it.s));
   }
 
   // Couleur de l'élément : terre (Rt, E) jaune, bois (F, VB) vert, feu (C, IG, EC, TF) rouge,
@@ -384,7 +417,8 @@
     const go = ' data-go="' + c.code + "|" + si + '"';
     const meta = CANAL[c.code];
     const orb = code => '<span class="orb el-' + (ELEMENT[code] || "none") + '">' + esc(code) + "</span>";
-    const rmBtn = '<button type="button" class="rm" data-rm="' + c.code + "|" + si + '" title="Retirer ce lieu de ce trajet">retirer</button>';
+    const rmBtn = (item.jh ? '<small class="jh">' + (item.certain ? "intersection, selon certains auteurs" : "point d’intersection") + "</small>" : "") +
+      '<button type="button" class="rm" data-rm="' + c.code + "|" + si + '" title="Retirer ce lieu de ce trajet">retirer</button>';
     if(!meta){
       const name = c.name.replace(/ — .*/, "") + (s.type === "luo" ? " luò mài" : "");
       return '<div class="crow"' + go + ">" + ((c.code === "RM" || c.code === "DM") ? orb(c.code) : '<span class="orb-gap"></span>') +
@@ -480,6 +514,27 @@
   // - une branche qui se sépare en cours de route prend la voie libre la plus proche à
   //   droite ; une voie libérée plus haut (branche terminée) est réutilisée plus bas ;
   // - le numéro de la branche (= paragraphe) est posé à gauche de sa première station.
+  // sigles des canaux : régulier = code de l'organe ; RM, DM ; ChM ; QM / WM avec ▲ yáng, ▼ yīn
+  const SIGLE = {CM:"ChM", YangQ:"QM▲", YinQ:"QM▼", YangW:"WM▲", YinW:"WM▼", DaiM:"DaiM"};
+  const sigle = code => SIGLE[code] || code;
+  const SIGLE_COLOR = {terre:"#c79600", bois:"#2f9a3c", feu:"#e0261b", eau:"#1f5fd6", metal:"#444"};
+  function otherCanals(pid, hereCode){
+    if(pid.startsWith("c:")) return [];
+    // membres : les canaux longent le bras, la jambe, la main, le pied… sans s'y croiser ;
+    // seuls les points y marquent un vrai carrefour (prudence aux extrémités)
+    const g = (PLACES[pid] || {}).group;
+    if(!pid.startsWith("pt:") && (g === "membre supérieur" || g === "membre inférieur")) return [];
+    const codes = [];
+    const certain = new Set();
+    sectionsThrough(corrKey(pid)).forEach(it => {
+      if(it.c.code === hereCode) return;
+      if(!codes.includes(it.c.code)) codes.push(it.c.code);
+      if(it.certain) certain.add(it.c.code);
+    });
+    codes.certain = certain;
+    return codes;
+  }
+
   function planSvg(s, title){
     if(!s.branches || !s.branches.length) return "";
     const branches = withJunctions(s.branches);
@@ -574,16 +629,21 @@
         const r = isPoint ? 5 : 7;
         const tip = info.label + " — cité dans le texte au départ d’une autre branche ; sa place sur cette ligne est déduite de la numérotation";
         const cp = p.cp, pending = cp && complementStatus(cp) !== "validé";
+        const others = otherCanals(p.pid, current);
         stations += '<g class="node' + (cp ? " from-image" : "") + (pending ? " pending" : "") + '" data-pid="' + esc(p.pid) + '" data-bi="' + p.bi + '" data-idx="' + p.idx + '"' +
           (cp ? ' data-cp="' + esc(cp.id) + '"' : "") + (p.inferred ? '><title>' + esc(tip) + "</title>" : ">") +
           (pending ? '<circle cx="' + x + '" cy="' + y + '" r="' + (r + 5) + '" fill="#ffe27a" opacity=".75"/>' : "") +
+          (others.length ? '<circle cx="' + x + '" cy="' + y + '" r="' + (r + 3.5) + '" fill="#fff" stroke="#1d1d1f" stroke-width="2.6"/>' : "") +
           '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (isPoint && !cp ? color : "#fff") + '" stroke="' + (cp ? "#8a8aa0" : color) + '" stroke-width="2.2"' + (cp ? ' stroke-dasharray="2.5 2"' : "") + "/>" +
-          '<text x="' + (x + 11) + '" y="' + (y + 3.5) + '"' + (cp ? ' font-style="italic" fill="#6d6d85"' : "") + ">" + esc(info.label.length > MAXCH ? info.label.slice(0, MAXCH - 1) + "…" : info.label) + "</text></g>";
+          '<text x="' + (x + (others.length ? 15 : 11)) + '" y="' + (y + (others.length ? 1 : 3.5)) + '"' + (cp ? ' font-style="italic" fill="#6d6d85"' : "") + (others.length ? ' font-weight="700"' : "") + ">" + esc(info.label.length > MAXCH ? info.label.slice(0, MAXCH - 1) + "…" : info.label) + "</text>" +
+          (others.length ? '<text class="xfer" x="' + (x + 15) + '" y="' + (y + 11) + '">' +
+            others.slice(0, 6).map(code => '<tspan fill="' + (SIGLE_COLOR[ELEMENT[code]] || "#7a3fb0") + '">' + esc(sigle(code)) + (others.certain && others.certain.has(code) ? "*" : "") + "</tspan>").join(" ") +
+            (others.length > 6 ? " +" + (others.length - 6) : "") + "</text>" : "") + "</g>";
       });
     });
     return '<div class="plan"><h4>Plan des vaisseaux du ' + esc(title) + '</h4><div class="plan-scroll"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img">' +
       lines + stations + nums + "</svg></div>" +
-      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span>n : début de la branche n</span></div></div>';
+      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span></div></div>';
   }
 
   let current = null;
@@ -595,7 +655,9 @@
     nav.querySelectorAll("button[data-code]").forEach(b => b.classList.toggle("on", b.dataset.code === canal.code));
     main.innerHTML = "<h2>" + esc(canal.code) + " — " + esc(canal.name) + "</h2>" +
       '<div class="src">Source : ' + esc(canal.source) + "</div>" +
+      (canal.sections.some(typeShown) ? "" : '<p class="src">Aucun trajet de ce canal pour les types cochés en haut.</p>') +
       canal.sections.map((s, si) => {
+        if(!typeShown(s)) return "";
         const key = canal.code + "-" + si;
         return '<section id="sec-' + si + '"><h3>' + esc(s.label) + "</h3>" +
           '<div class="cols"><div class="desc">' +
@@ -632,7 +694,20 @@
   }
 
   applyEdits();
-  nav.insertAdjacentHTML("afterbegin", '<p class="check-legend">☑ = vérifié</p>');
+  nav.insertAdjacentHTML("afterbegin", '<p class="check-legend">☑ = vérifié · <button type="button" id="toggleChecks" class="linkish">masquer</button></p>');
+  const CHECKS_KEY = "mtc_trajets_hide_checks";
+  const setChecks = hide => {
+    document.body.classList.toggle("hide-checks", hide);
+    const b = document.getElementById("toggleChecks");
+    if(b) b.textContent = hide ? "afficher les cases" : "masquer";
+    try{ localStorage.setItem(CHECKS_KEY, hide ? "1" : ""); }catch(e){}
+  };
+  setTimeout(() => {
+    let hide = false;
+    try{ hide = localStorage.getItem(CHECKS_KEY) === "1"; }catch(e){}
+    setChecks(hide);
+    document.getElementById("toggleChecks").addEventListener("click", () => setChecks(!document.body.classList.contains("hide-checks")));
+  });
   data.forEach((c, i) => {
     if(i && c.kind === "vaisseau" && data[i - 1].kind !== "vaisseau"){
       const gap = document.createElement("div"); gap.className = "nav-gap"; nav.appendChild(gap);
@@ -827,7 +902,7 @@
     const hereSi = sec ? Number(sec.id.replace("sec-", "")) : -1;
     const others = sectionsThrough(corrKey(pid)).filter(it => !(it.c.code === current && it.si === hereSi));
     const cp = node.dataset.cp && COMPLEMENTS.find(x => x.id === node.dataset.cp);
-    tip.innerHTML = (cp ? '<span style="display:block;margin-bottom:5px;color:#6d6d85"><i>D\u2019après l\u2019illustration' + (cp.page ? " (p. " + cp.page + ")" : "") +
+    tip.innerHTML = (cp ? '<span style="display:block;margin-bottom:5px;color:#6d6d85"><i>' + (cp.source ? "Selon la " + esc(cp.source) : "D\u2019après l\u2019illustration" + (cp.page ? " (p. " + cp.page + ")" : "")) +
         ", non cité dans le texte</i> — <b>" + esc(complementStatus(cp)) + "</b>" + (cp.note ? "<br>" + esc(cp.note) : "") +
         (editing && complementStatus(cp) !== "validé" ? "<br>Clic : valider ou refuser" : "") + "</span>" : "") +
       "<b>" + esc((PLACES[pid] || {label:pid}).label) + " — autres trajets" + (FAMILY_OF[pid] ? " (famille « " + esc(FAMILIES[FAMILY_OF[pid]].label) + " »)" : "") + "</b>" +
@@ -876,6 +951,16 @@
     saveEdits(); applyEdits(); show(current, undefined, true);
   });
   updateEditCount();
+  document.querySelectorAll("#typeFilter input").forEach(box => {
+    box.checked = TYPES_ON[box.dataset.type] !== false;
+    box.addEventListener("change", () => {
+      TYPES_ON[box.dataset.type] = box.checked;
+      try{ localStorage.setItem(TYPES_KEY, JSON.stringify(TYPES_ON)); }catch(e){}
+      show(current, undefined, true);
+      const corr = document.getElementById("corr");
+      if(corr.classList.contains("open")){ if(corrPid) openCorr(corrPid); else openIndex(); }
+    });
+  });
   document.addEventListener("dblclick", event => {
     const node = event.target.closest(".node");
     if(node) openCorr(corrKey(node.dataset.pid));
