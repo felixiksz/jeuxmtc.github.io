@@ -113,6 +113,12 @@
   .tgroup{ display:inline-flex; gap:6px; align-items:center; padding:1px 7px; border:1px solid #d7d7e6; border-radius:999px; }
   .netwrap{ background:#f4f1ea; }
   .qcell{ stroke:none; }
+  .rivername{ font-family:"Libre Baskerville", Georgia, serif; font-style:italic; font-size:12px; fill:#2f6b9f; letter-spacing:.12em; paint-order:stroke; stroke:#eaf4fb; stroke-width:3px; pointer-events:none; }
+  .rivername.big{ font-size:16px; font-weight:700; }
+  .terminus text{ font-size:11px; font-weight:800; }
+  .netstop .cat{ font-size:10px; fill:#1f4e79; }
+  .pier .anchor{ font-size:11px; font-weight:800; fill:#1f4e79; paint-order:stroke; stroke:#fff; stroke-width:3px; }
+  body.editing .netstop{ cursor:move; }
   .qborder{ stroke:#ffffff; stroke-width:5; stroke-linejoin:round; }
   .qlabel{ font-size:15px; font-weight:800; fill:#9c9483; letter-spacing:.08em; text-transform:uppercase; pointer-events:none; }
   .qlabel.downtown{ fill:#b0755c; }
@@ -120,6 +126,8 @@
   .netwrap.dark .qcell{ fill-opacity:.12; }
   .netwrap.dark .qborder{ stroke:#2a2f3b; }
   .netwrap.dark .qlabel{ fill:#6f7686; }
+  .netwrap.dark .rivername{ stroke:#171a22; fill:#8cc3ec; }
+  .netwrap.dark .netstop .cat{ fill:#9cc9ee; }
   .netwrap.dark .netjoint circle{ fill:#171a22; }
   .netwrap.dark .netjoint text{ fill:#cfd3dc; stroke:#171a22; }
   .netwrap.dark{ background:#171a22; border-color:#2a2f3b; }
@@ -267,7 +275,7 @@
   // ---- corrections faites dans la page (gardées dans ce navigateur, exportables) ----
   const EDIT_KEY = "mtc_trajets_edits_v1";
   const ORIG = JSON.parse(JSON.stringify({data, PLACES}));
-  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}, complements:{}, internes:{}});
+  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}, complements:{}, internes:{}, stationPos:{}, pointZone:{}});
   let edits = loadEdits();
   let editing = false;
   function loadEdits(){
@@ -463,6 +471,22 @@
       const si = own.sections.findIndex(s => s.type === "principal");
       if(si >= 0 && !out.some(o => o.c === own && o.si === si)) out.push({c:own, s:own.sections[si], si});
     }
+    // zone : les points placés dans son quartier sur le plan (ex. RM 2 derrière le pubis)
+    if(!pm && typeof zoneQuartier === "function"){
+      const quarts = new Set(ms.map(z => zoneQuartier(z)).filter(Boolean));
+      Object.entries(pointZones()).forEach(([pt, q]) => {
+        if(!quarts.has(q)) return;
+        const code = pt.slice(3).split(" ")[0], c = data.find(x => x.code === code);
+        if(!c) return;
+        c.sections.forEach((s, si) => {
+          const passes = s.type === "principal" || (s.branches || []).some(b => b.places.includes(pt));
+          if(!passes) return;
+          const had = out.find(o => o.c === c && o.si === si);
+          const via = (PLACES[pt] || {label:pt.slice(3)}).label + " (placé dans ce quartier)";
+          if(had) had.via = had.via || via; else out.push({c, s, si, via});
+        });
+      });
+    }
     // point d'intersection (jiāo huì) : les canaux du tableau s'y rejoignent (gris = selon certains auteurs)
     const jh = pm && TYPES_ON.externe !== false && JIAOHUI[pid.slice(3)];
     if(jh){
@@ -519,6 +543,7 @@
         it.s.branches.forEach(b => { if(branchShown(it.s, b)) b.places.forEach(q => { if(ms.includes(q) && !hit.includes(q)) hit.push(q); }); });
         it.where = hit.map(q => (PLACES[q] || {label:q}).label).join(", ");
       }
+      if(it.via && !it.where) it.where = it.via;
       html += rowHtml(it);
     });
     document.getElementById("corrBody").innerHTML =
@@ -778,7 +803,7 @@
     const box = svg.getBBox();
     const pad = 40;
     let vb = null;
-    const apply = () => svg.setAttribute("viewBox", vb.x + " " + vb.y + " " + vb.w + " " + vb.h);
+    const apply = () => { svg.setAttribute("viewBox", vb.x + " " + vb.y + " " + vb.w + " " + vb.h); NET_VB = Object.assign({}, vb); };
     const fit = () => {
       const r = wrap.getBoundingClientRect();
       const ratio = r.width > 50 && r.height > 50 ? r.height / r.width : 0.75;   // cadre pas encore affiché
@@ -796,9 +821,9 @@
       vb = {x:px - (px - vb.x) * k, y:py - (py - vb.y) * k, w, h:vb.h * k};
       apply();
     };
-    fit();
-    // la taille du cadre change (fenêtre, panneau) : on recadre tant qu'on n'a pas zoomé
-    let touched = false;
+    // afficher / masquer des éléments ne doit pas dézoomer : on garde le cadrage précédent
+    let touched = !!NET_VB;
+    if(NET_VB){ vb = Object.assign({}, NET_VB); apply(); } else fit();
     try{ new ResizeObserver(() => { if(!touched) fit(); }).observe(wrap); }catch(e){}
     svg.addEventListener("wheel", () => { touched = true; }, {passive:true});
     svg.addEventListener("pointerdown", () => { touched = true; });
@@ -806,6 +831,7 @@
     const ptrs = new Map();
     let dragged = false, last = null, pinch = null;
     svg.addEventListener("pointerdown", e => {
+      if(editing && e.target.closest && e.target.closest(".netstop")) return;   // glisser d'une station : voir showNetwork
       ptrs.set(e.pointerId, [e.clientX, e.clientY]);
       dragged = false; last = [e.clientX, e.clientY];
       if(ptrs.size === 2){ const [p1, p2] = [...ptrs.values()]; pinch = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]); }
@@ -835,7 +861,7 @@
     wrap.querySelector(".netzoom").addEventListener("click", e => {
       const b = e.target.closest("button"); if(!b) return;
       const r = svg.getBoundingClientRect();
-      if(b.dataset.z === "fit") fit();
+      if(b.dataset.z === "fit"){ NET_VB = null; fit(); }
       else zoomAt(b.dataset.z === "in" ? 1 / 1.4 : 1.4, r.left + r.width / 2, r.top + r.height / 2);
     });
   }
@@ -890,6 +916,32 @@
       V:[r(1, 40), [10].concat(r(41, 54), [40]), [40].concat(r(55, 67))], Rn:[r(1, 27)], EC:[r(1, 9)], TF:[r(1, 23)],
       VB:[r(1, 44)], F:[r(1, 14)], RM:[r(1, 24)], DM:[r(1, 28)]};
   })();
+  // catégories de points (canaux réguliers) : cinq points de transport, yuán, luò, xì
+  const POINT_CATS = (() => {
+    const T = {P:[11, 10, 9, 8, 5], GI:[1, 2, 3, 5, 11], E:[45, 44, 43, 41, 36], Rt:[1, 2, 3, 5, 9], C:[9, 8, 7, 4, 3], IG:[1, 2, 3, 5, 8],
+      V:[67, 66, 65, 60, 40], Rn:[1, 2, 3, 7, 10], EC:[9, 8, 7, 5, 3], TF:[1, 2, 3, 6, 10], VB:[44, 43, 41, 38, 34], F:[1, 2, 3, 4, 8]};
+    const NAMES = ["jǐng-puits", "yíng-jaillissement", "shū-rivière", "jīng-fleuve", "hé-réunion"];
+    const Y = {P:9, GI:4, E:42, Rt:3, C:7, IG:4, V:64, Rn:3, EC:7, TF:4, VB:40, F:3};
+    const L = {P:7, GI:6, E:40, Rt:4, C:5, IG:7, V:58, Rn:4, EC:6, TF:5, VB:37, F:5, RM:15, DM:1};
+    const X = {P:6, GI:7, E:34, Rt:8, C:6, IG:6, V:63, Rn:5, EC:4, TF:7, VB:36, F:6};
+    const out = {};
+    const add = (code, n, cat, name) => { const k = "pt:" + code + " " + n; (out[k] = out[k] || []).push({cat, name}); };
+    Object.entries(T).forEach(([code, ns]) => ns.forEach((n, i) => add(code, n, "transport", "point " + NAMES[i])));
+    Object.entries(Y).forEach(([code, n]) => add(code, n, "yuan", "point yuán-source"));
+    Object.entries(L).forEach(([code, n]) => add(code, n, "luo", "point luò-liaison"));
+    add("Rt", 21, "luo", "point du grand luò-liaison");
+    Object.entries(X).forEach(([code, n]) => add(code, n, "xi", "point xì-crevasse"));
+    return out;
+  })();
+  const CAT_GLYPH = {transport:"⛵\uFE0E", yuan:"☀\uFE0E", luo:"⛓\uFE0E", xi:"⛏\uFE0E"};
+  // points d'ouverture des merveilleux vaisseaux : embarcadères des navettes
+  const OPENING = {CM:"Rt 4", YinW:"EC 6", DM:"IG 3", YangQ:"V 62", RM:"P 7", YinQ:"Rn 6", DaiM:"VB 41", YangW:"TF 5"};
+  // voies : les canaux côte à côte (de droite à gauche du tronc), le fleuve au milieu
+  const LANE = {V:6, VB:5, TF:4, IG:3, GI:2, E:1, RM:0, DM:0, Rt:-1, P:-2, EC:-3, C:-4, F:-5, Rn:-6};
+  // points placés dans un quartier (correspondances par localisation) ; déplaçables en mode édition
+  const DEFAULT_POINT_ZONE = {"pt:RM 2":"pubis"};
+  const pointZones = () => Object.assign({}, DEFAULT_POINT_ZONE, edits.pointZone || {});
+  let NET_VB = null;
   const RIVER = new Set(["RM", "DM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"]);
   const NET_COLOR = {terre:"#d9a400", bois:"#2f9a3c", feu:"#e0261b", eau:"#1f5fd6", metal:"#ffffff"};
   const RIVER_COLOR = {RM:"#7fb8e8", DM:"#7fb8e8", CM:"#9bcfe0", YangQ:"#a9c4ee", YinQ:"#a9c4ee", YangW:"#9fd6cf", YinW:"#9fd6cf", DaiM:"#b5d3a8"};
@@ -1042,12 +1094,20 @@
     });
     // 3. stations sur la grille invisible (carrefours d'abord), articulations et passages de quartier
     const canalsAt = {};
+    const vesselOnly = c => RIVER.has(c) && c !== "RM" && c !== "DM";
     lines.forEach(l => l.nodes.forEach(n => { if(n.startsWith("pt:")) (canalsAt[n] = canalsAt[n] || new Set()).add(l.c.code); }));
     const stationsList = Object.keys(canalsAt).sort((a, b) => canalsAt[b].size - canalsAt[a].size);
+    const isStation = n => [...(canalsAt[n] || [])].some(c => !vesselOnly(c));
     const used = new Set(), cell = {};
     Object.values(jointPos).forEach(([x, y]) => { for(let dx = -1; dx <= 1; dx++) for(let dy = -1; dy <= 1; dy++) used.add((x / G + dx) + "," + (y / G + dy)); });
+    // positions posées à la main (mode édition) d'abord
+    const manual = edits.stationPos || {};
+    stationsList.forEach(p => { if(manual[p]){ cell[p] = manual[p].slice(); used.add((manual[p][0] / G) + "," + (manual[p][1] / G)); } });
     stationsList.forEach(p => {
-      const gx = Math.round(netX(pos[p][0]) / G), gy = Math.round(netY(pos[p][1]) / G);
+      if(cell[p]) return;
+      // voie du canal : les lignes qui parcourent la même zone restent côte à côte
+      const code = p.slice(3).split(" ")[0], lane = LANE[code] || 0, arm = pos[p][0] < 450;
+      const gx = Math.round((netX(pos[p][0]) + (arm ? 0 : lane * 13)) / G), gy = Math.round((netY(pos[p][1]) + (arm ? lane * 11 : 0)) / G);
       let found = null;
       for(let r = 0; r < 14 && !found; r++){
         for(let dx = -r; dx <= r && !found; dx++) for(let dy = -r; dy <= r && !found; dy++){
@@ -1057,6 +1117,21 @@
         }
       }
       cell[p] = found || [gx * G, gy * G];
+    });
+    lines.filter(l => l.main).forEach(l => {
+      const own = l.nodes.filter(n => n.startsWith("pt:" + l.c.code + " ") && !manual[n]);
+      for(let i = 1; i < own.length; i++){
+        const a = cell[own[i - 1]], b = cell[own[i]];
+        if(!a || !b) continue;
+        const dx = Math.abs(a[0] - b[0]), dy = Math.abs(a[1] - b[1]);
+        let target = null;
+        if(dx && dx <= 2 * G && dy >= dx) target = [a[0], b[1]];
+        else if(dy && dy <= 2 * G && dx > dy) target = [b[0], a[1]];
+        if(target){
+          const k = (target[0] / G) + "," + (target[1] / G);
+          if(!used.has(k)){ used.delete((b[0] / G) + "," + (b[1] / G)); used.add(k); cell[own[i]] = target; }
+        }
+      }
     });
     const nodePos = n => {
       if(cell[n]) return cell[n];
@@ -1096,7 +1171,8 @@
       });
     };
     const GAP = 4.2;
-    let rivers = "", svgLines = "", badges = "";
+    let rivers = "", svgLines = "", badges = "", riverNames = "", shuttles = "";
+    const riverPts = {};
     const badgeAt = {};
     lines.forEach((l, li) => {
       const code = l.c.code, river = RIVER.has(code), col = netColor(code), metal = ELEMENT[code] === "metal";
@@ -1112,6 +1188,20 @@
       if(!d) return;
       const title = "<title>" + esc(sectionName(l.c, l.s)) + "</title>";
       if(river){
+        // cours d'eau continu (pour y écrire son nom)
+        const pts = [];
+        l.nodes.forEach((n, i) => { if(!i) return; let q = route(edgeKey(l.nodes[i - 1], n)); if(l.nodes[i - 1] > n) q = q.slice().reverse(); q.forEach((z, j) => { if(!(pts.length && j === 0)) pts.push(z); }); });
+        d = "M" + pts.map(z => z[0].toFixed(1) + "," + z[1].toFixed(1)).join(" L");
+        const rid = "rv-" + li, nm = esc(l.c.name.replace(/\s*\(.*$/, "").replace(/ — .*/, ""));
+        riverNames += '<path id="' + rid + '" d="' + d + '" fill="none" stroke="none"/>' +
+          [8, 45, 82].map(o => '<text class="rivername' + (code === "RM" || code === "DM" ? " big" : "") + '" dy="-' + (code === "RM" || code === "DM" ? 11 : 7) + '"><textPath href="#' + rid + '" startOffset="' + o + '%">' + nm + "</textPath></text>").join("");
+        if(code !== "RM" && code !== "DM"){
+          // navette sur le cours d'eau
+          shuttles += '<path d="' + d + '" fill="none" stroke="#1f4e79" stroke-width="1.3" stroke-dasharray="6 5" opacity=".8"/>';
+          riverPts[code] = (riverPts[code] || []).concat(pts);
+        }else riverPts[code] = (riverPts[code] || []).concat(pts);
+      }
+      if(river){
         // fleuve (RM, DM) et rivières (merveilleux vaisseaux) : berges, eau, reflet
         const w = code === "RM" || code === "DM" ? 16 : 9;
         rivers += '<path d="' + d + '" fill="none" stroke="#5f95c6" stroke-width="' + (w + 3) + '" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>' +
@@ -1123,19 +1213,30 @@
         if(metal) svgLines += '<path d="' + d + '" fill="none" stroke="#1d1d1f" stroke-width="' + (wdt + 2.2) + '" stroke-linecap="round" stroke-linejoin="round"' + dash + "/>";
         svgLines += '<path class="netline" data-code="' + code + '" d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + wdt + '" stroke-linecap="round" stroke-linejoin="round"' + dash + (l.interne ? ' opacity=".65"' : "") + ">" + title + "</path>";
       }
-      const key = code + "|" + typeGroup(l.s.type) + (l.interne ? "|i" : "");
-      if(!badgeAt[key] && l.nodes[0]){ badgeAt[key] = true; (badgeAt["@" + l.nodes[0]] = badgeAt["@" + l.nodes[0]] || []).push({code, col:river ? "#3f79ad" : col, metal, dash:NET_DASH[l.s.type] ? ' stroke-dasharray="3 2"' : "", title}); }
+
     });
-    Object.keys(badgeAt).filter(k => k.startsWith("@")).forEach(k => {
-      const list = badgeAt[k], P = nodePos(k.slice(1)); if(!P) return;
-      const [x, y] = P, n = list.length, rad = 24 + Math.max(0, n - 6) * 4;
-      list.forEach((b, i) => {
-        const ang = Math.PI / 4 + (i + 0.5) * (2 * Math.PI / Math.max(n, 4));
-        const bx = x + Math.cos(ang) * rad, by = y + Math.sin(ang) * rad;
-        badges += '<g class="netbadge"><line x1="' + x + '" y1="' + y + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '" stroke="' + (b.metal ? "#1d1d1f" : b.col) + '" stroke-width="1.2"/>' +
-          '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="10.5" fill="#fff" stroke="' + (b.metal ? "#1d1d1f" : b.col) + '" stroke-width="2.4"' + b.dash + "/>" +
-          '<text x="' + bx.toFixed(1) + '" y="' + (by + 3.2).toFixed(1) + '" text-anchor="middle">' + esc(sigle(b.code)) + "</text>" + b.title + "</g>";
+    Object.entries(MAIN_SEG).forEach(([code, segs]) => {
+      if(!lines.some(l => l.main && l.c.code === code)) return;
+      const nums = segs.flat(), ends = ["pt:" + code + " " + Math.min(...nums), "pt:" + code + " " + Math.max(...nums)];
+      const col = RIVER.has(code) ? "#3f79ad" : netColor(code), metal = ELEMENT[code] === "metal";
+      ends.forEach(e => {
+        const P = cell[e]; if(!P) return;
+        const tag = sigle(code), w = 8 + tag.length * 7.5;
+        badges += '<g class="terminus"><title>Terminus de la ligne ' + esc(tag) + "</title>" +
+          '<rect x="' + (P[0] - w - 10).toFixed(1) + '" y="' + (P[1] - 9) + '" width="' + w.toFixed(1) + '" height="18" rx="4" fill="' + (metal ? "#fff" : col) + '" stroke="' + (metal ? "#1d1d1f" : col) + '" stroke-width="1.6"/>' +
+          '<text x="' + (P[0] - w / 2 - 10).toFixed(1) + '" y="' + (P[1] + 4) + '" text-anchor="middle" fill="' + (metal ? "#1d1d1f" : "#fff") + '">' + esc(tag) + "</text></g>";
       });
+    });
+    // embarcadères : point d'ouverture de chaque merveilleux vaisseau, relié à son cours d'eau
+    let piers = "";
+    Object.entries(OPENING).forEach(([code, pt]) => {
+      const st = cell["pt:" + pt], rp = riverPts[code];
+      if(!st || !rp || !rp.length || !isStation("pt:" + pt)) return;
+      let best = rp[0];
+      rp.forEach(q => { if(Math.hypot(q[0] - st[0], q[1] - st[1]) < Math.hypot(best[0] - st[0], best[1] - st[1])) best = q; });
+      piers += '<g class="pier"><title>Embarcadère : point d’ouverture du ' + esc(sectionName(data.find(c => c.code === code), {type:"vaisseau"})) + "</title>" +
+        '<path d="M' + st[0] + "," + st[1] + " L" + best[0].toFixed(1) + "," + best[1].toFixed(1) + '" stroke="#1f4e79" stroke-width="1.6" stroke-dasharray="3 3" fill="none"/>' +
+        '<text class="anchor" x="' + (st[0] - 16) + '" y="' + (st[1] + 16) + '">⚓\uFE0E ' + esc(sigle(code)) + "</text></g>";
     });
     // 5. la ville : quartiers (zones du corps), centre-ville = organes, banlieue = extrémités
     const qIds = Object.keys(qSeed), seeds = qIds.map(q => qSeed[q]);
@@ -1159,8 +1260,12 @@
     });
     let stations = "";
     stationsList.forEach(p => {
-      const [x, y] = cell[p], n = canalsAt[p].size, jh = !!JIAOHUI[p.slice(3)];
-      const label = esc((PLACES[p] || {label:p.slice(3)}).label);
+      if(!isStation(p)) return;
+      const [x, y] = cell[p], n = [...canalsAt[p]].filter(c => !vesselOnly(c)).length, jh = !!JIAOHUI[p.slice(3)];
+      const cats = POINT_CATS[p] || [];
+      const glyphs = [...new Set(cats.map(k => k.cat))].map(k => CAT_GLYPH[k]).join("");
+      const label = (glyphs ? '<tspan class="cat">' + glyphs + " </tspan>" : "") + esc((PLACES[p] || {label:p.slice(3)}).label) +
+        (cats.length ? "<title>" + esc(cats.map(k => k.name).join(", ")) + "</title>" : "");
       if(n >= 2 || (jh && (JIAOHUI[p.slice(3)].canaux || []).length >= 2)){
         stations += '<g class="node netstop" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="' + (6 + Math.min(5, n)) + '" fill="#fff" stroke="#1d1d1f" stroke-width="3"/>' +
           '<text x="' + (x + 9 + Math.min(5, n)) + '" y="' + (y - 7) + '">' + label + "</text></g>";
@@ -1179,12 +1284,13 @@
       '<span><svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#9bcfe0" stroke-width="6"/></svg>rivières : merveilleux vaisseaux</span>' +
       '<span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="#fff" stroke="#1d1d1f" stroke-width="3"/></svg>carrefour (point d’intersection)</span>' +
       '<span><svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#fff" stroke="#6d6a62" stroke-width="3.5"/></svg>articulation</span>' +
+      '<span>⛵\uFE0E point de transport · ☀\uFE0E yuán · ⛓\uFE0E luò · ⛏\uFE0E xì · ⚓\uFE0E embarcadère (point d’ouverture)</span>' +
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     main.innerHTML = "<h2>Réseau global des trajets</h2>" +
-      '<div class="src">Chaque canal est une ligne ; ses stations sont ses points (tous les points des branches externes) ; les points d’intersection sont les carrefours ; les zones du corps sont des quartiers ; les organes forment le centre-ville. Clique un canal dans la barre de gauche pour l’afficher ou le masquer. Molette : zoom · glisser : se déplacer · clic sur une station : correspondances.</div>' +
+      '<div class="src">Chaque canal régulier est une ligne dont les stations sont ses points ; RM et DM forment un fleuve, les merveilleux vaisseaux des rivières avec leur navette ; les zones du corps sont des quartiers (centre-ville : organes). Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer · clic : correspondances · en mode ✎ Modifier : glisser une station dans son quartier.</div>' +
       legend + '<div class="netwrap"><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre / plan de ville">◐</button></div>' +
       '<svg class="netsvg" role="img"><defs><pattern id="streets" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><path d="M0 23 H46 M23 0 V46" stroke="#ffffff" stroke-width="1.3" opacity=".6"/><path d="M0 0 L46 46" stroke="#ffffff" stroke-width=".8" opacity=".35"/></pattern></defs>' +
-      '<g class="city">' + city + qLabels + "</g>" + rivers + svgLines + joints + stations + badges + "</svg></div>";
+      '<g class="city">' + city + qLabels + "</g>" + rivers + shuttles + riverNames + svgLines + piers + joints + stations + badges + "</svg></div>";
     const wrap = main.querySelector(".netwrap");
     try{ if(localStorage.getItem("mtc_trajets_net_dark") === "1") wrap.classList.add("dark"); }catch(e){}
     wrap.querySelector('[data-z="dark"]').addEventListener("click", () => {
@@ -1195,7 +1301,40 @@
       if(b.dataset.net === "all") NET_HIDDEN.clear(); else data.forEach(c => NET_HIDDEN.add(c.code));
       saveHidden(); showNetwork();
     }));
-    initNetZoom(main.querySelector(".netsvg"));
+    const svgEl = main.querySelector(".netsvg");
+    initNetZoom(svgEl);
+    // mode édition : glisser une station dans un quartier (sa zone de correspondance)
+    const cells = qIds.map((q, i) => ({q, poly:voronoiCell(seeds, i, 380)}));
+    const inPoly = (pt, poly) => { let ins = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; };
+    let drag = null;
+    svgEl.addEventListener("pointerdown", e => {
+      const st = editing && e.target.closest && e.target.closest(".netstop");
+      if(!st) return;
+      const m = svgEl.getScreenCTM().inverse(), pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(m);
+      drag = {st, pid:st.dataset.pid, x0:pt.x, y0:pt.y, moved:false};
+      try{ svgEl.setPointerCapture(e.pointerId); }catch(err){}
+      e.stopPropagation();
+    }, true);
+    svgEl.addEventListener("pointermove", e => {
+      if(!drag) return;
+      const m = svgEl.getScreenCTM().inverse(), pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(m);
+      const dx = pt.x - drag.x0, dy = pt.y - drag.y0;
+      if(Math.hypot(dx, dy) > 3) drag.moved = true;
+      drag.st.setAttribute("transform", "translate(" + dx + "," + dy + ")");
+      drag.pt = [pt.x, pt.y];
+    });
+    svgEl.addEventListener("pointerup", () => {
+      if(!drag) return;
+      const d = drag; drag = null;
+      if(!d.moved || !d.pt) return;
+      const snapped = [Math.round(d.pt[0] / G) * G, Math.round(d.pt[1] / G) * G];
+      const hit = cells.find(c => c.poly.length > 2 && inPoly(d.pt, c.poly));
+      edits.stationPos = edits.stationPos || {}; edits.pointZone = edits.pointZone || {};
+      edits.stationPos[d.pid] = snapped;
+      if(hit) edits.pointZone[d.pid] = hit.q;
+      saveEdits(); showNetwork();
+      svgEl.dispatchEvent(new Event("click"));
+    });
     try{ history.replaceState(null, "", "#reseau"); }catch(e){}
   }
 
