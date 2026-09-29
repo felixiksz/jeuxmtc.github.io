@@ -73,6 +73,8 @@
   .plan h4{ margin:0 0 4px; font-size:.85rem; color:var(--muted); }
   .plan-scroll{ overflow-x:auto; max-width:100%; }
   .plan svg{ display:block; }
+  .zonepass .zlabel{ font-size:10px; font-style:italic; fill:#7a6f55; }
+  .zonepass{ cursor:pointer; }
   .plan .br-label.int{ fill:#7d84b8; }
   body.editing .plan .br-label{ cursor:pointer; text-decoration:underline; }
   .plan .br-label{ font-size:10px; fill:var(--muted); font-weight:700; }
@@ -639,9 +641,17 @@
     return codes;
   }
 
+  const zoneBands = html => (html.match(/<g class="node zonepass"[\s\S]*?<\/g>/g) || []).join("");
+  const stationsOnly = html => html.replace(/<g class="node zonepass"[\s\S]*?<\/g>/g, "");
   function planSvg(s, title){
     if(!s.branches || !s.branches.length) return "";
-    const branches = withJunctions(s.branches.map((b, i) => ({...b, origBi:i})).filter(b => branchShown(s, b)));
+    // « Canal X » juste à côté d'un carrefour qui affiche déjà X : doublon retiré
+    const dedup = b => {
+      const near = (i, step) => { let j = i + step; while(j >= 0 && j < b.places.length && b.places[j].startsWith("c:")) j += step; return b.places[j]; };
+      const keep = b.places.map((p, i) => !(p.startsWith("c:") && [near(i, -1), near(i, 1)].some(q => q && q.startsWith("pt:") && otherCanals(q, current).includes(p.slice(2)))));
+      return {...b, places:b.places.filter((p, i) => keep[i]), img:(b.img || b.places.map(() => null)).filter((p, i) => keep[i])};
+    };
+    const branches = withJunctions(s.branches.map((b, i) => ({...dedup(b), origBi:i})).filter(b => branchShown(s, b)));
     if(!branches.length) return "";
     const STEP = 30, LANE_W = 132, X0 = 24, MAXCH = 17;
     const lanes = [];     // intervalles verticaux occupés, par voie
@@ -733,6 +743,18 @@
         const y = p.y + off;
         const info = PLACES[p.pid] || {label:p.pid, group:""};
         const isPoint = p.pid.startsWith("pt:");
+        // zone du corps : un quartier que la ligne traverse, pas un arrêt
+        if(!isPoint && !p.pid.startsWith("c:") && !p.cp){
+          const q = typeof zoneQuartier === "function" ? zoneQuartier(p.pid) : null;
+          const inQ = q ? Object.entries(pointZones()).filter(([pt, z]) => z === q).map(([pt]) => pt.slice(3)) : [];
+          const organ = info.group === "organes";
+          const lab = info.label.length > MAXCH + 2 ? info.label.slice(0, MAXCH + 1) + "…" : info.label;
+          stations += '<g class="node zonepass" data-pid="' + esc(p.pid) + '" data-bi="' + p.bi + '" data-idx="' + p.idx + '"><title>Quartier traversé : ' + esc(info.label) +
+            (inQ.length ? " — arrêt(s) du quartier : " + esc(inQ.join(", ")) : "") + "</title>" +
+            '<rect x="' + (x - 8) + '" y="' + (y - 11) + '" width="' + (MAXCH * 6.4 + 22) + '" height="22" rx="11" fill="' + (organ ? "#f6dcd2" : "#efe9d8") + '" opacity=".9"/>' +
+            '<text class="zlabel" x="' + (x + 9) + '" y="' + (y + 4) + '">' + esc(lab) + (inQ.length ? " · " + esc(inQ.join(", ")) : "") + "</text></g>";
+          return;
+        }
         const color = isPoint ? "var(--point)" : info.group === "organes" ? "var(--organ)" : info.group === "canaux" ? "var(--canal)" : "var(--zone)";
         const r = isPoint ? 5 : 7;
         const tip = info.label + " — cité dans le texte au départ d’une autre branche ; sa place sur cette ligne est déduite de la numérotation";
@@ -750,8 +772,8 @@
       });
     });
     return '<div class="plan"><h4>Plan des vaisseaux du ' + esc(title) + '</h4><div class="plan-scroll"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img">' +
-      lines + stations + nums + "</svg></div>" +
-      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span><span><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#9aa0c8" stroke-width="2.4" stroke-dasharray="6 4"/></svg>branche interne</span></div></div>';
+      zoneBands(stations) + lines + stationsOnly(stations) + nums + "</svg></div>" +
+      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="background:#efe9d8;border-radius:4px;width:16px"></i>quartier traversé (zone du corps)</span><span><i style="background:#f6dcd2;border-radius:4px;width:16px"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span><span><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#9aa0c8" stroke-width="2.4" stroke-dasharray="6 4"/></svg>branche interne</span></div></div>';
   }
 
   // =====================================================================
@@ -939,7 +961,7 @@
   // voies : les canaux côte à côte (de droite à gauche du tronc), le fleuve au milieu
   const LANE = {V:6, VB:5, TF:4, IG:3, GI:2, E:1, RM:0, DM:0, Rt:-1, P:-2, EC:-3, C:-4, F:-5, Rn:-6};
   // points placés dans un quartier (correspondances par localisation) ; déplaçables en mode édition
-  const DEFAULT_POINT_ZONE = {"pt:RM 2":"pubis"};
+  const DEFAULT_POINT_ZONE = {"pt:RM 2":"pubis", "pt:RM 8":"ombilic"};
   const pointZones = () => Object.assign({}, DEFAULT_POINT_ZONE, edits.pointZone || {});
   let NET_VB = null;
   const RIVER = new Set(["RM", "DM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"]);
