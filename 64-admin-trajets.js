@@ -17,7 +17,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.id = "mtcAdminTrajets";
-    button.textContent = "Trajets";
+    button.textContent = "Trajets β";
     button.title = "Trajets des canaux (admin)";
     button.addEventListener("click", () => { window.location.href = "trajets/index.html?admin=1"; });
     bar.appendChild(button);

@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Trajets des canaux</title>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root{ --bg:#fff; --text:#111; --accent:#2b2bff; --muted:#666; --line:#9aa0c8; --zone:#ff8a3d; --organ:#e0457b; --point:#2b2bff; }
   body{ margin:0; background:var(--bg); color:var(--text); font-family:"Archivo", system-ui, sans-serif; line-height:1.5; }
   :root{ --navw:150px; }
   header{ position:sticky; top:0; background:var(--bg); border-bottom:1px solid #ddd; padding:10px 16px; z-index:3;
           margin-left:var(--navw); display:flex; align-items:center; gap:10px; }
+  .beta{ font-size:.7em; color:var(--accent); font-weight:800; }
   h1{ font-size:1.1rem; margin:0; }
   nav{ position:fixed; top:0; left:0; bottom:0; width:var(--navw); box-sizing:border-box; overflow-y:auto; z-index:6;
        display:flex; flex-direction:column; gap:3px; padding:10px 8px; background:#f7f7fc; border-right:1px solid #ddd; }
@@ -42,6 +45,8 @@
   section{ border-top:1px solid #e3e3ee; padding:14px 0; scroll-margin-top:110px; }
   h3{ font-size:1rem; margin:0 0 8px; color:var(--accent); }
   p{ margin:0 0 8px; }
+  .desc p, .desc li, details{ font-family:"Libre Baskerville", Georgia, serif; font-size:.9rem; line-height:1.7; }
+  .typefilter, .edit-count, .legend{ font-family:"Tomorrow", "Archivo", sans-serif; }
   p.li{ padding-left:1.1em; text-indent:-1.1em; }
   p.li::before{ content:"• "; }
   body.editing [contenteditable="true"]{ outline:1px dashed #b9b9e6; border-radius:4px; background:#fffef4; }
@@ -68,6 +73,8 @@
   .plan h4{ margin:0 0 4px; font-size:.85rem; color:var(--muted); }
   .plan-scroll{ overflow-x:auto; max-width:100%; }
   .plan svg{ display:block; }
+  .plan .br-label.int{ fill:#7d84b8; }
+  body.editing .plan .br-label{ cursor:pointer; text-decoration:underline; }
   .plan .br-label{ font-size:10px; fill:var(--muted); font-weight:700; }
   .node{ cursor:pointer; }
   .node text{ font-size:10.5px; fill:#222; }
@@ -101,10 +108,27 @@
         border:2px solid currentColor; border-radius:999px; font-weight:800; font-size:.8rem; background:#fff; }
   .orb.el-metal{ color:#000; -webkit-text-stroke:0; }
   .cgap{ height:10px; }
-  .netwrap{ border:1px solid #e6e6f3; border-radius:12px; background:#fbfbff; padding:8px; overflow:auto; }
-  .netsvg{ display:block; width:100%; max-width:1150px; height:auto; margin:0 auto; }
+  .crow .where{ flex:none; width:8.5em; font-size:.72rem; font-weight:700; color:#555; background:#f1f1f7; border-radius:6px; padding:1px 6px; line-height:1.25; }
+  .netwrap.dark{ background:#171a22; border-color:#2a2f3b; }
+  .netwrap.dark .quartier rect{ fill-opacity:.09; stroke:#3a4150; }
+  .netwrap.dark .quartier text{ fill:#8c93a3; }
+  .netwrap.dark .netstop circle{ fill:#171a22; stroke:#f2f2f2; }
+  .netwrap.dark .netstop text{ fill:#eef0f4; stroke:#171a22; }
+  .netwrap.dark .netstop text.small{ fill:#aab0bd; }
+  .netwrap.dark .netbadge circle{ fill:#171a22; }
+  .netwrap.dark .netbadge text{ fill:#fff; }
+  .netwrap.dark .joint rect{ fill:#fff; fill-opacity:.05; }
+  .netwrap.dark .joint text{ fill:#6f7686; }
+  .netwrap{ position:relative; border:1px solid #e6e6f3; border-radius:12px; background:#fff; height:calc(100vh - 200px); min-height:420px; overflow:hidden; }
+  .netsvg{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; user-select:none; }
+  .netsvg.dragging{ cursor:grabbing; }
+  .netzoom{ position:absolute; right:10px; top:10px; z-index:2; display:flex; flex-direction:column; gap:4px; }
+  .netzoom button{ font:inherit; font-weight:800; width:32px; height:32px; border:1px solid #ccd; border-radius:8px; background:#fff; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .joint text{ font-size:11px; font-weight:800; fill:#9a96a8; letter-spacing:.04em; text-transform:uppercase; }
+  .quartier text{ font-size:15px; font-weight:800; fill:#a39d8c; letter-spacing:.03em; }
+  .netstop text.small{ font-size:8px; font-weight:600; fill:#666; }
   .netstop{ cursor:pointer; }
-  .netstop text{ font-size:12px; font-weight:800; fill:#222; paint-order:stroke; stroke:#fbfbff; stroke-width:4px; }
+  .netstop text{ font-size:10.5px; font-weight:800; fill:#222; paint-order:stroke; stroke:#fff; stroke-width:3.5px; }
   .netstop:hover rect, .netstop:hover circle{ stroke:#000; stroke-width:2.6; }
   .netbadge text{ font-size:8px; font-weight:800; fill:#222; }
   .netline:hover{ stroke-width:6; }
@@ -128,13 +152,14 @@
 <nav id="nav" aria-label="Canaux"></nav>
 <header>
   <a class="tool" href="../index.html?admin=1" title="Retour au jeu">← Jeu</a>
-  <h1>Trajets des canaux</h1>
+  <h1>Trajets des canaux <sup class="beta" title="Version bêta">β</sup></h1>
   <div class="typefilter" id="typeFilter" role="group" aria-label="Types de trajets affichés">
     <label><input type="checkbox" data-type="principal"> régulier</label>
     <label><input type="checkbox" data-type="luo"> luo</label>
     <label><input type="checkbox" data-type="distinct"> distinct</label>
     <label><input type="checkbox" data-type="tendineux"> tendineux</label>
     <label><input type="checkbox" data-type="vaisseau"> merveilleux vaisseaux</label>
+    <label title="Branches internes des canaux réguliers (nommées ainsi dans le texte, ou déduites)"><input type="checkbox" data-type="interne"> branches internes</label>
   </div>
   <div class="tools">
     <span class="edit-tools">
@@ -229,7 +254,7 @@
   // ---- corrections faites dans la page (gardées dans ce navigateur, exportables) ----
   const EDIT_KEY = "mtc_trajets_edits_v1";
   const ORIG = JSON.parse(JSON.stringify({data, PLACES}));
-  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}, complements:{}});
+  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}, complements:{}, internes:{}});
   let edits = loadEdits();
   let editing = false;
   function loadEdits(){
@@ -268,6 +293,25 @@
       b.img.splice(at, 0, cp);
     });
   }
+  // Branche interne / externe (canaux réguliers) : d'abord ce que dit le texte (« une branche
+  // interne… », « dans l'interne », « le trajet externe… ») ; sinon déduit : une branche qui passe
+  // surtout par des organes et des structures profondes, sans point de son propre canal.
+  const DEEP = new Set(["oculaire", "cerveau", "nasopharynx", "diaphragme", "cavite-corp", "foyer-central", "trachee"]);
+  function classifyBranch(c, s, si, b, bi){
+    const key = c.code + "|" + si + "|" + bi;
+    if(edits.internes && key in edits.internes){ b.interne = edits.internes[key]; b.interneSrc = "corrigé"; return; }
+    const txt = (s.paragraphs[b.p] || "").replace(/^-\s*/, "");
+    const first = txt.split(/[.;:](?:\s|$)/)[0];
+    if(/^(?:[^.;:]{0,90}?[\s,])?(?<!par\s)(?:la|une)\s+branche\s+interne\b/i.test(first) || /dans\s+l[’']interne/i.test(first)){ b.interne = true; b.interneSrc = "texte"; return; }
+    if(/^(?:[^.;:]{0,90}?[\s,])?(?:le\s+|la\s+)?(?:trajet|branche)\s+externe\b/i.test(first)){ b.interne = false; b.interneSrc = "texte"; return; }
+    const ps = b.places.filter(pid => !pid.startsWith("c:"));
+    const own = ps.slice(1, -1).filter(pid => pid.startsWith("pt:" + c.code + " ")).length;
+    const deep = ps.filter(pid => DEEP.has(pid) || (PLACES[pid] || ORIG.PLACES[pid] || {}).group === "organes").length;
+    const surf = ps.filter(pid => !pid.startsWith("pt:") && !(DEEP.has(pid) || (PLACES[pid] || ORIG.PLACES[pid] || {}).group === "organes")).length;
+    b.interne = own === 0 && deep > 0 && deep >= surf;
+    b.interneSrc = "déduit";
+  }
+  const branchShown = (s, b) => TYPES_ON.interne !== false || !b.interne;
   function applyEdits(){
     data.forEach((c, ci) => c.sections.forEach((s, si) => {
       const o = ORIG.data[ci].sections[si];
@@ -277,7 +321,8 @@
       s.branches = eb ? eb.map((places, bi) => ({...(o.branches[bi] || {}), places:places.slice()}))
                       : (o.branches || []).map(b => ({...b, places:b.places.slice()}));
       s.branches.forEach(b => { b.img = b.places.map(() => null); });
-      if(!eb) applyComplements(c, s);   // arrêts retouchés à la main : ta version prime
+      if(!eb) applyComplements(c, s);
+      if(s.type === "principal") s.branches.forEach((b, bi) => classifyBranch(c, s, si, b, bi));   // arrêts retouchés à la main : ta version prime
     }));
     Object.keys(PLACES).forEach(k => delete PLACES[k]);
     Object.assign(PLACES, JSON.parse(JSON.stringify(ORIG.PLACES)));
@@ -386,18 +431,16 @@
   // types de trajets affichés (cases en haut) : plans et correspondances
   const TYPES_KEY = "mtc_trajets_types_v1";
   const typeGroup = type => (type === "grand_luo" ? "luo" : type);
-  let TYPES_ON = {principal:true, luo:true, distinct:true, tendineux:true, vaisseau:true};
+  let TYPES_ON = {principal:true, luo:true, distinct:true, tendineux:true, vaisseau:true, interne:true};
   try{ Object.assign(TYPES_ON, JSON.parse(localStorage.getItem(TYPES_KEY) || "{}")); }catch(e){}
   const typeShown = s => TYPES_ON[typeGroup(s.type)] !== false;
 
   const JIAOHUI = window.MTC_TRAJETS_JIAOHUI || {};
   function sectionsThrough(pid){
-    if(pid.startsWith("hub:")) return (HUB_SECTIONS[pid] || []).filter(it => typeShown(it.s)).slice()
-      .sort((a, b) => (CANAL_ORDER.indexOf(a.c.code) - CANAL_ORDER.indexOf(b.c.code)) || (TYPE_ORDER.indexOf(a.s.type) - TYPE_ORDER.indexOf(b.s.type)));
     const ms = membersOf(pid);
     const out = [];
     data.forEach(c => c.sections.forEach((s, si) => {
-      if(s.branches && s.branches.some(b => b.places.some(p => ms.includes(p)))) out.push({c, s, si});
+      if(s.branches && s.branches.some(b => branchShown(s, b) && b.places.some(p => ms.includes(p)))) out.push({c, s, si});
     }));
     // un point appartient par définition au canal régulier de son code (VB 8 → canal VB),
     // même si le texte de ce trajet ne le cite pas
@@ -430,6 +473,7 @@
 
   function rowHtml(item){
     const {c, s, si} = item;
+    const where = item.where ? '<span class="where" title="Lieu de correspondance">' + esc(item.where) + "</span>" : "";
     const go = ' data-go="' + c.code + "|" + si + '"';
     const meta = CANAL[c.code];
     const orb = code => '<span class="orb el-' + (ELEMENT[code] || "none") + '">' + esc(code) + "</span>";
@@ -437,12 +481,12 @@
       '<button type="button" class="rm" data-rm="' + c.code + "|" + si + '" title="Retirer ce lieu de ce trajet">retirer</button>';
     if(!meta){
       const name = c.name.replace(/ — .*/, "") + (s.type === "luo" ? " luò mài" : "");
-      return '<div class="crow"' + go + ">" + ((c.code === "RM" || c.code === "DM") ? orb(c.code) : '<span class="orb-gap"></span>') +
+      return '<div class="crow"' + go + ">" + where + ((c.code === "RM" || c.code === "DM") ? orb(c.code) : '<span class="orb-gap"></span>') +
         '<span class="cname el-none">' + esc(name) + "</span>" + rmBtn + "</div>";
     }
     const t = TYPE[s.type] || ["", ""];
     const name = meta.limb + " " + meta.layer.toLowerCase() + " " + t[0];
-    return '<div class="crow"' + go + ">" + orb(c.code) + '<span class="cname el-' + ELEMENT[c.code] + '">' + esc(name) +
+    return '<div class="crow"' + go + ">" + where + orb(c.code) + '<span class="cname el-' + ELEMENT[c.code] + '">' + esc(name) +
       ' <small>' + esc(t[1].toLowerCase()) + "</small></span>" + rmBtn + "</div>";
   }
 
@@ -456,6 +500,12 @@
       const layer = CANAL[it.c.code] ? LAYER_OF(it.c.code) : "vaisseaux";
       if(lastLayer !== null && layer !== lastLayer) html += '<div class="cgap"></div>';
       lastLayer = layer;
+      if(FAMILIES[pid]){
+        const ms = FAMILIES[pid].members;
+        const hit = [];
+        it.s.branches.forEach(b => { if(branchShown(it.s, b)) b.places.forEach(q => { if(ms.includes(q) && !hit.includes(q)) hit.push(q); }); });
+        it.where = hit.map(q => (PLACES[q] || {label:q}).label).join(", ");
+      }
       html += rowHtml(it);
     });
     document.getElementById("corrBody").innerHTML =
@@ -553,7 +603,8 @@
 
   function planSvg(s, title){
     if(!s.branches || !s.branches.length) return "";
-    const branches = withJunctions(s.branches);
+    const branches = withJunctions(s.branches.map((b, i) => ({...b, origBi:i})).filter(b => branchShown(s, b)));
+    if(!branches.length) return "";
     const STEP = 30, LANE_W = 132, X0 = 24, MAXCH = 17;
     const lanes = [];     // intervalles verticaux occupés, par voie
     const drawn = [];     // stations placées {pid, lane, y, inferred}
@@ -614,29 +665,32 @@
       }
       occupy(lane, from && !dashed ? from.y : startY, endY);
       const base = b.places.length - places.length;   // 1 si le lieu de séparation (déjà dessiné) a été retiré
-      const nodes = places.map((pid, i) => ({pid, lane, y:startY + i * STEP, inferred:b.inferred.has(pid), bi, idx:base + i, cp:b.img[base + i]}));
+      const nodes = places.map((pid, i) => ({pid, lane, y:startY + i * STEP, inferred:b.inferred.has(pid), bi:b.origBi, idx:base + i, cp:b.img[base + i]}));
       nodes.forEach(n => drawn.push(n));
-      segs.push({bi, lane, nodes, from, dashed, k, fallback});
+      segs.push({bi:b.origBi, lane, nodes, from, dashed, k, fallback, interne:!!b.interne, interneSrc:b.interneSrc});
     });
     const allY = segs.flatMap(g => g.nodes.map(n => n.y)).concat(segs.filter(g => g.from).map(g => g.from.y));
     const minY = Math.min(...allY), maxY = Math.max(...allY), off = 16 - minY;
     const nLanes = Math.max(...segs.map(g => g.lane)) + 1;
     const lx = l => X0 + l * LANE_W;
     const W = lx(nLanes - 1) + 122, H = maxY - minY + 34;
-    const line = (d, extra) => '<path d="' + d + '" fill="none" stroke="var(--line)" stroke-width="2.4" stroke-linejoin="round"' + (extra || "") + "/>";
+    const line = (d, extra) => '<path d="' + d + '" fill="none"' + (extra && extra.includes("stroke=") ? "" : ' stroke="var(--line)"') + ' stroke-width="2.4" stroke-linejoin="round"' + (extra || "") + "/>";
     let lines = "", stations = "", nums = "";
     segs.forEach(g => {
       const x = lx(g.lane), first = g.nodes[0], last = g.nodes[g.nodes.length - 1];
+      const st = g.interne ? ' stroke-dasharray="6 4" stroke="#9aa0c8" opacity=".85"' : "";
       if(g.from && !g.dashed){
-        lines += line("M" + lx(g.from.lane) + "," + (g.from.y + off) + (g.from.lane !== g.lane ? " H" + x : "") + " V" + (last.y + off));
+        lines += line("M" + lx(g.from.lane) + "," + (g.from.y + off) + (g.from.lane !== g.lane ? " H" + x : "") + " V" + (last.y + off), st);
       }else{
         if(g.dashed){
-          // même lieu plus loin dans la branche : trait pointillé entre les deux
-          lines += line("M" + lx(g.from.lane) + "," + (g.from.y + off) + " H" + x);
+          // même lieu plus loin dans la branche : liaison entre les deux
+          lines += line("M" + lx(g.from.lane) + "," + (g.from.y + off) + " H" + x, st);
         }
-        if(g.nodes.length > 1) lines += line("M" + x + "," + (first.y + off) + " V" + (last.y + off));
+        if(g.nodes.length > 1) lines += line("M" + x + "," + (first.y + off) + " V" + (last.y + off), st);
       }
-      nums += '<text class="br-label" x="' + (x - 13) + '" y="' + (first.y + off + 3.5) + '" text-anchor="end">' + (g.bi + 1) + "</text>";
+      nums += '<text class="br-label' + (g.interne ? " int" : "") + '" data-bi="' + g.bi + '" x="' + (x - 13) + '" y="' + (first.y + off + 3.5) + '" text-anchor="end">' +
+        (g.bi + 1) + "<title>Branche " + (g.bi + 1) + (g.interne ? " : interne" : " : externe") + (g.interneSrc ? " (" + g.interneSrc + ")" : "") +
+        (editing && g.interneSrc ? " — clic : changer" : "") + "</title></text>";
       g.nodes.forEach(p => {
         const y = p.y + off;
         const info = PLACES[p.pid] || {label:p.pid, group:""};
@@ -659,164 +713,333 @@
     });
     return '<div class="plan"><h4>Plan des vaisseaux du ' + esc(title) + '</h4><div class="plan-scroll"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img">' +
       lines + stations + nums + "</svg></div>" +
-      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span></div></div>';
+      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span><span><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#9aa0c8" stroke-width="2.4" stroke-dasharray="6 4"/></svg>branche interne</span></div></div>';
   }
 
   // =====================================================================
-  // Réseau global, façon plan de métro : les arrêts sont de grandes zones du
-  // corps (Yeux, Gorge, Thorax, Genou…), bien espacées ; chaque trajet relie
-  // les zones qu'il traverse, dans l'ordre. Les lignes qui partagent un
-  // tronçon sont posées côte à côte ; chaque zone est un grand cercle de
-  // correspondance. Le détail point par point reste dans les plans des canaux.
+  // Réseau global, façon plan de métro : les stations sont les points des
+  // trajets, les carrefours les points d'intersection (tableau jiāo huì), les
+  // quartiers les zones du corps. Positions anatomiques (zones fixées à la main,
+  // points entre leurs voisins), puis posées sur une grille invisible.
   // =====================================================================
-  const HUBS = {
-    // [libellé, x, y]
-    sommet:["Sommet de la tête", 520, 50], cerveau:["Cerveau", 600, 95], front:["Front", 440, 95], tempe:["Tempe", 360, 130],
-    yeux:["Yeux", 460, 165], nez:["Nez", 540, 180], oreille:["Oreille", 320, 190], joue:["Joue, pommette", 400, 225],
-    bouche:["Bouche, lèvres", 540, 250], dents:["Dents, gencives", 460, 275], machoire:["Mâchoire", 360, 280], langue:["Langue", 620, 280],
-    occiput:["Occiput", 700, 150], nuque:["Nuque", 720, 260], gorge:["Gorge", 540, 330], cou:["Cou", 440, 335],
-    susclav:["Creux sus-claviculaire", 440, 400], clavicule:["Clavicule", 360, 395], epaule:["Épaule", 270, 420], omoplate:["Omoplate", 780, 400],
-    aisselle:["Aisselle", 270, 490], bras:["Bras", 200, 520], coude:["Coude", 140, 560], avbras:["Avant-bras", 95, 620], poignet:["Poignet", 60, 690],
-    main:["Main", 40, 760], doigts:["Doigts", 45, 840],
-    thorax:["Thorax, poitrine", 540, 440], seins:["Seins", 440, 470], poumon:["Poumon", 420, 525], coeur:["Cœur", 620, 500], ec:["Enveloppe du cœur", 690, 460],
-    cotes:["Côtes, flancs", 330, 590], diaphragme:["Diaphragme", 540, 580], hypocondre:["Hypocondre", 360, 650], oesophage:["Œsophage", 620, 400],
-    foie:["Foie", 440, 640], vb:["Vésicule biliaire", 420, 700], estomac:["Estomac", 620, 640], rate:["Rate, pancréas", 700, 670],
-    dos:["Dos", 800, 500], colonne:["Colonne vertébrale", 800, 600], reins:["Reins", 800, 700], lombes:["Lombes", 860, 760],
-    tf:["Trois foyers", 540, 690], abdomen:["Abdomen", 540, 760], ombilic:["Ombilic", 620, 800], intestins:["Intestins", 700, 780],
-    basventre:["Bas-ventre", 540, 850], vessie:["Vessie", 620, 880], pubis:["Pubis", 540, 920], genitaux:["Organes génitaux", 460, 950],
-    perinee:["Périnée", 540, 990], anus:["Anus", 640, 1000], sacrum:["Sacrum", 800, 860], fesse:["Fesse", 820, 950],
-    aine:["Aine", 400, 900], hanche:["Hanche", 340, 960], cuisse:["Cuisse", 420, 1060], genou:["Genou", 420, 1150], poplite:["Creux poplité", 560, 1150],
-    jambe:["Jambe", 420, 1230], mollet:["Mollet", 560, 1230], malleole:["Malléole", 420, 1300], talon:["Talon", 560, 1310],
-    pied:["Pied", 360, 1360], plante:["Plante du pied", 520, 1380], orteils:["Orteils", 300, 1420]
+  const NET_POS = {
+    // tête
+    tete:[600,60], vertex:[600,40], crane:[600,52], parietal:[565,50], cerveau:[610,72], front:[600,96], "angle-frontal":[545,96],
+    cheveux:[600,86], tempe:[522,124], "angle-temporal":[528,110], sourcil:[562,118], occiput:[690,120],
+    yeux:[560,140], oculaire:[578,136], "canthus-int":[586,142], "canthus-ext":[536,142], "paupiere-sup":[560,132], "paupiere-inf":[560,150],
+    orbite:[562,142], "sus-orbitaire":[560,126], "sous-orbitaire":[560,160],
+    nez:[600,162], "racine-nez":[600,142], "aile-nez":[586,170], "arriere-nez":[608,174], nasopharynx:[608,184],
+    pommette:[530,166], "arcade-zyg":[524,160], "region-zyg":[528,168], joue:[536,182], visage:[560,176],
+    oreille:[476,150], "devant-oreille":[492,152], "derriere-oreille":[460,152], "autour-oreille":[468,140], "dessus-oreille":[476,126],
+    "apex-oreille":[476,120], "supant-oreille":[486,132], mastoide:[462,168],
+    levres:[600,192], bouche:[600,194], "frein-levre":[600,186], gouttiere:[600,180], dents:[584,198], "gencive-sup":[590,186], "gencive-inf":[590,202],
+    langue:[600,208], machoire:[546,206], mandibule:[546,212], "angle-mandibule":[520,206], menton:[600,218], "sillon-ml":[600,212],
+    // cou, épaule, thorax
+    cou:[600,242], gorge:[600,236], trachee:[600,252], nuque:[690,232], "o-oesophage":[604,300],
+    "sus-clav":[560,272], clavicule:[540,266], "zone-clav":[540,270], epaule:[472,286], acromion:[462,278], trapeze:[650,266],
+    omoplate:[722,302], supraep:[712,288], infraep:[728,316], delto:[502,292], aisselle:[466,322], "pli-axill":[470,332],
+    thorax:[600,332], poitrine:[590,342], "thorax-lat":[500,372], seins:[562,352], mamelon:[556,354],
+    intercostal:[540,382], cotes:[520,402], "cotes-flott":[520,432], hypocondre:[520,452], diaphragme:[600,422],
+    dos:[722,362], paravert:[706,382], colonne:[690,422], vertebres:[692,432], lombes:[702,522], lombaires:[692,522],
+    // organes
+    "o-poumon":[560,362], "o-systeme-poumon":[560,346], "o-coeur":[612,376], "o-systeme-coeur":[616,388], "o-ec":[622,366],
+    "o-foie":[558,452], "o-vb":[574,466], "o-estomac":[632,462], "foyer-central":[632,474], "o-rate":[662,462], "o-pancreas":[650,478],
+    "o-tf":[600,500], "o-ig":[600,542], "o-gi":[622,562], "o-intestins":[612,552], "o-reins":[722,502], "o-vessie":[600,642],
+    // abdomen, bassin
+    "cavite-corp":[600,512], abdomen:[600,522], ombilic:[600,542], "abdomen-inf":[600,602], pubis:[600,652], symphyse:[600,656],
+    genitaux:[600,682], verge:[600,692], uretre:[600,686], perinee:[600,702], anus:[682,702], sacrum:[712,622], aine:[560,652], fesse:[742,662],
+    // membre supérieur (vers la gauche)
+    "membre-sup":[300,332], bras:[402,332], "pli-coude":[342,338], coude:[336,330], olecrane:[330,322], "avant-bras":[272,334],
+    poignet:[212,334], "dos-poignet":[212,326], "cun-kou":[216,344], "styloide-rad":[212,348], "styloide-uln":[208,320], pisiforme:[204,340],
+    paume:[162,346], thenar:[172,356], main:[156,334], "dos-main":[160,324], metacarpe:[142,334],
+    pouce:[132,362], index:[112,348], medius:[102,338], annulaire:[106,326], "petit-doigt":[116,314],
+    // membre inférieur
+    hanche:[662,692], trochanter:[682,692], coxo:[692,662], cuisse:[622,782], "membre-inf":[622,850], genou:[622,882], poplite:[662,882],
+    jambe:[622,962], tibia:[606,962], fibula:[642,962], gastrocnemien:[658,950], malleole:[622,1040], "malleole-int":[602,1040],
+    "malleole-ext":[646,1040], talon:[652,1070], "tendon-calc":[662,1030], "dos-pied":[612,1082], plante:[632,1096], tarse:[622,1076],
+    naviculaire:[606,1070], metatarse:[612,1102], hallux:[590,1132], orteils:[622,1132], "petit-orteil":[652,1132]
   };
-  const HUB_OF = {
-    vertex:"sommet", tete:"sommet", crane:"sommet", parietal:"sommet", cerveau:"cerveau", front:"front", "angle-frontal":"front", cheveux:"front",
-    tempe:"tempe", "angle-temporal":"tempe", sourcil:"yeux", yeux:"yeux", oculaire:"yeux", "canthus-int":"yeux", "canthus-ext":"yeux",
-    "paupiere-sup":"yeux", "paupiere-inf":"yeux", orbite:"yeux", "sus-orbitaire":"yeux", "sous-orbitaire":"yeux",
-    nez:"nez", "racine-nez":"nez", "aile-nez":"nez", "arriere-nez":"nez", nasopharynx:"gorge",
-    pommette:"joue", "arcade-zyg":"joue", "region-zyg":"joue", joue:"joue", visage:"joue",
-    oreille:"oreille", "devant-oreille":"oreille", "derriere-oreille":"oreille", "autour-oreille":"oreille", "dessus-oreille":"oreille",
-    "apex-oreille":"oreille", "supant-oreille":"oreille", mastoide:"oreille",
-    levres:"bouche", bouche:"bouche", "frein-levre":"bouche", gouttiere:"bouche", "sillon-ml":"bouche", menton:"bouche",
-    dents:"dents", "gencive-sup":"dents", "gencive-inf":"dents", langue:"langue", machoire:"machoire", mandibule:"machoire", "angle-mandibule":"machoire",
-    occiput:"occiput", nuque:"nuque", cou:"cou", gorge:"gorge", trachee:"gorge", "o-oesophage":"oesophage",
-    "sus-clav":"susclav", clavicule:"clavicule", "zone-clav":"clavicule", epaule:"epaule", acromion:"epaule", trapeze:"epaule", delto:"epaule",
-    omoplate:"omoplate", supraep:"omoplate", infraep:"omoplate", aisselle:"aisselle", "pli-axill":"aisselle",
-    "membre-sup":"bras", bras:"bras", "pli-coude":"coude", coude:"coude", olecrane:"coude", "avant-bras":"avbras",
-    poignet:"poignet", "dos-poignet":"poignet", "cun-kou":"poignet", "styloide-rad":"poignet", "styloide-uln":"poignet", pisiforme:"poignet",
-    paume:"main", thenar:"main", main:"main", "dos-main":"main", metacarpe:"main",
-    pouce:"doigts", index:"doigts", medius:"doigts", annulaire:"doigts", "petit-doigt":"doigts",
-    thorax:"thorax", poitrine:"thorax", "thorax-lat":"cotes", seins:"seins", mamelon:"seins",
-    intercostal:"cotes", cotes:"cotes", "cotes-flott":"cotes", hypocondre:"hypocondre", diaphragme:"diaphragme",
-    dos:"dos", paravert:"dos", colonne:"colonne", vertebres:"colonne", lombes:"lombes", lombaires:"lombes",
-    "o-poumon":"poumon", "o-systeme-poumon":"poumon", "o-coeur":"coeur", "o-systeme-coeur":"coeur", "o-ec":"ec",
-    "o-foie":"foie", "o-vb":"vb", "o-estomac":"estomac", "foyer-central":"estomac", "o-rate":"rate", "o-pancreas":"rate",
-    "o-tf":"tf", "o-ig":"intestins", "o-gi":"intestins", "o-intestins":"intestins", "o-reins":"reins", "o-vessie":"vessie",
-    "cavite-corp":"abdomen", abdomen:"abdomen", ombilic:"ombilic", "abdomen-inf":"basventre", pubis:"pubis", symphyse:"pubis",
-    genitaux:"genitaux", verge:"genitaux", uretre:"genitaux", perinee:"perinee", anus:"anus", sacrum:"sacrum", aine:"aine", fesse:"fesse",
-    hanche:"hanche", trochanter:"hanche", coxo:"hanche", cuisse:"cuisse", "membre-inf":"cuisse", genou:"genou", poplite:"poplite",
-    jambe:"jambe", tibia:"jambe", fibula:"jambe", gastrocnemien:"mollet", malleole:"malleole", "malleole-int":"malleole", "malleole-ext":"malleole",
-    talon:"talon", "tendon-calc":"talon", "dos-pied":"pied", tarse:"pied", naviculaire:"pied", metatarse:"pied", plante:"plante",
-    hallux:"orteils", orteils:"orteils", "petit-orteil":"orteils"
-  };
+  // quartiers (zones du corps) : chaque lieu de base appartient à un quartier
+  const QUARTIERS = [
+    ["tete", "Tête", "#f4efe2", ["tete","vertex","crane","parietal","cerveau","front","angle-frontal","cheveux","tempe","angle-temporal","sourcil","occiput","yeux","oculaire","canthus-int","canthus-ext","paupiere-sup","paupiere-inf","orbite","sus-orbitaire","sous-orbitaire","nez","racine-nez","aile-nez","arriere-nez","pommette","arcade-zyg","region-zyg","joue","visage","oreille","devant-oreille","derriere-oreille","autour-oreille","dessus-oreille","apex-oreille","supant-oreille","mastoide","levres","bouche","frein-levre","gouttiere","dents","gencive-sup","gencive-inf","machoire","mandibule","angle-mandibule","menton","sillon-ml"]],
+    ["cou", "Cou et gorge", "#eef3f8", ["cou","gorge","trachee","nasopharynx","langue","o-oesophage"]],
+    ["bras", "Membre supérieur", "#f6eef0", ["epaule","acromion","delto","aisselle","pli-axill","membre-sup","bras","pli-coude","coude","olecrane","avant-bras","poignet","dos-poignet","cun-kou","styloide-rad","styloide-uln","pisiforme","paume","thenar","main","dos-main","metacarpe","pouce","index","medius","annulaire","petit-doigt"]],
+    ["thorax", "Thorax", "#eef6ef", ["sus-clav","clavicule","zone-clav","thorax","poitrine","thorax-lat","seins","mamelon","intercostal","cotes","cotes-flott","diaphragme","o-poumon","o-systeme-poumon","o-coeur","o-systeme-coeur","o-ec"]],
+    ["dos", "Dos", "#efeef7", ["nuque","trapeze","omoplate","supraep","infraep","dos","paravert","colonne","vertebres","lombes","lombaires","o-reins","sacrum"]],
+    ["abdomen", "Abdomen", "#f7f2e8", ["hypocondre","o-foie","o-vb","o-estomac","foyer-central","o-rate","o-pancreas","o-tf","o-ig","o-gi","o-intestins","cavite-corp","abdomen","ombilic"]],
+    ["bassin", "Bassin", "#f3eef6", ["abdomen-inf","o-vessie","pubis","symphyse","genitaux","verge","uretre","perinee","anus","aine","fesse","hanche","trochanter","coxo"]],
+    ["jambe", "Membre inférieur", "#eef5f5", ["cuisse","membre-inf","genou","poplite","jambe","tibia","fibula","gastrocnemien","malleole","malleole-int","malleole-ext","talon","tendon-calc","dos-pied","plante","tarse","naviculaire","metatarse","hallux","orteils","petit-orteil"]]
+  ];
+  const QUARTIER_OF = {};
+  QUARTIERS.forEach(([q, , , members]) => members.forEach(m => { QUARTIER_OF[m] = q; }));
   const NET_COLOR = {terre:"#d9a400", bois:"#2f9a3c", feu:"#e0261b", eau:"#1f5fd6", metal:"#ffffff",
     RM:"#6b3fa0", DM:"#3d2a7a", CM:"#b0529a", YangQ:"#8a6bd1", YinQ:"#8a6bd1", YangW:"#4a9aa6", YinW:"#4a9aa6", DaiM:"#9a7b3c"};
   const netColor = code => NET_COLOR[ELEMENT[code]] || NET_COLOR[code] || "#666";
   const NET_DASH = {luo:"8 5", grand_luo:"8 5", distinct:"2.5 4", tendineux:"12 4 2.5 4"};
-  const HUB_SECTIONS = {};   // « hub:xxx » → trajets qui passent par cette zone (pour les correspondances)
-  const hubOfPlace = pid => HUB_OF[pid] || HUB_OF[pid.split("~")[0]] || null;
+  const netBasePos = pid => NET_POS[pid] ? NET_POS[pid].slice() : (NET_POS[pid.split("~")[0]] ? NET_POS[pid.split("~")[0]].slice() : null);
+  const ptKey = pid => pid.slice(3);   // « pt:E 12 » → « E 12 »
 
   let view = "canal";
+  // Zoom : molette (autour du curseur), glisser pour se déplacer, pincement à deux doigts, boutons.
+  function initNetZoom(svg){
+    const wrap = svg.parentElement;
+    const box = svg.getBBox();
+    const pad = 40;
+    let vb = null;
+    const apply = () => svg.setAttribute("viewBox", vb.x + " " + vb.y + " " + vb.w + " " + vb.h);
+    const fit = () => {
+      const r = wrap.getBoundingClientRect();
+      const ratio = r.width > 50 && r.height > 50 ? r.height / r.width : 0.75;   // cadre pas encore affiché
+      let w = box.width + pad * 2, h = w * ratio;
+      if(h < box.height + pad * 2){ h = box.height + pad * 2; w = h / ratio; }
+      vb = {x:box.x + box.width / 2 - w / 2, y:box.y + box.height / 2 - h / 2, w, h};
+      apply();
+    };
+    const zoomAt = (factor, cx, cy) => {
+      const r = svg.getBoundingClientRect();
+      if(r.width < 10 || r.height < 10) return;
+      const px = vb.x + (cx - r.left) / r.width * vb.w, py = vb.y + (cy - r.top) / r.height * vb.h;
+      const w = Math.min(Math.max(vb.w * factor, 120), (box.width + pad * 2) * 3);
+      const k = w / vb.w;
+      vb = {x:px - (px - vb.x) * k, y:py - (py - vb.y) * k, w, h:vb.h * k};
+      apply();
+    };
+    fit();
+    // la taille du cadre change (fenêtre, panneau) : on recadre tant qu'on n'a pas zoomé
+    let touched = false;
+    try{ new ResizeObserver(() => { if(!touched) fit(); }).observe(wrap); }catch(e){}
+    svg.addEventListener("wheel", () => { touched = true; }, {passive:true});
+    svg.addEventListener("pointerdown", () => { touched = true; });
+    svg.addEventListener("wheel", e => { e.preventDefault(); zoomAt(Math.exp(e.deltaY * 0.0016), e.clientX, e.clientY); }, {passive:false});
+    const ptrs = new Map();
+    let dragged = false, last = null, pinch = null;
+    svg.addEventListener("pointerdown", e => {
+      ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+      dragged = false; last = [e.clientX, e.clientY];
+      if(ptrs.size === 2){ const [p1, p2] = [...ptrs.values()]; pinch = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]); }
+    });
+    svg.addEventListener("pointermove", e => {
+      if(!ptrs.has(e.pointerId)) return;
+      ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+      if(ptrs.size === 2 && pinch){
+        const [p1, p2] = [...ptrs.values()], dist = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]);
+        zoomAt(pinch / dist, (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
+        pinch = dist; dragged = true;
+        return;
+      }
+      const dx = e.clientX - last[0], dy = e.clientY - last[1];
+      if(!dragged && Math.hypot(dx, dy) < 4) return;
+      if(!dragged){ dragged = true; try{ svg.setPointerCapture(e.pointerId); }catch(err){} svg.classList.add("dragging"); }
+      const r = svg.getBoundingClientRect();
+      if(r.width < 10 || r.height < 10) return;
+      vb.x -= dx / r.width * vb.w; vb.y -= dy / r.height * vb.h;
+      last = [e.clientX, e.clientY];
+      apply();
+    });
+    const up = e => { ptrs.delete(e.pointerId); if(ptrs.size < 2) pinch = null; svg.classList.remove("dragging"); };
+    svg.addEventListener("pointerup", up);
+    svg.addEventListener("pointercancel", up);
+    svg.addEventListener("click", e => { if(dragged){ e.stopPropagation(); e.preventDefault(); dragged = false; } }, true);
+    wrap.querySelector(".netzoom").addEventListener("click", e => {
+      const b = e.target.closest("button"); if(!b) return;
+      const r = svg.getBoundingClientRect();
+      if(b.dataset.z === "fit") fit();
+      else zoomAt(b.dataset.z === "in" ? 1 / 1.4 : 1.4, r.left + r.width / 2, r.top + r.height / 2);
+    });
+  }
+
+  // Réseau : stations = points des trajets (les points d'intersection du tableau sont les
+  // carrefours), quartiers = zones du corps, lignes = trajets, sur une grille invisible.
   function showNetwork(){
     view = "network";
     current = null;
     nav.querySelectorAll("button[data-code]").forEach(b => b.classList.remove("on"));
     document.getElementById("netToggle").classList.add("on");
-    Object.keys(HUB_SECTIONS).forEach(k => delete HUB_SECTIONS[k]);
-    // chaque branche → suite des zones traversées (un point prend la zone de son voisin)
+    const secs = [];
+    data.forEach(c => c.sections.forEach((s, si) => { if(typeShown(s) && s.branches && s.branches.length) secs.push({c, s, si}); }));
+    secs.sort((a, b) => (TYPE_ORDER.indexOf(a.s.type) - TYPE_ORDER.indexOf(b.s.type)) || (CANAL_ORDER.indexOf(a.c.code) - CANAL_ORDER.indexOf(b.c.code)));
+    // 1. position anatomique de chaque lieu (zones fixées, points entre leurs voisins)
+    const pos = {}, raw = [];
+    secs.forEach(({c, s}) => s.branches.forEach(b => { if(!branchShown(s, b)) return; const pids = b.places.filter(p => !p.startsWith("c:")); if(pids.length) raw.push({c, s, pids, interne:!!b.interne}); }));
+    raw.forEach(l => l.pids.forEach(p => { if(!pos[p]){ const q = netBasePos(p); if(q) pos[p] = q; } }));
+    for(let pass = 0; pass < 6; pass++){
+      raw.forEach(l => l.pids.forEach((p, i) => {
+        if(pos[p]) return;
+        let a = i - 1; while(a >= 0 && !pos[l.pids[a]]) a--;
+        let z = i + 1; while(z < l.pids.length && !pos[l.pids[z]]) z++;
+        const A = a >= 0 ? pos[l.pids[a]] : null, Z = z < l.pids.length ? pos[l.pids[z]] : null;
+        if(A && Z){ const f = (i - a) / (z - a); pos[p] = [A[0] + (Z[0] - A[0]) * f, A[1] + (Z[1] - A[1]) * f]; }
+        else if(pass >= 3 && (A || Z)){ const B = A || Z, dd = A ? i - a : i - z; pos[p] = [B[0] + 5 * dd, B[1] + 12 * dd]; }
+      }));
+    }
+    // points du tableau d'intersection non cités : à côté d'un point voisin du même canal
+    Object.keys(JIAOHUI).forEach(k => {
+      const pid = "pt:" + k;
+      if(pos[pid]) return;
+      const m = /^(\S+) (\d+)$/.exec(k);
+      let best = null;
+      Object.keys(pos).forEach(q => { const n = /^pt:(\S+) (\d+)$/.exec(q); if(n && n[1] === m[1] && (!best || Math.abs(n[2] - m[2]) < best[0])) best = [Math.abs(n[2] - m[2]), q]; });
+      if(best) pos[pid] = [pos[best[1]][0] + 4, pos[best[1]][1] + 6 * Math.sign(Number(m[2]) - Number(best[1].split(" ")[1]) || 1)];
+    });
+    // 2. lignes : suite des points de chaque branche ; les carrefours du tableau s'y ajoutent
     const lines = [];
-    data.forEach(c => c.sections.forEach((s, si) => {
-      if(!typeShown(s) || !s.branches) return;
-      s.branches.forEach(b => {
-        const raw = b.places.filter(p => !p.startsWith("c:"));
-        const hubs = raw.map(hubOfPlace);
-        for(let i = 0; i < hubs.length; i++) if(!hubs[i]){ let j = i - 1; while(j >= 0 && !hubs[j]) j--; if(j >= 0) hubs[i] = hubs[j]; }
-        for(let i = hubs.length - 1; i >= 0; i--) if(!hubs[i]){ let j = i + 1; while(j < hubs.length && !hubs[j]) j++; if(j < hubs.length) hubs[i] = hubs[j]; }
-        const seq = hubs.filter((h, i) => h && h !== hubs[i - 1]);
-        seq.forEach(h => {
-          const id = "hub:" + h;
-          HUB_SECTIONS[id] = HUB_SECTIONS[id] || [];
-          if(!HUB_SECTIONS[id].some(o => o.c === c && o.si === si)) HUB_SECTIONS[id].push({c, s, si});
-        });
-        if(seq.length >= 2) lines.push({c, s, si, seq});
-      });
+    raw.forEach(l => {
+      const pts = l.pids.filter(p => p.startsWith("pt:") && pos[p]);
+      if(pts.length) lines.push({c:l.c, s:l.s, interne:l.interne, pts:pts.filter((p, i) => p !== pts[i - 1])});
+    });
+    Object.entries(JIAOHUI).forEach(([k, v]) => (v.canaux || []).forEach(code => {
+      const pid = "pt:" + k;
+      if(!pos[pid]) return;
+      const mine = lines.filter(l => l.c.code === code && !l.interne && (l.s.type === "principal" || l.s.type === "vaisseau"));
+      if(!mine.length || mine.some(l => l.pts.includes(pid))) return;
+      // inséré dans la branche du canal où il est le plus proche
+      let best = null;
+      mine.forEach(l => l.pts.forEach((q, i) => { const d = Math.hypot(pos[q][0] - pos[pid][0], pos[q][1] - pos[pid][1]); if(!best || d < best[0]) best = [d, l, i]; }));
+      if(best){
+        const [, l, i] = best, prev = l.pts[i - 1], next = l.pts[i + 1];
+        const dPrev = prev ? Math.hypot(pos[prev][0] - pos[pid][0], pos[prev][1] - pos[pid][1]) : Infinity;
+        const dNext = next ? Math.hypot(pos[next][0] - pos[pid][0], pos[next][1] - pos[pid][1]) : Infinity;
+        l.pts.splice(dNext < dPrev ? i + 1 : i, 0, pid);
+      }
     }));
-    Object.entries(HUBS).forEach(([h, [label]]) => { PLACES["hub:" + h] = {label, group:"réseau"}; });
-    // tronçons partagés : lignes côte à côte
+    // 3. grille invisible : chaque station sur une case libre, carrefours d'abord
+    const SCX = 3.6, SCY = 2.5, G = 30;   // plus d'écart en largeur : le tronc est étroit
+    const canalsAt = {};
+    lines.forEach(l => l.pts.forEach(p => { (canalsAt[p] = canalsAt[p] || new Set()).add(l.c.code); }));
+    Object.entries(JIAOHUI).forEach(([k, v]) => { const pid = "pt:" + k; if(canalsAt[pid]) (v.canaux || []).forEach(code => canalsAt[pid].add(code)); });
+    const stationsList = Object.keys(canalsAt).sort((a, b) => canalsAt[b].size - canalsAt[a].size);
+    const used = new Set(), cell = {};
+    stationsList.forEach(p => {
+      const gx = Math.round(pos[p][0] * SCX / G), gy = Math.round(pos[p][1] * SCY / G);
+      let found = null;
+      for(let r = 0; r < 12 && !found; r++){
+        for(let dx = -r; dx <= r && !found; dx++) for(let dy = -r; dy <= r && !found; dy++){
+          if(Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+          const k = (gx + dx) + "," + (gy + dy);
+          if(!used.has(k)){ used.add(k); found = [(gx + dx) * G, (gy + dy) * G]; }
+        }
+      }
+      cell[p] = found || [gx * G, gy * G];
+    });
+    // 4. tronçons partagés, tracé à angles droits / 45°, lignes côte à côte
     const edgeKey = (a, b) => a < b ? a + "|" + b : b + "|" + a;
     const edges = {};
-    lines.forEach((l, li) => l.seq.forEach((h, i) => { if(i){ const k = edgeKey(l.seq[i - 1], h); (edges[k] = edges[k] || []); if(!edges[k].includes(li)) edges[k].push(li); } }));
+    lines.forEach((l, li) => l.pts.forEach((p, i) => { if(i){ const k = edgeKey(l.pts[i - 1], p); (edges[k] = edges[k] || []); if(!edges[k].includes(li)) edges[k].push(li); } }));
     Object.values(edges).forEach(list => list.sort((a, b) => (CANAL_ORDER.indexOf(lines[a].c.code) - CANAL_ORDER.indexOf(lines[b].c.code)) || (TYPE_ORDER.indexOf(lines[a].s.type) - TYPE_ORDER.indexOf(lines[b].s.type))));
-    const GAP = 3.6;
+    const route = k => {
+      const [a, b] = k.split("|"), [x1, y1] = cell[a], [x2, y2] = cell[b];
+      const dx = x2 - x1, dy = y2 - y1, adx = Math.abs(dx), ady = Math.abs(dy);
+      if(!adx || !ady || adx === ady) return [[x1, y1], [x2, y2]];
+      const dg = Math.min(adx, ady);
+      const m = ady > adx ? [x1, y1 + Math.sign(dy) * (ady - dg)] : [x1 + Math.sign(dx) * (adx - dg), y1];
+      return [[x1, y1], m, [x2, y2]];
+    };
+    const offsetPath = (pts, o) => {
+      if(!o) return pts;
+      const nrm = [];
+      for(let i = 0; i < pts.length - 1; i++){
+        const ux = pts[i + 1][0] - pts[i][0], uy = pts[i + 1][1] - pts[i][1], L = Math.hypot(ux, uy) || 1;
+        nrm.push([-uy / L, ux / L]);
+      }
+      return pts.map((q, i) => {
+        if(i === 0) return [q[0] + nrm[0][0] * o, q[1] + nrm[0][1] * o];
+        if(i === pts.length - 1) return [q[0] + nrm[i - 1][0] * o, q[1] + nrm[i - 1][1] * o];
+        const n1 = nrm[i - 1], n2 = nrm[i], dot = n1[0] * n2[0] + n1[1] * n2[1], f = o / (1 + dot);
+        return [q[0] + (n1[0] + n2[0]) * f, q[1] + (n1[1] + n2[1]) * f];
+      });
+    };
+    const GAP = 4;
     let svgLines = "", badges = "";
     const badgeAt = {};
     lines.forEach((l, li) => {
+      if(l.pts.length < 2 && !(l.s.type === "principal" || l.s.type === "vaisseau")) return;
       const col = netColor(l.c.code), metal = ELEMENT[l.c.code] === "metal";
       const dash = NET_DASH[l.s.type] ? ' stroke-dasharray="' + NET_DASH[l.s.type] + '"' : "";
       let d = "";
-      l.seq.forEach((h, i) => {
+      l.pts.forEach((p, i) => {
         if(!i) return;
-        const A = HUBS[l.seq[i - 1]], B = HUBS[h], k = edgeKey(l.seq[i - 1], h), list = edges[k];
-        const dx = B[1] - A[1], dy = B[2] - A[2], len = Math.hypot(dx, dy) || 1;
-        // décalage perpendiculaire, toujours dans le même sens pour un tronçon donné
-        const sgn = l.seq[i - 1] < h ? 1 : -1;
-        const o = (list.indexOf(li) - (list.length - 1) / 2) * GAP * sgn;
-        const nx = -dy / len * o, ny = dx / len * o;
-        d += " M" + (A[1] + nx).toFixed(1) + "," + (A[2] + ny).toFixed(1) + " L" + (B[1] + nx).toFixed(1) + "," + (B[2] + ny).toFixed(1);
+        const from = l.pts[i - 1], k = edgeKey(from, p), list = edges[k];
+        const o = (list.indexOf(li) - (list.length - 1) / 2) * GAP;
+        let q = offsetPath(route(k), o);
+        if(from > p) q = q.slice().reverse();
+        d += " M" + q.map(z => z[0].toFixed(1) + "," + z[1].toFixed(1)).join(" L");
       });
       const title = "<title>" + esc(sectionName(l.c, l.s)) + "</title>";
-      if(metal) svgLines += '<path d="' + d + '" fill="none" stroke="#222" stroke-width="4.8" stroke-linecap="round"' + dash + "/>";
-      svgLines += '<path class="netline" data-code="' + l.c.code + '" d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + (metal ? 2.6 : 3.2) + '" stroke-linecap="round"' + dash + ">" + title + "</path>";
-      // sigle au départ de la ligne (un par canal et type)
-      const key = l.c.code + "|" + typeGroup(l.s.type);
-      if(!badgeAt[key]){
-        badgeAt[key] = true;
-        (badgeAt["@" + l.seq[0]] = badgeAt["@" + l.seq[0]] || []).push({code:l.c.code, col, metal, dash, title});
+      if(d){
+        svgLines += '<path class="netline" data-code="' + l.c.code + '" d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + (l.interne ? 1.8 : metal ? 2.6 : 3.2) + '" stroke-linecap="round" stroke-linejoin="round"' + dash + (l.interne ? ' opacity=".6"' : "") + ">" + title + "</path>";
       }
+      const key = l.c.code + "|" + typeGroup(l.s.type);
+      if(!badgeAt[key]){ badgeAt[key] = true; (badgeAt["@" + l.pts[0]] = badgeAt["@" + l.pts[0]] || []).push({code:l.c.code, col, metal, dash, title}); }
     });
-    // sigles de départ : en couronne autour de leur zone, sans se chevaucher
     Object.keys(badgeAt).filter(k => k.startsWith("@")).forEach(k => {
-      const list = badgeAt[k], [, x, y] = HUBS[k.slice(1)], n = list.length;
-      const rad = 30 + Math.max(0, n - 6) * 4.2;
+      const list = badgeAt[k], [x, y] = cell[k.slice(1)], n = list.length, rad = 26 + Math.max(0, n - 6) * 4;
       list.forEach((b, i) => {
-        const ang = -Math.PI / 2 + (i + 0.5) * (2 * Math.PI / n);
+        const ang = Math.PI / 4 + (i + 0.5) * (2 * Math.PI / Math.max(n, 4));
         const bx = x + Math.cos(ang) * rad, by = y + Math.sin(ang) * rad;
-        badges += '<g class="netbadge"><line x1="' + x + '" y1="' + y + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '" stroke="' + (b.metal ? "#222" : b.col) + '" stroke-width="1.2"/>' +
-          '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="10.5" fill="#fff" stroke="' + (b.metal ? "#222" : b.col) + '" stroke-width="2.4"' + b.dash + "/>" +
+        badges += '<g class="netbadge"><line x1="' + x + '" y1="' + y + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '" stroke="' + (b.metal ? "#ddd" : b.col) + '" stroke-width="1.2"/>' +
+          '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="10.5" fill="#fff" stroke="' + (b.metal ? "#fff" : b.col) + '" stroke-width="2.4"' + b.dash + "/>" +
           '<text x="' + bx.toFixed(1) + '" y="' + (by + 3.2).toFixed(1) + '" text-anchor="middle">' + esc(sigle(b.code)) + "</text>" + b.title + "</g>";
       });
     });
-    // zones (grands cercles de correspondance)
+    // 5. quartiers : aplat clair autour des stations de chaque zone du corps
+    const nearestQuartier = p => {
+      let best = null;
+      Object.keys(NET_POS).forEach(z => { if(!QUARTIER_OF[z]) return; const d = Math.hypot(NET_POS[z][0] - pos[p][0], NET_POS[z][1] - pos[p][1]); if(!best || d < best[0]) best = [d, QUARTIER_OF[z]]; });
+      return best ? best[1] : null;
+    };
+    const qBox = {};
+    stationsList.forEach(p => {
+      const q = nearestQuartier(p); if(!q) return;
+      const [x, y] = cell[p], b = qBox[q] = qBox[q] || [x, y, x, y];
+      b[0] = Math.min(b[0], x); b[1] = Math.min(b[1], y); b[2] = Math.max(b[2], x); b[3] = Math.max(b[3], y);
+    });
+    let districts = "";
+    // articulations : chaque canal de la jambe passe par une face de la hanche, du genou et de la
+    // cheville ; chaque canal du bras par une face de l'épaule, du coude et du poignet
+    [["hanche", "Hanche", "y"], ["genou", "Genou", "y"], ["malleole", "Cheville", "y"], ["epaule", "Épaule", "x"], ["coude", "Coude", "x"], ["poignet", "Poignet", "x"]].forEach(([z, label, axis]) => {
+      const q = NET_POS[z]; if(!q) return;
+      const lim = axis === "y" ? qBox.jambe || qBox.bassin : qBox.bras;
+      if(!lim) return;
+      if(axis === "y"){
+        const y = Math.round(q[1] * SCY);
+        districts += '<g class="joint"><rect x="' + (lim[0] - 60) + '" y="' + (y - 12) + '" width="' + (lim[2] - lim[0] + 120) + '" height="24" rx="12" fill="#8a8aa0" fill-opacity=".08"/><text x="' + (lim[2] + 66) + '" y="' + (y + 4) + '">' + label + "</text></g>";
+      }else{
+        const x = Math.round(q[0] * SCX);
+        districts += '<g class="joint"><rect x="' + (x - 12) + '" y="' + (lim[1] - 50) + '" width="24" height="' + (lim[3] - lim[1] + 100) + '" rx="12" fill="#8a8aa0" fill-opacity=".08"/><text x="' + x + '" y="' + (lim[1] - 56) + '" text-anchor="middle">' + label + "</text></g>";
+      }
+    });
+    QUARTIERS.forEach(([q, label, fill]) => {
+      const b = qBox[q]; if(!b) return;
+      const P = 22;
+      districts += '<g class="quartier"><rect x="' + (b[0] - P) + '" y="' + (b[1] - P) + '" width="' + (b[2] - b[0] + 2 * P) + '" height="' + (b[3] - b[1] + 2 * P) + '" rx="26" fill="' + fill + '" stroke="#d9d5c8" stroke-width="1"/>' +
+        '<text x="' + (b[0] - P + 12) + '" y="' + (b[1] - P + 22) + '">' + esc(label) + "</text></g>";
+    });
+    // 6. stations : carrefours (tableau d'intersection ou plusieurs lignes) et stations simples
     let stations = "";
-    Object.entries(HUBS).forEach(([h, [label, x, y]]) => {
-      const secs = HUB_SECTIONS["hub:" + h] || [];
-      if(!secs.length) return;
-      const codes = [...new Set(secs.map(o => o.c.code))];
-      const r = 7 + Math.min(10, codes.length * 0.9);
-      const left = x < 300;
-      stations += '<g class="node netstop" data-pid="hub:' + h + '"><circle cx="' + x + '" cy="' + y + '" r="' + r.toFixed(1) + '" fill="#fff" stroke="#1d1d1f" stroke-width="' + (codes.length > 1 ? 3 : 2) + '"/>' +
-        '<text x="' + (left ? x - r - 4 : x + r + 4) + '" y="' + (y + 4) + '"' + (left ? ' text-anchor="end"' : "") + ">" + esc(label) + "</text></g>";
+    stationsList.forEach(p => {
+      const [x, y] = cell[p], n = canalsAt[p].size, jh = !!JIAOHUI[ptKey(p)];
+      const label = esc((PLACES[p] || {label:ptKey(p)}).label);
+      if(n >= 2 || jh){
+        stations += '<g class="node netstop" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="' + (6 + Math.min(5, n)) + '" fill="#fff" stroke="#1d1d1f" stroke-width="3"/>' +
+          '<text x="' + (x + 9 + Math.min(5, n)) + '" y="' + (y - 7) + '">' + label + "</text></g>";
+      }else{
+        stations += '<g class="node netstop single" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="3.4" fill="#fff" stroke="#333" stroke-width="1.6"/>' +
+          '<text class="small" x="' + (x + 6) + '" y="' + (y - 4) + '">' + label + "</text></g>";
+      }
     });
     const legend = '<div class="legend netlegend">' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3"/></svg>régulier, vaisseau</span>' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="8 5"/></svg>luo</span>' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="2.5 4"/></svg>distinct</span>' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="12 4 2.5 4"/></svg>tendineux</span>' +
-      '<span><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#fff" stroke="#1d1d1f" stroke-width="2.4"/></svg>zone (plus elle est grande, plus de canaux y passent)</span>' +
+      '<span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="#fff" stroke="#1d1d1f" stroke-width="3"/></svg>carrefour : point d’intersection (tableau) ou point commun à plusieurs trajets</span>' +
+      '<span><svg width="10" height="10"><circle cx="5" cy="5" r="3.4" fill="#fff" stroke="#333" stroke-width="1.6"/></svg>point d’un seul trajet</span>' +
       "<span>P, GI, E… · RM, DM · ChM · QM▲/▼ · WM▲/▼ · DaiM (▲ yáng, ▼ yīn)</span></div>";
     main.innerHTML = "<h2>Réseau global des trajets</h2>" +
-      '<div class="src">Tous les trajets cochés en haut, reliant les grandes zones du corps qu’ils traversent. Survol d’une ligne : son trajet · survol d’une zone : les trajets qui y passent · clic : correspondances. Le détail point par point est dans le plan de chaque canal.</div>' +
-      legend + '<div class="netwrap"><svg class="netsvg" viewBox="-70 0 1000 1510" role="img">' + svgLines + stations + badges + "</svg></div>";
+      '<div class="src">Stations = points des trajets ; carrefours = points d’intersection de ton tableau ; quartiers = zones du corps. Molette : zoom · glisser : se déplacer · survol : trajets qui passent · clic : correspondances.</div>' +
+      legend + '<div class="netwrap dark"><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button></div>' +
+      '<svg class="netsvg" role="img">' + districts + svgLines + stations + badges + "</svg></div>";
+    initNetZoom(main.querySelector(".netsvg"));
     try{ history.replaceState(null, "", "#reseau"); }catch(e){}
   }
 
@@ -830,7 +1053,7 @@
     const scrollY = window.scrollY;
     nav.querySelectorAll("button[data-code]").forEach(b => b.classList.toggle("on", b.dataset.code === canal.code));
     main.innerHTML = "<h2>" + esc(canal.code) + " — " + esc(canal.name) + "</h2>" +
-      '<div class="src">Source : ' + esc(canal.source) + "</div>" +
+      '<div class="src">Source : ' + esc(String(canal.source).replace(/&#0?39;/g, "’")) + "</div>" +
       (canal.sections.some(typeShown) ? "" : '<p class="src">Aucun trajet de ce canal pour les types cochés en haut.</p>') +
       canal.sections.map((s, si) => {
         if(!typeShown(s)) return "";
@@ -906,6 +1129,17 @@
     nav.appendChild(row);
   });
 
+  document.addEventListener("click", event => {
+    const lab = editing && event.target.closest && event.target.closest(".plan .br-label");
+    if(!lab) return;
+    const sec = lab.closest("section"), si = Number(sec.id.replace("sec-", "")), bi = Number(lab.dataset.bi);
+    const c = data.find(x => x.code === current), s = c.sections[si];
+    if(s.type !== "principal") return;
+    const key = c.code + "|" + si + "|" + bi;
+    edits.internes = edits.internes || {};
+    edits.internes[key] = !s.branches[bi].interne;
+    saveEdits(); applyEdits(); show(current, undefined, true);
+  });
   function complementClick(node){
     const cp = COMPLEMENTS.find(x => x.id === node.dataset.cp);
     if(!cp) return;
