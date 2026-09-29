@@ -5,6 +5,8 @@
    - lieu : identifiant du lieu ajouté ; avant / apres : lieu de la branche à côté duquel l'insérer ;
    - page : page du cours où se trouve l'illustration ; note : ce que montre l'image. */
 window.MTC_TRAJETS_COMPLEMENTS = [
+ {"id":"CM-F3", "canal":"CM", "section":"vaisseau", "branche":"cinquième branche", "apres":"pt:E 42", "lieu":"pt:F 3", "statut":"validé",
+  "source":"tradition taoïste", "note":"Selon les taoïstes, F 3 (tài chōng) fait partie de la 5e branche du chōng mài ; non cité dans le texte du cours."},
  {"id":"GI-tend-VB13", "canal":"GI", "section":"tendineux", "branche":"passe par la tempe", "apres":"tempe", "lieu":"pt:VB 13", "page":14, "statut":"validé",
   "note":"VB 13 est nommé sur l'image, là où la branche enveloppe la tête."},
  {"id":"E-tend-E12", "canal":"E", "section":"tendineux", "branche":"fosse sus-claviculaire", "apres":"sus-clav", "lieu":"pt:E 12", "page":16, "statut":"validé",

@@ -822,7 +822,8 @@ window.MTC_TRAJETS = [
        "pouce",
        "thenar",
        "pt:P 10",
-       "pouce",
+       "pouce~bord-radial",
+       "pouce~angle-ungueal-radial",
        "pt:P 11"
       ]
      },
@@ -834,7 +835,7 @@ window.MTC_TRAJETS = [
       "places": [
        "pt:P 7",
        "paume",
-       "index",
+       "index~bord-radial",
        "c:GI"
       ]
      }
@@ -1165,9 +1166,9 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "index",
+       "index~bord-radial",
        "pt:GI 1",
-       "metacarpe",
+       "metacarpe~2e-bord-radial",
        "pt:GI 4",
        "pt:GI 5",
        "avant-bras",
@@ -1435,7 +1436,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "index",
+       "index~bord-radial",
        "dos-poignet",
        "avant-bras",
        "coude",
@@ -1669,7 +1670,7 @@ window.MTC_TRAJETS = [
        "pt:E 40",
        "dos-pied",
        "pt:E 41",
-       "orteils",
+       "orteils~2e-extremite-externe",
        "pt:E 45"
       ]
      },
@@ -1680,7 +1681,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "pt:E 36",
-       "orteils"
+       "orteils~3e-bord-externe"
       ]
      },
      {
@@ -1692,7 +1693,7 @@ window.MTC_TRAJETS = [
        "dos-pied",
        "pt:E 42",
        "c:Rt",
-       "hallux"
+       "hallux~extremite-interne"
       ]
      }
     ]
@@ -1868,7 +1869,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "orteils",
+       "orteils~2e-3e-et-4e",
        "dos-pied",
        "jambe",
        "fibula",
@@ -2035,10 +2036,12 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
+       "hallux~bord-interne",
        "hallux",
        "pt:Rt 1",
+       "hallux~bord-interne",
        "hallux",
-       "metatarse",
+       "metatarse~1er-bord-interne",
        "malleole-int",
        "jambe",
        "tibia",
@@ -2315,6 +2318,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
+       "hallux~extremite-interne",
        "hallux",
        "malleole-int",
        "tibia",
@@ -2459,8 +2463,8 @@ window.MTC_TRAJETS = [
        "poignet",
        "pisiforme",
        "paume",
-       "metacarpe",
-       "petit-doigt",
+       "metacarpe~entre-4e-et-5e-face-palmaire",
+       "petit-doigt~bord-radial",
        "pt:C 9"
       ],
       "from": "o-systeme-coeur"
@@ -2653,7 +2657,7 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "petit-doigt",
+       "petit-doigt~bord-interne",
        "pisiforme",
        "pt:C 7",
        "coude",
@@ -3213,8 +3217,8 @@ window.MTC_TRAJETS = [
        "jambe",
        "gastrocnemien",
        "malleole-ext",
-       "metatarse",
-       "petit-orteil",
+       "metatarse~5e-tuberosite",
+       "petit-orteil~bord-externe",
        "c:Rn"
       ]
      }
@@ -3585,7 +3589,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "pt:V 67",
-       "plante",
+       "plante~centre",
        "pt:Rn 1",
        "naviculaire",
        "malleole-int",
@@ -3869,8 +3873,8 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "petit-orteil",
-       "plante",
+       "petit-orteil~extremite-inferieure",
+       "plante~centre",
        "c:Rt",
        "malleole-int"
       ]
@@ -4039,7 +4043,7 @@ window.MTC_TRAJETS = [
       "places": [
        "avant-bras",
        "paume",
-       "medius",
+       "medius~bord-ulnaire",
        "pt:EC 9"
       ]
      },
@@ -4049,8 +4053,8 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
-       "paume",
-       "annulaire",
+       "paume~centre",
+       "annulaire~bord-ulnaire",
        "pt:TF 1"
       ]
      }
@@ -4405,10 +4409,10 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "annulaire",
+       "annulaire~angle-ungueal-cubital",
        "pt:TF 1",
        "dos-main",
-       "metacarpe",
+       "metacarpe~entre-4e-et-5e-face-dorsale",
        "avant-bras",
        "olecrane",
        "pt:TF 10",
@@ -4960,7 +4964,7 @@ window.MTC_TRAJETS = [
        "malleole-ext",
        "pt:VB 40",
        "dos-pied",
-       "orteils",
+       "orteils~4e-bord-externe",
        "pt:VB 44"
       ]
      },
@@ -5116,7 +5120,7 @@ window.MTC_TRAJETS = [
       "places": [
        "pt:VB 37",
        "dos-pied",
-       "orteils"
+       "orteils~3e-4e-et-5e"
       ],
       "from": "pt:VB 37"
      }
@@ -5191,7 +5195,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "orteils",
+       "orteils~4e",
        "malleole-ext",
        "tibia",
        "genou"
@@ -5402,10 +5406,10 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
-       "hallux",
+       "hallux~face-dorsale",
        "pt:F 1",
-       "metatarse",
-       "dos-pied",
+       "metatarse~entre-1er-et-2e",
+       "dos-pied~face-mediale",
        "malleole-int",
        "pt:F 4",
        "jambe",
@@ -5629,7 +5633,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "hallux",
+       "hallux~face-dorsale",
        "pt:F 1",
        "pt:F 4",
        "tibia",
@@ -5951,7 +5955,7 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "talon",
+       "talon~centre",
        "pt:Rn 6",
        "malleole-int",
        "pt:Rn 8",
@@ -6097,9 +6101,9 @@ window.MTC_TRAJETS = [
        5
       ],
       "places": [
-       "talon",
+       "talon~centre",
        "pt:V 62",
-       "talon",
+       "talon~face-laterale",
        "pt:V 61",
        "malleole-ext",
        "membre-inf",
@@ -6344,7 +6348,7 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "talon",
+       "talon~face-laterale",
        "pt:V 63",
        "pt:VB 35",
        "membre-inf",
@@ -6939,6 +6943,14 @@ window.MTC_TRAJETS_PLACES = {
   "label": "P 10",
   "group": "points"
  },
+ "pouce~bord-radial": {
+  "label": "Pouce — bord radial",
+  "group": "membre supérieur"
+ },
+ "pouce~angle-ungueal-radial": {
+  "label": "Pouce — angle unguéal radial",
+  "group": "membre supérieur"
+ },
  "pt:P 11": {
   "label": "P 11",
   "group": "points"
@@ -6951,8 +6963,8 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Paume",
   "group": "membre supérieur"
  },
- "index": {
-  "label": "Index",
+ "index~bord-radial": {
+  "label": "Index — bord radial",
   "group": "membre supérieur"
  },
  "pt:P 3": {
@@ -7003,8 +7015,8 @@ window.MTC_TRAJETS_PLACES = {
   "label": "GI 1",
   "group": "points"
  },
- "metacarpe": {
-  "label": "Métacarpiens",
+ "metacarpe~2e-bord-radial": {
+  "label": "Métacarpiens — 2e, bord radial",
   "group": "membre supérieur"
  },
  "pt:GI 5": {
@@ -7211,8 +7223,8 @@ window.MTC_TRAJETS_PLACES = {
   "label": "E 41",
   "group": "points"
  },
- "orteils": {
-  "label": "Orteils",
+ "orteils~2e-extremite-externe": {
+  "label": "Orteils — 2e, extrémité externe",
   "group": "membre inférieur"
  },
  "pt:E 45": {
@@ -7223,12 +7235,16 @@ window.MTC_TRAJETS_PLACES = {
   "label": "E 36",
   "group": "points"
  },
+ "orteils~3e-bord-externe": {
+  "label": "Orteils — 3e, bord externe",
+  "group": "membre inférieur"
+ },
  "pt:E 42": {
   "label": "E 42",
   "group": "points"
  },
- "hallux": {
-  "label": "Gros orteil (hallux)",
+ "hallux~extremite-interne": {
+  "label": "Gros orteil (hallux) — extrémité interne",
   "group": "membre inférieur"
  },
  "o-oesophage": {
@@ -7246,6 +7262,10 @@ window.MTC_TRAJETS_PLACES = {
  "yeux": {
   "label": "Yeux",
   "group": "tête"
+ },
+ "orteils~2e-3e-et-4e": {
+  "label": "Orteils — 2e, 3e et 4e",
+  "group": "membre inférieur"
  },
  "fibula": {
   "label": "Fibula (péroné)",
@@ -7271,12 +7291,20 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Région thoracique latérale",
   "group": "tronc"
  },
+ "hallux~bord-interne": {
+  "label": "Gros orteil (hallux) — bord interne",
+  "group": "membre inférieur"
+ },
+ "hallux": {
+  "label": "Gros orteil (hallux)",
+  "group": "membre inférieur"
+ },
  "pt:Rt 1": {
   "label": "Rt 1",
   "group": "points"
  },
- "metatarse": {
-  "label": "Métatarses",
+ "metatarse~1er-bord-interne": {
+  "label": "Métatarsiens — 1er, bord interne",
   "group": "membre inférieur"
  },
  "malleole-int": {
@@ -7339,8 +7367,12 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Os pisiforme",
   "group": "membre supérieur"
  },
- "petit-doigt": {
-  "label": "Petit doigt",
+ "metacarpe~entre-4e-et-5e-face-palmaire": {
+  "label": "Métacarpiens — entre 4e et 5e, face palmaire",
+  "group": "membre supérieur"
+ },
+ "petit-doigt~bord-radial": {
+  "label": "Petit doigt — bord radial",
   "group": "membre supérieur"
  },
  "pt:C 9": {
@@ -7350,6 +7382,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:C 5": {
   "label": "C 5",
   "group": "points"
+ },
+ "petit-doigt~bord-interne": {
+  "label": "Petit doigt — bord interne",
+  "group": "membre supérieur"
  },
  "pt:C 7": {
   "label": "C 7",
@@ -7362,6 +7398,10 @@ window.MTC_TRAJETS_PLACES = {
  "seins": {
   "label": "Seins",
   "group": "tronc"
+ },
+ "petit-doigt": {
+  "label": "Petit doigt",
+  "group": "membre supérieur"
  },
  "styloide-uln": {
   "label": "Styloïde ulnaire",
@@ -7507,8 +7547,12 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Malléole latérale",
   "group": "membre inférieur"
  },
- "petit-orteil": {
-  "label": "Petit orteil",
+ "metatarse~5e-tuberosite": {
+  "label": "Métatarsiens — 5e, tubérosité",
+  "group": "membre inférieur"
+ },
+ "petit-orteil~bord-externe": {
+  "label": "Petit orteil — bord externe",
   "group": "membre inférieur"
  },
  "anus": {
@@ -7522,6 +7566,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:V 58": {
   "label": "V 58",
   "group": "points"
+ },
+ "petit-orteil": {
+  "label": "Petit orteil",
+  "group": "membre inférieur"
  },
  "talon": {
   "label": "Talon",
@@ -7551,8 +7599,8 @@ window.MTC_TRAJETS_PLACES = {
   "label": "V 67",
   "group": "points"
  },
- "plante": {
-  "label": "Plante du pied",
+ "plante~centre": {
+  "label": "Plante du pied — centre",
   "group": "membre inférieur"
  },
  "pt:Rn 1": {
@@ -7615,6 +7663,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Vertèbres",
   "group": "tronc"
  },
+ "petit-orteil~extremite-inferieure": {
+  "label": "Petit orteil — extrémité inférieure",
+  "group": "membre inférieur"
+ },
  "o-tf": {
   "label": "Trois foyers (organe)",
   "group": "organes"
@@ -7627,16 +7679,20 @@ window.MTC_TRAJETS_PLACES = {
   "label": "EC 3",
   "group": "points"
  },
- "medius": {
-  "label": "Médius",
+ "medius~bord-ulnaire": {
+  "label": "Médius — bord ulnaire",
   "group": "membre supérieur"
  },
  "pt:EC 9": {
   "label": "EC 9",
   "group": "points"
  },
- "annulaire": {
-  "label": "Annulaire",
+ "paume~centre": {
+  "label": "Paume — centre",
+  "group": "membre supérieur"
+ },
+ "annulaire~bord-ulnaire": {
+  "label": "Annulaire — bord ulnaire",
   "group": "membre supérieur"
  },
  "pt:TF 1": {
@@ -7647,8 +7703,20 @@ window.MTC_TRAJETS_PLACES = {
   "label": "EC 6",
   "group": "points"
  },
+ "medius": {
+  "label": "Médius",
+  "group": "membre supérieur"
+ },
+ "annulaire~angle-ungueal-cubital": {
+  "label": "Annulaire — angle unguéal cubital",
+  "group": "membre supérieur"
+ },
  "dos-main": {
   "label": "Dos de la main",
+  "group": "membre supérieur"
+ },
+ "metacarpe~entre-4e-et-5e-face-dorsale": {
+  "label": "Métacarpiens — entre 4e et 5e, face dorsale",
   "group": "membre supérieur"
  },
  "pt:TF 10": {
@@ -7702,6 +7770,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:TF 5": {
   "label": "TF 5",
   "group": "points"
+ },
+ "annulaire": {
+  "label": "Annulaire",
+  "group": "membre supérieur"
  },
  "angle-temporal": {
   "label": "Angle temporal",
@@ -7803,6 +7875,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "VB 40",
   "group": "points"
  },
+ "orteils~4e-bord-externe": {
+  "label": "Orteils — 4e, bord externe",
+  "group": "membre inférieur"
+ },
  "pt:VB 44": {
   "label": "VB 44",
   "group": "points"
@@ -7811,17 +7887,41 @@ window.MTC_TRAJETS_PLACES = {
   "label": "VB 41",
   "group": "points"
  },
+ "metatarse": {
+  "label": "Métatarses",
+  "group": "membre inférieur"
+ },
  "pt:VB 37": {
   "label": "VB 37",
   "group": "points"
+ },
+ "orteils~3e-4e-et-5e": {
+  "label": "Orteils — 3e, 4e et 5e",
+  "group": "membre inférieur"
+ },
+ "orteils~4e": {
+  "label": "Orteils — 4e",
+  "group": "membre inférieur"
  },
  "arcade-zyg": {
   "label": "Arcade zygomatique",
   "group": "tête"
  },
+ "hallux~face-dorsale": {
+  "label": "Gros orteil (hallux) — face dorsale",
+  "group": "membre inférieur"
+ },
  "pt:F 1": {
   "label": "F 1",
   "group": "points"
+ },
+ "metatarse~entre-1er-et-2e": {
+  "label": "Métatarsiens — entre 1er et 2e",
+  "group": "membre inférieur"
+ },
+ "dos-pied~face-mediale": {
+  "label": "Dos du pied — face médiale",
+  "group": "membre inférieur"
  },
  "pt:F 4": {
   "label": "F 4",
@@ -7895,12 +7995,20 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Orbite",
   "group": "tête"
  },
+ "plante": {
+  "label": "Plante du pied",
+  "group": "membre inférieur"
+ },
  "malleole": {
   "label": "Malléole",
   "group": "membre inférieur"
  },
  "tarse": {
   "label": "Os du tarse",
+  "group": "membre inférieur"
+ },
+ "talon~centre": {
+  "label": "Talon — centre",
   "group": "membre inférieur"
  },
  "pt:Rn 6": {
@@ -7922,6 +8030,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:V 62": {
   "label": "V 62",
   "group": "points"
+ },
+ "talon~face-laterale": {
+  "label": "Talon — face latérale",
+  "group": "membre inférieur"
  },
  "pt:V 61": {
   "label": "V 61",
