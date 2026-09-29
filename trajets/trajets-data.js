@@ -3415,7 +3415,7 @@ window.MTC_TRAJETS = [
        "pubis",
        "pt:Rn 11",
        "pt:Rn 21",
-       "cotes",
+       "intercostal",
        "pt:Rn 22",
        "clavicule",
        "pt:Rn 27"
@@ -6926,6 +6926,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:Rn 21": {
   "label": "Rn 21",
   "group": "points"
+ },
+ "intercostal": {
+  "label": "Espace intercostal",
+  "group": "tronc"
  },
  "pt:Rn 22": {
   "label": "Rn 22",
