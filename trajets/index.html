@@ -561,7 +561,7 @@
       }else{
         if(g.dashed){
           // même lieu plus loin dans la branche : trait pointillé entre les deux
-          lines += line("M" + lx(g.from.lane) + "," + (g.from.y + off) + " H" + x, ' stroke-width="1.6" stroke-dasharray="4 3"');
+          lines += line("M" + lx(g.from.lane) + "," + (g.from.y + off) + " H" + x);
         }
         if(g.nodes.length > 1) lines += line("M" + x + "," + (first.y + off) + " V" + (last.y + off));
       }
@@ -572,12 +572,12 @@
         const isPoint = p.pid.startsWith("pt:");
         const color = isPoint ? "var(--point)" : info.group === "organes" ? "var(--organ)" : info.group === "canaux" ? "var(--canal)" : "var(--zone)";
         const r = isPoint ? 5 : 7;
-        const tip = info.label + " — non cité dans ce paragraphe, placé d'après la numérotation pour y accrocher la branche suivante";
+        const tip = info.label + " — cité dans le texte au départ d’une autre branche ; sa place sur cette ligne est déduite de la numérotation";
         const cp = p.cp, pending = cp && complementStatus(cp) !== "validé";
         stations += '<g class="node' + (cp ? " from-image" : "") + (pending ? " pending" : "") + '" data-pid="' + esc(p.pid) + '" data-bi="' + p.bi + '" data-idx="' + p.idx + '"' +
           (cp ? ' data-cp="' + esc(cp.id) + '"' : "") + (p.inferred ? '><title>' + esc(tip) + "</title>" : ">") +
           (pending ? '<circle cx="' + x + '" cy="' + y + '" r="' + (r + 5) + '" fill="#ffe27a" opacity=".75"/>' : "") +
-          '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (isPoint && !p.inferred && !cp ? color : "#fff") + '" stroke="' + (cp ? "#8a8aa0" : color) + '" stroke-width="2.2"' + (p.inferred || cp ? ' stroke-dasharray="2.5 2"' : "") + "/>" +
+          '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (isPoint && !cp ? color : "#fff") + '" stroke="' + (cp ? "#8a8aa0" : color) + '" stroke-width="2.2"' + (cp ? ' stroke-dasharray="2.5 2"' : "") + "/>" +
           '<text x="' + (x + 11) + '" y="' + (y + 3.5) + '"' + (cp ? ' font-style="italic" fill="#6d6d85"' : "") + ">" + esc(info.label.length > MAXCH ? info.label.slice(0, MAXCH - 1) + "…" : info.label) + "</text></g>";
       });
     });
