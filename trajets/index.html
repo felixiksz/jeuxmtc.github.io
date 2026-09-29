@@ -163,13 +163,18 @@
     return r;
   }
   async function loadTrajetsData(){
-    if(await loadScript("trajets-data.js")){ await loadScript("trajets-places-rx.js"); return; }
+    if(await loadScript("trajets-data.js")){
+      await loadScript("trajets-places-rx.js");
+      await loadScript("trajets-complements.js");
+      return;
+    }
     const c = syncCfg();
     if(!(c.token && c.owner && c.repo)) throw new Error("Synchro GitHub non configurée dans ce navigateur.");
     dataMode = "private";
     const code = await (await privateFetch(PRIVATE_DIR + "/trajets-data.js")).text();
     new Function(code)();
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-places-rx.js")).text())(); }catch(e){}
+    try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-complements.js")).text())(); }catch(e){}
   }
   // images : directes en local, lues dans le dépôt privé sinon
   const imageCache = new Map();
@@ -198,7 +203,7 @@
   // ---- corrections faites dans la page (gardées dans ce navigateur, exportables) ----
   const EDIT_KEY = "mtc_trajets_edits_v1";
   const ORIG = JSON.parse(JSON.stringify({data, PLACES}));
-  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}});
+  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}, complements:{}});
   let edits = loadEdits();
   let editing = false;
   function loadEdits(){
@@ -209,9 +214,29 @@
     updateEditCount();
   }
   function updateEditCount(){
-    const n = Object.keys(edits.paras).length + Object.keys(edits.notes).length + Object.keys(edits.branches).length + Object.keys(edits.places).length;
+    const n = Object.keys(edits.paras).length + Object.keys(edits.notes).length + Object.keys(edits.branches).length + Object.keys(edits.places).length + Object.keys(edits.complements || {}).length;
     const el = document.getElementById("editCount");
     if(el) el.textContent = n ? n + " correction" + (n > 1 ? "s" : "") : "aucune correction";
+  }
+  // ---- compléments d'après l'illustration (lieux montrés par l'image, non cités dans le texte) ----
+  const COMPLEMENTS = window.MTC_TRAJETS_COMPLEMENTS || [];
+  const complementStatus = cp => (edits.complements || {})[cp.id] || cp.statut || "à valider";
+  function applyComplements(c, s){
+    COMPLEMENTS.filter(cp => cp.canal === c.code && cp.section === s.type).forEach(cp => {
+      if(complementStatus(cp) === "refusé") return;
+      // repère souple : « malleole » reconnaît aussi « malleole-ext », « front » « angle-frontal »…
+      const anchor = cp.avant || cp.apres;
+      const findAnchor = places => anchor ? places.findIndex(pid => pid === anchor || pid.includes(anchor)) : -1;
+      const candidates = s.branches.filter(br => (br.ps || [br.p]).some(pi => (s.paragraphs[pi] || "").includes(cp.branche)));
+      const b = candidates.find(br => findAnchor(br.places) >= 0) || candidates[0];
+      if(!b) return;
+      const ai = findAnchor(b.places);
+      let at = b.places.length;
+      if(ai >= 0) at = cp.avant ? ai : ai + 1;
+      else if(cp.debut) at = 0;
+      b.places.splice(at, 0, cp.lieu);
+      b.img.splice(at, 0, cp);
+    });
   }
   function applyEdits(){
     data.forEach((c, ci) => c.sections.forEach((s, si) => {
@@ -221,10 +246,16 @@
       const eb = edits.branches[c.code + "|" + si];
       s.branches = eb ? eb.map((places, bi) => ({...(o.branches[bi] || {}), places:places.slice()}))
                       : (o.branches || []).map(b => ({...b, places:b.places.slice()}));
+      s.branches.forEach(b => { b.img = b.places.map(() => null); });
+      if(!eb) applyComplements(c, s);   // arrêts retouchés à la main : ta version prime
     }));
     Object.keys(PLACES).forEach(k => delete PLACES[k]);
     Object.assign(PLACES, JSON.parse(JSON.stringify(ORIG.PLACES)));
     Object.entries(edits.places).forEach(([pid, v]) => { PLACES[pid] = {...(PLACES[pid] || {group:"ajoutés"}), ...v}; });
+    // lieux ajoutés par les compléments (point cité seulement sur l'image, ex. E 32)
+    COMPLEMENTS.forEach(cp => {
+      if(!PLACES[cp.lieu]) PLACES[cp.lieu] = {label:cp.lieu.replace(/^pt:/, ""), group:cp.lieu.startsWith("pt:") ? "points" : "ajoutés"};
+    });
   }
   // texte d'un paragraphe modifié : les appels de note redeviennent [[nN]]
   function serializeEditable(el){
@@ -365,7 +396,7 @@
   // ce point est placé sur la branche précédente, entre ses voisins de
   // numérotation, pour que la branche s'y accroche.
   function withJunctions(branches){
-    const out = branches.map(b => ({...b, places:b.places.slice(), inferred:new Set()}));
+    const out = branches.map(b => ({...b, places:b.places.slice(), img:(b.img || b.places.map(() => null)).slice(), inferred:new Set()}));
     const ptNum = pid => { const m = /^pt:(\S+) (\d+)$/.exec(pid); return m ? {code:m[1], n:Number(m[2])} : null; };
     for(let bi = 1; bi < out.length; bi++){
       const first = out[bi].places[0];
@@ -384,6 +415,7 @@
         }
         if(insertAt > 0){
           pl.splice(insertAt, 0, first);
+          out[pi].img.splice(insertAt, 0, null);
           out[pi].inferred.add(first);
           break;
         }
@@ -432,7 +464,7 @@
         // aucun lieu commun :
         if(!junction && segs.length){
           const prev = segs[segs.length - 1];
-          if(siblingText && prev.fallback && prev.from){
+          if(siblingText && prev.from){
             // « la seconde… » : même lieu de division que « la première… »
             junction = {node:prev.from, k:-1};
           }else if((s.type === "luo" || s.type === "grand_luo") && /^une\s+(autre\s+)?branche/i.test(txt)){
@@ -468,7 +500,7 @@
       }
       occupy(lane, from && !dashed ? from.y : startY, endY);
       const base = b.places.length - places.length;   // 1 si le lieu de séparation (déjà dessiné) a été retiré
-      const nodes = places.map((pid, i) => ({pid, lane, y:startY + i * STEP, inferred:b.inferred.has(pid), bi, idx:base + i}));
+      const nodes = places.map((pid, i) => ({pid, lane, y:startY + i * STEP, inferred:b.inferred.has(pid), bi, idx:base + i, cp:b.img[base + i]}));
       nodes.forEach(n => drawn.push(n));
       segs.push({bi, lane, nodes, from, dashed, k, fallback});
     });
@@ -498,14 +530,17 @@
         const color = isPoint ? "var(--point)" : info.group === "organes" ? "var(--organ)" : info.group === "canaux" ? "var(--canal)" : "var(--zone)";
         const r = isPoint ? 5 : 7;
         const tip = info.label + " — non cité dans ce paragraphe, placé d'après la numérotation pour y accrocher la branche suivante";
-        stations += '<g class="node" data-pid="' + esc(p.pid) + '" data-bi="' + p.bi + '" data-idx="' + p.idx + '"' + (p.inferred ? '><title>' + esc(tip) + "</title>" : ">") +
-          '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (isPoint && !p.inferred ? color : "#fff") + '" stroke="' + color + '" stroke-width="2.2"' + (p.inferred ? ' stroke-dasharray="2.5 2"' : "") + "/>" +
-          '<text x="' + (x + 11) + '" y="' + (y + 3.5) + '">' + esc(info.label.length > MAXCH ? info.label.slice(0, MAXCH - 1) + "…" : info.label) + "</text></g>";
+        const cp = p.cp, pending = cp && complementStatus(cp) !== "validé";
+        stations += '<g class="node' + (cp ? " from-image" : "") + (pending ? " pending" : "") + '" data-pid="' + esc(p.pid) + '" data-bi="' + p.bi + '" data-idx="' + p.idx + '"' +
+          (cp ? ' data-cp="' + esc(cp.id) + '"' : "") + (p.inferred ? '><title>' + esc(tip) + "</title>" : ">") +
+          (pending ? '<circle cx="' + x + '" cy="' + y + '" r="' + (r + 5) + '" fill="#ffe27a" opacity=".75"/>' : "") +
+          '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + (isPoint && !p.inferred && !cp ? color : "#fff") + '" stroke="' + (cp ? "#8a8aa0" : color) + '" stroke-width="2.2"' + (p.inferred || cp ? ' stroke-dasharray="2.5 2"' : "") + "/>" +
+          '<text x="' + (x + 11) + '" y="' + (y + 3.5) + '"' + (cp ? ' font-style="italic" fill="#6d6d85"' : "") + ">" + esc(info.label.length > MAXCH ? info.label.slice(0, MAXCH - 1) + "…" : info.label) + "</text></g>";
       });
     });
     return '<div class="plan"><h4>Plan des vaisseaux du ' + esc(title) + '</h4><div class="plan-scroll"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img">' +
       lines + stations + nums + "</svg></div>" +
-      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span>n : début de la branche n</span></div></div>';
+      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="border:2px solid var(--zone)"></i>zone du corps</span><span><i style="border:2px solid var(--organ)"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span>n : début de la branche n</span></div></div>';
   }
 
   let current = null;
@@ -577,6 +612,28 @@
     nav.appendChild(row);
   });
 
+  function complementClick(node){
+    const cp = COMPLEMENTS.find(x => x.id === node.dataset.cp);
+    if(!cp) return;
+    if(editing){
+      const label = (PLACES[cp.lieu] || {label:cp.lieu}).label;
+      if(confirm("Valider « " + label + " » d'après l'illustration" + (cp.page ? " (p. " + cp.page + ")" : "") + " ?\n\nOK = valider · Annuler = autre choix")){
+        edits.complements[cp.id] = "validé";
+      }else if(confirm("Refuser ce complément (il disparaîtra du plan et des correspondances) ?")){
+        edits.complements[cp.id] = "refusé";
+      }else return;
+      saveEdits(); applyEdits(); show(current, undefined, true);
+      return;
+    }
+    // hors édition : montrer l'illustration de la section
+    const img = node.closest("section") && node.closest("section").querySelector(".imgs img");
+    if(img){
+      const r = img.getBoundingClientRect();
+      window.scrollBy({top:r.top - 90, behavior:"smooth"});
+      img.style.outline = "3px solid #ffd84d";
+      setTimeout(() => { img.style.outline = ""; }, 2500);
+    }
+  }
   // ---- clic sur une station : le texte défile jusqu'à la mention du lieu, surlignée ----
   const ZONE_RX = window.MTC_TRAJETS_RX || {};
   const PINYIN_OF = {P:"shǒu tài yīn", GI:"shǒu yáng míng", E:"z[úù] yáng míng", Rt:"z[úù] tài yīn", C:"shǒu sh[àǎ]o yīn",
@@ -658,6 +715,7 @@
     if(node){
       // station du plan : seulement la mention dans le texte (le panneau cacherait la carte) ;
       // la liste complète des correspondances s'ouvre au double-clic
+      if(node.dataset.cp){ complementClick(node); return; }
       if(node.classList.contains("node")) highlightMention(node);
       else openCorr(node.dataset.pid);
       return;
@@ -725,7 +783,11 @@
     const sec = node.closest("section");
     const hereSi = sec ? Number(sec.id.replace("sec-", "")) : -1;
     const others = sectionsThrough(pid).filter(it => !(it.c.code === current && it.si === hereSi));
-    tip.innerHTML = "<b>" + esc((PLACES[pid] || {label:pid}).label) + " — autres trajets</b>" +
+    const cp = node.dataset.cp && COMPLEMENTS.find(x => x.id === node.dataset.cp);
+    tip.innerHTML = (cp ? '<span style="display:block;margin-bottom:5px;color:#6d6d85"><i>D\u2019après l\u2019illustration' + (cp.page ? " (p. " + cp.page + ")" : "") +
+        ", non cité dans le texte</i> — <b>" + esc(complementStatus(cp)) + "</b>" + (cp.note ? "<br>" + esc(cp.note) : "") +
+        (editing && complementStatus(cp) !== "validé" ? "<br>Clic : valider ou refuser" : "") + "</span>" : "") +
+      "<b>" + esc((PLACES[pid] || {label:pid}).label) + " — autres trajets</b>" +
       (others.length ? others.map(rowHtml).join("") : '<span class="none">Aucun autre trajet ne passe ici.</span>') +
       '<span class="none" style="display:block;margin-top:5px;font-size:.72rem">Clic : voir dans le texte · double-clic : liste des correspondances</span>';
     tip.querySelectorAll(".rm").forEach(b => b.remove());
