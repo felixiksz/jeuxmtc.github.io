@@ -242,7 +242,11 @@
       if(complementStatus(cp) === "refusé") return;
       // repère souple : « malleole » reconnaît aussi « malleole-ext », « front » « angle-frontal »…
       const anchor = cp.avant || cp.apres;
-      const findAnchor = places => anchor ? places.findIndex(pid => pid === anchor || pid.includes(anchor)) : -1;
+      const findAnchor = places => {
+        if(!anchor) return -1;
+        const exact = places.indexOf(anchor);
+        return exact >= 0 ? exact : places.findIndex(pid => !anchor.includes(":") && pid.includes(anchor));
+      };
       const candidates = s.branches.filter(br => (br.ps || [br.p]).some(pi => (s.paragraphs[pi] || "").includes(cp.branche)));
       const b = candidates.find(br => findAnchor(br.places) >= 0) || candidates[0];
       if(!b) return;
