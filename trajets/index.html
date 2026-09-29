@@ -656,8 +656,10 @@
   document.addEventListener("click", event => {
     const node = event.target.closest(".node, .places-index button");
     if(node){
+      // station du plan : seulement la mention dans le texte (le panneau cacherait la carte) ;
+      // la liste complète des correspondances s'ouvre au double-clic
       if(node.classList.contains("node")) highlightMention(node);
-      openCorr(node.dataset.pid);
+      else openCorr(node.dataset.pid);
       return;
     }
     if(event.target.closest("[contenteditable='true'], textarea, input")) return;
@@ -724,7 +726,8 @@
     const hereSi = sec ? Number(sec.id.replace("sec-", "")) : -1;
     const others = sectionsThrough(pid).filter(it => !(it.c.code === current && it.si === hereSi));
     tip.innerHTML = "<b>" + esc((PLACES[pid] || {label:pid}).label) + " — autres trajets</b>" +
-      (others.length ? others.map(rowHtml).join("") : '<span class="none">Aucun autre trajet ne passe ici.</span>');
+      (others.length ? others.map(rowHtml).join("") : '<span class="none">Aucun autre trajet ne passe ici.</span>') +
+      '<span class="none" style="display:block;margin-top:5px;font-size:.72rem">Clic : voir dans le texte · double-clic : liste des correspondances</span>';
     tip.querySelectorAll(".rm").forEach(b => b.remove());
     tip.style.display = "block";
   });
@@ -768,6 +771,10 @@
     saveEdits(); applyEdits(); show(current, undefined, true);
   });
   updateEditCount();
+  document.addEventListener("dblclick", event => {
+    const node = event.target.closest(".node");
+    if(node) openCorr(node.dataset.pid);
+  });
   document.getElementById("corrClose").addEventListener("click", () => document.getElementById("corr").classList.remove("open"));
   document.getElementById("allPlaces").addEventListener("click", openIndex);
   document.addEventListener("keydown", e => { if(e.key === "Escape") document.getElementById("corr").classList.remove("open"); });
