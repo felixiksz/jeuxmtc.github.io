@@ -115,9 +115,12 @@
   .tgroup{ display:inline-flex; gap:6px; align-items:center; padding:1px 7px; border:1px solid #d7d7e6; border-radius:999px; }
   .netwrap{ background:#f4f1ea; }
   .qcell{ stroke:none; }
+  .casing{ stroke:#ffffff; pointer-events:none; }
+  .netwrap.dark .casing{ stroke:#171a22; }
   .subq rect{ fill:#ffffff; fill-opacity:.28; stroke:#ffffff; stroke-opacity:.8; stroke-dasharray:6 5; }
   .subq text{ font-size:11px; font-weight:800; fill:#8f8878; letter-spacing:.06em; text-transform:uppercase; }
   .rivername{ font-family:"Libre Baskerville", Georgia, serif; font-style:italic; font-size:12px; fill:#2f6b9f; letter-spacing:.12em; paint-order:stroke; stroke:#eaf4fb; stroke-width:3px; pointer-events:none; }
+  .rivername.rm{ fill:#b0527c; stroke:#fbe6ef; }
   .rivername.big{ font-size:16px; font-weight:700; }
   .terminus text{ font-size:11px; font-weight:800; }
   .netstop .cat{ font-size:10px; fill:#1f4e79; }
@@ -980,7 +983,22 @@
   let NET_VB = null;
   const RIVER = new Set(["RM", "DM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"]);
   const NET_COLOR = {terre:"#d9a400", bois:"#2f9a3c", feu:"#e0261b", eau:"#1f5fd6", metal:"#ffffff"};
-  const RIVER_COLOR = {RM:"#7fb8e8", DM:"#7fb8e8", CM:"#9bcfe0", YangQ:"#a9c4ee", YinQ:"#a9c4ee", YangW:"#9fd6cf", YinW:"#9fd6cf", DaiM:"#b5d3a8"};
+  // tracé arrondi (virages en courbe, comme sur un plan d'autoroute)
+  const roundPath = (pts, r) => {
+    if(pts.length < 3) return "M" + pts.map(z => z[0].toFixed(1) + "," + z[1].toFixed(1)).join(" L");
+    let d = "M" + pts[0][0].toFixed(1) + "," + pts[0][1].toFixed(1);
+    for(let i = 1; i < pts.length - 1; i++){
+      const [ax, ay] = pts[i - 1], [bx, by] = pts[i], [cx, cy] = pts[i + 1];
+      const l1 = Math.hypot(bx - ax, by - ay) || 1, l2 = Math.hypot(cx - bx, cy - by) || 1;
+      const rr = Math.min(r, l1 / 2, l2 / 2);
+      const p1 = [bx - (bx - ax) / l1 * rr, by - (by - ay) / l1 * rr], p2 = [bx + (cx - bx) / l2 * rr, by + (cy - by) / l2 * rr];
+      d += " L" + p1[0].toFixed(1) + "," + p1[1].toFixed(1) + " Q" + bx.toFixed(1) + "," + by.toFixed(1) + " " + p2[0].toFixed(1) + "," + p2[1].toFixed(1);
+    }
+    const z = pts[pts.length - 1];
+    return d + " L" + z[0].toFixed(1) + "," + z[1].toFixed(1);
+  };
+  const RIVER_BANK = {RM:"#d77fa4", DM:"#6aa9d6"};
+  const RIVER_COLOR = {RM:"#f4b6cf", DM:"#a9d8f5", CM:"#9bcfe0", YangQ:"#a9c4ee", YinQ:"#a9c4ee", YangW:"#9fd6cf", YinW:"#9fd6cf", DaiM:"#b5d3a8"};
   const netColor = code => NET_COLOR[ELEMENT[code]] || RIVER_COLOR[code] || "#666";
   const NET_DASH = {luo:"8 5", grand_luo:"8 5", distinct:"2.5 4", tendineux:"12 4 2.5 4"};
   const NET_HIDE_KEY = "mtc_trajets_net_hidden_v1";
@@ -1248,7 +1266,7 @@
         const o = river ? 0 : (list.filter(x => !RIVER.has(lines[x].c.code)).indexOf(li) - (list.filter(x => !RIVER.has(lines[x].c.code)).length - 1) / 2) * GAP;
         let q = offsetPath(route(k), o);
         if(from > n) q = q.slice().reverse();
-        d += " M" + q.map(z => z[0].toFixed(1) + "," + z[1].toFixed(1)).join(" L");
+        d += " " + roundPath(q, 16);
       });
       if(!d) return;
       const title = "<title>" + esc(sectionName(l.c, l.s)) + "</title>";
@@ -1256,10 +1274,10 @@
         // cours d'eau continu (pour y écrire son nom)
         const pts = [];
         l.nodes.forEach((n, i) => { if(!i) return; let q = route(edgeKey(l.nodes[i - 1], n)); if(l.nodes[i - 1] > n) q = q.slice().reverse(); q.forEach((z, j) => { if(!(pts.length && j === 0)) pts.push(z); }); });
-        d = "M" + pts.map(z => z[0].toFixed(1) + "," + z[1].toFixed(1)).join(" L");
+        d = roundPath(pts, 30);
         const rid = "rv-" + li, nm = esc(l.c.name.replace(/\s*\(.*$/, "").replace(/ — .*/, ""));
         riverNames += '<path id="' + rid + '" d="' + d + '" fill="none" stroke="none"/>' +
-          [8, 45, 82].map(o => '<text class="rivername' + (code === "RM" || code === "DM" ? " big" : "") + '" dy="-' + (code === "RM" || code === "DM" ? 11 : 7) + '"><textPath href="#' + rid + '" startOffset="' + o + '%">' + nm + "</textPath></text>").join("");
+          [8, 45, 82].map(o => '<text class="rivername' + (code === "RM" ? " big rm" : code === "DM" ? " big" : "") + '" dy="-' + (code === "RM" || code === "DM" ? 11 : 7) + '"><textPath href="#' + rid + '" startOffset="' + o + '%">' + nm + "</textPath></text>").join("");
         if(code !== "RM" && code !== "DM"){
           // navette sur le cours d'eau
           shuttles += '<path d="' + d + '" fill="none" stroke="#1f4e79" stroke-width="1.3" stroke-dasharray="6 5" opacity=".8"/>';
@@ -1269,12 +1287,15 @@
       if(river){
         // fleuve (RM, DM) et rivières (merveilleux vaisseaux) : berges, eau, reflet
         const w = code === "RM" || code === "DM" ? 16 : 9;
-        rivers += '<path d="' + d + '" fill="none" stroke="#5f95c6" stroke-width="' + (w + 3) + '" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>' +
+        rivers += '<path d="' + d + '" fill="none" stroke="' + (RIVER_BANK[code] || "#5f95c6") + '" stroke-width="' + (w + 3) + '" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>' +
           '<path class="netline river" data-code="' + code + '" d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round">' + title + "</path>" +
           '<path d="' + d + '" fill="none" stroke="#dff0fb" stroke-width="1.4" stroke-dasharray="14 18" stroke-linecap="round" opacity=".9"/>';
       }else{
         const dash = NET_DASH[l.s.type] ? ' stroke-dasharray="' + NET_DASH[l.s.type] + '"' : "";
         const wdt = l.interne ? 1.8 : 3.4;
+        // liseré couleur du fond : là où une ligne passe par-dessus une autre sans correspondance, celle du dessous
+        // s'interrompt (effet de pont)
+        svgLines += '<path class="casing" d="' + d + '" fill="none" stroke-width="' + (wdt + (metal ? 4.4 : 2.2)) + '" stroke-linecap="butt" stroke-linejoin="round"/>';
         if(metal) svgLines += '<path d="' + d + '" fill="none" stroke="#1d1d1f" stroke-width="' + (wdt + 2.2) + '" stroke-linecap="round" stroke-linejoin="round"' + dash + "/>";
         svgLines += '<path class="netline" data-code="' + code + '" d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + wdt + '" stroke-linecap="round" stroke-linejoin="round"' + dash + (l.interne ? ' opacity=".65"' : "") + ">" + title + "</path>";
       }
@@ -1352,9 +1373,11 @@
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="8 5"/></svg>luo</span>' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="2.5 4"/></svg>distinct</span>' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="12 4 2.5 4"/></svg>tendineux</span>' +
-      '<span><svg width="28" height="12"><line x1="0" y1="6" x2="28" y2="6" stroke="#7fb8e8" stroke-width="10"/></svg>fleuve RM / DM</span>' +
+      '<span><svg width="28" height="12"><line x1="0" y1="6" x2="28" y2="6" stroke="#f4b6cf" stroke-width="10"/></svg>fleuve : rèn mài</span>' +
+      '<span><svg width="28" height="12"><line x1="0" y1="6" x2="28" y2="6" stroke="#a9d8f5" stroke-width="10"/></svg>fleuve : dū mài</span>' +
       '<span><svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#9bcfe0" stroke-width="6"/></svg>rivières : merveilleux vaisseaux</span>' +
       '<span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="#fff" stroke="#1d1d1f" stroke-width="3"/></svg>carrefour (point d’intersection)</span>' +
+      '<span><svg width="26" height="18"><line x1="13" y1="0" x2="13" y2="18" stroke="#1f5fd6" stroke-width="3"/><line x1="0" y1="9" x2="26" y2="9" stroke="#fff" stroke-width="6"/><line x1="0" y1="9" x2="26" y2="9" stroke="#e0261b" stroke-width="3"/></svg>croisement sans correspondance</span>' +
       '<span><svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#fff" fill-opacity=".4" stroke="#b8b1a0" stroke-width="1.5" stroke-dasharray="3 2"/></svg>articulation (repère)</span>' +
       '<span>⛵\uFE0E point de transport · ☀\uFE0E yuán · ⛓\uFE0E luò · ⛏\uFE0E xì · ⚓\uFE0E embarcadère (point d’ouverture)</span>' +
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
