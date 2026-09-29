@@ -253,6 +253,7 @@
     Object.assign(PLACES, JSON.parse(JSON.stringify(ORIG.PLACES)));
     Object.entries(edits.places).forEach(([pid, v]) => { PLACES[pid] = {...(PLACES[pid] || {group:"ajoutés"}), ...v}; });
     // lieux ajoutés par les compléments (point cité seulement sur l'image, ex. E 32)
+    Object.entries(FAMILIES).forEach(([fid, f]) => { PLACES[fid] = {label:f.label, group:"familles"}; });
     COMPLEMENTS.forEach(cp => {
       if(!PLACES[cp.lieu]) PLACES[cp.lieu] = {label:cp.lieu.replace(/^pt:/, ""), group:cp.lieu.startsWith("pt:") ? "points" : "ajoutés"};
     });
@@ -315,10 +316,52 @@
   const CANAL_ORDER = ["P", "Rt", "GI", "E", "C", "Rn", "IG", "V", "EC", "F", "TF", "VB", "DM", "RM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"];
   const LAYER_OF = code => CANAL[code] ? CANAL[code].layer : code;
 
+  // ---- familles de lieux : les plans restent au mot près, mais les listes de correspondances
+  // regroupent les lieux voisins (« Yeux » = œil, canthus, paupières, orbite…) ----
+  const FAMILIES = {
+    "fam:yeux":{label:"Yeux (tout l’œil)", members:["yeux", "oculaire", "canthus-int", "canthus-ext", "paupiere-inf", "paupiere-sup", "orbite", "sous-orbitaire", "sus-orbitaire"]},
+    "fam:oreille":{label:"Oreille (tout autour)", members:["oreille", "devant-oreille", "derriere-oreille", "autour-oreille", "dessus-oreille", "apex-oreille", "supant-oreille"]},
+    "fam:nez":{label:"Nez (tout le nez)", members:["nez", "aile-nez", "racine-nez", "arriere-nez"]},
+    "fam:bouche":{label:"Bouche et lèvres", members:["bouche", "levres", "frein-levre", "gouttiere"]},
+    "fam:dents":{label:"Dents et gencives", members:["dents", "gencive-inf", "gencive-sup"]},
+    "fam:machoire":{label:"Mâchoire et mandibule", members:["machoire", "mandibule", "angle-mandibule"]},
+    "fam:front":{label:"Front", members:["front", "angle-frontal", "cheveux"]},
+    "fam:tempe":{label:"Tempe", members:["tempe", "angle-temporal"]},
+    "fam:pommette":{label:"Pommette", members:["pommette", "arcade-zyg", "region-zyg"]},
+    "fam:sommet":{label:"Sommet de la tête", members:["vertex", "parietal"]},
+    "fam:thorax":{label:"Thorax et poitrine", members:["thorax", "poitrine", "thorax-lat"]},
+    "fam:cotes":{label:"Côtes", members:["cotes", "cotes-flott", "intercostal"]},
+    "fam:seins":{label:"Seins et mamelons", members:["seins", "mamelon"]},
+    "fam:abdomen":{label:"Abdomen", members:["abdomen", "abdomen-inf"]},
+    "fam:colonne":{label:"Colonne vertébrale", members:["colonne", "vertebres", "lombaires"]},
+    "fam:pubis":{label:"Pubis", members:["pubis", "symphyse"]},
+    "fam:genitaux":{label:"Organes génitaux", members:["genitaux", "verge", "uretre"]},
+    "fam:epaule":{label:"Épaule", members:["epaule", "acromion"]},
+    "fam:omoplate":{label:"Omoplate (scapula)", members:["omoplate", "supraep", "infraep"]},
+    "fam:clavicule":{label:"Clavicule", members:["clavicule", "zone-clav"]},
+    "fam:aisselle":{label:"Aisselle", members:["aisselle", "pli-axill"]},
+    "fam:coude":{label:"Coude", members:["coude", "pli-coude", "olecrane"]},
+    "fam:poignet":{label:"Poignet", members:["poignet", "dos-poignet", "cun-kou", "styloide-rad", "styloide-uln", "pisiforme"]},
+    "fam:main":{label:"Main", members:["main", "paume", "dos-main", "metacarpe", "thenar"]},
+    "fam:hanche":{label:"Hanche", members:["hanche", "trochanter", "coxo"]},
+    "fam:jambe":{label:"Jambe", members:["jambe", "tibia", "fibula", "gastrocnemien"]},
+    "fam:malleole":{label:"Malléoles", members:["malleole", "malleole-int", "malleole-ext"]},
+    "fam:pied":{label:"Pied", members:["dos-pied", "plante", "metatarse", "tarse", "naviculaire"]},
+    "fam:orteils":{label:"Orteils", members:["orteils", "hallux", "petit-orteil"]},
+    "fam:coeur":{label:"Cœur (et système du cœur)", members:["o-coeur", "o-systeme-coeur"]},
+    "fam:poumon":{label:"Poumon (et système pulmonaire)", members:["o-poumon", "o-systeme-poumon"]}
+  };
+  const FAMILY_OF = {};
+  Object.entries(FAMILIES).forEach(([fid, f]) => f.members.forEach(m => { FAMILY_OF[m] = fid; }));
+  const membersOf = pid => FAMILIES[pid] ? FAMILIES[pid].members : [pid];
+  // lieu à utiliser pour les correspondances d'un arrêt : sa famille s'il en a une
+  const corrKey = pid => FAMILY_OF[pid] || pid;
+
   function sectionsThrough(pid){
+    const ms = membersOf(pid);
     const out = [];
     data.forEach(c => c.sections.forEach((s, si) => {
-      if(s.branches && s.branches.some(b => b.places.includes(pid))) out.push({c, s, si});
+      if(s.branches && s.branches.some(b => b.places.some(p => ms.includes(p)))) out.push({c, s, si});
     }));
     // un point appartient par définition au canal régulier de son code (VB 8 → canal VB),
     // même si le texte de ce trajet ne le cite pas
@@ -379,7 +422,7 @@
       const g = PLACES[pid].group || "autres";
       (groups[g] = groups[g] || []).push(pid);
     });
-    const order = ["tête", "membre supérieur", "tronc", "membre inférieur", "organes", "canaux", "points", "ajoutés"];
+    const order = ["familles", "tête", "membre supérieur", "tronc", "membre inférieur", "organes", "canaux", "points", "ajoutés"];
     document.getElementById("corrTitle").textContent = "Correspondances — lieux de passage";
     document.getElementById("corrBody").innerHTML = '<div class="places-index">' + order.filter(g => groups[g]).map(g =>
       "<h3>" + esc(g) + "</h3>" + groups[g].sort((a, b) => PLACES[a].label.localeCompare(PLACES[b].label, "fr", {numeric:true}))
@@ -782,12 +825,12 @@
     // canal — tendineux, distinct… — restent listés)
     const sec = node.closest("section");
     const hereSi = sec ? Number(sec.id.replace("sec-", "")) : -1;
-    const others = sectionsThrough(pid).filter(it => !(it.c.code === current && it.si === hereSi));
+    const others = sectionsThrough(corrKey(pid)).filter(it => !(it.c.code === current && it.si === hereSi));
     const cp = node.dataset.cp && COMPLEMENTS.find(x => x.id === node.dataset.cp);
     tip.innerHTML = (cp ? '<span style="display:block;margin-bottom:5px;color:#6d6d85"><i>D\u2019après l\u2019illustration' + (cp.page ? " (p. " + cp.page + ")" : "") +
         ", non cité dans le texte</i> — <b>" + esc(complementStatus(cp)) + "</b>" + (cp.note ? "<br>" + esc(cp.note) : "") +
         (editing && complementStatus(cp) !== "validé" ? "<br>Clic : valider ou refuser" : "") + "</span>" : "") +
-      "<b>" + esc((PLACES[pid] || {label:pid}).label) + " — autres trajets</b>" +
+      "<b>" + esc((PLACES[pid] || {label:pid}).label) + " — autres trajets" + (FAMILY_OF[pid] ? " (famille « " + esc(FAMILIES[FAMILY_OF[pid]].label) + " »)" : "") + "</b>" +
       (others.length ? others.map(rowHtml).join("") : '<span class="none">Aucun autre trajet ne passe ici.</span>') +
       '<span class="none" style="display:block;margin-top:5px;font-size:.72rem">Clic : voir dans le texte · double-clic : liste des correspondances</span>';
     tip.querySelectorAll(".rm").forEach(b => b.remove());
@@ -835,7 +878,7 @@
   updateEditCount();
   document.addEventListener("dblclick", event => {
     const node = event.target.closest(".node");
-    if(node) openCorr(node.dataset.pid);
+    if(node) openCorr(corrKey(node.dataset.pid));
   });
   document.getElementById("corrClose").addEventListener("click", () => document.getElementById("corr").classList.remove("open"));
   document.getElementById("allPlaces").addEventListener("click", openIndex);
@@ -844,7 +887,7 @@
   show(location.hash.slice(1) || (data[0] && data[0].code));
   // lien direct vers une liste de correspondances : index.html?lieu=yeux
   const lieu = new URLSearchParams(location.search).get("lieu");
-  if(lieu && PLACES[lieu]) openCorr(lieu);
+  if(lieu && (PLACES[lieu] || PLACES["fam:" + lieu])) openCorr(PLACES["fam:" + lieu] ? "fam:" + lieu : lieu);
   })();
 </script>
 </body>

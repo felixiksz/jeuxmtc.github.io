@@ -126,6 +126,7 @@ window.MTC_TRAJETS = [
      8,
      9
     ],
+    "_textx": 78.6240005493164,
     "label": "Canal principal",
     "branches": [
      {
@@ -139,7 +140,6 @@ window.MTC_TRAJETS = [
        5
       ],
       "places": [
-       "pt:RM 3",
        "pt:RM 1",
        "c:CM",
        "c:DM",
@@ -167,7 +167,7 @@ window.MTC_TRAJETS = [
        "c:IG",
        "c:E",
        "pt:RM 13",
-       "thorax",
+       "poitrine",
        "pt:RM 16",
        "pt:RM 17",
        "c:Rt",
@@ -181,19 +181,20 @@ window.MTC_TRAJETS = [
        "c:YinW",
        "machoire",
        "pt:RM 24",
+       "sillon-ml",
        "c:E",
        "c:GI",
        "c:DM",
        "levres",
        "pt:DM 28",
        "c:E",
-       "levres",
+       "frein-levre",
        "pt:DM 26",
        "c:E",
        "c:GI",
        "pt:DM 26",
        "visage",
-       "yeux",
+       "sous-orbitaire",
        "c:YangQ",
        "pt:E 1"
       ]
@@ -204,7 +205,7 @@ window.MTC_TRAJETS = [
        6
       ],
       "places": [
-       "abdomen",
+       "abdomen-inf",
        "colonne"
       ]
      }
@@ -241,6 +242,7 @@ window.MTC_TRAJETS = [
     "pages": [
      10
     ],
+    "_textx": 78.6240005493164,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -479,6 +481,7 @@ window.MTC_TRAJETS = [
      80,
      81
     ],
+    "_textx": 63.86399841308594,
     "label": "Canal principal",
     "branches": [
      {
@@ -490,21 +493,35 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
-       "abdomen",
-       "pubis",
+       "abdomen-inf",
+       "symphyse",
        "genitaux",
        "pt:RM 1",
        "genitaux",
+       "uretre",
+       "pt:RM 1",
+       "verge",
        "pt:RM 1",
        "colonne",
        "pt:DM 1",
        "c:VB",
        "c:Rn",
        "c:RM",
-       "anus",
-       "coccyx",
        "colonne",
        "pt:DM 2",
+       "pt:DM 3",
+       "pt:DM 4",
+       "pt:DM 5",
+       "pt:DM 6",
+       "pt:DM 7",
+       "pt:DM 8",
+       "pt:DM 9",
+       "pt:DM 10",
+       "pt:DM 11",
+       "pt:DM 12",
+       "pt:DM 13",
+       "pt:DM 14",
+       "pt:DM 15",
        "pt:DM 16"
       ]
      },
@@ -527,15 +544,33 @@ window.MTC_TRAJETS = [
      {
       "p": 5,
       "ps": [
-       5,
-       6
+       5
       ],
       "places": [
        "pt:DM 16",
        "nuque",
        "c:YangW",
-       "c:V",
-       "cerveau",
+       "c:V"
+      ]
+     },
+     {
+      "p": 5,
+      "ps": [
+       5
+      ],
+      "places": [
+       "nuque",
+       "cerveau"
+      ],
+      "sub": 1,
+      "from": "nuque"
+     },
+     {
+      "p": 6,
+      "ps": [
+       6
+      ],
+      "places": [
        "nuque",
        "vertex",
        "pt:DM 17",
@@ -553,10 +588,10 @@ window.MTC_TRAJETS = [
        "pt:DM 26",
        "c:E",
        "c:GI",
-       "levres",
+       "gouttiere",
        "c:GI",
        "pt:DM 27",
-       "levres",
+       "frein-levre",
        "pt:DM 28",
        "c:E",
        "c:RM"
@@ -568,7 +603,7 @@ window.MTC_TRAJETS = [
        7
       ],
       "places": [
-       "abdomen",
+       "abdomen-inf",
        "genitaux",
        "pt:RM 1",
        "ombilic",
@@ -576,7 +611,8 @@ window.MTC_TRAJETS = [
        "gorge",
        "menton",
        "levres",
-       "yeux"
+       "sous-orbitaire",
+       "paupiere-inf"
       ]
      },
      {
@@ -585,7 +621,7 @@ window.MTC_TRAJETS = [
        8
       ],
       "places": [
-       "yeux",
+       "canthus-int",
        "pt:V 1",
        "front",
        "vertex",
@@ -597,6 +633,7 @@ window.MTC_TRAJETS = [
        "pt:V 12",
        "pt:V 11",
        "colonne",
+       "paravert",
        "c:V",
        "colonne",
        "lombes",
@@ -609,7 +646,7 @@ window.MTC_TRAJETS = [
        9
       ],
       "places": [
-       "abdomen",
+       "abdomen-inf",
        "genitaux",
        "perinee",
        "pt:RM 1",
@@ -652,6 +689,7 @@ window.MTC_TRAJETS = [
     "pages": [
      82
     ],
+    "_textx": 78.6240005493164,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -747,6 +785,7 @@ window.MTC_TRAJETS = [
      5,
      6
     ],
+    "_textx": 63.84000015258789,
     "label": "Canal principal",
     "branches": [
      {
@@ -755,6 +794,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
+       "foyer-central",
        "o-estomac",
        "o-gi",
        "o-estomac",
@@ -769,16 +809,16 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "trachee",
-       "gorge",
-       "aisselle",
+       "o-systeme-poumon",
        "pt:P 1",
+       "delto",
        "pt:P 2",
        "bras",
-       "coude",
+       "pli-coude",
        "pt:P 5",
-       "coude",
+       "pli-coude",
        "avant-bras",
+       "cun-kou",
        "pouce",
        "thenar",
        "pt:P 10",
@@ -794,7 +834,6 @@ window.MTC_TRAJETS = [
       "places": [
        "pt:P 7",
        "paume",
-       "main",
        "index",
        "c:GI"
       ]
@@ -840,6 +879,7 @@ window.MTC_TRAJETS = [
      7,
      8
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal distinct",
     "branches": [
      {
@@ -854,19 +894,37 @@ window.MTC_TRAJETS = [
      {
       "p": 1,
       "ps": [
-       1,
-       2,
+       1
+      ],
+      "places": [
+       "poitrine",
+       "pt:VB 22",
+       "o-poumon"
+      ]
+     },
+     {
+      "p": 2,
+      "ps": [
+       2
+      ],
+      "places": [
+       "o-poumon",
+       "o-gi"
+      ],
+      "from": "o-poumon"
+     },
+     {
+      "p": 3,
+      "ps": [
        3
       ],
       "places": [
-       "thorax",
-       "pt:VB 22",
        "o-poumon",
-       "o-gi",
        "sus-clav",
        "gorge",
        "c:GI"
-      ]
+      ],
+      "from": "o-poumon"
      }
     ]
    },
@@ -903,6 +961,7 @@ window.MTC_TRAJETS = [
     "pages": [
      9
     ],
+    "_textx": 60.41999816894531,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -917,15 +976,26 @@ window.MTC_TRAJETS = [
      {
       "p": 1,
       "ps": [
-       1,
+       1
+      ],
+      "places": [
+       "pt:P 7",
+       "pt:GI 4"
+      ],
+      "sub": 1,
+      "from": "pt:P 7"
+     },
+     {
+      "p": 2,
+      "ps": [
        2
       ],
       "places": [
-       "poignet",
-       "pt:GI 4",
+       "pt:P 7",
        "paume",
        "thenar"
-      ]
+      ],
+      "from": "pt:P 7"
      }
     ]
    },
@@ -967,6 +1037,7 @@ window.MTC_TRAJETS = [
      10,
      11
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -977,6 +1048,8 @@ window.MTC_TRAJETS = [
       "places": [
        "pouce",
        "thenar",
+       "styloide-rad",
+       "cun-kou",
        "avant-bras",
        "coude",
        "bras",
@@ -992,8 +1065,10 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:GI 15",
        "sus-clav"
-      ]
+      ],
+      "from": "pt:GI 15"
      },
      {
       "p": 2,
@@ -1001,10 +1076,12 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "pt:GI 15",
        "thorax",
        "diaphragme",
-       "cotes"
-      ]
+       "cotes-flott"
+      ],
+      "from": "pt:GI 15"
      }
     ]
    }
@@ -1079,6 +1156,7 @@ window.MTC_TRAJETS = [
      7,
      8
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal principal",
     "branches": [
      {
@@ -1089,18 +1167,18 @@ window.MTC_TRAJETS = [
       "places": [
        "index",
        "pt:GI 1",
+       "metacarpe",
        "pt:GI 4",
        "pt:GI 5",
        "avant-bras",
        "coude",
        "pt:GI 11",
        "bras",
-       "epaule",
+       "acromion",
        "clavicule",
        "pt:IG 12",
-       "omoplate",
+       "supraep",
        "pt:DM 14",
-       "colonne",
        "sus-clav",
        "pt:E 12"
       ]
@@ -1111,10 +1189,12 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:E 12",
        "o-poumon",
        "diaphragme",
        "o-gi"
-      ]
+      ],
+      "from": "pt:E 12"
      },
      {
       "p": 2,
@@ -1134,13 +1214,13 @@ window.MTC_TRAJETS = [
       "places": [
        "sus-clav",
        "cou",
-       "machoire",
-       "dents",
+       "mandibule",
+       "gencive-inf",
        "levres",
        "pt:RM 24",
        "pt:E 4",
        "pt:DM 26",
-       "nez",
+       "aile-nez",
        "pt:GI 20"
       ]
      }
@@ -1179,6 +1259,7 @@ window.MTC_TRAJETS = [
      9,
      10
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal distinct",
     "branches": [
      {
@@ -1200,6 +1281,7 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "cavite-corp",
        "o-gi",
        "o-poumon",
        "sus-clav",
@@ -1255,6 +1337,7 @@ window.MTC_TRAJETS = [
      11,
      12
     ],
+    "_textx": 96.54000091552734,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -1273,9 +1356,12 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:GI 6",
+       "membre-sup",
        "pt:GI 15",
-       "machoire"
-      ]
+       "mandibule"
+      ],
+      "from": "pt:GI 6"
      },
      {
       "p": 2,
@@ -1283,8 +1369,10 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "dents"
-      ]
+       "mandibule",
+       "gencive-inf"
+      ],
+      "from": "mandibule"
      },
      {
       "p": 3,
@@ -1292,11 +1380,13 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
+       "mandibule",
        "oreille",
        "c:IG",
        "c:TF",
        "c:VB"
-      ]
+      ],
+      "from": "mandibule"
      }
     ]
    },
@@ -1336,6 +1426,7 @@ window.MTC_TRAJETS = [
      13,
      14
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -1345,7 +1436,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "index",
-       "poignet",
+       "dos-poignet",
        "avant-bras",
        "coude",
        "bras",
@@ -1358,8 +1449,10 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:GI 15",
        "colonne"
-      ]
+      ],
+      "from": "pt:GI 15"
      },
      {
       "p": 2,
@@ -1367,9 +1460,11 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "pt:GI 15",
        "cou",
        "joue"
-      ]
+      ],
+      "from": "pt:GI 15"
      },
      {
       "p": 3,
@@ -1377,8 +1472,10 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
+       "joue",
        "nez"
-      ]
+      ],
+      "from": "joue"
      },
      {
       "p": 4,
@@ -1386,12 +1483,14 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
-       "oreille",
-       "c:IG",
+       "joue",
+       "devant-oreille",
        "tempe",
+       "tete",
        "visage",
-       "machoire"
-      ]
+       "mandibule"
+      ],
+      "from": "joue"
      }
     ]
    }
@@ -1462,6 +1561,7 @@ window.MTC_TRAJETS = [
      10,
      11
     ],
+    "_textx": 63.98400115966797,
     "label": "Canal principal",
     "branches": [
      {
@@ -1471,29 +1571,30 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "nez",
+       "aile-nez",
        "pt:GI 20",
-       "nez",
+       "racine-nez",
        "pt:V 1",
-       "yeux",
+       "paupiere-inf",
        "nez",
        "pt:E 2",
        "pt:E 3",
-       "dents",
+       "gencive-sup",
        "pt:DM 26",
        "levres",
        "pt:E 4",
        "pt:RM 24",
-       "machoire",
+       "angle-mandibule",
+       "mandibule",
        "pt:E 5",
-       "machoire",
+       "angle-mandibule",
        "pt:E 6",
-       "oreille",
+       "devant-oreille",
        "pt:VB 3",
        "pt:VB 6",
        "pt:VB 5",
        "pt:VB 4",
-       "front",
+       "angle-frontal",
        "pt:E 8"
       ]
      },
@@ -1503,7 +1604,8 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "front",
+       "angle-frontal",
+       "cheveux",
        "pt:DM 24"
       ]
      },
@@ -1514,11 +1616,10 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "pt:E 5",
-       "machoire",
+       "mandibule",
        "gorge",
        "clavicule",
        "pt:E 11",
-       "dos",
        "pt:DM 14",
        "sus-clav",
        "pt:E 12"
@@ -1530,14 +1631,17 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
+       "pt:E 12",
        "diaphragme",
        "pt:RM 13",
        "pt:RM 12",
        "o-estomac",
        "o-rate",
+       "o-pancreas",
        "o-estomac",
        "pt:E 30"
-      ]
+      ],
+      "from": "pt:E 12"
      },
      {
       "p": 5,
@@ -1546,7 +1650,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "sus-clav",
-       "seins",
+       "mamelon",
        "pt:E 30"
       ]
      },
@@ -1559,8 +1663,8 @@ window.MTC_TRAJETS = [
        "pt:E 30",
        "cuisse",
        "pt:E 31",
-       "genou",
        "pt:E 35",
+       "tibia",
        "jambe",
        "pt:E 40",
        "dos-pied",
@@ -1621,6 +1725,7 @@ window.MTC_TRAJETS = [
     "pages": [
      12
     ],
+    "_textx": 63.98400115966797,
     "label": "Canal distinct",
     "branches": [
      {
@@ -1644,8 +1749,9 @@ window.MTC_TRAJETS = [
        "o-coeur",
        "o-oesophage",
        "gorge",
-       "levres",
-       "nez",
+       "bouche",
+       "racine-nez",
+       "oculaire",
        "yeux",
        "cerveau"
       ]
@@ -1681,6 +1787,7 @@ window.MTC_TRAJETS = [
      13,
      14
     ],
+    "_textx": 63.98400115966797,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -1689,9 +1796,20 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
+       "pt:E 40"
+      ]
+     },
+     {
+      "p": 0,
+      "ps": [
+       0
+      ],
+      "places": [
        "pt:E 40",
        "c:Rt"
-      ]
+      ],
+      "sub": 1,
+      "from": "pt:E 40"
      },
      {
       "p": 1,
@@ -1699,11 +1817,14 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "jambe",
+       "pt:E 40",
+       "tibia",
+       "tete",
        "nuque",
        "pt:DM 14",
        "gorge"
-      ]
+      ],
+      "from": "pt:E 40"
      }
     ]
    },
@@ -1738,6 +1859,7 @@ window.MTC_TRAJETS = [
      15,
      16
     ],
+    "_textx": 63.98400115966797,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -1749,10 +1871,12 @@ window.MTC_TRAJETS = [
        "orteils",
        "dos-pied",
        "jambe",
+       "fibula",
        "genou",
        "hanche",
+       "trochanter",
        "hypocondre",
-       "thorax",
+       "thorax-lat",
        "colonne"
       ]
      },
@@ -1763,9 +1887,9 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "dos-pied",
-       "jambe",
+       "tibia",
        "genou",
-       "jambe",
+       "fibula",
        "c:VB",
        "cuisse",
        "genitaux",
@@ -1773,6 +1897,7 @@ window.MTC_TRAJETS = [
        "thorax",
        "sus-clav",
        "cou",
+       "bouche",
        "levres"
       ]
      },
@@ -1782,11 +1907,13 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "yeux",
-       "nez",
+       "levres",
+       "sous-orbitaire",
+       "racine-nez",
        "c:V",
-       "yeux"
-      ]
+       "paupiere-inf"
+      ],
+      "from": "levres"
      },
      {
       "p": 3,
@@ -1794,7 +1921,8 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
-       "oreille"
+       "mandibule",
+       "devant-oreille"
       ]
      }
     ]
@@ -1898,6 +2026,7 @@ window.MTC_TRAJETS = [
      9,
      10
     ],
+    "_textx": 60.50400161743164,
     "label": "Canal principal",
     "branches": [
      {
@@ -1909,8 +2038,10 @@ window.MTC_TRAJETS = [
        "hallux",
        "pt:Rt 1",
        "hallux",
-       "malleole",
+       "metatarse",
+       "malleole-int",
        "jambe",
+       "tibia",
        "c:F",
        "c:Rn",
        "pt:Rt 6",
@@ -1921,10 +2052,11 @@ window.MTC_TRAJETS = [
        "pt:RM 4",
        "pt:RM 10",
        "o-rate",
+       "o-pancreas",
        "o-estomac",
        "pt:VB 24",
        "pt:F 14",
-       "thorax",
+       "poitrine",
        "pt:P 1",
        "aisselle",
        "pt:Rt 21"
@@ -1994,6 +2126,7 @@ window.MTC_TRAJETS = [
      11,
      12
     ],
+    "_textx": 60.50400161743164,
     "label": "Canal distinct",
     "branches": [
      {
@@ -2009,6 +2142,7 @@ window.MTC_TRAJETS = [
        "o-estomac",
        "o-rate",
        "o-coeur",
+       "tete",
        "c:E",
        "gorge",
        "langue"
@@ -2045,6 +2179,7 @@ window.MTC_TRAJETS = [
      13,
      14
     ],
+    "_textx": 60.50400161743164,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -2053,9 +2188,20 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
+       "pt:Rt 4"
+      ]
+     },
+     {
+      "p": 0,
+      "ps": [
+       0
+      ],
+      "places": [
        "pt:Rt 4",
        "c:E"
-      ]
+      ],
+      "sub": 1,
+      "from": "pt:Rt 4"
      },
      {
       "p": 1,
@@ -2063,9 +2209,12 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:Rt 4",
        "abdomen",
+       "o-intestins",
        "o-estomac"
-      ]
+      ],
+      "from": "pt:Rt 4"
      }
     ]
    },
@@ -2104,6 +2253,7 @@ window.MTC_TRAJETS = [
     "pages": [
      15
     ],
+    "_textx": 60.50400161743164,
     "label": "Grand vaisseau liaison",
     "branches": [
      {
@@ -2156,6 +2306,7 @@ window.MTC_TRAJETS = [
      16,
      17
     ],
+    "_textx": 60.50400161743164,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -2165,8 +2316,8 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "hallux",
-       "malleole",
-       "jambe",
+       "malleole-int",
+       "tibia",
        "cuisse",
        "genitaux",
        "pubis",
@@ -2231,20 +2382,10 @@ window.MTC_TRAJETS = [
      },
      {
       "n": 6,
-      "text": "Les trois canaux yīn du bras partent tous de la poitrine et circulent vers le bras jusqu’à la main et finissent leur course à l’extrémité d’un doigt. Le « système de connexions du cœur » reproduit par Ming Wong, Ling-Shu: Base de l'acupuncture traditionnelle chinoise, Paris, Masson, 1987, p. 235, d’après Zhāng Zhì Cōng, Huáng Dì Nèi Jīng Líng Shū Jí Zhù Annotations à propos du pivot spirituel du Classique interne de l’Empereur Jaune (1672). On y voit au centre la représentation du cœur, en haut le conduit du poumon et sa connexion (à droite) puis, en bas, de gauche à droite, la connexion avec les reins, avec la rate et avec le foie."
+      "text": "Les trois canaux yīn du bras partent tous de la poitrine et circulent vers le bras jusqu’à la main et finissent leur course à l’extrémité d’un doigt."
      }
     ],
     "images": [
-     {
-      "src": "img/C-p5.png",
-      "page": 5,
-      "rect": [
-       202,
-       105,
-       393,
-       400
-      ]
-     },
      {
       "src": "img/C-p7.png",
       "page": 7,
@@ -2262,6 +2403,7 @@ window.MTC_TRAJETS = [
      6,
      7
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal principal",
     "branches": [
      {
@@ -2270,7 +2412,8 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "o-coeur"
+       "o-coeur",
+       "o-systeme-coeur"
       ]
      },
      {
@@ -2279,9 +2422,11 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "o-systeme-coeur",
        "diaphragme",
        "o-ig"
-      ]
+      ],
+      "from": "o-systeme-coeur"
      },
      {
       "p": 2,
@@ -2289,11 +2434,13 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "o-systeme-coeur",
        "o-oesophage",
        "gorge",
-       "yeux",
+       "oculaire",
        "cerveau"
-      ]
+      ],
+      "from": "o-systeme-coeur"
      },
      {
       "p": 3,
@@ -2302,18 +2449,21 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
+       "o-systeme-coeur",
        "o-poumon",
        "aisselle",
        "pt:C 1",
        "bras",
-       "coude",
+       "pli-coude",
        "avant-bras",
        "poignet",
+       "pisiforme",
        "paume",
-       "main",
+       "metacarpe",
        "petit-doigt",
        "pt:C 9"
-      ]
+      ],
+      "from": "o-systeme-coeur"
      },
      {
       "p": 5,
@@ -2321,8 +2471,10 @@ window.MTC_TRAJETS = [
        5
       ],
       "places": [
+       "pt:C 9",
        "c:IG"
-      ]
+      ],
+      "from": "pt:C 9"
      }
     ]
    },
@@ -2366,6 +2518,7 @@ window.MTC_TRAJETS = [
     "pages": [
      8
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal distinct",
     "branches": [
      {
@@ -2377,7 +2530,7 @@ window.MTC_TRAJETS = [
       "places": [
        "aisselle",
        "pt:C 1",
-       "thorax",
+       "poitrine",
        "pt:VB 22",
        "o-coeur",
        "cou",
@@ -2385,7 +2538,7 @@ window.MTC_TRAJETS = [
        "pt:RM 23",
        "visage",
        "c:IG",
-       "yeux",
+       "canthus-int",
        "pt:V 1"
       ]
      }
@@ -2421,6 +2574,7 @@ window.MTC_TRAJETS = [
      9,
      10
     ],
+    "_textx": 60.41999816894531,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -2447,11 +2601,13 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "pt:C 5",
        "o-coeur",
        "langue",
-       "yeux",
+       "oculaire",
        "cerveau"
-      ]
+      ],
+      "from": "pt:C 5"
      }
     ]
    },
@@ -2487,6 +2643,7 @@ window.MTC_TRAJETS = [
     "pages": [
      11
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -2497,6 +2654,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "petit-doigt",
+       "pisiforme",
        "pt:C 7",
        "coude",
        "pt:C 3",
@@ -2578,6 +2736,7 @@ window.MTC_TRAJETS = [
      7,
      8
     ],
+    "_textx": 60.540000915527344,
     "label": "Canal principal",
     "branches": [
      {
@@ -2589,16 +2748,22 @@ window.MTC_TRAJETS = [
        "petit-doigt",
        "main",
        "poignet",
+       "styloide-uln",
        "avant-bras",
        "coude",
+       "olecrane",
        "bras",
        "epaule",
+       "omoplate",
+       "infraep",
+       "supraep",
        "omoplate",
        "epaule",
        "dos",
        "pt:V 41",
        "pt:V 11",
        "pt:DM 14",
+       "sus-clav",
        "pt:E 12"
       ]
      },
@@ -2608,11 +2773,12 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "sus-clav",
        "cou",
        "joue",
-       "yeux",
+       "canthus-ext",
        "pt:VB 1",
-       "oreille",
+       "devant-oreille",
        "pt:TF 22",
        "oreille",
        "pt:IG 19"
@@ -2626,7 +2792,7 @@ window.MTC_TRAJETS = [
       "places": [
        "joue",
        "nez",
-       "yeux",
+       "canthus-int",
        "pt:V 1"
       ]
      },
@@ -2636,6 +2802,7 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
+       "sus-clav",
        "pt:E 12",
        "thorax",
        "pt:RM 17",
@@ -2696,6 +2863,7 @@ window.MTC_TRAJETS = [
     "pages": [
      9
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal distinct",
     "branches": [
      {
@@ -2745,6 +2913,7 @@ window.MTC_TRAJETS = [
     "pages": [
      10
     ],
+    "_textx": 60.41999816894531,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -2764,10 +2933,13 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:IG 7",
        "coude",
        "epaule",
+       "acromion",
        "pt:GI 15"
-      ]
+      ],
+      "from": "pt:IG 7"
      }
     ]
    },
@@ -2808,6 +2980,7 @@ window.MTC_TRAJETS = [
      11,
      12
     ],
+    "_textx": 60.540000915527344,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -2817,7 +2990,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "petit-doigt",
-       "poignet",
+       "dos-poignet",
        "pt:IG 5",
        "avant-bras",
        "coude",
@@ -2825,7 +2998,8 @@ window.MTC_TRAJETS = [
        "aisselle",
        "omoplate",
        "cou",
-       "oreille"
+       "mastoide",
+       "derriere-oreille"
       ]
      },
      {
@@ -2834,13 +3008,28 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "oreille",
-       "machoire",
+       "derriere-oreille",
+       "oreille"
+      ],
+      "from": "derriere-oreille"
+     },
+     {
+      "p": 1,
+      "ps": [
+       1
+      ],
+      "places": [
+       "derriere-oreille",
+       "autour-oreille",
+       "dessus-oreille",
+       "mandibule",
        "dents",
-       "yeux",
+       "canthus-ext",
        "pt:VB 1",
-       "front"
-      ]
+       "angle-frontal"
+      ],
+      "sub": 1,
+      "from": "derriere-oreille"
      }
     ]
    }
@@ -2928,6 +3117,7 @@ window.MTC_TRAJETS = [
      9,
      10
     ],
+    "_textx": 63.98400115966797,
     "label": "Canal principal",
     "branches": [
      {
@@ -2936,7 +3126,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "yeux",
+       "canthus-int",
        "pt:V 1",
        "front",
        "pt:DM 24",
@@ -2952,6 +3142,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "vertex",
+       "parietal",
        "pt:VB 7",
        "pt:VB 8",
        "pt:VB 9",
@@ -2967,6 +3158,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "vertex",
+       "crane",
        "cerveau",
        "pt:DM 17",
        "nuque",
@@ -2981,12 +3173,14 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
+       "pt:V 10",
        "colonne",
        "lombes",
        "pt:V 23",
        "o-reins",
        "o-vessie"
-      ]
+      ],
+      "from": "pt:V 10"
      },
      {
       "p": 4,
@@ -3010,16 +3204,17 @@ window.MTC_TRAJETS = [
        7
       ],
       "places": [
-       "nuque",
        "pt:V 10",
+       "coxo",
        "pt:VB 30",
        "cuisse",
        "poplite",
        "pt:V 40",
        "jambe",
-       "mollet",
-       "malleole",
-       "orteils",
+       "gastrocnemien",
+       "malleole-ext",
+       "metatarse",
+       "petit-orteil",
        "c:Rn"
       ]
      }
@@ -3027,10 +3222,10 @@ window.MTC_TRAJETS = [
    },
    {
     "type": "distinct",
-    "title": "Trajet du tú tài yáng jīng bié (",
+    "title": "Trajet du tú tài yáng jīng bié (canal distinct V)",
     "paragraphs": [
-     ") (canal distinct V)",
-     "- Le zú tài yáng jīng bié (canal distinct V) se détache du canal principal dans la zone du creux poplité à V 40 (wěi zhōng), pénètre dans la région de l’anus en passant par V 36 (chéng fú), rentre dans la cavité abdominale, se connecte à la vessie et se relie aux reins. Puis il remonte en suivant les muscles paravertébraux, pénètre et se répand dans le cœur, continue à circuler vers le haut, émerge à la nuque et se connecte au canal principal de la vessie[[n9]]."
+     "- Le zú tài yáng jīng bié (canal distinct V) se détache du canal principal dans la zone du creux poplité à V 40 (wěi zhōng), pénètre dans la région de l’anus en passant par V 36 (chéng fú), rentre dans la cavité abdominale, se connecte à la vessie et se relie aux reins.",
+     "Puis il remonte en suivant les muscles paravertébraux, pénètre et se répand dans le cœur, continue à circuler vers le haut, émerge à la nuque et se connecte au canal principal de la vessie[[n9]]."
     ],
     "notes": [
      {
@@ -3053,11 +3248,13 @@ window.MTC_TRAJETS = [
     "pages": [
      11
     ],
+    "_textx": 60.50400161743164,
     "label": "Canal distinct",
     "branches": [
      {
-      "p": 1,
+      "p": 0,
       "ps": [
+       0,
        1
       ],
       "places": [
@@ -3068,6 +3265,7 @@ window.MTC_TRAJETS = [
        "abdomen",
        "o-vessie",
        "o-reins",
+       "paravert",
        "o-coeur",
        "nuque"
       ]
@@ -3106,6 +3304,7 @@ window.MTC_TRAJETS = [
     "pages": [
      12
     ],
+    "_textx": 78.02400207519531,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -3123,7 +3322,7 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "mollet",
+       "gastrocnemien",
        "c:Rn"
       ]
      }
@@ -3131,15 +3330,19 @@ window.MTC_TRAJETS = [
    },
    {
     "type": "tendineux",
-    "title": "Trajet du zú tài yáng jīng jīn (canal tendineux de la",
+    "title": "Trajet du zú tài yáng jīng jīn (canal tendineux V)",
     "paragraphs": [
      "- Le zú tài yáng jīng jīn (canal tendineux V) naît au petit orteil, se connecte à la malléole externe et remonte pour se connecter à la face latérale du genou.",
      "- Une branche se détache en dessous de la malléole externe, se connecte au talon, monte le long du tendon calcanéen (tendon d’Achille) jusqu’à la partie externe du creux poplité.",
-     "- Une autre branche débute à la zone de convergence des deux chefs du gastrocnémien et remonte se connecter au bord interne du creux poplité. Ces deux dernières branches se connectent à la région fessière où elles se rejoignent, pour monter jusqu’à la nuque[[n12]].",
+     "- Une autre branche débute à la zone de convergence des deux chefs du gastrocnémien et remonte se connecter au bord interne du creux poplité.",
+     "Ces deux dernières branches se connectent à la région fessière où elles se rejoignent, pour monter jusqu’à la nuque[[n12]].",
      "- D’ici une déviation se détache pour se connecter à la racine de la langue[[n13]], tandis que le trajet principal continu à monter, se connecte à l’occiput, contourne le sommet du crâne pour rejoindre le nez[[n14]] et se nouer à la pommette au niveau d’IG 18 (quán liáo)[[n15]].",
-     "- À partir de ce dernier, une branche remonte pour couvrir la zone de la paupière supérieure[[n16]]. Deux autres branches se détachent du trajet principal dans la zone du dos.",
+     "- À partir de ce dernier, une branche remonte pour couvrir la zone de la paupière supérieure[[n16]].",
+     "Deux autres branches se détachent du trajet principal dans la zone du dos.",
      "- La première branche remonte du dos pour se connecter à l’épaule dans la région de GI 15 (jiān yú).",
-     "- La deuxième branche passe sous l’aisselle, rejoint la zone claviculaire où elle se divise en deux. o La première déviation remonte vers la zone en arrière de l’oreille pour se connecter dans la région de la mastoïde au niveau de VB 12 (wán gǔ), o tandis que l’autre remonte obliquement vers la pommette au niveau d’IG 18 (quán liáo)."
+     "- La deuxième branche passe sous l’aisselle, rejoint la zone claviculaire où elle se divise en deux.",
+     "- La première déviation remonte vers la zone en arrière de l’oreille pour se connecter dans la région de la mastoïde au niveau de VB 12 (wán gǔ),",
+     "- tandis que l’autre remonte obliquement vers la pommette au niveau d’IG 18 (quán liáo)."
     ],
     "notes": [
      {
@@ -3179,6 +3382,7 @@ window.MTC_TRAJETS = [
      13,
      14
     ],
+    "_textx": 78.6240005493164,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -3187,8 +3391,8 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "orteils",
-       "malleole",
+       "petit-orteil",
+       "malleole-ext",
        "genou"
       ]
      },
@@ -3198,35 +3402,23 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "malleole",
+       "malleole-ext",
        "talon",
+       "tendon-calc",
        "poplite"
       ]
      },
      {
       "p": 2,
       "ps": [
-       2
-      ],
-      "places": [
-       "mollet",
-       "poplite",
-       "fesse",
-       "nuque"
-      ]
-     },
-     {
-      "p": 3,
-      "ps": [
+       2,
        3
       ],
       "places": [
-       "langue",
-       "occiput",
-       "vertex",
-       "nez",
-       "pommette",
-       "pt:IG 18"
+       "gastrocnemien",
+       "poplite",
+       "fesse",
+       "nuque"
       ]
      },
      {
@@ -3235,14 +3427,51 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
-       "yeux",
-       "dos"
-      ]
+       "nuque",
+       "langue"
+      ],
+      "from": "nuque"
+     },
+     {
+      "p": 4,
+      "ps": [
+       4
+      ],
+      "places": [
+       "nuque",
+       "occiput",
+       "vertex",
+       "nez",
+       "pommette",
+       "pt:IG 18"
+      ],
+      "sub": 1,
+      "from": "nuque"
      },
      {
       "p": 5,
       "ps": [
        5
+      ],
+      "places": [
+       "pt:IG 18",
+       "paupiere-sup"
+      ],
+      "from": "pt:IG 18"
+     },
+     {
+      "p": 6,
+      "ps": [
+       6
+      ],
+      "places": [
+       "dos"
+      ]
+     },
+     {
+      "p": 7,
+      "ps": [
+       7
       ],
       "places": [
        "dos",
@@ -3251,18 +3480,41 @@ window.MTC_TRAJETS = [
       ]
      },
      {
-      "p": 6,
+      "p": 8,
       "ps": [
-       6
+       8
       ],
       "places": [
+       "dos",
        "aisselle",
-       "clavicule",
-       "oreille",
-       "pt:VB 12",
+       "zone-clav"
+      ],
+      "from": "dos"
+     },
+     {
+      "p": 9,
+      "ps": [
+       9
+      ],
+      "places": [
+       "zone-clav",
+       "derriere-oreille",
+       "mastoide",
+       "pt:VB 12"
+      ],
+      "from": "zone-clav"
+     },
+     {
+      "p": 10,
+      "ps": [
+       10
+      ],
+      "places": [
+       "zone-clav",
        "pommette",
        "pt:IG 18"
-      ]
+      ],
+      "from": "zone-clav"
      }
     ]
    }
@@ -3323,6 +3575,7 @@ window.MTC_TRAJETS = [
      7,
      8
     ],
+    "_textx": 63.84000015258789,
     "label": "Canal principal",
     "branches": [
      {
@@ -3334,11 +3587,12 @@ window.MTC_TRAJETS = [
        "pt:V 67",
        "plante",
        "pt:Rn 1",
-       "malleole",
+       "naviculaire",
+       "malleole-int",
        "talon",
        "jambe",
        "pt:Rt 6",
-       "mollet",
+       "gastrocnemien",
        "poplite",
        "pt:Rn 10",
        "cuisse",
@@ -3359,24 +3613,17 @@ window.MTC_TRAJETS = [
       ]
      },
      {
-      "p": 2,
-      "ps": [
-       2
-      ],
-      "places": [
-       "o-reins"
-      ]
-     },
-     {
       "p": 3,
       "ps": [
        3
       ],
       "places": [
+       "o-reins",
        "pt:RM 4",
        "pt:RM 3",
        "o-vessie"
-      ]
+      ],
+      "from": "o-reins"
      },
      {
       "p": 4,
@@ -3384,13 +3631,15 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
+       "o-reins",
        "o-foie",
        "diaphragme",
        "o-poumon",
        "trachee",
        "gorge",
        "langue"
-      ]
+      ],
+      "from": "o-reins"
      },
      {
       "p": 5,
@@ -3412,8 +3661,9 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "perinee",
-       "pubis",
+       "symphyse",
        "pt:Rn 11",
+       "abdomen",
        "pt:Rn 21",
        "intercostal",
        "pt:Rn 22",
@@ -3452,6 +3702,7 @@ window.MTC_TRAJETS = [
     "pages": [
      9
     ],
+    "_textx": 63.84000015258789,
     "label": "Canal distinct",
     "branches": [
      {
@@ -3468,24 +3719,32 @@ window.MTC_TRAJETS = [
        "anus",
        "o-vessie",
        "o-reins",
-       "colonne",
-       "lombes",
+       "lombaires",
        "pt:V 23"
       ]
      },
      {
       "p": 1,
       "ps": [
-       1,
+       1
+      ],
+      "places": [
+       "c:DaiM"
+      ]
+     },
+     {
+      "p": 2,
+      "ps": [
        2
       ],
       "places": [
-       "c:DaiM",
+       "pt:V 23",
        "langue",
        "pt:RM 23",
        "nuque",
        "pt:V 10"
-      ]
+      ],
+      "from": "pt:V 23"
      }
     ]
    },
@@ -3519,6 +3778,7 @@ window.MTC_TRAJETS = [
      10,
      11
     ],
+    "_textx": 85.08000183105469,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -3538,12 +3798,13 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:Rn 4",
        "jambe",
        "perinee",
-       "colonne",
-       "lombes",
+       "lombaires",
        "pt:DM 1"
-      ]
+      ],
+      "from": "pt:Rn 4"
      },
      {
       "p": 2,
@@ -3551,9 +3812,20 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "lombes",
-       "colonne"
-      ]
+       "pt:DM 1",
+       "lombaires"
+      ],
+      "from": "pt:DM 1"
+     },
+     {
+      "p": 2,
+      "ps": [
+       2
+      ],
+      "places": [
+       "vertebres"
+      ],
+      "sub": 1
      }
     ]
    },
@@ -3562,7 +3834,8 @@ window.MTC_TRAJETS = [
     "title": "Trajet du canal tendineux",
     "paragraphs": [
      "- Il nait à l’extrémité inférieure du petit orteil[[n5]], se dirige vers le centre de la plante du pied et croise le canal tendineux de la rate sous la malléole médiale.",
-     "- Une branche se dirige vers le talon où elle rejoint le canal tendineux de la vessie. Le trajet principal remonte avec le canal tendineux de la rate jusqu’à la partie supérieure de la cuisse où il se connecte à la région génitale jusqu’à RM 2 (qū gǔ) et RM 3 (zhōng jí).",
+     "- Une branche se dirige vers le talon où elle rejoint le canal tendineux de la vessie.",
+     "Le trajet principal remonte avec le canal tendineux de la rate jusqu’à la partie supérieure de la cuisse où il se connecte à la région génitale jusqu’à RM 2 (qū gǔ) et RM 3 (zhōng jí).",
      "- D’ici il plonge dans l’interne, poursuit son ascension le long de la face médiale de la colonne vertébrale jusqu’à l’occiput où il rejoint le canal tendineux de la vessie."
     ],
     "notes": [
@@ -3587,6 +3860,7 @@ window.MTC_TRAJETS = [
      12,
      13
     ],
+    "_textx": 63.84000015258789,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -3595,10 +3869,10 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "orteils",
+       "petit-orteil",
        "plante",
        "c:Rt",
-       "malleole"
+       "malleole-int"
       ]
      },
      {
@@ -3607,13 +3881,11 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "malleole-int",
        "talon",
-       "c:V",
-       "c:Rt",
-       "cuisse",
-       "pt:RM 2",
-       "pt:RM 3"
-      ]
+       "c:V"
+      ],
+      "from": "malleole-int"
      },
      {
       "p": 2,
@@ -3621,10 +3893,25 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "c:Rt",
+       "cuisse",
+       "genitaux",
+       "pt:RM 2",
+       "pt:RM 3"
+      ]
+     },
+     {
+      "p": 3,
+      "ps": [
+       3
+      ],
+      "places": [
+       "pt:RM 3",
        "colonne",
        "occiput",
        "c:V"
-      ]
+      ],
+      "from": "pt:RM 3"
      }
     ]
    }
@@ -3699,6 +3986,7 @@ window.MTC_TRAJETS = [
      6,
      7
     ],
+    "_textx": 78.23999786376953,
     "label": "Canal principal",
     "branches": [
      {
@@ -3707,7 +3995,7 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "thorax",
+       "poitrine",
        "pt:RM 17",
        "c:Rn"
       ]
@@ -3718,10 +4006,12 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:RM 17",
        "diaphragme",
        "abdomen",
        "o-tf"
-      ]
+      ],
+      "from": "pt:RM 17"
      },
      {
       "p": 2,
@@ -3729,15 +4019,17 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "pt:RM 17",
        "thorax",
        "seins",
        "cotes",
        "pt:EC 1",
        "aisselle",
        "bras",
-       "coude",
+       "pli-coude",
        "pt:EC 3"
-      ]
+      ],
+      "from": "pt:RM 17"
      },
      {
       "p": 3,
@@ -3747,7 +4039,6 @@ window.MTC_TRAJETS = [
       "places": [
        "avant-bras",
        "paume",
-       "main",
        "medius",
        "pt:EC 9"
       ]
@@ -3759,7 +4050,6 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "paume",
-       "main",
        "annulaire",
        "pt:TF 1"
       ]
@@ -3809,6 +4099,7 @@ window.MTC_TRAJETS = [
      8,
      9
     ],
+    "_textx": 78.54000091552734,
     "label": "Canal distinct",
     "branches": [
      {
@@ -3827,10 +4118,13 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "o-tf",
        "gorge",
-       "oreille",
+       "derriere-oreille",
+       "mastoide",
        "c:TF"
-      ]
+      ],
+      "from": "o-tf"
      }
     ]
    },
@@ -3866,6 +4160,7 @@ window.MTC_TRAJETS = [
     "pages": [
      10
     ],
+    "_textx": 78.54000091552734,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -3884,10 +4179,12 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:EC 6",
        "thorax",
        "pt:RM 17",
-       "o-coeur"
-      ]
+       "o-systeme-coeur"
+      ],
+      "from": "pt:EC 6"
      }
     ]
    },
@@ -3930,6 +4227,7 @@ window.MTC_TRAJETS = [
     "pages": [
      11
     ],
+    "_textx": 78.54000091552734,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -3951,8 +4249,10 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "aisselle",
        "thorax"
-      ]
+      ],
+      "from": "aisselle"
      },
      {
       "p": 3,
@@ -3960,8 +4260,10 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
+       "aisselle",
        "thorax"
-      ]
+      ],
+      "from": "aisselle"
      },
      {
       "p": 4,
@@ -3969,9 +4271,12 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
+       "aisselle",
+       "poitrine",
        "thorax",
        "diaphragme"
-      ]
+      ],
+      "from": "aisselle"
      }
     ]
    }
@@ -4089,6 +4394,7 @@ window.MTC_TRAJETS = [
      8,
      9
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal principal",
     "branches": [
      {
@@ -4101,27 +4407,27 @@ window.MTC_TRAJETS = [
       "places": [
        "annulaire",
        "pt:TF 1",
-       "main",
+       "dos-main",
+       "metacarpe",
        "avant-bras",
-       "coude",
+       "olecrane",
        "pt:TF 10",
        "bras",
        "epaule",
        "pt:TF 14",
        "pt:IG 12",
        "pt:DM 14",
+       "trapeze",
        "pt:TF 15",
        "epaule",
        "pt:VB 21",
-       "clavicule",
+       "zone-clav",
        "pt:E 12",
        "sus-clav",
-       "seins",
        "pt:RM 17",
        "o-ec",
        "diaphragme",
-       "o-tf",
-       "o-vessie"
+       "o-tf"
       ]
      },
      {
@@ -4144,13 +4450,15 @@ window.MTC_TRAJETS = [
        "pt:RM 17",
        "sus-clav",
        "cou",
+       "mastoide",
        "pt:VB 11",
-       "oreille",
+       "apex-oreille",
+       "cheveux",
        "pt:VB 4",
        "pt:VB 5",
        "pt:VB 6",
-       "machoire",
-       "yeux",
+       "mandibule",
+       "sous-orbitaire",
        "pt:IG 18"
       ]
      },
@@ -4160,8 +4468,10 @@ window.MTC_TRAJETS = [
        6
       ],
       "places": [
+       "derriere-oreille",
        "pt:TF 17",
        "oreille",
+       "devant-oreille",
        "pt:IG 19",
        "pt:VB 3",
        "sourcil",
@@ -4216,6 +4526,7 @@ window.MTC_TRAJETS = [
     "pages": [
      10
     ],
+    "_textx": 60.540000915527344,
     "label": "Canal distinct",
     "branches": [
      {
@@ -4225,7 +4536,7 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "oreille",
+       "dessus-oreille",
        "vertex",
        "pt:DM 20",
        "pt:TF 16",
@@ -4265,6 +4576,7 @@ window.MTC_TRAJETS = [
     "pages": [
      11
     ],
+    "_textx": 60.540000915527344,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -4283,8 +4595,10 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:TF 5",
        "c:EC"
-      ]
+      ],
+      "from": "pt:TF 5"
      },
      {
       "p": 2,
@@ -4292,11 +4606,13 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "pt:TF 5",
        "epaule",
-       "thorax",
+       "poitrine",
        "c:EC",
        "o-tf"
-      ]
+      ],
+      "from": "pt:TF 5"
      }
     ]
    },
@@ -4354,6 +4670,7 @@ window.MTC_TRAJETS = [
      12,
      13
     ],
+    "_textx": 60.540000915527344,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -4364,13 +4681,13 @@ window.MTC_TRAJETS = [
       "places": [
        "annulaire",
        "pt:TF 1",
-       "poignet",
+       "dos-poignet",
        "avant-bras",
-       "coude",
+       "olecrane",
        "bras",
-       "epaule",
+       "acromion",
        "cou",
-       "machoire",
+       "angle-mandibule",
        "c:IG"
       ]
      },
@@ -4380,7 +4697,7 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "machoire",
+       "angle-mandibule",
        "langue"
       ]
      },
@@ -4390,11 +4707,11 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
-       "machoire",
-       "oreille",
-       "yeux",
+       "angle-mandibule",
+       "devant-oreille",
+       "canthus-ext",
        "front",
-       "tempe",
+       "angle-temporal",
        "pt:VB 13"
       ]
      }
@@ -4499,6 +4816,7 @@ window.MTC_TRAJETS = [
      10,
      11
     ],
+    "_textx": 63.84000015258789,
     "label": "Canal principal",
     "branches": [
      {
@@ -4510,22 +4828,26 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
-       "yeux",
+       "canthus-ext",
        "pt:VB 1",
        "pt:VB 2",
-       "front",
+       "angle-frontal",
        "pt:E 8",
-       "oreille",
+       "supant-oreille",
        "pt:VB 7",
-       "oreille",
+       "autour-oreille",
+       "mastoide",
        "pt:VB 12",
        "pt:TF 22",
        "pt:TF 20",
-       "front",
+       "mastoide",
+       "angle-frontal",
        "pt:VB 13",
+       "sus-orbitaire",
        "pt:VB 14",
        "occiput",
        "pt:VB 20",
+       "trapeze",
        "pt:VB 21",
        "epaule",
        "pt:TF 15",
@@ -4543,11 +4865,12 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
-       "oreille",
+       "derriere-oreille",
        "pt:VB 20",
        "pt:TF 17",
        "oreille",
-       "yeux",
+       "devant-oreille",
+       "canthus-ext",
        "pt:VB 1",
        "pt:IG 19",
        "pt:E 7"
@@ -4556,25 +4879,23 @@ window.MTC_TRAJETS = [
      {
       "p": 5,
       "ps": [
-       5,
-       6
+       5
       ],
       "places": [
-       "yeux",
+       "canthus-ext",
        "pt:VB 1",
-       "machoire",
+       "angle-mandibule",
        "pt:E 5",
        "c:TF",
-       "yeux",
+       "sous-orbitaire",
        "pt:V 1",
-       "yeux",
-       "machoire",
+       "canthus-int",
+       "angle-mandibule",
        "pt:E 6",
        "cou",
        "pt:E 9",
        "sus-clav",
-       "pt:E 12",
-       "sus-clav"
+       "pt:E 12"
       ]
      },
      {
@@ -4584,12 +4905,13 @@ window.MTC_TRAJETS = [
        8
       ],
       "places": [
+       "sus-clav",
        "thorax",
        "pt:EC 1",
        "diaphragme",
        "o-foie",
        "o-vb",
-       "thorax",
+       "thorax-lat",
        "abdomen",
        "lombes",
        "aine",
@@ -4602,7 +4924,8 @@ window.MTC_TRAJETS = [
        "pt:V 34",
        "pt:DM 1",
        "pt:VB 30"
-      ]
+      ],
+      "from": "sus-clav"
      },
      {
       "p": 9,
@@ -4617,8 +4940,8 @@ window.MTC_TRAJETS = [
        "aisselle",
        "pt:VB 22",
        "pt:VB 23",
-       "thorax",
-       "cotes",
+       "thorax-lat",
+       "cotes-flott",
        "pt:VB 24",
        "pt:F 13",
        "hypocondre",
@@ -4631,10 +4954,10 @@ window.MTC_TRAJETS = [
        "pt:VB 31",
        "genou",
        "pt:VB 33",
-       "jambe",
+       "fibula",
        "pt:VB 34",
        "pt:VB 39",
-       "malleole",
+       "malleole-ext",
        "pt:VB 40",
        "dos-pied",
        "orteils",
@@ -4649,7 +4972,7 @@ window.MTC_TRAJETS = [
       "places": [
        "dos-pied",
        "pt:VB 41",
-       "pied",
+       "metatarse",
        "c:F",
        "hallux"
       ]
@@ -4686,6 +5009,7 @@ window.MTC_TRAJETS = [
      12,
      13
     ],
+    "_textx": 92.16000366210938,
     "label": "Canal distinct",
     "branches": [
      {
@@ -4706,13 +5030,15 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "thorax",
+       "pt:RM 2",
+       "thorax-lat",
        "pt:F 13",
        "thorax",
        "o-vb",
        "o-foie",
        "o-coeur"
-      ]
+      ],
+      "from": "pt:RM 2"
      },
      {
       "p": 2,
@@ -4721,9 +5047,10 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "o-oesophage",
-       "machoire",
+       "mandibule",
        "joue",
-       "yeux",
+       "oculaire",
+       "canthus-ext",
        "pt:VB 1"
       ]
      }
@@ -4758,6 +5085,7 @@ window.MTC_TRAJETS = [
     "pages": [
      14
     ],
+    "_textx": 92.16000366210938,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -4775,8 +5103,10 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "pt:VB 37",
        "c:F"
-      ]
+      ],
+      "from": "pt:VB 37"
      },
      {
       "p": 2,
@@ -4784,9 +5114,11 @@ window.MTC_TRAJETS = [
        2
       ],
       "places": [
+       "pt:VB 37",
        "dos-pied",
        "orteils"
-      ]
+      ],
+      "from": "pt:VB 37"
      }
     ]
    },
@@ -4850,6 +5182,7 @@ window.MTC_TRAJETS = [
      15,
      16
     ],
+    "_textx": 92.16000366210938,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -4859,8 +5192,8 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "orteils",
-       "malleole",
-       "jambe",
+       "malleole-ext",
+       "tibia",
        "genou"
       ]
      },
@@ -4870,9 +5203,11 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "jambe",
+       "genou",
+       "fibula",
        "cuisse"
-      ]
+      ],
+      "from": "genou"
      },
      {
       "p": 2,
@@ -4882,7 +5217,7 @@ window.MTC_TRAJETS = [
       "places": [
        "genou",
        "cuisse",
-       "hanche"
+       "trochanter"
       ]
      },
      {
@@ -4891,8 +5226,10 @@ window.MTC_TRAJETS = [
        3
       ],
       "places": [
+       "trochanter",
        "sacrum"
-      ]
+      ],
+      "from": "trochanter"
      },
      {
       "p": 4,
@@ -4900,9 +5237,9 @@ window.MTC_TRAJETS = [
        4
       ],
       "places": [
-       "hanche",
-       "cotes",
-       "thorax",
+       "trochanter",
+       "cotes-flott",
+       "thorax-lat",
        "aisselle",
        "thorax",
        "seins",
@@ -4915,10 +5252,12 @@ window.MTC_TRAJETS = [
        5
       ],
       "places": [
-       "oreille",
-       "front",
+       "sus-clav",
+       "derriere-oreille",
+       "angle-frontal",
        "vertex"
-      ]
+      ],
+      "from": "sus-clav"
      },
      {
       "p": 6,
@@ -4926,9 +5265,9 @@ window.MTC_TRAJETS = [
        6
       ],
       "places": [
-       "front",
-       "machoire",
-       "pommette"
+       "angle-frontal",
+       "mandibule",
+       "arcade-zyg"
       ]
      },
      {
@@ -4937,8 +5276,10 @@ window.MTC_TRAJETS = [
        7
       ],
       "places": [
-       "nez"
-      ]
+       "arcade-zyg",
+       "racine-nez"
+      ],
+      "from": "arcade-zyg"
      },
      {
       "p": 8,
@@ -4946,8 +5287,10 @@ window.MTC_TRAJETS = [
        8
       ],
       "places": [
-       "yeux"
-      ]
+       "arcade-zyg",
+       "canthus-ext"
+      ],
+      "from": "arcade-zyg"
      }
     ]
    }
@@ -5046,6 +5389,7 @@ window.MTC_TRAJETS = [
      8,
      9
     ],
+    "_textx": 99.23999786376953,
     "label": "Canal principal",
     "branches": [
      {
@@ -5060,7 +5404,9 @@ window.MTC_TRAJETS = [
       "places": [
        "hallux",
        "pt:F 1",
+       "metatarse",
        "dos-pied",
+       "malleole-int",
        "pt:F 4",
        "jambe",
        "c:Rt",
@@ -5074,7 +5420,7 @@ window.MTC_TRAJETS = [
        "pt:Rt 13",
        "pubis",
        "genitaux",
-       "abdomen",
+       "abdomen-inf",
        "pt:RM 2",
        "pt:RM 3",
        "pt:RM 4",
@@ -5084,7 +5430,7 @@ window.MTC_TRAJETS = [
        "o-foie",
        "o-vb",
        "diaphragme",
-       "thorax"
+       "poitrine"
       ]
      },
      {
@@ -5106,7 +5452,8 @@ window.MTC_TRAJETS = [
       "places": [
        "diaphragme",
        "gorge",
-       "yeux",
+       "nasopharynx",
+       "oculaire",
        "front",
        "c:DM",
        "vertex"
@@ -5118,6 +5465,7 @@ window.MTC_TRAJETS = [
        7
       ],
       "places": [
+       "oculaire",
        "joue",
        "levres"
       ]
@@ -5157,6 +5505,7 @@ window.MTC_TRAJETS = [
      10,
      11
     ],
+    "_textx": 60.41999816894531,
     "label": "Canal distinct",
     "branches": [
      {
@@ -5176,11 +5525,10 @@ window.MTC_TRAJETS = [
        "o-vb",
        "o-coeur",
        "cou",
-       "machoire",
-       "c:VB",
-       "yeux",
+       "angle-mandibule",
+       "canthus-ext",
        "pt:VB 1",
-       "yeux"
+       "oculaire"
       ]
      }
     ]
@@ -5213,6 +5561,7 @@ window.MTC_TRAJETS = [
     "pages": [
      12
     ],
+    "_textx": 63.84000015258789,
     "label": "Vaisseau liaison",
     "branches": [
      {
@@ -5231,9 +5580,11 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
-       "jambe",
+       "pt:F 5",
+       "tibia",
        "genitaux"
-      ]
+      ],
+      "from": "pt:F 5"
      }
     ]
    },
@@ -5269,6 +5620,7 @@ window.MTC_TRAJETS = [
      13,
      14
     ],
+    "_textx": 63.84000015258789,
     "label": "Canal tendineux",
     "branches": [
      {
@@ -5280,10 +5632,8 @@ window.MTC_TRAJETS = [
        "hallux",
        "pt:F 1",
        "pt:F 4",
-       "jambe",
+       "tibia",
        "cuisse",
-       "c:Rt",
-       "c:Rn",
        "pubis",
        "pt:RM 3",
        "genitaux"
@@ -5415,6 +5765,7 @@ window.MTC_TRAJETS = [
      15,
      16
     ],
+    "_textx": 63.779998779296875,
     "label": "Trajet",
     "branches": [
      {
@@ -5423,14 +5774,13 @@ window.MTC_TRAJETS = [
        0
       ],
       "places": [
-       "abdomen",
+       "abdomen-inf",
        "perinee",
        "pt:RM 1",
        "genitaux",
        "pt:E 30",
        "c:Rn",
        "abdomen",
-       "ombilic",
        "pt:Rn 11",
        "pt:Rn 12",
        "pt:Rn 13",
@@ -5452,13 +5802,15 @@ window.MTC_TRAJETS = [
        1
       ],
       "places": [
+       "thorax",
        "gorge",
-       "nez",
+       "arriere-nez",
        "levres",
        "nez",
-       "yeux",
+       "orbite",
        "c:RM"
-      ]
+      ],
+      "from": "thorax"
      },
      {
       "p": 2,
@@ -5468,11 +5820,20 @@ window.MTC_TRAJETS = [
       "places": [
        "pt:RM 1",
        "colonne",
-       "c:DM",
-       "abdomen",
+       "c:DM"
+      ]
+     },
+     {
+      "p": 2,
+      "ps": [
+       2
+      ],
+      "places": [
+       "abdomen-inf",
        "colonne",
        "c:DaiM"
-      ]
+      ],
+      "sub": 1
      },
      {
       "p": 3,
@@ -5484,8 +5845,8 @@ window.MTC_TRAJETS = [
        "pt:E 30",
        "cuisse",
        "poplite",
-       "jambe",
-       "malleole",
+       "tibia",
+       "malleole-int",
        "talon",
        "plante"
       ]
@@ -5497,7 +5858,7 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "malleole",
-       "pied",
+       "tarse",
        "pt:E 42",
        "hallux"
       ]
@@ -5580,6 +5941,7 @@ window.MTC_TRAJETS = [
      44,
      45
     ],
+    "_textx": 63.779998779296875,
     "label": "Trajet",
     "branches": [
      {
@@ -5590,10 +5952,10 @@ window.MTC_TRAJETS = [
       ],
       "places": [
        "talon",
-       "pt:Rn 2",
        "pt:Rn 6",
-       "malleole",
+       "malleole-int",
        "pt:Rn 8",
+       "membre-inf",
        "perinee",
        "pubis",
        "genitaux",
@@ -5602,9 +5964,9 @@ window.MTC_TRAJETS = [
        "sus-clav",
        "gorge",
        "pt:E 9",
-       "pommette",
+       "region-zyg",
        "nez",
-       "yeux",
+       "canthus-int",
        "pt:V 1",
        "c:E",
        "c:YangQ",
@@ -5721,6 +6083,7 @@ window.MTC_TRAJETS = [
      49,
      50
     ],
+    "_textx": 63.779998779296875,
     "label": "Trajet",
     "branches": [
      {
@@ -5738,14 +6101,16 @@ window.MTC_TRAJETS = [
        "pt:V 62",
        "talon",
        "pt:V 61",
-       "malleole",
-       "jambe",
+       "malleole-ext",
+       "membre-inf",
+       "fibula",
        "pt:V 59",
        "cuisse",
        "hanche",
        "pt:VB 29",
+       "thorax-lat",
        "thorax",
-       "aisselle",
+       "pli-axill",
        "epaule",
        "pt:IG 10",
        "pt:GI 16",
@@ -5759,17 +6124,17 @@ window.MTC_TRAJETS = [
        "pt:E 3",
        "c:RM",
        "pt:E 1",
-       "yeux",
+       "canthus-int",
        "pt:V 1",
        "c:E",
        "c:YinQ",
        "c:V",
        "front",
        "tempe",
-       "oreille",
+       "derriere-oreille",
        "pt:VB 20",
        "cerveau",
-       "yeux"
+       "oculaire"
       ]
      }
     ]
@@ -5842,6 +6207,7 @@ window.MTC_TRAJETS = [
      54,
      55
     ],
+    "_textx": 63.779998779296875,
     "label": "Trajet",
     "branches": [
      {
@@ -5853,15 +6219,16 @@ window.MTC_TRAJETS = [
       "places": [
        "jambe",
        "pt:Rn 9",
+       "membre-inf",
        "abdomen",
        "pt:Rt 12",
        "pt:Rt 13",
        "pt:Rt 15",
        "pt:Rt 16",
-       "thorax",
+       "thorax-lat",
        "pt:F 14",
        "diaphragme",
-       "thorax",
+       "poitrine",
        "gorge",
        "pt:RM 22",
        "pt:RM 23"
@@ -5966,6 +6333,7 @@ window.MTC_TRAJETS = [
      59,
      60
     ],
+    "_textx": 63.779998779296875,
     "label": "Trajet",
     "branches": [
      {
@@ -5979,9 +6347,11 @@ window.MTC_TRAJETS = [
        "talon",
        "pt:V 63",
        "pt:VB 35",
+       "membre-inf",
        "hanche",
+       "thorax-lat",
        "thorax",
-       "aisselle",
+       "pli-axill",
        "epaule",
        "c:IG",
        "c:V",
@@ -5997,6 +6367,7 @@ window.MTC_TRAJETS = [
        "front",
        "pt:VB 13",
        "pt:VB 14",
+       "tete",
        "pt:VB 15",
        "pt:VB 16",
        "pt:VB 17",
@@ -6076,6 +6447,7 @@ window.MTC_TRAJETS = [
      66,
      67
     ],
+    "_textx": 63.779998779296875,
     "label": "Trajet",
     "branches": [
      {
@@ -6087,9 +6459,9 @@ window.MTC_TRAJETS = [
       "places": [
        "hypocondre",
        "pt:F 13",
-       "thorax",
+       "thorax-lat",
        "cotes",
-       "abdomen",
+       "abdomen-inf",
        "pt:VB 26",
        "pt:VB 27",
        "pt:VB 28",
@@ -6103,10 +6475,6 @@ window.MTC_TRAJETS = [
  }
 ];
 window.MTC_TRAJETS_PLACES = {
- "pt:RM 3": {
-  "label": "RM 3",
-  "group": "points"
- },
  "pt:RM 1": {
   "label": "RM 1",
   "group": "points"
@@ -6130,6 +6498,10 @@ window.MTC_TRAJETS_PLACES = {
  "c:F": {
   "label": "Canal F",
   "group": "canaux"
+ },
+ "pt:RM 3": {
+  "label": "RM 3",
+  "group": "points"
  },
  "pt:RM 4": {
   "label": "RM 4",
@@ -6191,8 +6563,8 @@ window.MTC_TRAJETS_PLACES = {
   "label": "RM 13",
   "group": "points"
  },
- "thorax": {
-  "label": "Thorax, poitrine",
+ "poitrine": {
+  "label": "Poitrine",
   "group": "tronc"
  },
  "pt:RM 16": {
@@ -6220,24 +6592,32 @@ window.MTC_TRAJETS_PLACES = {
   "group": "points"
  },
  "machoire": {
-  "label": "Mâchoire (mandibule)",
+  "label": "Mâchoire",
   "group": "tête"
  },
  "pt:RM 24": {
   "label": "RM 24",
   "group": "points"
  },
+ "sillon-ml": {
+  "label": "Sillon mentolabial",
+  "group": "tête"
+ },
  "c:GI": {
   "label": "Canal GI",
   "group": "canaux"
  },
  "levres": {
-  "label": "Lèvres, bouche",
+  "label": "Lèvres",
   "group": "tête"
  },
  "pt:DM 28": {
   "label": "DM 28",
   "group": "points"
+ },
+ "frein-levre": {
+  "label": "Frein de la lèvre supérieure",
+  "group": "tête"
  },
  "pt:DM 26": {
   "label": "DM 26",
@@ -6247,8 +6627,8 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Visage",
   "group": "tête"
  },
- "yeux": {
-  "label": "Yeux",
+ "sous-orbitaire": {
+  "label": "Région sous-orbitaire",
   "group": "tête"
  },
  "c:YangQ": {
@@ -6259,6 +6639,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "E 1",
   "group": "points"
  },
+ "abdomen-inf": {
+  "label": "Abdomen inférieur",
+  "group": "tronc"
+ },
  "colonne": {
   "label": "Colonne vertébrale",
   "group": "tronc"
@@ -6267,12 +6651,20 @@ window.MTC_TRAJETS_PLACES = {
   "label": "RM 15",
   "group": "points"
  },
- "pubis": {
-  "label": "Pubis (symphyse)",
+ "symphyse": {
+  "label": "Symphyse pubienne",
   "group": "tronc"
  },
  "genitaux": {
   "label": "Organes génitaux",
+  "group": "tronc"
+ },
+ "uretre": {
+  "label": "Urètre",
+  "group": "tronc"
+ },
+ "verge": {
+  "label": "Verge",
   "group": "tronc"
  },
  "pt:DM 1": {
@@ -6287,52 +6679,80 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Rèn mài",
   "group": "canaux"
  },
- "anus": {
-  "label": "Anus",
-  "group": "tronc"
- },
- "coccyx": {
-  "label": "Coccyx",
-  "group": "tronc"
- },
  "pt:DM 2": {
   "label": "DM 2",
   "group": "points"
  },
- "pt:DM 16": {
-  "label": "DM 16",
+ "pt:DM 3": {
+  "label": "DM 3",
+  "group": "points"
+ },
+ "pt:DM 4": {
+  "label": "DM 4",
+  "group": "points"
+ },
+ "pt:DM 5": {
+  "label": "DM 5",
+  "group": "points"
+ },
+ "pt:DM 6": {
+  "label": "DM 6",
+  "group": "points"
+ },
+ "pt:DM 7": {
+  "label": "DM 7",
+  "group": "points"
+ },
+ "pt:DM 8": {
+  "label": "DM 8",
+  "group": "points"
+ },
+ "pt:DM 9": {
+  "label": "DM 9",
+  "group": "points"
+ },
+ "pt:DM 10": {
+  "label": "DM 10",
+  "group": "points"
+ },
+ "pt:DM 11": {
+  "label": "DM 11",
   "group": "points"
  },
  "pt:DM 12": {
   "label": "DM 12",
   "group": "points"
  },
- "pt:V 12": {
-  "label": "V 12",
-  "group": "points"
- },
  "pt:DM 13": {
   "label": "DM 13",
+  "group": "points"
+ },
+ "pt:DM 14": {
+  "label": "DM 14",
+  "group": "points"
+ },
+ "pt:DM 15": {
+  "label": "DM 15",
+  "group": "points"
+ },
+ "pt:DM 16": {
+  "label": "DM 16",
+  "group": "points"
+ },
+ "pt:V 12": {
+  "label": "V 12",
   "group": "points"
  },
  "c:V": {
   "label": "Canal V",
   "group": "canaux"
  },
- "pt:DM 14": {
-  "label": "DM 14",
-  "group": "points"
- },
  "c:YangW": {
   "label": "Yáng wéi mài",
   "group": "canaux"
  },
- "pt:DM 15": {
-  "label": "DM 15",
-  "group": "points"
- },
  "langue": {
-  "label": "Langue",
+  "label": "Racine de la langue",
   "group": "tête"
  },
  "nuque": {
@@ -6379,6 +6799,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "DM 25",
   "group": "points"
  },
+ "gouttiere": {
+  "label": "Gouttière labiale",
+  "group": "tête"
+ },
  "pt:DM 27": {
   "label": "DM 27",
   "group": "points"
@@ -6389,6 +6813,14 @@ window.MTC_TRAJETS_PLACES = {
  },
  "menton": {
   "label": "Menton",
+  "group": "tête"
+ },
+ "paupiere-inf": {
+  "label": "Paupière inférieure",
+  "group": "tête"
+ },
+ "canthus-int": {
+  "label": "Canthus interne",
   "group": "tête"
  },
  "pt:V 1": {
@@ -6402,6 +6834,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:V 11": {
   "label": "V 11",
   "group": "points"
+ },
+ "paravert": {
+  "label": "Muscles paravertébraux",
+  "group": "tronc"
  },
  "lombes": {
   "label": "Lombes",
@@ -6435,6 +6871,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Omoplate (scapula)",
   "group": "membre supérieur"
  },
+ "foyer-central": {
+  "label": "Foyer central (zhōng jiāo)",
+  "group": "organes"
+ },
  "o-estomac": {
   "label": "Estomac",
   "group": "organes"
@@ -6451,17 +6891,17 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Poumon",
   "group": "organes"
  },
- "trachee": {
-  "label": "Trachée",
-  "group": "tête"
- },
- "aisselle": {
-  "label": "Aisselle",
-  "group": "membre supérieur"
+ "o-systeme-poumon": {
+  "label": "Système pulmonaire (fèi xì)",
+  "group": "organes"
  },
  "pt:P 1": {
   "label": "P 1",
   "group": "points"
+ },
+ "delto": {
+  "label": "Triangle delto-pectoral",
+  "group": "membre supérieur"
  },
  "pt:P 2": {
   "label": "P 2",
@@ -6471,8 +6911,8 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Bras",
   "group": "membre supérieur"
  },
- "coude": {
-  "label": "Coude",
+ "pli-coude": {
+  "label": "Pli du coude",
   "group": "membre supérieur"
  },
  "pt:P 5": {
@@ -6481,6 +6921,10 @@ window.MTC_TRAJETS_PLACES = {
  },
  "avant-bras": {
   "label": "Avant-bras",
+  "group": "membre supérieur"
+ },
+ "cun-kou": {
+  "label": "Cùn kǒu",
   "group": "membre supérieur"
  },
  "pouce": {
@@ -6507,10 +6951,6 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Paume",
   "group": "membre supérieur"
  },
- "main": {
-  "label": "Main",
-  "group": "membre supérieur"
- },
  "index": {
   "label": "Index",
   "group": "membre supérieur"
@@ -6527,13 +6967,21 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Creux sus-claviculaire",
   "group": "membre supérieur"
  },
- "poignet": {
-  "label": "Poignet",
-  "group": "membre supérieur"
- },
  "pt:GI 4": {
   "label": "GI 4",
   "group": "points"
+ },
+ "styloide-rad": {
+  "label": "Styloïde radiale",
+  "group": "membre supérieur"
+ },
+ "coude": {
+  "label": "Coude",
+  "group": "membre supérieur"
+ },
+ "aisselle": {
+  "label": "Aisselle",
+  "group": "membre supérieur"
  },
  "epaule": {
   "label": "Épaule",
@@ -6543,13 +6991,21 @@ window.MTC_TRAJETS_PLACES = {
   "label": "GI 15",
   "group": "points"
  },
- "cotes": {
-  "label": "Côtes",
+ "thorax": {
+  "label": "Thorax",
+  "group": "tronc"
+ },
+ "cotes-flott": {
+  "label": "Côtes flottantes",
   "group": "tronc"
  },
  "pt:GI 1": {
   "label": "GI 1",
   "group": "points"
+ },
+ "metacarpe": {
+  "label": "Métacarpiens",
+  "group": "membre supérieur"
  },
  "pt:GI 5": {
   "label": "GI 5",
@@ -6559,6 +7015,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "GI 11",
   "group": "points"
  },
+ "acromion": {
+  "label": "Acromion",
+  "group": "membre supérieur"
+ },
  "clavicule": {
   "label": "Clavicule",
   "group": "membre supérieur"
@@ -6566,6 +7026,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:IG 12": {
   "label": "IG 12",
   "group": "points"
+ },
+ "supraep": {
+  "label": "Fosse supra-épineuse",
+  "group": "membre supérieur"
  },
  "pt:E 12": {
   "label": "E 12",
@@ -6579,17 +7043,33 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Cou",
   "group": "tête"
  },
- "dents": {
-  "label": "Dents, gencives",
+ "mandibule": {
+  "label": "Mandibule",
+  "group": "tête"
+ },
+ "gencive-inf": {
+  "label": "Gencive inférieure",
   "group": "tête"
  },
  "pt:E 4": {
   "label": "E 4",
   "group": "points"
  },
+ "aile-nez": {
+  "label": "Aile du nez",
+  "group": "tête"
+ },
  "pt:GI 20": {
   "label": "GI 20",
   "group": "points"
+ },
+ "main": {
+  "label": "Main",
+  "group": "membre supérieur"
+ },
+ "cavite-corp": {
+  "label": "Cavité corporelle",
+  "group": "tronc"
  },
  "pt:GI 6": {
   "label": "GI 6",
@@ -6599,16 +7079,36 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Canal P",
   "group": "canaux"
  },
+ "membre-sup": {
+  "label": "Membre supérieur",
+  "group": "membre supérieur"
+ },
  "oreille": {
   "label": "Oreille",
   "group": "tête"
+ },
+ "dos-poignet": {
+  "label": "Dos du poignet",
+  "group": "membre supérieur"
  },
  "joue": {
   "label": "Joue",
   "group": "tête"
  },
+ "devant-oreille": {
+  "label": "Devant l'oreille",
+  "group": "tête"
+ },
  "tempe": {
   "label": "Tempe",
+  "group": "tête"
+ },
+ "tete": {
+  "label": "Tête",
+  "group": "tête"
+ },
+ "racine-nez": {
+  "label": "Racine du nez",
   "group": "tête"
  },
  "pt:E 2": {
@@ -6618,6 +7118,14 @@ window.MTC_TRAJETS_PLACES = {
  "pt:E 3": {
   "label": "E 3",
   "group": "points"
+ },
+ "gencive-sup": {
+  "label": "Gencive supérieure",
+  "group": "tête"
+ },
+ "angle-mandibule": {
+  "label": "Angle de la mandibule",
+  "group": "tête"
  },
  "pt:E 5": {
   "label": "E 5",
@@ -6643,9 +7151,17 @@ window.MTC_TRAJETS_PLACES = {
   "label": "VB 4",
   "group": "points"
  },
+ "angle-frontal": {
+  "label": "Angle frontal",
+  "group": "tête"
+ },
  "pt:E 8": {
   "label": "E 8",
   "group": "points"
+ },
+ "cheveux": {
+  "label": "Ligne antérieure des cheveux",
+  "group": "tête"
  },
  "pt:E 11": {
   "label": "E 11",
@@ -6655,25 +7171,29 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Rate",
   "group": "organes"
  },
+ "o-pancreas": {
+  "label": "Pancréas",
+  "group": "organes"
+ },
  "pt:E 30": {
   "label": "E 30",
   "group": "points"
  },
- "seins": {
-  "label": "Seins, mamelons",
+ "mamelon": {
+  "label": "Mamelon",
   "group": "tronc"
  },
  "pt:E 31": {
   "label": "E 31",
   "group": "points"
  },
- "genou": {
-  "label": "Genou",
-  "group": "membre inférieur"
- },
  "pt:E 35": {
   "label": "E 35",
   "group": "points"
+ },
+ "tibia": {
+  "label": "Tibia",
+  "group": "membre inférieur"
  },
  "jambe": {
   "label": "Jambe",
@@ -6715,20 +7235,52 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Œsophage",
   "group": "organes"
  },
+ "bouche": {
+  "label": "Bouche",
+  "group": "tête"
+ },
+ "oculaire": {
+  "label": "Système oculaire (mù xì)",
+  "group": "tête"
+ },
+ "yeux": {
+  "label": "Yeux",
+  "group": "tête"
+ },
+ "fibula": {
+  "label": "Fibula (péroné)",
+  "group": "membre inférieur"
+ },
+ "genou": {
+  "label": "Genou",
+  "group": "membre inférieur"
+ },
  "hanche": {
   "label": "Hanche",
+  "group": "membre inférieur"
+ },
+ "trochanter": {
+  "label": "Grand trochanter",
   "group": "membre inférieur"
  },
  "hypocondre": {
   "label": "Hypocondre",
   "group": "tronc"
  },
+ "thorax-lat": {
+  "label": "Région thoracique latérale",
+  "group": "tronc"
+ },
  "pt:Rt 1": {
   "label": "Rt 1",
   "group": "points"
  },
- "malleole": {
-  "label": "Malléole",
+ "metatarse": {
+  "label": "Métatarses",
+  "group": "membre inférieur"
+ },
+ "malleole-int": {
+  "label": "Malléole médiale",
   "group": "membre inférieur"
  },
  "pt:Rt 6": {
@@ -6755,6 +7307,22 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Rt 4",
   "group": "points"
  },
+ "o-intestins": {
+  "label": "Intestins",
+  "group": "organes"
+ },
+ "pubis": {
+  "label": "Pubis",
+  "group": "tronc"
+ },
+ "cotes": {
+  "label": "Côtes",
+  "group": "tronc"
+ },
+ "o-systeme-coeur": {
+  "label": "Système du cœur (xīn xì)",
+  "group": "organes"
+ },
  "o-ig": {
   "label": "Intestin grêle",
   "group": "organes"
@@ -6762,6 +7330,14 @@ window.MTC_TRAJETS_PLACES = {
  "pt:C 1": {
   "label": "C 1",
   "group": "points"
+ },
+ "poignet": {
+  "label": "Poignet",
+  "group": "membre supérieur"
+ },
+ "pisiforme": {
+  "label": "Os pisiforme",
+  "group": "membre supérieur"
  },
  "petit-doigt": {
   "label": "Petit doigt",
@@ -6783,9 +7359,29 @@ window.MTC_TRAJETS_PLACES = {
   "label": "C 3",
   "group": "points"
  },
+ "seins": {
+  "label": "Seins",
+  "group": "tronc"
+ },
+ "styloide-uln": {
+  "label": "Styloïde ulnaire",
+  "group": "membre supérieur"
+ },
+ "olecrane": {
+  "label": "Olécrâne",
+  "group": "membre supérieur"
+ },
+ "infraep": {
+  "label": "Fosse infra-épineuse",
+  "group": "membre supérieur"
+ },
  "pt:V 41": {
   "label": "V 41",
   "group": "points"
+ },
+ "canthus-ext": {
+  "label": "Canthus externe",
+  "group": "tête"
  },
  "pt:VB 1": {
   "label": "VB 1",
@@ -6815,9 +7411,33 @@ window.MTC_TRAJETS_PLACES = {
   "label": "IG 5",
   "group": "points"
  },
+ "mastoide": {
+  "label": "Mastoïde",
+  "group": "tête"
+ },
+ "derriere-oreille": {
+  "label": "Derrière l'oreille",
+  "group": "tête"
+ },
+ "autour-oreille": {
+  "label": "Autour de l'oreille",
+  "group": "tête"
+ },
+ "dessus-oreille": {
+  "label": "Au-dessus de l'oreille",
+  "group": "tête"
+ },
+ "dents": {
+  "label": "Dents",
+  "group": "tête"
+ },
  "pt:VB 15": {
   "label": "VB 15",
   "group": "points"
+ },
+ "parietal": {
+  "label": "Région pariétale",
+  "group": "tête"
  },
  "pt:VB 7": {
   "label": "VB 7",
@@ -6843,6 +7463,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "VB 12",
   "group": "points"
  },
+ "crane": {
+  "label": "Crâne",
+  "group": "tête"
+ },
  "pt:V 10": {
   "label": "V 10",
   "group": "points"
@@ -6867,13 +7491,29 @@ window.MTC_TRAJETS_PLACES = {
   "label": "V 40",
   "group": "points"
  },
+ "coxo": {
+  "label": "Articulation coxo-iliaque",
+  "group": "membre inférieur"
+ },
  "pt:VB 30": {
   "label": "VB 30",
   "group": "points"
  },
- "mollet": {
-  "label": "Mollet",
+ "gastrocnemien": {
+  "label": "Muscle gastrocnémien",
   "group": "membre inférieur"
+ },
+ "malleole-ext": {
+  "label": "Malléole latérale",
+  "group": "membre inférieur"
+ },
+ "petit-orteil": {
+  "label": "Petit orteil",
+  "group": "membre inférieur"
+ },
+ "anus": {
+  "label": "Anus",
+  "group": "tronc"
  },
  "pt:V 36": {
   "label": "V 36",
@@ -6887,6 +7527,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Talon",
   "group": "membre inférieur"
  },
+ "tendon-calc": {
+  "label": "Tendon calcanéen (d'Achille)",
+  "group": "membre inférieur"
+ },
  "pommette": {
   "label": "Pommette",
   "group": "tête"
@@ -6894,6 +7538,14 @@ window.MTC_TRAJETS_PLACES = {
  "pt:IG 18": {
   "label": "IG 18",
   "group": "points"
+ },
+ "paupiere-sup": {
+  "label": "Paupière supérieure",
+  "group": "tête"
+ },
+ "zone-clav": {
+  "label": "Zone claviculaire",
+  "group": "membre supérieur"
  },
  "pt:V 67": {
   "label": "V 67",
@@ -6907,6 +7559,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Rn 1",
   "group": "points"
  },
+ "naviculaire": {
+  "label": "Os naviculaire",
+  "group": "membre inférieur"
+ },
  "pt:Rn 10": {
   "label": "Rn 10",
   "group": "points"
@@ -6914,6 +7570,10 @@ window.MTC_TRAJETS_PLACES = {
  "o-foie": {
   "label": "Foie",
   "group": "organes"
+ },
+ "trachee": {
+  "label": "Trachée",
+  "group": "tête"
  },
  "c:EC": {
   "label": "Canal EC",
@@ -6939,6 +7599,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Rn 27",
   "group": "points"
  },
+ "lombaires": {
+  "label": "Colonne lombaire (vertèbres lombaires)",
+  "group": "tronc"
+ },
  "c:DaiM": {
   "label": "Dài mài",
   "group": "canaux"
@@ -6946,6 +7610,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:Rn 4": {
   "label": "Rn 4",
   "group": "points"
+ },
+ "vertebres": {
+  "label": "Vertèbres",
+  "group": "tronc"
  },
  "o-tf": {
   "label": "Trois foyers (organe)",
@@ -6979,6 +7647,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "EC 6",
   "group": "points"
  },
+ "dos-main": {
+  "label": "Dos de la main",
+  "group": "membre supérieur"
+ },
  "pt:TF 10": {
   "label": "TF 10",
   "group": "points"
@@ -6986,6 +7658,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:TF 14": {
   "label": "TF 14",
   "group": "points"
+ },
+ "trapeze": {
+  "label": "Trapèze",
+  "group": "tronc"
  },
  "pt:TF 15": {
   "label": "TF 15",
@@ -7002,6 +7678,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:V 39": {
   "label": "V 39",
   "group": "points"
+ },
+ "apex-oreille": {
+  "label": "Apex de l'oreille",
+  "group": "tête"
  },
  "pt:TF 17": {
   "label": "TF 17",
@@ -7023,6 +7703,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "TF 5",
   "group": "points"
  },
+ "angle-temporal": {
+  "label": "Angle temporal",
+  "group": "tête"
+ },
  "pt:VB 13": {
   "label": "VB 13",
   "group": "points"
@@ -7031,9 +7715,17 @@ window.MTC_TRAJETS_PLACES = {
   "label": "VB 2",
   "group": "points"
  },
+ "supant-oreille": {
+  "label": "Zone supéro-antérieure de l'oreille",
+  "group": "tête"
+ },
  "pt:TF 20": {
   "label": "TF 20",
   "group": "points"
+ },
+ "sus-orbitaire": {
+  "label": "Région sus-orbitaire",
+  "group": "tête"
  },
  "pt:VB 14": {
   "label": "VB 14",
@@ -7119,13 +7811,13 @@ window.MTC_TRAJETS_PLACES = {
   "label": "VB 41",
   "group": "points"
  },
- "pied": {
-  "label": "Pied",
-  "group": "membre inférieur"
- },
  "pt:VB 37": {
   "label": "VB 37",
   "group": "points"
+ },
+ "arcade-zyg": {
+  "label": "Arcade zygomatique",
+  "group": "tête"
  },
  "pt:F 1": {
   "label": "F 1",
@@ -7150,6 +7842,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:Rt 13": {
   "label": "Rt 13",
   "group": "points"
+ },
+ "nasopharynx": {
+  "label": "Nasopharynx (cavum)",
+  "group": "tête"
  },
  "pt:F 5": {
   "label": "F 5",
@@ -7191,9 +7887,21 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Rn 20",
   "group": "points"
  },
- "pt:Rn 2": {
-  "label": "Rn 2",
-  "group": "points"
+ "arriere-nez": {
+  "label": "Arrière du nez",
+  "group": "tête"
+ },
+ "orbite": {
+  "label": "Orbite",
+  "group": "tête"
+ },
+ "malleole": {
+  "label": "Malléole",
+  "group": "membre inférieur"
+ },
+ "tarse": {
+  "label": "Os du tarse",
+  "group": "membre inférieur"
  },
  "pt:Rn 6": {
   "label": "Rn 6",
@@ -7202,6 +7910,14 @@ window.MTC_TRAJETS_PLACES = {
  "pt:Rn 8": {
   "label": "Rn 8",
   "group": "points"
+ },
+ "membre-inf": {
+  "label": "Membre inférieur",
+  "group": "membre inférieur"
+ },
+ "region-zyg": {
+  "label": "Région zygomatique",
+  "group": "tête"
  },
  "pt:V 62": {
   "label": "V 62",
@@ -7214,6 +7930,10 @@ window.MTC_TRAJETS_PLACES = {
  "pt:V 59": {
   "label": "V 59",
   "group": "points"
+ },
+ "pli-axill": {
+  "label": "Pli axillaire postérieur",
+  "group": "membre supérieur"
  },
  "pt:GI 16": {
   "label": "GI 16",
