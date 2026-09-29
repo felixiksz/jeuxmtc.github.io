@@ -115,6 +115,8 @@
   .tgroup{ display:inline-flex; gap:6px; align-items:center; padding:1px 7px; border:1px solid #d7d7e6; border-radius:999px; }
   .netwrap{ background:#f4f1ea; }
   .qcell{ stroke:none; }
+  .subq rect{ fill:#ffffff; fill-opacity:.28; stroke:#ffffff; stroke-opacity:.8; stroke-dasharray:6 5; }
+  .subq text{ font-size:11px; font-weight:800; fill:#8f8878; letter-spacing:.06em; text-transform:uppercase; }
   .rivername{ font-family:"Libre Baskerville", Georgia, serif; font-style:italic; font-size:12px; fill:#2f6b9f; letter-spacing:.12em; paint-order:stroke; stroke:#eaf4fb; stroke-width:3px; pointer-events:none; }
   .rivername.big{ font-size:16px; font-weight:700; }
   .terminus text{ font-size:11px; font-weight:800; }
@@ -239,6 +241,7 @@
       await loadScript("trajets-places-rx.js");
       await loadScript("trajets-complements.js");
       await loadScript("trajets-jiaohui.js");
+      await loadScript("trajets-point-zones.js");
       return;
     }
     const c = syncCfg();
@@ -249,6 +252,7 @@
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-places-rx.js")).text())(); }catch(e){}
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-complements.js")).text())(); }catch(e){}
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-jiaohui.js")).text())(); }catch(e){}
+    try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-point-zones.js")).text())(); }catch(e){}
   }
   // images : directes en local, lues dans le dépôt privé sinon
   const imageCache = new Map();
@@ -889,7 +893,7 @@
   }
 
   // chaque zone du corps appartient à un quartier de la ville
-  const ZONE_QUARTIER = {
+  const ZONE_QUARTIER = {narine:"nez", rotule:"genou", cheville:"malleole", pied:"pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux",
     vertex:"sommet", tete:"sommet", crane:"sommet", parietal:"sommet", cerveau:"cerveau", front:"front", "angle-frontal":"front", cheveux:"front",
     tempe:"tempe", "angle-temporal":"tempe", sourcil:"yeux", yeux:"yeux", oculaire:"yeux", "canthus-int":"yeux", "canthus-ext":"yeux",
     "paupiere-sup":"yeux", "paupiere-inf":"yeux", orbite:"yeux", "sus-orbitaire":"yeux", "sous-orbitaire":"yeux",
@@ -962,7 +966,16 @@
   const LANE = {V:6, VB:5, TF:4, IG:3, GI:2, E:1, RM:0, DM:0, Rt:-1, P:-2, EC:-3, C:-4, F:-5, Rn:-6};
   // points placés dans un quartier (correspondances par localisation) ; déplaçables en mode édition
   const DEFAULT_POINT_ZONE = {"pt:RM 2":"pubis", "pt:RM 8":"ombilic"};
-  const pointZones = () => Object.assign({}, DEFAULT_POINT_ZONE, edits.pointZone || {});
+  const POINT_ZONE_DATA = window.MTC_TRAJETS_POINT_ZONES || {};
+  const LIMB_Q = new Set(["epaule", "aisselle", "bras", "coude", "avbras", "poignet", "main", "doigts", "hanche", "cuisse", "genou", "poplite", "jambe", "mollet", "malleole", "talon", "pied", "plante", "orteils", "aine"]);
+  const pointZones = () => {
+    const out = {};
+    Object.entries(POINT_ZONE_DATA).forEach(([k, v]) => {
+      const q = v.zone && typeof zoneQuartier === "function" ? zoneQuartier(v.zone) : null;
+      if(q && !LIMB_Q.has(q)) out["pt:" + k] = q;
+    });
+    return Object.assign(out, DEFAULT_POINT_ZONE, edits.pointZone || {});
+  };
   let NET_VB = null;
   const RIVER = new Set(["RM", "DM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"]);
   const NET_COLOR = {terre:"#d9a400", bois:"#2f9a3c", feu:"#e0261b", eau:"#1f5fd6", metal:"#ffffff"};
@@ -1053,6 +1066,32 @@
         });
       }));
     }
+    // localisation des fiches : chaque ligne externe avance quartier par quartier, dans l'ordre des points ;
+    // aux membres, la face (interne, antérieure, externe, postérieure) donne la bande du sous-quartier
+    const FACE_OFF = {"interne":-15, "antérieur":-5, "externe":5, "postérieur":15};
+    const manualZone = edits.pointZone || {};
+    const zoneOfPt = p => { const d = POINT_ZONE_DATA[p.slice(3)]; return d ? d.zone : null; };
+    const anchorOf = z => { if(!z) return null; if(NET_POS[z]) return NET_POS[z]; const base = {narine:"nez", rotule:"genou", cheville:"malleole", pied:"dos-pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux"}[z]; return base ? NET_POS[base] : null; };
+    Object.values(mainNodes).forEach(segs => segs.forEach(seq => {
+      const runs = [];
+      seq.forEach(p => {
+        const z = zoneOfPt(p), A = anchorOf(z);
+        if(!A) return;
+        const d = POINT_ZONE_DATA[p.slice(3)] || {};
+        const arm = A[0] < 450, off = FACE_OFF[d.face] || 0;
+        const Af = arm ? [A[0], A[1] + off] : (A[1] > 640 ? [A[0] + off * 0.6, A[1]] : A);
+        if(runs.length && runs[runs.length - 1].z === z) runs[runs.length - 1].pts.push(p);
+        else runs.push({z, A:Af, pts:[p]});
+      });
+      runs.forEach((r, k) => {
+        const B = runs[k + 1] ? runs[k + 1].A : null;
+        r.pts.forEach((p, j) => {
+          if(manualZone[p]) return;
+          const f = B ? j / r.pts.length : 0;
+          pos[p] = B ? [r.A[0] + (B[0] - r.A[0]) * f * 0.85, r.A[1] + (B[1] - r.A[1]) * f * 0.85] : [r.A[0] + j * 1.5, r.A[1] + j * 5];
+        });
+      });
+    }));
     Object.keys(JIAOHUI).forEach(k => {
       const pid = "pt:" + k;
       if(pos[pid]) return;
@@ -1257,7 +1296,7 @@
       let best = rp[0];
       rp.forEach(q => { if(Math.hypot(q[0] - st[0], q[1] - st[1]) < Math.hypot(best[0] - st[0], best[1] - st[1])) best = q; });
       piers += '<g class="pier"><title>Embarcadère : point d’ouverture du ' + esc(sectionName(data.find(c => c.code === code), {type:"vaisseau"})) + "</title>" +
-        '<path d="M' + st[0] + "," + st[1] + " L" + best[0].toFixed(1) + "," + best[1].toFixed(1) + '" stroke="#1f4e79" stroke-width="1.6" stroke-dasharray="3 3" fill="none"/>' +
+        (Math.hypot(best[0] - st[0], best[1] - st[1]) < 260 ? '<path d="M' + st[0] + "," + st[1] + " L" + best[0].toFixed(1) + "," + best[1].toFixed(1) + '" stroke="#1f4e79" stroke-width="1.6" stroke-dasharray="3 3" fill="none"/>' : "") +
         '<text class="anchor" x="' + (st[0] - 16) + '" y="' + (st[1] + 16) + '">⚓\uFE0E ' + esc(sigle(code)) + "</text></g>";
     });
     // 5. la ville : quartiers (zones du corps), centre-ville = organes, banlieue = extrémités
@@ -1270,6 +1309,14 @@
       const pts = poly.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
       city += '<polygon class="qcell" points="' + pts + '" fill="' + fill + '"/><polygon points="' + pts + '" fill="url(#streets)"/>' +
         '<polygon class="qborder" points="' + pts + '" fill="none"/>';
+    });
+    let subq = "";
+    Object.entries(FACE_OFF).forEach(([face, off]) => {
+      const lab = face.charAt(0).toUpperCase() + face.slice(1);
+      const ay = netY(334 + off), x0 = netX(30), x1 = netX(440);
+      subq += '<g class="subq"><rect x="' + x0.toFixed(0) + '" y="' + (ay - 12).toFixed(0) + '" width="' + (x1 - x0).toFixed(0) + '" height="24" rx="12"/><text x="' + (x0 + 8).toFixed(0) + '" y="' + (ay + 4).toFixed(0) + '">' + lab + "</text></g>";
+      const lx = netX(622 + off * 0.6), y0 = netY(700), y1 = netY(1440);
+      subq += '<g class="subq"><rect x="' + (lx - 14).toFixed(0) + '" y="' + y0.toFixed(0) + '" width="28" height="' + (y1 - y0).toFixed(0) + '" rx="14"/><text x="' + lx.toFixed(0) + '" y="' + (y1 + 18).toFixed(0) + '" text-anchor="middle">' + lab + "</text></g>";
     });
     let qLabels = "";
     qIds.forEach(q => { const [x, y] = qSeed[q]; qLabels += '<text class="qlabel' + (DOWNTOWN.has(q) ? " downtown" : "") + '" x="' + x.toFixed(0) + '" y="' + (y - 30).toFixed(0) + '" text-anchor="middle">' + esc(QUARTIER_LABEL[q] || q) + "</text>"; });
@@ -1312,7 +1359,7 @@
       '<div class="src">Chaque canal régulier est une ligne dont les stations sont ses points ; RM et DM forment un fleuve, les merveilleux vaisseaux des rivières avec leur navette ; les zones du corps sont des quartiers (centre-ville : organes). Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer · clic : correspondances · en mode ✎ Modifier : glisser une station dans son quartier.</div>' +
       legend + '<div class="netwrap"><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre / plan de ville">◐</button></div>' +
       '<svg class="netsvg" role="img"><defs><pattern id="streets" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><path d="M0 23 H46 M23 0 V46" stroke="#ffffff" stroke-width="1.3" opacity=".6"/><path d="M0 0 L46 46" stroke="#ffffff" stroke-width=".8" opacity=".35"/></pattern></defs>' +
-      '<g class="city">' + city + qLabels + "</g>" + rivers + shuttles + riverNames + svgLines + piers + joints + stations + badges + "</svg></div>";
+      '<g class="city">' + city + subq + qLabels + "</g>" + rivers + shuttles + riverNames + svgLines + piers + joints + stations + badges + "</svg></div>";
     const wrap = main.querySelector(".netwrap");
     try{ if(localStorage.getItem("mtc_trajets_net_dark") === "1") wrap.classList.add("dark"); }catch(e){}
     wrap.querySelector('[data-z="dark"]').addEventListener("click", () => {
@@ -1324,6 +1371,9 @@
       saveHidden(); showNetwork();
     }));
     const svgEl = main.querySelector(".netsvg");
+    // cadrage donné dans l'adresse (…&vb=x,y,l,h) : utile pour partager une vue
+    const vbq = new URLSearchParams(location.search).get("vb");
+    if(vbq && !NET_VB){ const [x, y, w, h] = vbq.split(",").map(Number); if(w && h) NET_VB = {x, y, w, h}; }
     initNetZoom(svgEl);
     // mode édition : glisser une station dans un quartier (sa zone de correspondance)
     const cells = qIds.map((q, i) => ({q, poly:voronoiCell(seeds, i, 380)}));
