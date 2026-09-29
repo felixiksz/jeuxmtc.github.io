@@ -1,7 +1,7 @@
 /* ============================================================
    64-admin-trajets.js
-   Entrée « Trajets des canaux » (module trajets/), proposée seulement
-   avec ?admin=1 dans l'adresse : un lien dans la fenêtre Affichage.
+   Bouton « Trajets » (module trajets/) dans la barre du haut, à côté
+   de « ? Aide », proposé seulement avec ?admin=1 dans l'adresse.
    ============================================================ */
 (function(){
   "use strict";
@@ -12,14 +12,15 @@
 
   function boot(){
     if(!isAdmin() || document.getElementById("mtcAdminTrajets")) return;
-    const presets = document.querySelector("#settingsPanel .settings-presets");
-    if(!presets) return;
-    const link = document.createElement("a");
-    link.id = "mtcAdminTrajets";
-    link.href = "trajets/index.html?admin=1";
-    link.textContent = "Trajets des canaux (admin)";
-    link.style.cssText = "display:block;margin-top:8px;font-size:11px;font-weight:700;text-align:center;color:inherit;";
-    presets.insertAdjacentElement("afterend", link);
+    const bar = document.querySelector(".topbar-main-buttons");
+    if(!bar) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.id = "mtcAdminTrajets";
+    button.textContent = "Trajets";
+    button.title = "Trajets des canaux (admin)";
+    button.addEventListener("click", () => { window.location.href = "trajets/index.html?admin=1"; });
+    bar.appendChild(button);
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, {once:true});
