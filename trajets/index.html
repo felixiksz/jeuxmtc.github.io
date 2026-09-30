@@ -481,6 +481,9 @@
   const typeGroup = type => (type === "grand_luo" ? "luo" : type);
   let TYPES_ON = {externe:true, luo:true, distinct:true, tendineux:true, vaisseau:true, interne:true};
   try{ Object.assign(TYPES_ON, JSON.parse(localStorage.getItem(TYPES_KEY) || "{}")); }catch(e){}
+  // …&types=externe,luo dans l'adresse : types affichés pour cette vue (sans toucher aux réglages enregistrés)
+  const typesQ = new URLSearchParams(location.search).get("types");
+  if(typesQ){ const on = typesQ.split(","); Object.keys(TYPES_ON).forEach(k => { TYPES_ON[k] = on.includes(k); }); }
   const typeShown = s => s.type === "principal" ? (TYPES_ON.externe !== false || TYPES_ON.interne !== false) : TYPES_ON[typeGroup(s.type)] !== false;
 
   const JIAOHUI = window.MTC_TRAJETS_JIAOHUI || {};
@@ -1186,46 +1189,68 @@
         if(clean.length >= 2) lines.push({c, s, main:false, interne:!!b.interne, nodes:clean});
       });
     });
-    // 3. stations sur la grille invisible (carrefours d'abord), articulations et passages de quartier
+    // 3. stations : chaque canal suit une courbe continue qui passe, dans l'ordre, par la zone (et la face)
+    //    de ses points d'après leur fiche ; ses stations sont réparties régulièrement sur cette courbe.
+    //    Chaque canal a son couloir (décalage latéral) : les lignes d'une même zone restent côte à côte.
     const canalsAt = {};
     const vesselOnly = c => RIVER.has(c) && c !== "RM" && c !== "DM";
     lines.forEach(l => l.nodes.forEach(n => { if(n.startsWith("pt:")) (canalsAt[n] = canalsAt[n] || new Set()).add(l.c.code); }));
     const stationsList = Object.keys(canalsAt).sort((a, b) => canalsAt[b].size - canalsAt[a].size);
     const isStation = n => [...(canalsAt[n] || [])].some(c => !vesselOnly(c));
-    const used = new Set(), cell = {};
-    // positions posées à la main (mode édition) d'abord
-    const manual = edits.stationPos || {};
-    stationsList.forEach(p => { if(manual[p]){ cell[p] = manual[p].slice(); used.add((manual[p][0] / G) + "," + (manual[p][1] / G)); } });
-    stationsList.forEach(p => {
-      if(cell[p]) return;
-      // voie du canal : les lignes qui parcourent la même zone restent côte à côte
-      const code = p.slice(3).split(" ")[0], lane = LANE[code] || 0, arm = pos[p][0] < 450;
-      const gx = Math.round(netX(pos[p][0]) / G) + (arm ? 0 : lane), gy = Math.round(netY(pos[p][1]) / G) + (arm ? lane : 0);
-      let found = null;
-      for(let r = 0; r < 14 && !found; r++){
-        for(let dx = -r; dx <= r && !found; dx++) for(let dy = -r; dy <= r && !found; dy++){
-          if(Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
-          const k = (gx + dx) + "," + (gy + dy);
-          if(!used.has(k)){ used.add(k); found = [(gx + dx) * G, (gy + dy) * G]; }
+    const cell = {}, manual = edits.stationPos || {};
+    const LANE_X = 20, LANE_Y = 15, MIN_GAP = 24;
+    Object.entries(mainNodes).forEach(([code, segs]) => segs.forEach(seq => {
+      const runs = [];
+      seq.forEach(p => {
+        const z = zoneOfPt(p), A = anchorOf(z);
+        if(!A) return;
+        const d = POINT_ZONE_DATA[p.slice(3)] || {};
+        const arm = A[0] < 450, off = FACE_OFF[d.face] || 0;
+        const Aa = arm ? [A[0], A[1] + off] : (A[1] > 640 ? [A[0] + off * 0.6, A[1]] : A);
+        const lane = LANE[code] || 0;
+        const S = arm ? [netX(Aa[0]), netY(Aa[1]) + lane * LANE_Y] : [netX(Aa[0]) + lane * LANE_X, netY(Aa[1])];
+        if(runs.length && runs[runs.length - 1].z === z) runs[runs.length - 1].pts.push(p);
+        else runs.push({z, S, pts:[p]});
+      });
+      const K = runs.length;
+      runs.forEach((r, k) => {
+        const n = r.pts.length;
+        const lo = k === 0 ? 0 : k - 0.45, hi = k === K - 1 ? K - 1 : k + 0.45;
+        r.pts.forEach((pt, j) => {
+          if(manual[pt]){ cell[pt] = manual[pt].slice(); return; }
+          if(K === 1){ cell[pt] = [r.S[0], r.S[1] + (j - (n - 1) / 2) * 28]; return; }
+          const u = n === 1 ? Math.min(Math.max(k, lo), hi) : lo + (hi - lo) * j / (n - 1);
+          const i0 = Math.floor(u), i1 = Math.min(K - 1, i0 + 1), f = u - i0, A = runs[i0].S, B = runs[i1].S;
+          cell[pt] = [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f];
+        });
+      });
+    }));
+    // points sans ligne externe affichée (ex. seulement cités par un luo) : position anatomique
+    stationsList.forEach(pt => { if(!cell[pt] && pos[pt]) cell[pt] = manual[pt] ? manual[pt].slice() : [netX(pos[pt][0]), netY(pos[pt][1])]; });
+    // écartement : deux stations différentes ne se superposent jamais (sauf position posée à la main)
+    const ids = Object.keys(cell);
+    for(let it = 0; it < 60; it++){
+      const grid = {}, keyOf = q => Math.floor(q[0] / MIN_GAP) + "," + Math.floor(q[1] / MIN_GAP);
+      ids.forEach(id => { (grid[keyOf(cell[id])] = grid[keyOf(cell[id])] || []).push(id); });
+      let moved = false;
+      ids.forEach((id, ii) => {
+        const [gx, gy] = keyOf(cell[id]).split(",").map(Number);
+        for(let dx = -1; dx <= 1; dx++) for(let dy = -1; dy <= 1; dy++){
+          (grid[(gx + dx) + "," + (gy + dy)] || []).forEach(o => {
+            if(o <= id) return;
+            const A = cell[id], B = cell[o];
+            let vx = B[0] - A[0], vy = B[1] - A[1], d = Math.hypot(vx, vy);
+            if(d >= MIN_GAP) return;
+            if(d < 0.01){ const ang = (ii * 2.399) % (2 * Math.PI); vx = Math.cos(ang); vy = Math.sin(ang); d = 1; }
+            const push = (MIN_GAP - d) / 2 + 0.2, ux = vx / d, uy = vy / d;
+            const fa = manual[id] ? 0 : (manual[o] ? 2 : 1), fb = manual[o] ? 0 : (manual[id] ? 2 : 1);
+            A[0] -= ux * push * fa; A[1] -= uy * push * fa; B[0] += ux * push * fb; B[1] += uy * push * fb;
+            moved = true;
+          });
         }
-      }
-      cell[p] = found || [gx * G, gy * G];
-    });
-    lines.filter(l => l.main).forEach(l => {
-      const own = l.nodes.filter(n => n.startsWith("pt:" + l.c.code + " ") && !manual[n]);
-      for(let i = 1; i < own.length; i++){
-        const a = cell[own[i - 1]], b = cell[own[i]];
-        if(!a || !b) continue;
-        const dx = Math.abs(a[0] - b[0]), dy = Math.abs(a[1] - b[1]);
-        let target = null;
-        if(dx && dx <= 2 * G && dy >= dx) target = [a[0], b[1]];
-        else if(dy && dy <= 2 * G && dx > dy) target = [b[0], a[1]];
-        if(target){
-          const k = (target[0] / G) + "," + (target[1] / G);
-          if(!used.has(k)){ used.delete((b[0] / G) + "," + (b[1] / G)); used.add(k); cell[own[i]] = target; }
-        }
-      }
-    });
+      });
+      if(!moved) break;
+    }
     const nodePos = n => {
       if(cell[n]) return cell[n];
       if(n.startsWith("j:")) return jointPos[n.slice(2)];
@@ -1251,8 +1276,8 @@
       const [a, b] = k.split("§"), A = nodePos(a), B = nodePos(b), [x1, y1] = A, [x2, y2] = B;
       const dx = x2 - x1, dy = y2 - y1, adx = Math.abs(dx), ady = Math.abs(dy), ends = [A, B];
       const cands = [];
-      if(adx < 1 || ady < 1 || Math.abs(adx - ady) < 1) cands.push([[x1, y1], [x2, y2]]);
-      else{
+      cands.push([[x1, y1], [x2, y2]]);
+      if(adx >= 1 && ady >= 1 && Math.abs(adx - ady) >= 1){
         const dg = Math.min(adx, ady);
         const m1 = ady > adx ? [x1, y1 + Math.sign(dy) * (ady - dg)] : [x1 + Math.sign(dx) * (adx - dg), y1];   // droit puis 45°
         const m2 = ady > adx ? [x2, y2 - Math.sign(dy) * (ady - dg)] : [x2 - Math.sign(dx) * (adx - dg), y2];   // 45° puis droit
