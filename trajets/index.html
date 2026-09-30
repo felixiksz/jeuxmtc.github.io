@@ -1039,7 +1039,9 @@
   // plan de la ville : la tête et les pieds étirés pour aérer les points, qui y sont serrés
   // tronc et jambes (x > 450) très élargis : c'est là que passent la plupart des lignes ; bras resserré
   // abscisses : bras de la face antérieure (x < 450) resserré, tronc et jambes élargis, bras de la face postérieure (x > 1020) resserré
-  const netX = x => x < 450 ? x * 2.6 : x <= 920 ? 450 * 2.6 + (x - 450) * 7.5 : 450 * 2.6 + 470 * 7.5 + (x - 920) * 2.6;
+  // (la tête, y < 250, garde l'échelle du tronc même quand elle s'étale à gauche de x = 450)
+  const netX = (x, y) => (y !== undefined && y < 250 && x < 920) ? 450 * 2.6 + (x - 450) * 7.5
+    : x < 450 ? x * 2.6 : x <= 920 ? 450 * 2.6 + (x - 450) * 7.5 : 450 * 2.6 + 470 * 7.5 + (x - 920) * 2.6;
   // Planche anatomique à deux faces : à gauche la face antérieure (visage, thorax, abdomen, avant de la jambe, bras des
   // canaux yīn), à droite la face postérieure (occiput, nuque, dos, lombes, sacrum, arrière de la jambe pour V, bras des
   // canaux yáng GI, IG, TF). La tête relie les deux faces par le sommet.
@@ -1060,8 +1062,11 @@
     if(ARM_ZONES.has(z)) return YANG_ARM.has(code) ? [ARM_MIRROR - b[0], b[1]] : b.slice();
     if(LEG_ZONES.has(z)) return code === "V" ? [b[0] + BACK_LEG_SHIFT, b[1]] : b.slice();
     if(BACK_ZONES.has(z)) return [b[0] + BACK_SHIFT, b[1]];
+    // tête (face antérieure) : zones écartées autour de l'axe du visage, pour aérer les nombreux points
+    if(b[1] < 250) return [600 + (b[0] - 600) * HEAD_SPREAD_X, b[1] * HEAD_SPREAD_Y - (HEAD_SPREAD_Y - 1) * 250];
     return b.slice();
   };
+  const HEAD_SPREAD_X = -1.7, HEAD_SPREAD_Y = 1.6;   // négatif : la tête est retournée, oreilles et tempes du côté de la face postérieure
   const netY = y => y < 260 ? y * 4.6 : 260 * 4.6 + (y - 260) * 2.6;
   const G = 24;
 
@@ -1174,7 +1179,7 @@
     const qSeed = {};
     Object.entries(ZONE_QUARTIER).forEach(([z, q]) => {
       if(!NET_POS[z]) return;
-      const add = (qid, v) => { (qSeed[qid] = qSeed[qid] || []).push([netX(v[0]), netY(v[1])]); };
+      const add = (qid, v) => { (qSeed[qid] = qSeed[qid] || []).push([netX(v[0], v[1]), netY(v[1])]); };
       if(ARM_ZONES.has(z)){ add(q, viewPos(z, "P")); add(q + "~p", viewPos(z, "GI")); }
       else if(LEG_ZONES.has(z)){ add(q, viewPos(z, "E")); add(q + "~p", viewPos(z, "V")); }
       else add(q, viewPos(z, ""));
@@ -1202,10 +1207,32 @@
         const cands = new Set();
         Object.entries(JIAOHUI).forEach(([k, v]) => { if((v.canaux || []).includes(c.code) && !k.startsWith(c.code + " ")) cands.add("pt:" + k); });
         s.branches.forEach(b => { if(!b.interne) b.places.forEach(p => { if(p.startsWith("pt:") && !p.startsWith("pt:" + c.code + " ")) cands.add(p); }); });
+        // ordre du texte d'abord : le point d'un autre canal se place juste avant le point du canal qui le suit dans la phrase
+        const placedByText = new Set();
+        s.branches.forEach(b => {
+          if(b.interne) return;
+          b.places.forEach((X, i) => {
+            if(!X.startsWith("pt:") || X.startsWith("pt:" + c.code + " ") || !pos[X] || placedByText.has(X)) return;
+            const after = b.places.slice(i + 1).find(q => q.startsWith("pt:" + c.code + " "));
+            const before = b.places.slice(0, i).reverse().find(q => q.startsWith("pt:" + c.code + " "));
+            for(const seq of segs){
+              if(seq.includes(X)){ placedByText.add(X); return; }
+              if(after && seq.includes(after)){ seq.splice(seq.indexOf(after), 0, X); placedByText.add(X); return; }
+              if(before && seq.includes(before)){ seq.splice(seq.indexOf(before) + 1, 0, X); placedByText.add(X); return; }
+            }
+          });
+        });
         cands.forEach(X => {
-          if(!pos[X]) return;
+          if(!pos[X] || placedByText.has(X)) return;
           let best = null;
-          segs.forEach(seq => { for(let i = 0; i < seq.length - 1; i++){ const cost = dist(P(seq[i]), pos[X]) + dist(pos[X], P(seq[i + 1])) - dist(P(seq[i]), P(seq[i + 1])); if(!best || cost < best[0]) best = [cost, seq, i + 1]; } });
+          segs.forEach(seq => {
+            for(let i = 0; i < seq.length - 1; i++){ const cost = dist(P(seq[i]), pos[X]) + dist(pos[X], P(seq[i + 1])) - dist(P(seq[i]), P(seq[i + 1])); if(!best || cost < best[0]) best = [cost, seq, i + 1]; }
+            if(seq.length){
+              const c0 = dist(pos[X], P(seq[0])), c1 = dist(pos[X], P(seq[seq.length - 1]));
+              if(!best || c0 < best[0]) best = [c0, seq, 0];
+              if(!best || c1 < best[0]) best = [c1, seq, seq.length];
+            }
+          });
           if(best && best[0] < 140) best[1].splice(best[2], 0, X);
         });
         segs.forEach(seq => { if(seq.length >= 2) lines.push({c, s, main:true, nodes:seq}); });
@@ -1214,7 +1241,8 @@
       s.branches.forEach(b => {
         if(!branchShown(s, b)) return;
         const pids = b.places.filter(p => !p.startsWith("c:"));
-        if(s.type === "principal" && mainNodes[c.code] && !b.interne && pids.filter(p => p.startsWith("pt:" + c.code + " ")).length >= 2) return;
+        if(s.type === "principal" && mainNodes[c.code] && !b.interne && TYPES_ON.externe !== false &&
+          (pids.filter(p => p.startsWith("pt:" + c.code + " ")).length >= 2 || !b.places.some(p => (p.startsWith("pt:") && !p.startsWith("pt:" + c.code + " ")) || p.startsWith("c:")))) return;
         const nodes = [];
         pids.forEach(p => {
           if(p.startsWith("pt:")){ if(pos[p]) nodes.push(p); return; }
@@ -1245,7 +1273,7 @@
         const arm = ARM_ZONES.has(z), off = FACE_OFF[d.face] || 0;
         const Aa = arm ? [A[0], A[1] + off] : (A[1] > 640 ? [A[0] + off * 0.6, A[1]] : A);
         const lane = LANE[code] || 0;
-        const S = arm ? [netX(Aa[0]), netY(Aa[1]) + lane * LANE_Y] : [netX(Aa[0]) + lane * LANE_X, netY(Aa[1])];
+        const S = arm ? [netX(Aa[0], Aa[1]), netY(Aa[1]) + lane * LANE_Y] : [netX(Aa[0], Aa[1]) + lane * LANE_X, netY(Aa[1])];
         if(runs.length && runs[runs.length - 1].z === z) runs[runs.length - 1].pts.push(p);
         else runs.push({z, S, pts:[p]});
       });
@@ -1436,7 +1464,7 @@
     });
     let qLabels = "";
     [["FACE ANTÉRIEURE", 600], ["FACE POSTÉRIEURE", 600 + BACK_SHIFT + 40]].forEach(([lab, x]) => {
-      qLabels += '<text class="facelabel" x="' + netX(x).toFixed(0) + '" y="' + (netY(0) - 60) + '" text-anchor="middle">' + lab + "</text>";
+      qLabels += '<text class="facelabel" x="' + netX(x).toFixed(0) + '" y="' + (Math.min(...Object.values(qSeed).map(s => s[1])) - 260).toFixed(0) + '" text-anchor="middle">' + lab + "</text>";
     });
     qIds.forEach(q => { const [x, y] = qSeed[q]; qLabels += '<text class="qlabel' + (DOWNTOWN.has(q) ? " downtown" : "") + '" x="' + x.toFixed(0) + '" y="' + (y - 30).toFixed(0) + '" text-anchor="middle">' + esc(QUARTIER_LABEL[q.replace("~p", "")] || q) + "</text>"; });
     // 6. articulations (grands carrefours) et stations
