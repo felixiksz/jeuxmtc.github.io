@@ -190,6 +190,14 @@
       V29:"Bèi Shù-Transport du dos du sacrum",
       V30:"Bèi Shù-Transport du dos du cercle blanc"
     },
+    // points yuán-source qui n'appartiennent pas à leur canal (RM) : ceux du gāo et du huāng
+    Points_Yuan_Source:{
+      RM15:"yuán-source des graisses (gāo)",
+      RM6:"yuán-source des fascias (huāng)"
+    },
+    Points_Luo_Liaison:{
+      Rt21:"grand luò-liaison de la rate"
+    },
     Les_4_mers:{
       DM20:"mer des moelles",
       DM16:"mer des moelles",
