@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "20260930-fiches-1";
+const MTC_OFFLINE_VERSION = "20260930-memo-b";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -76,6 +76,7 @@ const CORE_ASSETS = [
   "62-opening-glow.js",
   "63-settings-popover.js",
   "64-admin-trajets.js",
+  "65-special-point-labels.js",
   "Import_tableau pharma_pro(1).json",
   "README_HORS_CONNEXION.txt",
   "README_PUBLICATION.txt",

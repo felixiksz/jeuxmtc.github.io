@@ -106,7 +106,7 @@
   document.documentElement.setAttribute('data-study-domain', domain);
 })();
 </script>
-<link href="mtc-styles.css?v=20260928-tourbox4" rel="stylesheet"/>
+<link href="mtc-styles.css?v=20260930-b" rel="stylesheet"/>
 <link href="study-domain-launcher.css" rel="stylesheet"/>
 <link href="pharma-game-v1.css" rel="stylesheet"/>
 <link href="pharma-cheatsheet-essentielles.css" rel="stylesheet"/>
@@ -237,8 +237,8 @@
 <span id="lifeDisplay">♥♥♥♥♥</span>
 <button id="hintButton" onclick="giveHint()">ASTUCE</button>
 <span id="cheatDisplay">☘︎☘︎☘︎☘︎☘︎</span>
-<button id="cheatsheetButton" onclick="openCheatsheetPanel()">
-      Cheatsheet
+<button id="cheatsheetButton" onclick="openCheatsheetPanel()" title="Aide-mémoire">
+      Mémo
     </button>
 </div>
 </div>
@@ -247,7 +247,7 @@
 <script src="02-01-point-details-data.js?v=20260926-pinyin-fixes"></script>
 <script src="03-02-raw-data.js"></script>
 <script src="03-03-image-store-indexeddb.js?v=20260725-indexeddb-v1"></script>
-<script src="04-03-core-game.js?v=20260928-tour-lift"></script>
+<script src="04-03-core-game.js?v=20260930-b"></script>
 <div id="footerTitle">
 <span aria-label="Outils de révision" class="footer-main-tools" id="footerMainTools">
 <button id="statsButton" onclick="toggleStatsPanel()" title="Voir mes statistiques" type="button">
@@ -319,7 +319,7 @@
 <div id="mtcBottomMetaLine" aria-label="Ligne discrète : hors connexion, historique et nouveautés">
   <button id="mtcOfflineButton" type="button" title="Préparer le jeu pour réviser hors connexion" aria-label="Préparer le jeu pour réviser hors connexion">✈︎</button>
 </div>
-<script src="05-04-final-corrections.js?v=20260813-github-extra-fields"></script>
+<script src="05-04-final-corrections.js?v=20260930-b"></script>
 <script src="06-05-stats-total-real-points.js"></script>
 <!-- === Correctif final : correspondances lisibles + recherche sans accents/fuzzy léger === -->
 <script src="07-06-search-normalization.js"></script>
@@ -341,7 +341,7 @@
 <!-- === Correctif mobile : clic/tap sur la goutte = message “Me soutenir” === -->
 
 <script src="18-16-true-slot-message.js"></script>
-<script src="19-17-mobile-blooddrop-support.js?v=20260802-cheatsheet-context-label"></script>
+<script src="19-17-mobile-blooddrop-support.js?v=20260930-b"></script>
 <!-- === Correctif Stats : affichage plus clair + durées aberrantes ignorées === -->
 
 <script src="20-18-cheatsheet-8-vessels.js"></script>
@@ -359,10 +359,10 @@
 <script src="30-comparison-redesign.js?v=20260802-suggest-box-caret-position-v2"></script>
 <script src="31-search-compare-select.js?v=20260725-basket-ab-v1"></script>
 <script src="audio-manifest.js?v=20260722-cleanup"></script>
-<script src="32-audio-pronunciation.js?v=20260726-icons-v1"></script>
+<script src="32-audio-pronunciation.js?v=20260930-b"></script>
 <script src="33-stable-hotfix.js"></script>
 <script src="34-targeted-requests.js?v=20260726-icons-v1"></script>
-<script src="38-tutorial-user-texts.js?v=20260928-bell2"></script>
+<script src="38-tutorial-user-texts.js?v=20260930-b"></script>
 <script src="39-mobile-game-audio-fix.js?v=20260722-webaudio-prefetch"></script>
 <script src="40-comparison-loading-history.js?v=20260703-finalbatch2"></script>
 <script src="41-force-comparison-history-fix.js?v=20260703-finalbatch2"></script>
@@ -370,19 +370,20 @@
 <script src="44-simple-replay-history-mobile.js?v=20260703-finalbatch2"></script>
 <script src="45-baskerville-esprit-replay.js?v=20260703-finalbatch2"></script>
 <script src="46-memo-mode.js?v=20260728-quiz-image-merge"></script>
-<script src="52-quiz-mode.js?v=20260930-yuan1"></script>
+<script src="52-quiz-mode.js?v=20260930-b"></script>
 <script src="55-point-mastery.js?v=20260813-due-review"></script>
 <script src="47-acu-image-import-novelty.js?v=20260725-indexeddb-v1"></script>
 <script src="50-grid-lock.js?v=20260728-svg-icon"></script>
 <script src="51-daily-streak.js?v=20260726-icons-v1"></script>
 <script src="48-offline-pwa.js?v=20260928-no-reload-while-using"></script>
 <script src="57-daily-reminder.js?v=20260928-simple"></script>
-<script src="58-mobile-topbar-menu.js?v=20260810-github-sync-selector"></script>
+<script src="58-mobile-topbar-menu.js?v=20260930-b"></script>
 <script src="59-github-sync.js?v=20260927-autosync"></script>
-<script src="60-pharma-cards.js?v=20260927-bw21"></script>
+<script src="60-pharma-cards.js?v=20260930-b"></script>
 <script src="61-cards-bw-image.js?v=20260927-v7"></script>
 <script src="62-opening-glow.js?v=20260927-1"></script>
 <script src="63-settings-popover.js?v=20260928-2"></script>
-<script src="64-admin-trajets.js?v=20260929-2"></script>
+<script src="64-admin-trajets.js?v=20260930-b"></script>
+<script src="65-special-point-labels.js?v=20260930-b"></script>
 </body>
 </html>

@@ -666,7 +666,8 @@
     const wrapped = function(){
       const fromCheatsheet = !!(document.__mtcLastCheatsheetTapAt && Date.now() - document.__mtcLastCheatsheetTapAt < 900);
       const result = original.apply(this, arguments);
-      if(fromCheatsheet) window.setTimeout(closeCheatsheet, 0);
+      // la fiche s'ouvre PAR-DESSUS le mémo (qui reste ouvert derrière) : sur téléphone, on voit qu'il s'est passé quelque chose
+      if(fromCheatsheet) document.body.classList.add("panel-over-cheatsheet");
       return result;
     };
     wrapped.__mtcCloseCheatsheetAfterPanelOpen = true;

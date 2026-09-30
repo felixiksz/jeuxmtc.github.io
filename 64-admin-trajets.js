@@ -6,9 +6,13 @@
 (function(){
   "use strict";
 
+  // mode admin mémorisé sur l'appareil : ?admin=1 l'active, ?admin=0 (ou le lien « quitter ») le désactive
   function isAdmin(){
-    try{ return new URLSearchParams(window.location.search).get("admin") === "1"; }catch(error){ return false; }
+    return (function(){ try{ const q = new URLSearchParams(window.location.search).get("admin");
+      if(q === "1") localStorage.setItem("mtc_admin", "1"); else if(q === "0") localStorage.removeItem("mtc_admin");
+      return localStorage.getItem("mtc_admin") === "1" || q === "1"; }catch(error){ return new URLSearchParams(window.location.search).get("admin") === "1"; } })();
   }
+  window.mtcIsAdmin = isAdmin;
 
   function boot(){
     if(!isAdmin() || document.getElementById("mtcAdminTrajets")) return;
@@ -21,6 +25,20 @@
     button.title = "Trajets des canaux (admin)";
     button.addEventListener("click", () => { window.location.href = "trajets/index.html?admin=1"; });
     bar.appendChild(button);
+    // lien pour revenir au mode public (sous les réglages d'affichage)
+    const presets = document.querySelector("#settingsPanel .settings-presets");
+    if(presets && !document.getElementById("mtcAdminExit")){
+      const exit = document.createElement("button");
+      exit.type = "button";
+      exit.id = "mtcAdminExit";
+      exit.textContent = "Quitter le mode admin";
+      exit.addEventListener("click", () => {
+        try{ localStorage.removeItem("mtc_admin"); }catch(error){}
+        const url = new URL(window.location.href); url.searchParams.delete("admin");
+        window.location.href = url.pathname + (url.search || "") + url.hash;
+      });
+      presets.appendChild(exit);
+    }
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, {once:true});

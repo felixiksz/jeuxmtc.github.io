@@ -762,8 +762,11 @@
   // corrections sont mémorisées par fichier : {add:[[x,y],...], hide:[[x,y],...]}
   // en fractions de la largeur/hauteur. (Ancien format : simple liste = add.)
   // L'outil de vérification n'est proposé qu'avec ?admin=1 dans l'adresse.
+  // mode admin : ?admin=1 une fois suffit (mémorisé sur l'appareil), ?admin=0 pour le quitter
   function isAdmin(){
-    try{ return new URLSearchParams(window.location.search).get("admin") === "1"; }catch(error){ return false; }
+    return (function(){ try{ const q = new URLSearchParams(window.location.search).get("admin");
+      if(q === "1") localStorage.setItem("mtc_admin", "1"); else if(q === "0") localStorage.removeItem("mtc_admin");
+      return localStorage.getItem("mtc_admin") === "1" || q === "1"; }catch(error){ return new URLSearchParams(window.location.search).get("admin") === "1"; } })();
   }
   // Sous ce plus grand côté (en pixels), une image est floue à l'impression
   // sur une carte (~100 mm de large à 300 dpi : environ 1100 px).

@@ -87,7 +87,7 @@
     if(document.getElementById("tourBox") || !document.querySelector(CARDS_SELECTOR)) return;
     try{ localStorage.setItem(CARDS_FEATURE_SEEN_KEY, "1"); }catch(error){}
     const show = typeof window.showProgressHint === "function" ? window.showProgressHint : showProgressHint;
-    const steps = cardsTourSteps(isPharma());
+    const steps = cardsTourSteps(isPharma()).slice(0, 1);
     steps[0] = Object.assign({}, steps[0], {title:"Nouveau : 🃏 cartes à imprimer"});
     let index = 0;
     const next = () => {
@@ -102,6 +102,40 @@
       }, 300);
     };
     next();
+  }
+
+  // Conseils du module cartes : à la première ouverture du module, pas avant.
+  const CARDS_MODULE_TIPS_KEY = "mtc_cards_module_tips_v1";
+  function showCardsModuleTips(){
+    try{ if(localStorage.getItem(CARDS_MODULE_TIPS_KEY) === "1") return; }catch(error){ return; }
+    const show = typeof window.showProgressHint === "function" ? window.showProgressHint : (typeof showProgressHint === "function" ? showProgressHint : null);
+    if(!show) return;
+    try{ localStorage.setItem(CARDS_MODULE_TIPS_KEY, "1"); }catch(error){}
+    const all = cardsTourSteps(isPharma());
+    const steps = [
+      Object.assign({}, all[1], {selector:"#mtcCardsList"}),
+      Object.assign({}, all[2], {selector:'#mtcCardsModal [data-cards-act="test"]'})
+    ];
+    let index = 0;
+    const next = () => {
+      if(index >= steps.length) return;
+      const step = steps[index++];
+      if(!document.querySelector(step.selector)) return next();
+      show("cardsmodule_" + step.key, step.selector, step.title, step.text, {});
+      const wait = window.setInterval(() => {
+        if(document.getElementById("tourBox")) return;
+        window.clearInterval(wait);
+        window.setTimeout(next, 250);
+      }, 300);
+    };
+    window.setTimeout(next, 600);
+  }
+  function watchCardsModule(){
+    const obs = new MutationObserver(() => {
+      const modal = document.getElementById("mtcCardsModal");
+      if(modal && modal.classList.contains("visible")) showCardsModuleTips();
+    });
+    obs.observe(document.body, {subtree:true, attributes:true, attributeFilter:["class"]});
   }
 
   function scheduleCardsFeatureTour(){
@@ -178,8 +212,8 @@
       steps,
       "#cheatsheetButton",
       pharma
-        ? "Le Cheatsheet sert de mémo rapide pour les SM, les classes et les repères essentiels."
-        : "Le Cheatsheet sert de mémo rapide pour les points, les catégories et les grands repères du cours."
+        ? "Le Mémo sert d’aide-mémoire rapide pour les SM, les classes et les repères essentiels."
+        : "Le Mémo sert d’aide-mémoire rapide pour les points, les catégories et les grands repères du cours."
     );
 
     patchStep(
@@ -233,12 +267,10 @@
       position:"aboveBottom"
     }, 0);
 
-    // Cartes de révision à imprimer (bouton 🃏 en bas).
-    let previous = "#suggestionMailButton";
-    cardsTourSteps(pharma).forEach(step => {
-      insertKeyedStep(steps, step.key, {selector:CARDS_SELECTOR, title:step.title, text:step.text, position:"aboveBottom"}, previous);
-      previous = step.key;
-    });
+    // Cartes de révision à imprimer (bouton 🃏 en bas) : seulement la présentation du bouton ;
+    // le détail (choisir les cartes, conseils d'impression) s'affiche à l'ouverture du module.
+    const cardsIntro = cardsTourSteps(pharma)[0];
+    insertKeyedStep(steps, cardsIntro.key, {selector:CARDS_SELECTOR, title:cardsIntro.title, text:cardsIntro.text, position:"aboveBottom"}, "#suggestionMailButton");
     // Ce tuto complet contient déjà les cartes : pas de bulle « Nouveau » ensuite.
     try{ localStorage.setItem(CARDS_FEATURE_SEEN_KEY, "1"); }catch(error){}
 
@@ -299,6 +331,7 @@
     wrapStartTour();
     wrapProgressHints();
     scheduleCardsFeatureTour();
+    watchCardsModule();
   }
 
   if(document.readyState === "loading"){
