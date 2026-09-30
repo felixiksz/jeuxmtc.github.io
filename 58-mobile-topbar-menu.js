@@ -86,6 +86,7 @@
       return;
     }
     if(event.target.closest("#mtcTopbarMoreButton")) return;
+    if(event.target.closest("#tourBox")) return;   // « Suivant » du tuto : l'étape suivante vise un bouton du menu
     if(event.target.closest(".topbar-row.topbar-main-row")) return;
     closeMenu();
   });

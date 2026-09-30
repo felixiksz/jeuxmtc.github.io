@@ -1866,14 +1866,14 @@ function openCheatsheetPanel(){
     showProgressHintSoon(
       "cheatsheet_points",
       ".cheatsheet-point-link",
-      "Cheatsheet",
+      "Mémo",
       "Cette catégorie est ouverte pour l’exemple. En cliquant sur un code de point, tu ouvres sa fiche détaillée.",
       {},
       360
     );
   }catch(error){
     console.error("Erreur cheatsheet :", error);
-    message.textContent = "Erreur dans le cheatsheet. Regarde la console.";
+    message.textContent = "Erreur dans le mémo. Regarde la console.";
   }
 }
 
@@ -1978,7 +1978,7 @@ function renderCheatsheetPanel(){
 
   let html = `
     <div class="point-header">
-      <span class="point-code">Cheatsheet</span>
+      <span class="point-code">Mémo</span>
     </div>
   `;
 
@@ -3242,10 +3242,10 @@ function startTour(){
     },
     {
       selector: "#cheatsheetButton",
-      title: "Cheatsheet",
+      title: "Mémo",
       text: isPharmaTour
-        ? "Le Cheatsheet PHARMA sert de mémo rapide pour les SM, les classes et les repères essentiels."
-        : "Le Cheatsheet ACU sert de mémo rapide pour les points, les catégories et les grands repères du cours."
+        ? "Le Mémo PHARMA sert d’aide-mémoire rapide pour les SM, les classes et les repères essentiels."
+        : "Le Mémo ACU sert d’aide-mémoire rapide pour les points, les catégories et les grands repères du cours."
     },
     {
       selector: "#statsButton",

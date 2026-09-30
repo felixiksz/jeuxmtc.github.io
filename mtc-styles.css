@@ -7155,3 +7155,6 @@ body:has(#tourOverlay) :is(.advanced-search-panel, .stats-panel, .review-basket-
 .mtc-tour-lift{
   z-index:10001 !important;
 }
+
+/* Fiche d'un point ouverte depuis le mémo : par-dessus le mémo */
+.point-panel.open{ z-index:9850 !important; }

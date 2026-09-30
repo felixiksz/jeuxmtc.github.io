@@ -219,7 +219,7 @@
 
       let html = `
         <div class="point-header">
-          <span class="point-code">Cheatsheet</span>
+          <span class="point-code">Mémo</span>
         </div>
       `;
 
