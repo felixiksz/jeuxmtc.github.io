@@ -121,6 +121,7 @@
   .tgroup{ display:inline-flex; gap:6px; align-items:center; padding:1px 7px; border:1px solid #d7d7e6; border-radius:999px; }
   .netwrap{ background:#f4f1ea; }
   .qcell{ stroke:none; }
+  .facelabel{ font-size:34px; font-weight:800; fill:#b4ab97; letter-spacing:.2em; pointer-events:none; }
   .casing{ stroke:#ffffff; pointer-events:none; }
   .netwrap.dark .casing{ stroke:#171a22; }
   .subq rect{ fill:#ffffff; fill-opacity:.28; stroke:#ffffff; stroke-opacity:.8; stroke-dasharray:6 5; }
@@ -1037,7 +1038,30 @@
   const jointOf = pid => JOINT_OF[pid] || JOINT_OF[pid.split("~")[0]] || null;
   // plan de la ville : la tête et les pieds étirés pour aérer les points, qui y sont serrés
   // tronc et jambes (x > 450) très élargis : c'est là que passent la plupart des lignes ; bras resserré
-  const netX = x => x < 450 ? x * 2.6 : 450 * 2.6 + (x - 450) * 7.5;
+  // abscisses : bras de la face antérieure (x < 450) resserré, tronc et jambes élargis, bras de la face postérieure (x > 1020) resserré
+  const netX = x => x < 450 ? x * 2.6 : x <= 920 ? 450 * 2.6 + (x - 450) * 7.5 : 450 * 2.6 + 470 * 7.5 + (x - 920) * 2.6;
+  // Planche anatomique à deux faces : à gauche la face antérieure (visage, thorax, abdomen, avant de la jambe, bras des
+  // canaux yīn), à droite la face postérieure (occiput, nuque, dos, lombes, sacrum, arrière de la jambe pour V, bras des
+  // canaux yáng GI, IG, TF). La tête relie les deux faces par le sommet.
+  const BACK_ZONES = new Set(["occiput", "nuque", "trapeze", "omoplate", "supraep", "infraep", "dos", "paravert", "colonne", "vertebres",
+    "lombes", "lombaires", "sacrum", "coccyx", "fesse", "anus", "o-reins"]);
+  const ARM_ZONES = new Set(["epaule", "acromion", "delto", "aisselle", "pli-axill", "membre-sup", "bras", "pli-coude", "coude", "olecrane", "avant-bras",
+    "poignet", "dos-poignet", "cun-kou", "styloide-rad", "styloide-uln", "pisiforme", "paume", "thenar", "main", "dos-main", "metacarpe",
+    "pouce", "index", "medius", "annulaire", "petit-doigt"]);
+  const LEG_ZONES = new Set(["cuisse", "membre-inf", "genou", "poplite", "jambe", "tibia", "fibula", "gastrocnemien", "malleole", "malleole-int",
+    "malleole-ext", "talon", "tendon-calc", "dos-pied", "plante", "tarse", "naviculaire", "metatarse", "hallux", "orteils", "petit-orteil", "hanche", "trochanter", "coxo"]);
+  const YANG_ARM = new Set(["GI", "IG", "TF"]);
+  const BACK_SHIFT = 110, BACK_LEG_SHIFT = 230, ARM_MIRROR = 1392;
+  // quartier « ~p » = copie sur la face postérieure (bras yáng, jambe postérieure)
+  const sideOf = (z, code) => ARM_ZONES.has(z) ? (YANG_ARM.has(code) ? "p" : "a") : LEG_ZONES.has(z) ? (code === "V" ? "p" : "a") : BACK_ZONES.has(z) ? "p" : "a";
+  const viewPos = (z, code) => {
+    const b = NET_POS[z] || NET_POS[{narine:"nez", rotule:"genou", cheville:"malleole", pied:"dos-pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux"}[z]];
+    if(!b) return null;
+    if(ARM_ZONES.has(z)) return YANG_ARM.has(code) ? [ARM_MIRROR - b[0], b[1]] : b.slice();
+    if(LEG_ZONES.has(z)) return code === "V" ? [b[0] + BACK_LEG_SHIFT, b[1]] : b.slice();
+    if(BACK_ZONES.has(z)) return [b[0] + BACK_SHIFT, b[1]];
+    return b.slice();
+  };
   const netY = y => y < 260 ? y * 4.6 : 260 * 4.6 + (y - 260) * 2.6;
   const G = 24;
 
@@ -1148,10 +1172,22 @@
     });
     // quartiers : graine = centre des zones qui le composent
     const qSeed = {};
-    Object.entries(ZONE_QUARTIER).forEach(([z, q]) => { const p = NET_POS[z]; if(!p) return; (qSeed[q] = qSeed[q] || []).push([netX(p[0]), netY(p[1])]); });
+    Object.entries(ZONE_QUARTIER).forEach(([z, q]) => {
+      if(!NET_POS[z]) return;
+      const add = (qid, v) => { (qSeed[qid] = qSeed[qid] || []).push([netX(v[0]), netY(v[1])]); };
+      if(ARM_ZONES.has(z)){ add(q, viewPos(z, "P")); add(q + "~p", viewPos(z, "GI")); }
+      else if(LEG_ZONES.has(z)){ add(q, viewPos(z, "E")); add(q + "~p", viewPos(z, "V")); }
+      else add(q, viewPos(z, ""));
+    });
     Object.keys(qSeed).forEach(q => { const l = qSeed[q]; qSeed[q] = [l.reduce((s, p) => s + p[0], 0) / l.length, l.reduce((s, p) => s + p[1], 0) / l.length]; });
     const jointPos = {};
-    Object.keys(JOINTS).forEach(j => { const p = NET_POS[j]; if(p) jointPos[j] = [Math.round(netX(p[0]) / G) * G, Math.round(netY(p[1]) / G) * G]; });
+    Object.keys(JOINTS).forEach(j => {
+      if(!NET_POS[j]) return;
+      const put = (id, v) => { jointPos[id] = [Math.round(netX(v[0]) / G) * G, Math.round(netY(v[1]) / G) * G]; };
+      if(ARM_ZONES.has(j)){ put(j, viewPos(j, "P")); put(j + "~p", viewPos(j, "GI")); }
+      else if(LEG_ZONES.has(j)){ put(j, viewPos(j, "E")); put(j + "~p", viewPos(j, "V")); }
+      else put(j, viewPos(j, ""));
+    });
     // 2. lignes
     const visible = [];
     data.forEach(c => c.sections.forEach((s, si) => { if(typeShown(s) && s.branches && s.branches.length && !NET_HIDDEN.has(c.code)) visible.push({c, s, si}); }));
@@ -1183,7 +1219,8 @@
         pids.forEach(p => {
           if(p.startsWith("pt:")){ if(pos[p]) nodes.push(p); return; }
           const q = zoneQuartier(p);
-          if(q && qSeed[q]) nodes.push("w:" + q + "|" + c.code);
+          const qq = sideOf(p.split("~")[0], c.code) === "p" && qSeed[q + "~p"] ? q + "~p" : q;
+          if(qq && qSeed[qq]) nodes.push("w:" + qq + "|" + c.code);
         });
         const clean = nodes.filter((n, i) => n !== nodes[i - 1]);
         if(clean.length >= 2) lines.push({c, s, main:false, interne:!!b.interne, nodes:clean});
@@ -1202,10 +1239,10 @@
     Object.entries(mainNodes).forEach(([code, segs]) => segs.forEach(seq => {
       const runs = [];
       seq.forEach(p => {
-        const z = zoneOfPt(p), A = anchorOf(z);
+        const z = zoneOfPt(p), A = viewPos(z, code);
         if(!A) return;
         const d = POINT_ZONE_DATA[p.slice(3)] || {};
-        const arm = A[0] < 450, off = FACE_OFF[d.face] || 0;
+        const arm = ARM_ZONES.has(z), off = FACE_OFF[d.face] || 0;
         const Aa = arm ? [A[0], A[1] + off] : (A[1] > 640 ? [A[0] + off * 0.6, A[1]] : A);
         const lane = LANE[code] || 0;
         const S = arm ? [netX(Aa[0]), netY(Aa[1]) + lane * LANE_Y] : [netX(Aa[0]) + lane * LANE_X, netY(Aa[1])];
@@ -1379,7 +1416,8 @@
     qIds.forEach((q, i) => {
       const poly = voronoiCell(seeds, i, 380);
       if(poly.length < 3) return;
-      const fill = DOWNTOWN.has(q) ? "#f1d6c8" : SUBURB.has(q) ? "#dcebd2" : QUARTIER_COLORS[i % QUARTIER_COLORS.length];
+      const qb = q.replace("~p", "");
+      const fill = DOWNTOWN.has(qb) ? "#f1d6c8" : SUBURB.has(qb) ? "#dcebd2" : QUARTIER_COLORS[i % QUARTIER_COLORS.length];
       const pts = poly.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
       city += '<polygon class="qcell" points="' + pts + '" fill="' + fill + '"/><polygon points="' + pts + '" fill="url(#streets)"/>' +
         '<polygon class="qborder" points="' + pts + '" fill="none"/>';
@@ -1387,18 +1425,25 @@
     let subq = "";
     Object.entries(FACE_OFF).forEach(([face, off]) => {
       const lab = face.charAt(0).toUpperCase() + face.slice(1);
-      const ay = netY(334 + off), x0 = netX(30), x1 = netX(440);
-      subq += '<g class="subq"><rect x="' + x0.toFixed(0) + '" y="' + (ay - 12).toFixed(0) + '" width="' + (x1 - x0).toFixed(0) + '" height="24" rx="12"/><text x="' + (x0 + 8).toFixed(0) + '" y="' + (ay + 4).toFixed(0) + '">' + lab + "</text></g>";
-      const lx = netX(622 + off * 0.6), y0 = netY(700), y1 = netY(1440);
-      subq += '<g class="subq"><rect x="' + (lx - 14).toFixed(0) + '" y="' + y0.toFixed(0) + '" width="28" height="' + (y1 - y0).toFixed(0) + '" rx="14"/><text x="' + lx.toFixed(0) + '" y="' + (y1 + 18).toFixed(0) + '" text-anchor="middle">' + lab + "</text></g>";
+      const ay = netY(334 + off);
+      [[netX(30), netX(440)], [netX(ARM_MIRROR - 440), netX(ARM_MIRROR - 30)]].forEach(([x0, x1], k) => {
+        subq += '<g class="subq"><rect x="' + x0.toFixed(0) + '" y="' + (ay - 12).toFixed(0) + '" width="' + (x1 - x0).toFixed(0) + '" height="24" rx="12"/><text x="' + (k ? x1 - 8 : x0 + 8).toFixed(0) + '" y="' + (ay + 4).toFixed(0) + '"' + (k ? ' text-anchor="end"' : "") + ">" + lab + "</text></g>";
+      });
+      [0, BACK_LEG_SHIFT].forEach(sh => {
+        const lx = netX(622 + sh + off * 0.6), y0 = netY(700), y1 = netY(1440);
+        subq += '<g class="subq"><rect x="' + (lx - 14).toFixed(0) + '" y="' + y0.toFixed(0) + '" width="28" height="' + (y1 - y0).toFixed(0) + '" rx="14"/><text x="' + lx.toFixed(0) + '" y="' + (y1 + 18).toFixed(0) + '" text-anchor="middle">' + lab + "</text></g>";
+      });
     });
     let qLabels = "";
-    qIds.forEach(q => { const [x, y] = qSeed[q]; qLabels += '<text class="qlabel' + (DOWNTOWN.has(q) ? " downtown" : "") + '" x="' + x.toFixed(0) + '" y="' + (y - 30).toFixed(0) + '" text-anchor="middle">' + esc(QUARTIER_LABEL[q] || q) + "</text>"; });
+    [["FACE ANTÉRIEURE", 600], ["FACE POSTÉRIEURE", 600 + BACK_SHIFT + 40]].forEach(([lab, x]) => {
+      qLabels += '<text class="facelabel" x="' + netX(x).toFixed(0) + '" y="' + (netY(0) - 60) + '" text-anchor="middle">' + lab + "</text>";
+    });
+    qIds.forEach(q => { const [x, y] = qSeed[q]; qLabels += '<text class="qlabel' + (DOWNTOWN.has(q) ? " downtown" : "") + '" x="' + x.toFixed(0) + '" y="' + (y - 30).toFixed(0) + '" text-anchor="middle">' + esc(QUARTIER_LABEL[q.replace("~p", "")] || q) + "</text>"; });
     // 6. articulations (grands carrefours) et stations
     let joints = "";
     Object.entries(jointPos).forEach(([j, [x, y]]) => {
       joints += '<g class="netjoint"><circle cx="' + x + '" cy="' + y + '" r="150" fill="#ffffff" fill-opacity=".22" stroke="#b8b1a0" stroke-width="2" stroke-dasharray="10 8"/>' +
-        '<text x="' + x + '" y="' + (y - 158) + '" text-anchor="middle">' + JOINTS[j] + "</text></g>";
+        '<text x="' + x + '" y="' + (y - 158) + '" text-anchor="middle">' + JOINTS[j.replace("~p", "")] + "</text></g>";
     });
     let stations = "";
     stationsList.forEach(p => {
