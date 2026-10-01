@@ -2814,7 +2814,7 @@
     "hanzi": "青蒿",
     "nom": "Partie aérienne de 2 armoises",
     "nature": "Froid",
-    "saveur": "Amer, Légèrement piquant",
+    "saveur": "Amer, Légèrement piquant, Aromatique",
     "tropisme": "Foie, VB",
     "posologie": "6 à 15g",
     "actions": [
