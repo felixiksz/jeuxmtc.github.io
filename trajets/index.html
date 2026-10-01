@@ -135,6 +135,20 @@
   @keyframes ghint{ from{ stroke-opacity:.35; } to{ stroke-opacity:1; } }
   body.netgame-on #typeToggle, body.netgame-on #typeFilter, body.netgame-on #editToggle, body.netgame-on .netlegend .nettools{ display:none; }
   body.netgame-on .netstop{ cursor:grab; }
+  .relay path{ fill:none; stroke:#7d7a70; stroke-width:2.4; stroke-dasharray:7 6; stroke-linecap:round; }
+  .relay path.relayarrow{ stroke-dasharray:none; stroke-width:2.2; stroke-linejoin:round; }
+  .relay text{ font-size:10px; font-weight:800; fill:#5f5c54; paint-order:stroke; stroke:#fff; stroke-width:3px; }
+  .netwrap.dark .relay path{ stroke:#a8a49a; }
+  .netwrap.dark .relay text{ fill:#c9c5bb; stroke:#171a22; }
+  .itipath{ fill:none; stroke:#ffd84d; stroke-width:12; stroke-linecap:round; stroke-linejoin:round; opacity:.75; pointer-events:none; }
+  .itisol{ fill:none; stroke:#2c9a5c; stroke-width:5; stroke-dasharray:10 7; stroke-linecap:round; pointer-events:none; }
+  .itimark circle{ fill:none; stroke-width:4; pointer-events:none; }
+  .itimark text{ font-size:13px; font-weight:900; paint-order:stroke; stroke:#fff; stroke-width:4px; pointer-events:none; }
+  .itistart circle{ stroke:#2c9a5c; } .itistart text{ fill:#2c9a5c; }
+  .itiend circle{ stroke:#d23a33; } .itiend text{ fill:#d23a33; }
+  .itistep{ fill:none; stroke:#b07a00; stroke-width:3; pointer-events:none; }
+  .itisteps{ font-size:13px; line-height:1.6; }
+  .itileg{ font-size:11.5px; color:#7a6a3a; }
   .facelabel{ font-size:34px; font-weight:800; fill:#b4ab97; letter-spacing:.2em; pointer-events:none; }
   .casing{ stroke:#ffffff; pointer-events:none; }
   .netwrap.dark .casing{ stroke:#171a22; }
@@ -1049,7 +1063,23 @@
   const saveHidden = () => { if(GAME) return; try{ localStorage.setItem(NET_HIDE_KEY, JSON.stringify([...NET_HIDDEN])); }catch(e){} };
   // jeu de démêlage : les stations de quelques lignes sont mélangées, il faut les remettre à leur place
   // (la référence est la carte corrigée : positions calculées + stations déplacées à la main)
-  let GAME = null, LAST_LAYOUT = null;
+  let GAME = null, LAST_LAYOUT = null, ITI = null;
+  // relais d'un canal au suivant dans la circulation du qì nourricier (cours « Documentation - Les canaux
+  // réguliers », Zhōng Lì : connexions biǎo/lǐ, couples yáng à l'œil, trajets internes de la poitrine ; F → P : F 13, foie, poumon)
+  const RELAYS = [
+    {from:"P", to:"GI", path:["pt:P 7", "pt:GI 1"], txt:"de P 7 (avant-bras) à GI 1 (index)"},
+    {from:"GI", to:"E", path:["pt:GI 20", "pt:E 1"], txt:"GI 20, à l’aile du nez, où naît E"},
+    {from:"E", to:"Rt", path:["pt:E 42", "pt:Rt 1"], txt:"de E 42 (dos du pied) à Rt 1 (gros orteil)"},
+    {from:"Rt", to:"C", path:["q:estomac", "q:coeur", "pt:C 1"], txt:"de l’estomac, à travers le diaphragme, au cœur ; C émerge à C 1"},
+    {from:"C", to:"IG", path:["pt:C 9", "pt:IG 1"], txt:"de C 9 à IG 1 (auriculaire)"},
+    {from:"IG", to:"V", path:["pt:IG 18", "pt:V 1"], txt:"de la pommette (IG 18) à V 1 (angle interne de l’œil)"},
+    {from:"V", to:"Rn", path:["pt:V 67", "pt:Rn 1"], txt:"de V 67 (5e orteil) à Rn 1 (plante du pied)"},
+    {from:"Rn", to:"EC", path:["q:poumon", "q:coeur", "pt:EC 1"], txt:"du poumon au cœur, puis dans la poitrine ; EC émerge à EC 1"},
+    {from:"EC", to:"TF", path:["pt:EC 8", "pt:TF 1"], txt:"de EC 8 (paume) à TF 1 (annulaire)"},
+    {from:"TF", to:"VB", path:["pt:TF 23", "pt:VB 1"], txt:"de TF 23 (queue du sourcil) à VB 1 (angle externe de l’œil)"},
+    {from:"VB", to:"F", path:["pt:VB 41", "pt:F 1"], txt:"de VB 41 (dos du pied) à F 1 (gros orteil)"},
+    {from:"F", to:"P", path:["pt:F 13", "q:foie", "q:poumon", "pt:P 1"], txt:"de F 13, par le foie, jusqu’au poumon ; P émerge à P 1"}
+  ];
   const netInPoly = (pt, poly) => { let ins = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; };
   const netBasePos = pid => NET_POS[pid] ? NET_POS[pid].slice() : (NET_POS[pid.split("~")[0]] ? NET_POS[pid.split("~")[0]].slice() : null);
   const zoneQuartier = pid => ZONE_QUARTIER[pid] || ZONE_QUARTIER[pid.split("~")[0]] || null;
@@ -1335,7 +1365,7 @@
       });
       if(!moved) break;
     }
-    LAST_LAYOUT = {cell:JSON.parse(JSON.stringify(cell)), lines:lines.map(l => ({code:l.c.code, nodes:l.nodes.slice()}))};
+    LAST_LAYOUT = {cell:JSON.parse(JSON.stringify(cell)), lines:lines.map(l => ({code:l.c.code, type:l.s.type, interne:!!l.interne, name:sectionName(l.c, l.s) + (l.interne ? " (branche interne)" : ""), nodes:l.nodes.slice()}))};
     const nodePos = n => {
       if(cell[n]) return cell[n];
       if(n.startsWith("j:")) return jointPos[n.slice(2)];
@@ -1447,6 +1477,46 @@
           '<text x="' + (P[0] - w / 2 - 10).toFixed(1) + '" y="' + (P[1] + 4) + '" text-anchor="middle" fill="' + (metal ? "#1d1d1f" : "#fff") + '">' + esc(tag) + "</text></g>";
       });
     });
+    // relais entre canaux : trait neutre en pointillé, flèche dans le sens de la circulation ; aux bras (deux faces
+    // éloignées), une amorce avec renvoi plutôt qu'un trait à travers tout le plan
+    let relaysSvg = "";
+    const relayPos = n => n.startsWith("q:") ? qSeed[n.slice(2)] : cell[n];
+    const mainShown = code => lines.some(l => l.main && l.c.code === code);
+    LAST_LAYOUT.relays = [];
+    RELAYS.forEach(r => {
+      if(!mainShown(r.from) || !mainShown(r.to)) return;
+      const pts = r.path.map(relayPos);
+      if(pts.some(q => !q)) return;
+      const ends = r.path.filter(n => n.startsWith("pt:"));
+      if(ends.length === 2 && r.path[0].startsWith("pt:")) LAST_LAYOUT.relays.push({a:ends[0], b:ends[1], from:r.from, to:r.to});
+      else if(ends.length === 2) LAST_LAYOUT.relays.push({a:ends[0], b:ends[1], from:r.from, to:r.to});
+      const title = "<title>Relais " + esc(sigle(r.from)) + " → " + esc(sigle(r.to)) + " : " + esc(r.txt) + "</title>";
+      const A = pts[0], B = pts[pts.length - 1];
+      const arrow = (P, Q) => { const ang = Math.atan2(Q[1] - P[1], Q[0] - P[0]) * 180 / Math.PI, m = [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2];
+        return '<path class="relayarrow" d="M-6,-5 L5,0 L-6,5" transform="translate(' + m[0].toFixed(1) + "," + m[1].toFixed(1) + ") rotate(" + ang.toFixed(0) + ')"/>'; };
+      if(pts.length === 2 && Math.hypot(B[0] - A[0], B[1] - A[1]) > 900){
+        [[A, "→ " + r.path[1].slice(3), 1], [B, "← " + r.path[0].slice(3), -1]].forEach(([P, lab, dir]) => {
+          const E = [P[0], P[1] + 54];
+          relaysSvg += '<g class="relay">' + title + '<path d="M' + P[0].toFixed(1) + "," + P[1].toFixed(1) + " L" + E[0].toFixed(1) + "," + E[1].toFixed(1) + '"/>' +
+            arrow(dir > 0 ? P : E, dir > 0 ? E : P) +
+            '<text x="' + E[0].toFixed(1) + '" y="' + (E[1] + 13).toFixed(1) + '" text-anchor="middle">relais ' + esc(lab) + "</text></g>";
+        });
+      }else{
+        relaysSvg += '<g class="relay">' + title + '<path d="' + roundPath(pts, 20) + '"/>' + pts.slice(1).map((Q, i) => arrow(pts[i], Q)).join("") + "</g>";
+      }
+    });
+    // itinéraire en cours : trajet du joueur (jaune) et solution (pointillé)
+    let itiSvg = "";
+    if(ITI && ITI.a && cell[ITI.a] && cell[ITI.b]){
+      const poly = (ids, cls) => { const q = ids.map(n => cell[n]).filter(Boolean); return q.length > 1 ? '<path class="' + cls + '" d="M' + q.map(v => v[0].toFixed(1) + "," + v[1].toFixed(1)).join(" L") + '"/>' : ""; };
+      if(ITI.sol) itiSvg += poly(ITI.sol, "itisol");
+      itiSvg += poly(ITI.path, "itipath");
+      [[ITI.a, "Départ", "itistart"], [ITI.b, "Arrivée", "itiend"]].forEach(([n, lab, cls]) => {
+        const [x, y] = cell[n];
+        itiSvg += '<g class="itimark ' + cls + '"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="20"/><text x="' + x.toFixed(1) + '" y="' + (y - 26).toFixed(1) + '" text-anchor="middle">' + lab + "</text></g>";
+      });
+      ITI.path.slice(1, -1).forEach(n => { if(cell[n]){ const [x, y] = cell[n]; itiSvg += '<circle class="itistep" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="13"/>'; } });
+    }
     // embarcadères : point d'ouverture de chaque merveilleux vaisseau, relié à son cours d'eau
     let piers = "";
     Object.entries(OPENING).forEach(([code, pt]) => {
@@ -1528,15 +1598,16 @@
       '<span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="#fff" stroke="#1d1d1f" stroke-width="3"/></svg>carrefour (point d’intersection)</span>' +
       '<span><svg width="26" height="18"><line x1="13" y1="0" x2="13" y2="18" stroke="#1f5fd6" stroke-width="3"/><line x1="0" y1="9" x2="26" y2="9" stroke="#fff" stroke-width="6"/><line x1="0" y1="9" x2="26" y2="9" stroke="#e0261b" stroke-width="3"/></svg>croisement sans correspondance</span>' +
       '<span><svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#fff" fill-opacity=".4" stroke="#b8b1a0" stroke-width="1.5" stroke-dasharray="3 2"/></svg>articulation (repère)</span>' +
+      '<span><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="#7d7a70" stroke-width="2.4" stroke-dasharray="7 6" stroke-linecap="round"/></svg>relais vers le canal suivant (circulation du qì nourricier)</span>' +
       '<span>⛵\uFE0E point de transport · ☀\uFE0E yuán · ⛓\uFE0E luò · ⛏\uFE0E xì · ⚓\uFE0E embarcadère (point d’ouverture)</span>' +
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     const small = window.innerWidth < 760;
     document.body.classList.toggle("netgame-on", !!GAME && GAME.phase !== "setup");
-    main.innerHTML = '<h2>Réseau global des trajets <button type="button" class="tool gamebtn" id="netGameBtn"' + (GAME ? " hidden" : "") + '>🎲 Démêler</button></h2>' + gamePanel() + (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
+    main.innerHTML = '<h2>Réseau global des trajets <button type="button" class="tool gamebtn" id="netGameBtn"' + (GAME ? " hidden" : "") + '>🎲 Démêler</button><button type="button" class="tool gamebtn" id="netItiBtn"' + (GAME || ITI ? " hidden" : "") + '>🚇 Itinéraire</button></h2>' + gamePanel() + itiPanel() + (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Chaque canal régulier est une ligne dont les stations sont ses points ; RM et DM forment un fleuve, les merveilleux vaisseaux des rivières avec leur navette ; les zones du corps sont des quartiers (centre-ville : organes). Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer · clic : correspondances · en mode ✎ Modifier : glisser une station dans son quartier.</div>' +
       legend + (small ? "</details>" : "") + '<div class="netwrap"><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre / plan de ville">◐</button></div>' +
       '<svg class="netsvg" role="img"><defs><pattern id="streets" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><path d="M0 23 H46 M23 0 V46" stroke="#ffffff" stroke-width="1.3" opacity=".6"/><path d="M0 0 L46 46" stroke="#ffffff" stroke-width=".8" opacity=".35"/></pattern></defs>' +
-      '<g class="city">' + city + subq + qLabels + joints + "</g>" + rivers + shuttles + riverNames + svgLines + piers + stations + badges + "</svg></div>";
+      '<g class="city">' + city + subq + qLabels + joints + "</g>" + rivers + shuttles + riverNames + svgLines + relaysSvg + piers + itiSvg + stations + badges + "</svg></div>";
     const wrap = main.querySelector(".netwrap");
     try{ if(localStorage.getItem("mtc_trajets_net_dark") === "1") wrap.classList.add("dark"); }catch(e){}
     wrap.querySelector('[data-z="dark"]').addEventListener("click", () => {
@@ -1553,6 +1624,7 @@
     if(vbq && !NET_VB){ const [x, y, w, h] = vbq.split(",").map(Number); if(w && h) NET_VB = {x, y, w, h}; }
     initNetZoom(svgEl);
     bindGame();
+    bindIti();
     // mode édition : glisser une station dans un quartier (sa zone de correspondance)
     const cells = qIds.map((q, i) => ({q, poly:voronoiCell(seeds, i, 380)}));
     const inPoly = (pt, poly) => { let ins = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; };
@@ -1685,7 +1757,7 @@
   }
   function bindGame(){
     const btn = document.getElementById("netGameBtn");
-    if(btn) btn.addEventListener("click", () => { GAME = {phase:"setup", codes:randomCanals(3), level:"moyen"}; showNetwork(); });
+    if(btn) btn.addEventListener("click", () => { ITI = null; GAME = {phase:"setup", codes:randomCanals(3), level:"moyen"}; showNetwork(); });
     main.querySelectorAll(".netgame [data-gc]").forEach(b => b.addEventListener("click", () => {
       if(GAME.phase !== "setup") return;
       const c = b.dataset.gc, i = GAME.codes.indexOf(c);
@@ -1712,9 +1784,108 @@
     }));
   }
 
+  // ---- jeu de l'itinéraire : aller d'une station à une autre avec le moins de correspondances ----
+  const ITI_LEVELS = {1:"1 correspondance", 2:"2 correspondances", 3:"3 correspondances ou plus"};
+  const stLabel = p => (PLACES[p] || {label:p.slice(3)}).label;
+  // réseau des lignes affichées : une étape = un trajet sur une ligne (ou un relais)
+  function itiGraph(){
+    const L = LAST_LAYOUT, lineOf = {}, lineName = {}, at = {};
+    L.lines.forEach(l => {
+      const key = l.code + "|" + l.type + (l.interne ? "|i" : "");
+      lineName[key] = "ligne " + sigle(l.code) + (l.type === "principal" ? (l.interne ? " (branche interne)" : "") : " — " + l.name);
+      l.nodes.forEach(n => { if(n.startsWith("pt:") && L.cell[n]){ (lineOf[key] = lineOf[key] || new Set()).add(n); (at[n] = at[n] || new Set()).add(key); } });
+    });
+    const relay = {};
+    (L.relays || []).forEach(r => { if(at[r.a] && at[r.b]){ (relay[r.a] = relay[r.a] || []).push({to:r.b, name:"relais " + sigle(r.from) + " → " + sigle(r.to)}); (relay[r.b] = relay[r.b] || []).push({to:r.a, name:"relais " + sigle(r.from) + " → " + sigle(r.to)}); } });
+    return {lineOf, lineName, at, relay};
+  }
+  function itiBfs(g, start){
+    const dist = {[start]:0}, par = {}, done = new Set(), queue = [start];
+    for(let qi = 0; qi < queue.length; qi++){
+      const u = queue[qi];
+      const visit = (v, via) => { if(dist[v] === undefined){ dist[v] = dist[u] + 1; par[v] = {u, via}; queue.push(v); } };
+      [...(g.at[u] || [])].forEach(k => { if(done.has(k)) return; done.add(k); g.lineOf[k].forEach(v => visit(v, g.lineName[k])); });
+      (g.relay[u] || []).forEach(r => visit(r.to, r.name));
+    }
+    return {dist, par};
+  }
+  function itiLeg(g, x, y){
+    const k = [...(g.at[x] || [])].find(k => g.lineOf[k].has(y));
+    if(k) return g.lineName[k];
+    const r = (g.relay[x] || []).find(r => r.to === y);
+    return r ? r.name : null;
+  }
+  function itiNew(){
+    const g = itiGraph(), ids = Object.keys(g.at);
+    const want = Number(ITI.level);
+    for(let tries = 0; tries < 60 && ids.length; tries++){
+      const a = ids[Math.floor(Math.random() * ids.length)], {dist, par} = itiBfs(g, a);
+      const cands = Object.keys(dist).filter(b => want >= 3 ? dist[b] >= 4 : dist[b] === want + 1);
+      if(!cands.length) continue;
+      const b = cands[Math.floor(Math.random() * cands.length)];
+      const sol = [b]; while(sol[0] !== a) sol.unshift(par[sol[0]].u);
+      Object.assign(ITI, {phase:"play", a, b, path:[a], best:dist[b], bestPath:sol, sol:null, msg:"", t0:Date.now()});
+      return;
+    }
+    ITI.msg = "Pas d’itinéraire de ce niveau avec les lignes affichées : affiche plus de canaux ou de types.";
+  }
+  function itiClick(pid){
+    const g = itiGraph(), last = ITI.path[ITI.path.length - 1];
+    if(pid === last) return;
+    const i = ITI.path.indexOf(pid);
+    if(i >= 0){ ITI.path = ITI.path.slice(0, i + 1); ITI.msg = ""; showNetwork(); return; }   // revenir à une étape
+    const via = itiLeg(g, last, pid);
+    if(!via){ ITI.msg = "✘ Pas de ligne directe entre " + stLabel(last) + " et " + stLabel(pid) + "."; showNetwork(); return; }
+    ITI.path.push(pid);
+    ITI.msg = "";
+    if(pid === ITI.b){
+      const legs = ITI.path.length - 1;
+      ITI.phase = "done";
+      ITI.msg = legs <= ITI.best ? "🎉 Itinéraire optimal : " + (legs - 1) + " correspondance" + (legs > 2 ? "s" : "") + " !"
+        : "Arrivé avec " + (legs - 1) + " correspondances — le meilleur en demande " + (ITI.best - 1) + ".";
+    }
+    showNetwork();
+  }
+  function itiSteps(path){
+    const g = itiGraph();
+    return path.map((p, i) => i ? '<span class="itileg">' + esc(itiLeg(g, path[i - 1], p) || "?") + "</span> → <b>" + esc(stLabel(p)) + "</b>" : "<b>" + esc(stLabel(p)) + "</b>").join(" ");
+  }
+  function itiPanel(){
+    if(!ITI) return "";
+    const lv = '<select data-i="level">' + Object.entries(ITI_LEVELS).map(([k, v]) => '<option value="' + k + '"' + (String(k) === String(ITI.level) ? " selected" : "") + ">" + v + "</option>").join("") + "</select>";
+    let html = '<div class="netgame iti"><div class="grow"><b>🚇 Itinéraire</b> ';
+    if(ITI.phase === "setup" || !ITI.a){
+      html += "— va d’une station à une autre avec le moins de changements de ligne possible : clique les stations où tu changes de ligne, puis l’arrivée. Les lignes affichées comptent (types et canaux choisis en haut et à gauche), ainsi que les relais entre canaux.</div>" +
+        '<div class="grow">Niveau : ' + lv + ' <button type="button" class="tool" data-i="go">Nouveau trajet</button> <button type="button" class="linkish" data-i="quit">fermer</button>' +
+        (ITI.msg ? ' <span class="gres">' + esc(ITI.msg) + "</span>" : "") + "</div></div>";
+      return html;
+    }
+    html += "de <b>" + esc(stLabel(ITI.a)) + "</b> à <b>" + esc(stLabel(ITI.b)) + "</b> · " + esc(ITI_LEVELS[ITI.level]) + " · " + lv + "</div>" +
+      '<div class="grow itisteps">' + itiSteps(ITI.path) + (ITI.phase === "play" ? ' → <i>clique la station suivante</i>' : "") + "</div>" +
+      (ITI.sol ? '<div class="grow itisteps">Meilleur itinéraire : ' + itiSteps(ITI.sol) + "</div>" : "") +
+      '<div class="grow">' + (ITI.phase === "play" ? '<button type="button" class="tool" data-i="undo"' + (ITI.path.length > 1 ? "" : " disabled") + '>Annuler l’étape</button> <button type="button" class="tool" data-i="solve">Solution</button> ' : "") +
+      '<button type="button" class="tool" data-i="go">Nouveau trajet</button> <button type="button" class="linkish" data-i="quit">quitter</button>' +
+      (ITI.msg ? ' <span class="gres">' + esc(ITI.msg) + "</span>" : "") + "</div></div>";
+    return html;
+  }
+  function bindIti(){
+    const btn = document.getElementById("netItiBtn");
+    if(btn) btn.addEventListener("click", () => { ITI = {phase:"setup", level:"1", msg:""}; showNetwork(); });
+    const lv = main.querySelector('.netgame.iti [data-i="level"]');
+    if(lv) lv.addEventListener("change", () => { ITI.level = lv.value; });
+    main.querySelectorAll(".netgame.iti button[data-i]").forEach(b => b.addEventListener("click", () => {
+      const a = b.dataset.i;
+      if(a === "go"){ itiNew(); showNetwork(); }
+      else if(a === "quit"){ ITI = null; showNetwork(); }
+      else if(a === "undo"){ if(ITI.path.length > 1) ITI.path.pop(); ITI.msg = ""; showNetwork(); }
+      else if(a === "solve"){ ITI.sol = ITI.bestPath; ITI.phase = "done"; ITI.msg = "Meilleur : " + (ITI.best - 1) + " correspondance" + (ITI.best > 2 ? "s" : "") + "."; showNetwork(); }
+    }));
+  }
+
   let current = null;
   function show(code, sectionIndex, keepScroll){
     if(GAME) gameEnd();
+    ITI = null;
     const canal = data.find(c => c.code === code) || data[0];
     current = canal.code;
     view = "canal";
@@ -1916,7 +2087,7 @@
     if(node){
       // station du plan : seulement la mention dans le texte (le panneau cacherait la carte) ;
       // la liste complète des correspondances s'ouvre au double-clic
-      if(node.classList.contains("netstop")){ if(!GAME || GAME.phase === "setup") openCorr(corrKey(node.dataset.pid)); return; }
+      if(node.classList.contains("netstop")){ if(ITI && ITI.phase === "play") itiClick(node.dataset.pid); else if(!GAME || GAME.phase === "setup") openCorr(corrKey(node.dataset.pid)); return; }
       if(node.dataset.cp){ complementClick(node); return; }
       if(node.classList.contains("node")) highlightMention(node);
       else openCorr(node.dataset.pid);
