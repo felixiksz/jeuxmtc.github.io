@@ -119,8 +119,22 @@
   .crow .where{ flex:none; width:8.5em; font-size:.72rem; font-weight:700; color:#555; background:#f1f1f7; border-radius:6px; padding:1px 6px; line-height:1.25; }
   nav .navrow.muted button{ opacity:.38; background:#eee; text-decoration:line-through; }
   .tgroup{ display:inline-flex; gap:6px; align-items:center; padding:1px 7px; border:1px solid #d7d7e6; border-radius:999px; }
-  .netwrap{ background:#f4f1ea; }
+  .netwrap{ background:#e3e6eb; }   /* hors quartiers : gris bleuté, même luminosité que les quartiers */
   .qcell{ stroke:none; }
+  .gamebtn{ font-size:13px; margin-left:10px; vertical-align:middle; }
+  .netgame{ background:#fffbe9; border:1px solid #eadfb4; border-radius:12px; padding:8px 12px; margin:0 0 10px; font-size:13.5px; display:flex; flex-direction:column; gap:6px; }
+  .netgame .grow{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+  .netgame select{ font:inherit; padding:3px 6px; border-radius:8px; border:1px solid #ccd; }
+  .gchip{ font:inherit; font-size:12px; font-weight:800; min-width:34px; padding:3px 7px; border-radius:6px; border:2px solid var(--c); background:#fff; color:#333; cursor:pointer; }
+  span.gchip, .gchip.on{ background:var(--c); color:#fff; text-shadow:0 0 2px rgba(0,0,0,.45); }
+  .gres{ font-weight:700; margin-left:6px; }
+  .gres .g-ok{ color:#2c9a5c; } .gres .g-near{ color:#c98a10; } .gres .g-bad{ color:#d23a33; }
+  .netstop.g-ok circle{ fill:#3bb273; } .netstop.g-near circle{ fill:#f2b134; } .netstop.g-bad circle{ fill:#e0413a; }
+  .netstop.g-hint circle{ fill:#ffd84d; stroke:#b07a00; }
+  .ghint{ fill:#ffd84d; fill-opacity:.35; stroke:#b07a00; stroke-width:2.5; stroke-dasharray:5 4; pointer-events:none; animation:ghint 1.2s ease-in-out infinite alternate; }
+  @keyframes ghint{ from{ stroke-opacity:.35; } to{ stroke-opacity:1; } }
+  body.netgame-on #typeToggle, body.netgame-on #typeFilter, body.netgame-on #editToggle, body.netgame-on .netlegend .nettools{ display:none; }
+  body.netgame-on .netstop{ cursor:grab; }
   .facelabel{ font-size:34px; font-weight:800; fill:#b4ab97; letter-spacing:.2em; pointer-events:none; }
   .casing{ stroke:#ffffff; pointer-events:none; }
   .netwrap.dark .casing{ stroke:#171a22; }
@@ -163,7 +177,7 @@
     .netwrap{ height:calc(100vh - 120px) !important; }
     .netzoom button{ width:38px; height:38px; }
   }
-  .netwrap{ position:relative; border:1px solid #e6e6f3; border-radius:12px; background:#fff; height:calc(100vh - 200px); min-height:420px; overflow:hidden; }
+  .netwrap{ position:relative; border:1px solid #e6e6f3; border-radius:12px; background:#e3e6eb; height:calc(100vh - 200px); min-height:420px; overflow:hidden; }
   .netsvg{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; user-select:none; }
   .netsvg.dragging{ cursor:grabbing; }
   .netzoom{ position:absolute; right:10px; top:10px; z-index:2; display:flex; flex-direction:column; gap:4px; }
@@ -889,7 +903,7 @@
     const ptrs = new Map();
     let dragged = false, last = null, pinch = null;
     svg.addEventListener("pointerdown", e => {
-      if(editing && e.target.closest && e.target.closest(".netstop")) return;   // glisser d'une station : voir showNetwork
+      if((editing || (GAME && GAME.phase === "play")) && e.target.closest && e.target.closest(".netstop")) return;   // glisser d'une station : voir showNetwork
       ptrs.set(e.pointerId, [e.clientX, e.clientY]);
       dragged = false; last = [e.clientX, e.clientY];
       if(ptrs.size === 2){ const [p1, p2] = [...ptrs.values()]; pinch = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]); }
@@ -1032,7 +1046,11 @@
   const NET_HIDE_KEY = "mtc_trajets_net_hidden_v1";
   let NET_HIDDEN = new Set();
   try{ NET_HIDDEN = new Set(JSON.parse(localStorage.getItem(NET_HIDE_KEY) || "[]")); }catch(e){}
-  const saveHidden = () => { try{ localStorage.setItem(NET_HIDE_KEY, JSON.stringify([...NET_HIDDEN])); }catch(e){} };
+  const saveHidden = () => { if(GAME) return; try{ localStorage.setItem(NET_HIDE_KEY, JSON.stringify([...NET_HIDDEN])); }catch(e){} };
+  // jeu de démêlage : les stations de quelques lignes sont mélangées, il faut les remettre à leur place
+  // (la référence est la carte corrigée : positions calculées + stations déplacées à la main)
+  let GAME = null, LAST_LAYOUT = null;
+  const netInPoly = (pt, poly) => { let ins = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; };
   const netBasePos = pid => NET_POS[pid] ? NET_POS[pid].slice() : (NET_POS[pid.split("~")[0]] ? NET_POS[pid.split("~")[0]].slice() : null);
   const zoneQuartier = pid => ZONE_QUARTIER[pid] || ZONE_QUARTIER[pid.split("~")[0]] || null;
   const jointOf = pid => JOINT_OF[pid] || JOINT_OF[pid.split("~")[0]] || null;
@@ -1078,6 +1096,7 @@
     });
   }
   function toggleNetCanal(code){
+    if(GAME && GAME.phase !== "setup") return;
     if(NET_HIDDEN.has(code)) NET_HIDDEN.delete(code); else NET_HIDDEN.add(code);
     saveHidden(); showNetwork();
   }
@@ -1262,7 +1281,7 @@
     lines.forEach(l => l.nodes.forEach(n => { if(n.startsWith("pt:")) (canalsAt[n] = canalsAt[n] || new Set()).add(l.c.code); }));
     const stationsList = Object.keys(canalsAt).sort((a, b) => canalsAt[b].size - canalsAt[a].size);
     const isStation = n => [...(canalsAt[n] || [])].some(c => !vesselOnly(c));
-    const cell = {}, manual = edits.stationPos || {};
+    const cell = {}, manual = GAME && (GAME.phase === "play" || GAME.phase === "solved") ? GAME.pos : (edits.stationPos || {});
     const LANE_X = 20, LANE_Y = 15, MIN_GAP = 24;
     Object.entries(mainNodes).forEach(([code, segs]) => segs.forEach(seq => {
       const runs = [];
@@ -1316,6 +1335,7 @@
       });
       if(!moved) break;
     }
+    LAST_LAYOUT = {cell:JSON.parse(JSON.stringify(cell)), lines:lines.map(l => ({code:l.c.code, nodes:l.nodes.slice()}))};
     const nodePos = n => {
       if(cell[n]) return cell[n];
       if(n.startsWith("j:")) return jointPos[n.slice(2)];
@@ -1440,6 +1460,7 @@
     });
     // 5. la ville : quartiers (zones du corps), centre-ville = organes, banlieue = extrémités
     const qIds = Object.keys(qSeed), seeds = qIds.map(q => qSeed[q]);
+    LAST_LAYOUT.qcells = qIds.map((q, i) => ({q, poly:voronoiCell(seeds, i, 380)}));
     let city = "";
     qIds.forEach((q, i) => {
       const poly = voronoiCell(seeds, i, 380);
@@ -1478,17 +1499,23 @@
       if(!isStation(p)) return;
       const [x, y] = cell[p], n = [...canalsAt[p]].filter(c => !vesselOnly(c)).length, jh = !!JIAOHUI[p.slice(3)];
       const cats = POINT_CATS[p] || [];
+      const gcls = GAME && GAME.checked && GAME.checked[p] ? " g-" + GAME.checked[p] : "";
       const glyphs = [...new Set(cats.map(k => k.cat))].map(k => CAT_GLYPH[k]).join("");
       const label = (glyphs ? '<tspan class="cat">' + glyphs + " </tspan>" : "") + esc((PLACES[p] || {label:p.slice(3)}).label) +
         (cats.length ? "<title>" + esc(cats.map(k => k.name).join(", ")) + "</title>" : "");
       if(n >= 2 || (jh && (JIAOHUI[p.slice(3)].canaux || []).length >= 2)){
-        stations += '<g class="node netstop" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="' + (6 + Math.min(5, n)) + '" fill="#fff" stroke="#1d1d1f" stroke-width="3"/>' +
+        stations += '<g class="node netstop' + gcls + '" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="' + (6 + Math.min(5, n)) + '" fill="#fff" stroke="#1d1d1f" stroke-width="3"/>' +
           '<text x="' + (x + 9 + Math.min(5, n)) + '" y="' + (y - 7) + '">' + label + "</text></g>";
       }else{
-        stations += '<g class="node netstop single" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="3.6" fill="#fff" stroke="#333" stroke-width="1.6"/>' +
+        stations += '<g class="node netstop single' + gcls + '" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="3.6" fill="#fff" stroke="#333" stroke-width="1.6"/>' +
           '<text class="small" x="' + (x + 6) + '" y="' + (y - 4) + '">' + label + "</text></g>";
       }
     });
+    if(GAME && GAME.hint && GAME.ref[GAME.hint]){
+      const [hx, hy] = GAME.ref[GAME.hint];
+      stations += '<circle class="ghint" cx="' + hx.toFixed(1) + '" cy="' + hy.toFixed(1) + '" r="18"/>';
+    }
+    if(GAME) GAME.cross = gameCrossings(LAST_LAYOUT.lines.map(l => l.nodes), cell);
     const legend = '<div class="legend netlegend">' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3.4"/></svg>canal régulier (branches externes)</span>' +
       '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="1.8" opacity=".65"/></svg>branche interne</span>' +
@@ -1504,7 +1531,8 @@
       '<span>⛵\uFE0E point de transport · ☀\uFE0E yuán · ⛓\uFE0E luò · ⛏\uFE0E xì · ⚓\uFE0E embarcadère (point d’ouverture)</span>' +
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     const small = window.innerWidth < 760;
-    main.innerHTML = "<h2>Réseau global des trajets</h2>" + (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
+    document.body.classList.toggle("netgame-on", !!GAME && GAME.phase !== "setup");
+    main.innerHTML = '<h2>Réseau global des trajets <button type="button" class="tool gamebtn" id="netGameBtn"' + (GAME ? " hidden" : "") + '>🎲 Démêler</button></h2>' + gamePanel() + (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Chaque canal régulier est une ligne dont les stations sont ses points ; RM et DM forment un fleuve, les merveilleux vaisseaux des rivières avec leur navette ; les zones du corps sont des quartiers (centre-ville : organes). Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer · clic : correspondances · en mode ✎ Modifier : glisser une station dans son quartier.</div>' +
       legend + (small ? "</details>" : "") + '<div class="netwrap"><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre / plan de ville">◐</button></div>' +
       '<svg class="netsvg" role="img"><defs><pattern id="streets" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><path d="M0 23 H46 M23 0 V46" stroke="#ffffff" stroke-width="1.3" opacity=".6"/><path d="M0 0 L46 46" stroke="#ffffff" stroke-width=".8" opacity=".35"/></pattern></defs>' +
@@ -1524,12 +1552,13 @@
     const vbq = new URLSearchParams(location.search).get("vb");
     if(vbq && !NET_VB){ const [x, y, w, h] = vbq.split(",").map(Number); if(w && h) NET_VB = {x, y, w, h}; }
     initNetZoom(svgEl);
+    bindGame();
     // mode édition : glisser une station dans un quartier (sa zone de correspondance)
     const cells = qIds.map((q, i) => ({q, poly:voronoiCell(seeds, i, 380)}));
     const inPoly = (pt, poly) => { let ins = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; };
     let drag = null;
     svgEl.addEventListener("pointerdown", e => {
-      const st = editing && e.target.closest && e.target.closest(".netstop");
+      const st = (editing || (GAME && GAME.phase === "play")) && e.target.closest && e.target.closest(".netstop");
       if(!st) return;
       const m = svgEl.getScreenCTM().inverse(), pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(m);
       drag = {st, pid:st.dataset.pid, x0:pt.x, y0:pt.y, moved:false};
@@ -1548,6 +1577,11 @@
       if(!drag) return;
       const d = drag; drag = null;
       if(!d.moved || !d.pt) return;
+      if(GAME && GAME.phase === "play" && !editing){
+        GAME.pos[d.pid] = [d.pt[0], d.pt[1]]; GAME.moves++; GAME.checked = null; GAME.hint = null;
+        showNetwork();
+        return;
+      }
       const snapped = [Math.round(d.pt[0] / G) * G, Math.round(d.pt[1] / G) * G];
       const hit = cells.find(c => c.poly.length > 2 && inPoly(d.pt, c.poly));
       edits.stationPos = edits.stationPos || {}; edits.pointZone = edits.pointZone || {};
@@ -1559,8 +1593,128 @@
     try{ history.replaceState(null, "", "#reseau"); }catch(e){}
   }
 
+  // ---- jeu de démêlage ----
+  const GAME_LEVELS = {facile:"Facile — par groupes de 3 stations voisines", moyen:"Moyen — par groupes de 6 stations voisines", difficile:"Difficile — chaque ligne entière mélangée"};
+  const gameCanals = () => CANAL_ORDER.filter(code => MAIN_SEG[code] && data.some(c => c.code === code));
+  const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const randomCanals = n => shuffle(gameCanals().filter(c => c !== "RM" && c !== "DM")).slice(0, n);
+  // croisements : tronçons (entre deux stations) qui se coupent sans extrémité commune
+  function gameCrossings(seqs, P){
+    const segs = [];
+    seqs.forEach(seq => { const pts = seq.filter(n => P[n]); for(let i = 1; i < pts.length; i++) segs.push([pts[i - 1], pts[i]]); });
+    const orient = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
+    let n = 0;
+    for(let i = 0; i < segs.length; i++) for(let j = i + 1; j < segs.length; j++){
+      const [a, b] = segs[i], [c, d] = segs[j];
+      if(a === c || a === d || b === c || b === d) continue;
+      const A = P[a], B = P[b], C = P[c], D = P[d];
+      if(orient(A, B, C) * orient(A, B, D) < 0 && orient(C, D, A) * orient(C, D, B) < 0) n++;
+    }
+    return n;
+  }
+  function gameQuartier(pt){ const c = GAME.qcells.find(q => q.poly.length > 2 && netInPoly(pt, q.poly)); return c ? c.q : null; }
+  function gameCheck(){
+    const res = {};
+    Object.keys(GAME.ref).forEach(p => {
+      const A = GAME.pos[p], B = GAME.ref[p];
+      if(!A){ res[p] = "ok"; return; }
+      res[p] = Math.hypot(A[0] - B[0], A[1] - B[1]) <= 40 ? "ok" : gameQuartier(A) === gameQuartier(B) ? "near" : "bad";
+    });
+    return res;
+  }
+  function gamePanel(){
+    if(!GAME || GAME.phase === "ref") return "";
+    const chip = code => '<button type="button" class="gchip' + (GAME.codes.includes(code) ? " on" : "") + '" data-gc="' + code + '" style="--c:' + netColor(code) + '">' + esc(sigle(code)) + "</button>";
+    if(GAME.phase === "setup"){
+      return '<div class="netgame"><div class="grow"><b>🎲 Démêlage</b> — les stations des lignes choisies sont mélangées : glisse-les jusqu’à leur place sur la carte corrigée (bon quartier, bonne face, bon ordre).</div>' +
+        '<div class="grow">Lignes : ' + gameCanals().map(chip).join("") + ' <button type="button" class="linkish" data-g="rand">au hasard (3)</button></div>' +
+        '<div class="grow">Niveau : <select data-g="level">' + Object.entries(GAME_LEVELS).map(([k, v]) => '<option value="' + k + '"' + (k === GAME.level ? " selected" : "") + ">" + v + "</option>").join("") + "</select> " +
+        '<button type="button" class="tool" data-g="start"' + (GAME.codes.length ? "" : " disabled") + '>Mélanger</button> <button type="button" class="linkish" data-g="quit">fermer</button></div></div>';
+    }
+    const n = Object.keys(GAME.ref).length;
+    let res = "";
+    if(GAME.phase === "solved") res = "Solution affichée : voici la carte corrigée pour ces lignes.";
+    else if(GAME.checked && !GAME.hint){
+      const v = Object.values(GAME.checked), ok = v.filter(x => x === "ok").length, near = v.filter(x => x === "near").length, bad = v.length - ok - near;
+      const score = Math.round((ok * 2 + near) / (2 * n) * 100);
+      res = ok === n ? "🎉 Démêlé ! " + GAME.moves + " déplacements, " + Math.round((Date.now() - GAME.t0) / 1000) + " s."
+        : '<span class="g-ok">● ' + ok + " bien placées</span> · " + '<span class="g-near">● ' + near + " bon quartier</span> · " + '<span class="g-bad">● ' + bad + " à déplacer</span> · score " + score + " %";
+    }
+    else if(GAME.hint) res = "Indice : la station en jaune va dans le cercle pointillé.";
+    return '<div class="netgame"><div class="grow"><b>🎲 Démêlage</b> ' + GAME.codes.map(code => '<span class="gchip on" style="--c:' + netColor(code) + '">' + esc(sigle(code)) + "</span>").join("") +
+      " · " + esc(GAME_LEVELS[GAME.level].split(" — ")[0]) + " · " + n + " stations · déplacements : " + GAME.moves +
+      " · croisements : <b>" + (GAME.cross == null ? "…" : GAME.cross) + "</b> (carte corrigée : " + GAME.refCross + ")</div>" +
+      '<div class="grow">' + (GAME.phase === "play" ? '<button type="button" class="tool" data-g="check">Vérifier</button> <button type="button" class="tool" data-g="hint">Indice</button> <button type="button" class="tool" data-g="solve">Solution</button> ' : "") +
+      '<button type="button" class="tool" data-g="again">Rejouer</button> <button type="button" class="tool" data-g="setup">Autres lignes</button> <button type="button" class="linkish" data-g="quit">quitter</button>' +
+      (res ? ' <span class="gres">' + res + "</span>" : "") + "</div></div>";
+  }
+  function gameStart(){
+    if(!GAME.saved) GAME.saved = {hidden:new Set(NET_HIDDEN), types:Object.assign({}, TYPES_ON)};
+    // référence : la carte corrigée entière, lignes externes seulement
+    Object.keys(TYPES_ON).forEach(k => { TYPES_ON[k] = k === "externe"; });
+    NET_HIDDEN = new Set();
+    GAME.phase = "ref"; GAME.checked = null; GAME.hint = null;
+    showNetwork();
+    const L = LAST_LAYOUT;
+    const seqs = L.lines.filter(l => GAME.codes.includes(l.code)).map(l => l.nodes.filter(n => n.startsWith("pt:") && L.cell[n]));
+    GAME.ref = {}; GAME.qcells = L.qcells;
+    seqs.forEach(seq => seq.forEach(p => { GAME.ref[p] = L.cell[p].slice(); }));
+    GAME.refCross = gameCrossings(seqs, GAME.ref);
+    // mélange : chaque station prend la place d'une autre station de sa ligne (voisines ou ligne entière)
+    const owner = {}, groups = [];
+    seqs.forEach(seq => {
+      const own = seq.filter(p => !owner[p]); own.forEach(p => { owner[p] = true; });
+      const k = {facile:3, moyen:6}[GAME.level] || own.length;
+      for(let i = 0; i < own.length; i += k) groups.push(own.slice(i, i + k));
+    });
+    const all = groups;
+    GAME.pos = {};
+    all.forEach(g => {
+      let best = null;
+      for(let k = 0; k < 12; k++){ const s = shuffle(g.slice()), fixed = s.filter((p, i) => p === g[i]).length; if(!best || fixed < best[0]) best = [fixed, s]; if(!fixed) break; }
+      g.forEach((p, i) => { const R = GAME.ref[best[1][i]]; GAME.pos[p] = [R[0] + (Math.random() - 0.5) * 40, R[1] + (Math.random() - 0.5) * 40]; });
+    });
+    NET_HIDDEN = new Set(data.map(c => c.code).filter(code => !GAME.codes.includes(code)));
+    GAME.phase = "play"; GAME.moves = 0; GAME.t0 = Date.now();
+    showNetwork();
+  }
+  function gameEnd(){
+    if(GAME && GAME.saved){ NET_HIDDEN = GAME.saved.hidden; Object.assign(TYPES_ON, GAME.saved.types); }
+    GAME = null;
+    document.body.classList.remove("netgame-on");
+  }
+  function bindGame(){
+    const btn = document.getElementById("netGameBtn");
+    if(btn) btn.addEventListener("click", () => { GAME = {phase:"setup", codes:randomCanals(3), level:"moyen"}; showNetwork(); });
+    main.querySelectorAll(".netgame [data-gc]").forEach(b => b.addEventListener("click", () => {
+      if(GAME.phase !== "setup") return;
+      const c = b.dataset.gc, i = GAME.codes.indexOf(c);
+      if(i >= 0) GAME.codes.splice(i, 1); else GAME.codes.push(c);
+      showNetwork();
+    }));
+    const lv = main.querySelector('.netgame [data-g="level"]');
+    if(lv) lv.addEventListener("change", () => { GAME.level = lv.value; });
+    main.querySelectorAll(".netgame button[data-g]").forEach(b => b.addEventListener("click", () => {
+      const a = b.dataset.g;
+      if(a === "rand"){ GAME.codes = randomCanals(3); showNetwork(); }
+      else if(a === "start" || a === "again") gameStart();
+      else if(a === "setup"){ const keep = GAME.saved; if(keep){ NET_HIDDEN = keep.hidden; Object.assign(TYPES_ON, keep.types); } GAME = {phase:"setup", codes:GAME.codes, level:GAME.level}; showNetwork(); }
+      else if(a === "quit"){ gameEnd(); showNetwork(); }
+      else if(a === "check"){ GAME.checked = gameCheck(); GAME.hint = null; showNetwork(); }
+      else if(a === "hint"){
+        const res = gameCheck(), wrong = Object.keys(res).filter(p => res[p] !== "ok");
+        if(!wrong.length){ GAME.checked = res; showNetwork(); return; }
+        wrong.sort((x, y) => Math.hypot(GAME.pos[y][0] - GAME.ref[y][0], GAME.pos[y][1] - GAME.ref[y][1]) - Math.hypot(GAME.pos[x][0] - GAME.ref[x][0], GAME.pos[x][1] - GAME.ref[x][1]));
+        GAME.hint = wrong[0]; GAME.checked = {[wrong[0]]:"hint"};
+        showNetwork();
+      }
+      else if(a === "solve"){ GAME.pos = JSON.parse(JSON.stringify(GAME.ref)); GAME.phase = "solved"; GAME.checked = null; GAME.hint = null; showNetwork(); }
+    }));
+  }
+
   let current = null;
   function show(code, sectionIndex, keepScroll){
+    if(GAME) gameEnd();
     const canal = data.find(c => c.code === code) || data[0];
     current = canal.code;
     view = "canal";
@@ -1762,7 +1916,7 @@
     if(node){
       // station du plan : seulement la mention dans le texte (le panneau cacherait la carte) ;
       // la liste complète des correspondances s'ouvre au double-clic
-      if(node.classList.contains("netstop")){ openCorr(corrKey(node.dataset.pid)); return; }
+      if(node.classList.contains("netstop")){ if(!GAME || GAME.phase === "setup") openCorr(corrKey(node.dataset.pid)); return; }
       if(node.dataset.cp){ complementClick(node); return; }
       if(node.classList.contains("node")) highlightMention(node);
       else openCorr(node.dataset.pid);

@@ -483,6 +483,8 @@
 
     document.body.classList.add("panel-open");
     bindEditors(herb);
+    // mode admin : bouton « Corriger la fiche » (66-fiche-admin-edit.js)
+    if(window.mtcFicheAdminDecorate && herb && herb.id && getHerbById(herb.id)) window.mtcFicheAdminDecorate("pharma", herb.id, content, () => openPharmaHerbPanel(herb.id));
     if(window.updatePharmaBasketButtons) window.updatePharmaBasketButtons(herb.id);
   }
 
