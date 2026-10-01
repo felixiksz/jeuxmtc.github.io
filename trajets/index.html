@@ -287,11 +287,13 @@
     return r;
   }
   async function loadTrajetsData(){
-    if(await loadScript("trajets-data.js")){
-      await loadScript("trajets-places-rx.js");
-      await loadScript("trajets-complements.js");
-      await loadScript("trajets-jiaohui.js");
-      await loadScript("trajets-point-zones.js");
+    // ?v= : un fichier de données modifié ne doit pas rester servi par le cache du navigateur
+    const V = "?v=20261001-zones";
+    if(await loadScript("trajets-data.js" + V)){
+      await loadScript("trajets-places-rx.js" + V);
+      await loadScript("trajets-complements.js" + V);
+      await loadScript("trajets-jiaohui.js" + V);
+      await loadScript("trajets-point-zones.js" + V);
       return;
     }
     const c = syncCfg();
@@ -1105,15 +1107,17 @@
   // quartier « ~p » = copie sur la face postérieure (bras yáng, jambe postérieure)
   // le pied (dos, plante, métatarse, orteils) n'existe qu'une fois, sur la face antérieure : V y rejoint les autres
   // canaux de la jambe (V 67 au bout du 5e orteil, à côté de VB 44 et E 45) ; seuls la cuisse, le genou, la jambe,
-  // les malléoles et le talon ont une copie sur la face postérieure
+  // les malléoles et le talon ont une copie sur la face postérieure, où ne vont que les points de face postérieure
+  // (fiche du point) ; sans face connue (passages des textes), la jambe de V y va
   const FOOT_ZONES = new Set(["pied", "dos-pied", "plante", "tarse", "naviculaire", "metatarse", "hallux", "orteils", "petit-orteil"]);
   const legBack = z => LEG_ZONES.has(z) && !FOOT_ZONES.has(z);
-  const sideOf = (z, code) => ARM_ZONES.has(z) ? (YANG_ARM.has(code) ? "p" : "a") : legBack(z) ? (code === "V" ? "p" : "a") : BACK_ZONES.has(z) ? "p" : "a";
-  const viewPos = (z, code) => {
+  const backLeg = (z, code, face) => legBack(z) && (face ? face === "postérieur" : code === "V");
+  const sideOf = (z, code, face) => ARM_ZONES.has(z) ? (YANG_ARM.has(code) ? "p" : "a") : legBack(z) ? (backLeg(z, code, face) ? "p" : "a") : BACK_ZONES.has(z) ? "p" : "a";
+  const viewPos = (z, code, face) => {
     const b = NET_POS[z] || NET_POS[{narine:"nez", rotule:"genou", cheville:"malleole", pied:"dos-pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux"}[z]];
     if(!b) return null;
     if(ARM_ZONES.has(z)) return YANG_ARM.has(code) ? [ARM_MIRROR - b[0], b[1]] : b.slice();
-    if(legBack(z)) return code === "V" ? [b[0] + BACK_LEG_SHIFT, b[1]] : b.slice();
+    if(legBack(z)) return backLeg(z, code, face) ? [b[0] + BACK_LEG_SHIFT, b[1]] : b.slice();
     if(BACK_ZONES.has(z)) return [b[0] + BACK_SHIFT, b[1]];
     // tête (face antérieure) : zones écartées autour de l'axe du visage, pour aérer les nombreux points
     if(b[1] < 250) return [600 + (b[0] - 600) * HEAD_SPREAD_X, b[1] * HEAD_SPREAD_Y - (HEAD_SPREAD_Y - 1) * 250];
@@ -1321,9 +1325,9 @@
     Object.entries(mainNodes).forEach(([code, segs]) => segs.forEach(seq => {
       const runs = [];
       seq.forEach(p => {
-        const z = zoneOfPt(p), A = viewPos(z, code);
-        if(!A) return;
         const d = POINT_ZONE_DATA[p.slice(3)] || {};
+        const z = zoneOfPt(p), A = viewPos(z, code, d.face);
+        if(!A) return;
         const arm = ARM_ZONES.has(z), off = FACE_OFF[d.face] || 0;
         const Aa = arm ? [A[0], A[1] + off] : (A[1] > 640 ? [A[0] + off * 0.6, A[1]] : A);
         const lane = LANE[code] || 0;
@@ -1353,7 +1357,7 @@
     const homeQ = p => {
       const z = zoneOfPt(p), q = z && ZONE_QUARTIER[z];
       if(!q) return null;
-      return sideOf(z, p.slice(3).split(" ")[0]) === "p" && qSeed[q + "~p"] ? q + "~p" : (qSeed[q] ? q : null);
+      return sideOf(z, p.slice(3).split(" ")[0], (POINT_ZONE_DATA[p.slice(3)] || {}).face) === "p" && qSeed[q + "~p"] ? q + "~p" : (qSeed[q] ? q : null);
     };
     const keepHome = () => Object.keys(cell).forEach(p => {
       if(manual[p] || !p.startsWith("pt:")) return;
