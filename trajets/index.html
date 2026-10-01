@@ -1103,12 +1103,17 @@
   const YANG_ARM = new Set(["GI", "IG", "TF"]);
   const BACK_SHIFT = 110, BACK_LEG_SHIFT = 230, ARM_MIRROR = 1392;
   // quartier « ~p » = copie sur la face postérieure (bras yáng, jambe postérieure)
-  const sideOf = (z, code) => ARM_ZONES.has(z) ? (YANG_ARM.has(code) ? "p" : "a") : LEG_ZONES.has(z) ? (code === "V" ? "p" : "a") : BACK_ZONES.has(z) ? "p" : "a";
+  // le pied (dos, plante, métatarse, orteils) n'existe qu'une fois, sur la face antérieure : V y rejoint les autres
+  // canaux de la jambe (V 67 au bout du 5e orteil, à côté de VB 44 et E 45) ; seuls la cuisse, le genou, la jambe,
+  // les malléoles et le talon ont une copie sur la face postérieure
+  const FOOT_ZONES = new Set(["pied", "dos-pied", "plante", "tarse", "naviculaire", "metatarse", "hallux", "orteils", "petit-orteil"]);
+  const legBack = z => LEG_ZONES.has(z) && !FOOT_ZONES.has(z);
+  const sideOf = (z, code) => ARM_ZONES.has(z) ? (YANG_ARM.has(code) ? "p" : "a") : legBack(z) ? (code === "V" ? "p" : "a") : BACK_ZONES.has(z) ? "p" : "a";
   const viewPos = (z, code) => {
     const b = NET_POS[z] || NET_POS[{narine:"nez", rotule:"genou", cheville:"malleole", pied:"dos-pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux"}[z]];
     if(!b) return null;
     if(ARM_ZONES.has(z)) return YANG_ARM.has(code) ? [ARM_MIRROR - b[0], b[1]] : b.slice();
-    if(LEG_ZONES.has(z)) return code === "V" ? [b[0] + BACK_LEG_SHIFT, b[1]] : b.slice();
+    if(legBack(z)) return code === "V" ? [b[0] + BACK_LEG_SHIFT, b[1]] : b.slice();
     if(BACK_ZONES.has(z)) return [b[0] + BACK_SHIFT, b[1]];
     // tête (face antérieure) : zones écartées autour de l'axe du visage, pour aérer les nombreux points
     if(b[1] < 250) return [600 + (b[0] - 600) * HEAD_SPREAD_X, b[1] * HEAD_SPREAD_Y - (HEAD_SPREAD_Y - 1) * 250];
@@ -1230,7 +1235,7 @@
       if(!NET_POS[z]) return;
       const add = (qid, v) => { (qSeed[qid] = qSeed[qid] || []).push([netX(v[0], v[1]), netY(v[1])]); };
       if(ARM_ZONES.has(z)){ add(q, viewPos(z, "P")); add(q + "~p", viewPos(z, "GI")); }
-      else if(LEG_ZONES.has(z)){ add(q, viewPos(z, "E")); add(q + "~p", viewPos(z, "V")); }
+      else if(legBack(z)){ add(q, viewPos(z, "E")); add(q + "~p", viewPos(z, "V")); }
       else add(q, viewPos(z, ""));
     });
     Object.keys(qSeed).forEach(q => { const l = qSeed[q]; qSeed[q] = [l.reduce((s, p) => s + p[0], 0) / l.length, l.reduce((s, p) => s + p[1], 0) / l.length]; });
@@ -1239,7 +1244,7 @@
       if(!NET_POS[j]) return;
       const put = (id, v) => { jointPos[id] = [Math.round(netX(v[0]) / G) * G, Math.round(netY(v[1]) / G) * G]; };
       if(ARM_ZONES.has(j)){ put(j, viewPos(j, "P")); put(j + "~p", viewPos(j, "GI")); }
-      else if(LEG_ZONES.has(j)){ put(j, viewPos(j, "E")); put(j + "~p", viewPos(j, "V")); }
+      else if(legBack(j)){ put(j, viewPos(j, "E")); put(j + "~p", viewPos(j, "V")); }
       else put(j, viewPos(j, ""));
     });
     // 2. lignes
@@ -1341,6 +1346,23 @@
     }));
     // points sans ligne externe affichée (ex. seulement cités par un luo) : position anatomique
     stationsList.forEach(pt => { if(!cell[pt] && pos[pt]) cell[pt] = manual[pt] ? manual[pt].slice() : [netX(pos[pt][0]), netY(pos[pt][1])]; });
+    // chaque station reste dans le quartier de sa zone (fiche du point) : le couloir de sa ligne ou le passage
+    // d'une face à l'autre ne doit pas la pousser chez le voisin (ex. V 67 dans « Talon » au lieu d'« Orteils »)
+    const qSeedIds = Object.keys(qSeed);
+    const nearestQ = v => { let best = null, bd = Infinity; qSeedIds.forEach(q => { const s = qSeed[q], d = (s[0] - v[0]) ** 2 + (s[1] - v[1]) ** 2; if(d < bd){ bd = d; best = q; } }); return best; };
+    const homeQ = p => {
+      const z = zoneOfPt(p), q = z && ZONE_QUARTIER[z];
+      if(!q) return null;
+      return sideOf(z, p.slice(3).split(" ")[0]) === "p" && qSeed[q + "~p"] ? q + "~p" : (qSeed[q] ? q : null);
+    };
+    const keepHome = () => Object.keys(cell).forEach(p => {
+      if(manual[p] || !p.startsWith("pt:")) return;
+      const q = homeQ(p);
+      if(!q) return;
+      const v = cell[p], s = qSeed[q];
+      for(let k = 0; k < 16 && nearestQ(v) !== q; k++){ v[0] += (s[0] - v[0]) * 0.2; v[1] += (s[1] - v[1]) * 0.2; }
+    });
+    keepHome();
     // écartement : deux stations différentes ne se superposent jamais (sauf position posée à la main)
     const ids = Object.keys(cell);
     for(let it = 0; it < 60; it++){
@@ -1365,6 +1387,7 @@
       });
       if(!moved) break;
     }
+    keepHome();
     LAST_LAYOUT = {cell:JSON.parse(JSON.stringify(cell)), lines:lines.map(l => ({code:l.c.code, type:l.s.type, interne:!!l.interne, name:sectionName(l.c, l.s) + (l.interne ? " (branche interne)" : ""), nodes:l.nodes.slice()}))};
     const nodePos = n => {
       if(cell[n]) return cell[n];
