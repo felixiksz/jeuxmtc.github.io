@@ -13,7 +13,7 @@ window.MTC_BETA = {
   giscus: {
     repo: "felixiksz/jeuxmtc.github.io",
     repoId: "R_kgDOS3f7kg",
-    category: "Corrections bêta",
-    categoryId: ""
+    category: "Announcements",
+    categoryId: "DIC_kwDOS3f7ks4DG4r7"
   }
 };
