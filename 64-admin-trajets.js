@@ -23,7 +23,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.id = "mtcAdminTrajets";
-    button.textContent = "Trajets β";
+    button.innerHTML = 'Trajets<sup class="mtc-beta-sup">bêta</sup>';
     button.title = admin ? "Trajets des canaux (admin)" : "Trajets des canaux (bêta)";
     button.addEventListener("click", () => { window.location.href = "trajets/index.html" + q; });
     bar.appendChild(button);
@@ -31,10 +31,25 @@
     const formulas = document.createElement("button");
     formulas.type = "button";
     formulas.id = "mtcAdminFormules";
-    formulas.textContent = "Formules β";
+    formulas.innerHTML = 'Formules<sup class="mtc-beta-sup">bêta</sup>';
     formulas.title = admin ? "Formules de l'Outil diagnostique (admin)" : "Formules (bêta)";
     formulas.addEventListener("click", () => { window.location.href = "formules/index.html" + q; });
     bar.appendChild(formulas);
+    // côté ACU : Trajets ; côté Pharma : Formules
+    const syncDomain = () => {
+      const pharma = document.documentElement.getAttribute("data-study-domain") === "pharmacology";
+      button.hidden = pharma;
+      formulas.hidden = !pharma;
+    };
+    syncDomain();
+    new MutationObserver(syncDomain).observe(document.documentElement, {attributes:true, attributeFilter:["data-study-domain"]});
+    if(!document.getElementById("mtcBetaSupStyle")){
+      const st = document.createElement("style");
+      st.id = "mtcBetaSupStyle";
+      st.textContent = ".mtc-beta-sup{ font-size:.62em; text-transform:none; letter-spacing:0; margin-left:2px; color:#ff3b8d; font-weight:800; vertical-align:super; line-height:0; }" +
+        "#mtcAdminTrajets[hidden], #mtcAdminFormules[hidden]{ display:none !important; }";
+      document.head.appendChild(st);
+    }
     if(!admin) return;
     // lien pour revenir au mode public (sous les réglages d'affichage)
     const presets = document.querySelector("#settingsPanel .settings-presets");
