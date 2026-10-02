@@ -253,10 +253,10 @@
   <div id="corrBody"></div>
 </aside>
 <div id="tip" role="tooltip"></div>
-<script src="../beta-config.js?v=20261002-beta"></script>
-<script src="../beta-gate.js?v=20261002-beta"></script>
-<script src="../beta-tour.js?v=20261002-beta"></script>
-<script src="../beta-modules.js?v=20261002-beta"></script>
+<script src="../beta-config.js?v=20261002-beta2"></script>
+<script src="../beta-gate.js?v=20261002-beta2"></script>
+<script src="../beta-tour.js?v=20261002-beta2"></script>
+<script src="../beta-modules.js?v=20261002-beta2"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -1930,7 +1930,10 @@
       canal.sections.map((s, si) => {
         if(!typeShown(s)) return "";
         const key = canal.code + "-" + si;
-        return '<section id="sec-' + si + '"><h3>' + esc(s.label) + "</h3>" +
+        // vérification publique du trajet (réaction 👍 sur son fil de corrections, voir beta-modules.js)
+        const vterm = "Trajets — " + canal.code + " — " + s.label;
+        return '<section id="sec-' + si + '"><h3>' + esc(s.label) +
+          '<button type="button" class="verifybtn" data-verify="' + esc(vterm) + '" data-label="' + esc(canal.code + " — " + s.label) + '" title="Vérifier ce trajet (vérification publique)">✅ <span>Vérifier</span></button></h3>' +
           '<div class="cols"><div class="desc">' +
             s.paragraphs.map((p, pi) => {
               const k = canal.code + "|" + si + "|" + pi, bullet = /^- /.test(p);
