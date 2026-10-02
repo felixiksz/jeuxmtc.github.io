@@ -8,7 +8,10 @@
 (function(){
   "use strict";
 
+  // les deux modes existants (labo photo, nuit) en tête, avec leur aperçu ; puis les paires de couleurs
   const THEMES = [
+    ["Mode labo photo", "", "#000000", "#FF3B1F", "applyDarkroomMode"],
+    ["Mode nuit", "", "#271629", "#FCFCFA", "applyNightInvertMode"],
     ["Tasman", "Blue Gem", "#CFDDCD", "#5616AF"],
     ["Fern Frond", "Confetti", "#576B1B", "#EBD957"],
     ["Wistful", "Blue Gem", "#A7AFD3", "#2F0899"],
@@ -27,9 +30,12 @@
   ];
 
   const get = k => { try{ return (localStorage.getItem(k) || "").toLowerCase(); }catch(error){ return ""; } };
-  const isActive = t => get("mtc_pageBg") === t[2].toLowerCase() && get("mtc_text") === t[3].toLowerCase();
+  const isActive = t => t[4] === "applyDarkroomMode" ? document.body.classList.contains("darkroom")
+    : !document.body.classList.contains("darkroom") && get("mtc_pageBg") === t[2].toLowerCase() && get("mtc_text") === t[3].toLowerCase();
+  const nameOf = t => t[1] ? t[0] + " & " + t[1] : t[0];
 
   function apply(t){
+    if(t[4] && typeof window[t[4]] === "function"){ window[t[4]](); refresh(); return; }
     document.body.classList.remove("darkroom", "night-invert");
     try{ localStorage.removeItem("mtc_darkroom"); localStorage.removeItem("mtc_night_invert"); }catch(error){}
     if(typeof window.applyPreset === "function") window.applyPreset(t[2], t[3], t[3]);
@@ -55,7 +61,7 @@
     style.textContent = `
 #mtcColorThemes{ margin-top:10px; }
 #mtcColorThemes .mtc-themes-title{ font-size:11px; font-weight:700; opacity:.75; margin:0 0 5px; }
-#mtcColorThemes .mtc-themes-grid{ display:grid; grid-template-columns:repeat(5, 1fr); gap:5px; }
+#mtcColorThemes .mtc-themes-grid{ display:grid; grid-template-columns:repeat(6, 1fr); gap:5px; }
 #mtcColorThemes button{ all:unset; box-sizing:border-box; cursor:pointer; border-radius:7px; height:34px; display:flex; align-items:center; justify-content:center;
   font-weight:800; font-size:15px; letter-spacing:-.02em; box-shadow:0 1px 3px rgba(0,0,0,.18); outline:2px solid transparent; outline-offset:2px; transition:transform .12s; }
 #mtcColorThemes button:hover{ transform:translateY(-1px); }
@@ -72,8 +78,10 @@
     const box = document.createElement("div");
     box.id = "mtcColorThemes";
     box.innerHTML = '<p class="mtc-themes-title">Thèmes</p><div class="mtc-themes-grid">' +
-      THEMES.map((t, i) => '<button type="button" data-theme="' + i + '" style="background:' + t[2] + ";color:" + t[3] + '" title="' + t[0] + " &amp; " + t[1] + '" aria-label="Thème ' + t[0] + " et " + t[1] + '">Aa</button>').join("") + "</div>";
+      THEMES.map((t, i) => '<button type="button" data-theme="' + i + '" style="background:' + t[2] + ";color:" + t[3] + '" title="' + nameOf(t).replace(/&/g, "&amp;") + '" aria-label="Thème ' + nameOf(t).replace(/&/g, "et") + '">Aa</button>').join("") + "</div>";
     const presets = panel.querySelector(".settings-presets");
+    // les boutons texte « Mode labo photo » et « Mode nuit » sont remplacés par leurs aperçus
+    panel.querySelectorAll('.settings-presets button[onclick*="applyDarkroomMode"], .settings-presets button[onclick*="applyNightInvertMode"]').forEach(b => { b.style.display = "none"; });
     if(presets) presets.insertAdjacentElement("afterend", box); else panel.appendChild(box);
     box.addEventListener("click", e => {
       const b = e.target.closest("button[data-theme]");
