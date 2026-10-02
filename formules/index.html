@@ -74,6 +74,21 @@
   .mini{ margin-top:8px; font-size:.85rem; background:#fafaff; border:1px solid #eee; border-radius:10px; padding:8px 10px; }
   .mini b{ font-weight:800; }
   .hint{ margin-top:10px; font-size:.88rem; }
+  /* cas clinique */
+  .chat{ border:1px solid #e4e4f0; border-radius:14px; padding:12px 14px; min-height:220px; max-height:52vh; overflow-y:auto; background:#fcfcff; cursor:pointer; }
+  .line{ margin:0 0 9px; font-size:.95rem; line-height:1.55; }
+  .line .who{ display:block; font-family:"Tomorrow", "Archivo", sans-serif; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .line.patient .txt2{ font-family:"Libre Baskerville", Georgia, serif; }
+  .line.vous{ text-align:right; color:var(--accent); font-weight:700; }
+  .line.exam .txt2{ font-family:"Tomorrow", "Archivo", sans-serif; background:#f1f6ff; border-radius:8px; padding:3px 8px; display:inline-block; }
+  .line.narr{ color:var(--muted); font-style:italic; }
+  .caret{ display:inline-block; width:.5em; border-bottom:2px solid currentColor; animation:blink 1s steps(1) infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .asks{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+  .asks .tool{ font-size:.86rem; }
+  .decide{ margin-top:12px; border-top:1px dashed #ddd; padding-top:10px; }
+  .decide .choices{ grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); }
+  .reveal{ margin-top:12px; font-size:.9rem; }
 </style>
 </head>
 <body>
@@ -85,6 +100,7 @@
     <span class="srcinfo" id="srcinfo"></span>
     <button type="button" class="tool on" id="tabBrowse">Formules</button>
     <button type="button" class="tool" id="tabGame">🎲 Substance manquante</button>
+    <button type="button" class="tool" id="tabCase">🩺 Cas clinique</button>
   </div>
 </header>
 <main id="main"><p class="msg">Chargement des formules…</p></main>
@@ -327,19 +343,241 @@
     if(!GAME.q.answered && GAME.mode === "qcm" && /^[1-4]$/.test(e.key)){ const c = GAME.q.choices[+e.key - 1]; if(c) answer(c === GAME.q.ans, c); }
   });
 
+  // ---- jeu : cas clinique ----
+  // Le tableau clinique de la formule devient une consultation : le patient raconte ses symptômes (à la vitesse
+  // de la parole), le praticien regarde la langue, prend le pouls, observe, palpe… puis conseille une formule
+  // parmi trois. Notes, indications modernes et remarques de commentateurs sont écartées.
+  // en-têtes et phrases qui ne décrivent pas le patient : notes, commentateurs, mécanismes, recherches, usages
+  const SKIP_LABEL = /^(note|indications modernes|distinction|peut aussi|également|egalement|une note)|mécanisme|recherche|pharmacolog|selon|d['’]après (?!les notes)|utilisable|utilisée|tradition|étapes/i;
+  const PULSE_WORDS = new Set(("flottant flottants profond rapide lent vide plein fin ténu faible fort grand vaste glissant rugueux tendu serré modéré mou large court long noué " +
+    "interrompu irrégulier en corde sans avec force et ou mais à la le gauche droite droit pression profonde éventuellement toujours parfois possiblement combiné sur point de " +
+    "disparaître s'interrompre superficielle légère légèrement puissant surgissant très un peu plutôt").split(" "));
+  const isPulseFrag = s => { const w = s.replace(/\([^)]*\)/g, " ").toLowerCase().split(/[\s/]+/).filter(Boolean); return w.length > 0 && w.every(x => PULSE_WORDS.has(x)); };
+  const ADJ_CONT = /^(abondantes?|abondants?|claires?|clairs?|foncées?|épaisses?|persistantes?)(\s|$)/i;
+  function sentences(p){
+    const out = []; let d = 0, cur = "";
+    for(let i = 0; i < p.length; i++){
+      const ch = p[i]; cur += ch;
+      if(ch === "(" || ch === "«") d++; else if(ch === ")" || ch === "»") d = Math.max(0, d - 1);
+      if(ch === "." && d === 0 && (i === p.length - 1 || /\s/.test(p[i + 1])) && !/\betc$/.test(cur.slice(-4, -1))){ out.push(cur.trim()); cur = ""; }
+    }
+    if(cur.trim()) out.push(cur.trim());
+    return out;
+  }
+  function splitItems(body){
+    const items = [];
+    splitTop(body.replace(/\.$/, ""), /[,;—]/).forEach(raw => {
+      let it = raw.replace(/\.$/, "").trim();
+      if(it.includes(":")) it = it.slice(it.lastIndexOf(":") + 1).trim();     // « auxquels s'ajoutent… : X »
+      if(!it || /^(idem|etc\.?)$/i.test(it) || /^syndrome\b/i.test(it) || /précisés? comme/i.test(it)) return;
+      const prev = items.length ? items[items.length - 1] : "";
+      const prevIsPulse = /^pouls/i.test(prev), prevIsTongue = isLangue(prev);
+      if(prev && (prevIsPulse && isPulseFrag(it.replace(/^(ou|et|mais)\s+/i, "")) || prevIsTongue && /^ou\s/i.test(it) || /^(aux?|à la|à l['’])\s/i.test(it) || ADJ_CONT.test(it))) items[items.length - 1] += ", " + it;
+      else items.push(it.replace(/^(ou|et)\s+/i, ""));
+    });
+    return items;
+  }
+  function clinicalGroups(f){
+    const text = String(f.tableau_clinique || "").replace(/\[[^\]]*\]/g, "").replace(/\r/g, "");
+    const groups = [];
+    let last = null;
+    text.split(/\n\s*\n/).forEach(par => {
+      let p = par.trim();
+      if(!p) return;
+      const lines = p.split("\n").map(s => s.trim()).filter(Boolean);
+      if(lines.length > 2 && lines.filter(l => /[,;]/.test(l)).length <= 1) p = lines.join(", ");   // liste à la ligne
+      p = p.replace(/\s*\n\s*/g, " ");
+      sentences(p).forEach(s => {
+        const m = /^([^:()«]{0,150}(?:\([^)]*\))?[^:()«]{0,40}?)\s*:\s*(.+)$/.exec(s);
+        let label = m ? m[1].trim() : "", body = m ? m[2] : s;
+        if(/^mêmes symptômes/i.test(body)) return;
+        const app = /application|symptômes clés|plus détaillée|liste étendue/i.test(label) || /^idem/i.test(body);
+        if(label && !app && SKIP_LABEL.test(label)) return;
+        if(!label && !app && groups.length) return;            // phrase de commentaire après le tableau
+        body = body.replace(/^idem,?\s*(plus|avec ajout)?\s*:?\s*/i, "");
+        const items = splitItems(body);
+        if(!items.length) return;
+        if(app && last) last.extra.push(...items);
+        else if(app && groups.length) groups.forEach(g => g.extra.push(...items));
+        else{ last = {label:label.replace(/^(indications|symptômes|description)\s*(\(([^)]*)\))?$/i, "$3").replace(/^(d['’]après les notes manuscrites|section indications|description)$/i, "").trim(), items, extra:[]}; groups.push(last); }
+      });
+    });
+    return groups;
+  }
+  const isLangue = s => /^(langue|enduit|pointe de la langue|bout de la langue|revêtement de (la )?langue|veines sublinguales)/i.test(s);
+  const isPouls = s => /^pouls/i.test(s);
+  const isObs = s => /^(teint|visage|lèvres et ongles|lèvres|ongles|pommettes|patient silencieux|voix|battements des ailes du nez|yeux rouges|amaigrissement|mouvements péristaltiques visibles|éruptions|maculo|peau)/i.test(s);
+  const isPalp = s => /palpation|palpable|muscle droit|abdomen (généralement )?mou|paroi abdominale|clapot|tonus|plis cutanés|abdomen froid|pulsations/i.test(s);
+  const FEMALE = /règles|menstru|leucorrh|utér|grossesse|accouchement|seins|lactation|vagin|métrorragie|ménorragie|aménorrhée|oligoménorrhée|dysménorrhée|avortement/i;
+  const elide = (w, s) => /^([aeiouyéèêàâîïôûhœæ])/i.test(s) && !/^(hoquet|hernie|hanche|haut)/i.test(s) ? w.slice(0, -1) + "’" + s : w + " " + s;
+  const OPENERS = ["Je souffre de", "Il y a aussi un souci de", "Et puis je me plains de", "Ces derniers temps, je souffre de", "J’ai aussi remarqué un problème de"];
+  const ARTICLE = {manque:"un", perte:"une", baisse:"une", augmentation:"une", tendance:"une", sensation:"une", envie:"une", alternance:"une", difficulté:"une", difficultés:"des", lourdeur:"une", brûlure:"une", oppression:"une", distension:"une", tension:"une", raideur:"une", fièvre:"de la", soif:"", grande:"une"};
+  function patientLine(item, n){
+    let s = item.replace(/\s*\([^)]*\)/g, "").replace(/[«»"]/g, "").replace(/(^|\s)(de|à) se\s/g, "$1$2 me ").replace(/\s+/g, " ").trim();
+    if(!s) return "";
+    s = s.charAt(0).toLowerCase() + s.slice(1);
+    let out;
+    if(/^absence de /i.test(s)) out = "Je n’ai pas " + elide("de", s.slice(11));
+    else if(/^(aucune?|peu|beaucoup|pas|plus) /i.test(s)) out = (/^(aucune?|pas|plus) /i.test(s) ? "Je n’ai " : "J’ai ") + s;
+    else{
+      const w = s.split(/\s/)[0].toLowerCase();
+      if(ARTICLE[w] !== undefined && ARTICLE[w] !== "") out = "J’ai " + ARTICLE[w] + " " + s;
+      else out = elide(OPENERS[n % OPENERS.length].replace(/ de$/, " de"), s);
+    }
+    return out.charAt(0).toUpperCase() + out.slice(1) + ".";
+  }
+  function buildCase(f){
+    const groups = clinicalGroups(f).filter(g => {
+      const all = g.items.concat(g.extra);
+      return all.filter(i => !isPouls(i) && !isLangue(i) && !isPalp(i) && !isObs(i)).length >= 2 && all.some(i => isPouls(i) || isLangue(i));
+    });
+    if(!groups.length) return null;
+    const g = rnd(groups);
+    const seen = new Set(), all = [];
+    g.items.concat(g.extra).forEach(i => { const k = key(i); if(!k || seen.has(k)) return; seen.add(k); all.push(i); });
+    const c = {f, label:g.label, spoken:[], langue:[], pouls:[], obs:[], palp:[], all};
+    all.forEach(i => { (isPouls(i) ? c.pouls : isLangue(i) ? c.langue : isPalp(i) ? c.palp : isObs(i) ? c.obs : c.spoken).push(i); });
+    c.femme = FEMALE.test(all.join(" "));
+    return c;
+  }
+  const CASE = {speed:"normal", score:0, total:0, c:null, choices:[], asked:0, said:0, done:{}, answered:null, log:[], typing:null};
+  try{ CASE.speed = localStorage.getItem("mtc_formules_case_speed") || "normal"; }catch(e){}
+  const SPEED = {lent:95, normal:62, rapide:30};
+  function newCase(){
+    const pool = shuffle(FORMS.filter(f => !GAME.cat || f._catId === GAME.cat));
+    let c = null;
+    for(const f of pool){ if(CASE.c && pool.length > 1 && f.id === CASE.c.f.id) continue; c = buildCase(f); if(c) break; }
+    if(CASE.typing){ clearTimeout(CASE.typing); CASE.typing = null; }
+    CASE.c = c; CASE.asked = 0; CASE.said = 0; CASE.done = {}; CASE.answered = null; CASE.log = []; CASE.typing = null;
+    if(!c) return;
+    // deux autres formules, de préférence de la même catégorie
+    const same = shuffle(FORMS.filter(f => f.id !== c.f.id && f._catId === c.f._catId));
+    const other = shuffle(FORMS.filter(f => f.id !== c.f.id && f._catId !== c.f._catId));
+    CASE.choices = shuffle([c.f].concat(same.concat(other).slice(0, 2)));
+    say("narr", (c.femme ? "Une patiente" : "Un patient") + " entre et s’assoit.");
+    say("vous", "Bonjour, qu’est-ce qui vous amène ?");
+    sayNext();
+  }
+  function sayNext(){
+    const c = CASE.c;
+    if(CASE.said < c.spoken.length){
+      const line = patientLine(c.spoken[CASE.said], CASE.said);
+      say("patient", (CASE.said === 0 ? "Bonjour. " : "") + line);
+      CASE.said++;
+    }else{ say("patient", "Je crois que je vous ai tout dit."); CASE.said++; }
+  }
+  function say(who, text){
+    CASE.log.push({who, text, shown:who === "vous" || who === "narr" ? text.length : 0});
+    pump();
+  }
+  // écriture lettre par lettre, au rythme de la parole (une ligne après l'autre)
+  function pump(){
+    if(CASE.typing) return;
+    const line = CASE.log.find(l => l.shown < l.text.length);
+    if(!line){ renderCase(); return; }
+    const ms = SPEED[CASE.speed] || 62;
+    const step = () => {
+      if(!CASE.log.includes(line)){ CASE.typing = null; return; }
+      line.shown++;
+      const el = main.querySelector('.line[data-i="' + CASE.log.indexOf(line) + '"] .txt2');
+      if(el) el.innerHTML = esc(line.text.slice(0, line.shown)) + (line.shown < line.text.length ? '<span class="caret"></span>' : "");
+      else renderCase();
+      const chat = main.querySelector(".chat"); if(chat) chat.scrollTop = chat.scrollHeight;
+      if(line.shown < line.text.length){
+        const ch = line.text[line.shown - 1];
+        CASE.typing = setTimeout(step, ms * (/[.!?]/.test(ch) ? 7 : /[,;:…]/.test(ch) ? 3.5 : 1));
+      }else{ CASE.typing = null; pump(); }
+    };
+    renderCase();
+    CASE.typing = setTimeout(step, ms * 4);
+  }
+  function skipTyping(){
+    if(CASE.typing){ clearTimeout(CASE.typing); CASE.typing = null; }
+    CASE.log.forEach(l => { l.shown = l.text.length; });
+    renderCase();
+  }
+  function ask(kind){
+    const c = CASE.c;
+    if(!c || CASE.answered) return;
+    CASE.asked++;
+    if(kind === "more"){ say("vous", rnd(["Autre chose ?", "Et à part ça ?", "Pouvez-vous m’en dire plus ?", "D’autres symptômes ?"])); sayNext(); return; }
+    CASE.done[kind] = true;
+    const Q = {langue:"Pouvez-vous me montrer votre langue ?", pouls:"Je vais prendre votre pouls.", obs:"(vous observez le patient)", palp:"Je vais palper votre abdomen."};
+    const low = l => l.map(x => x.charAt(0).toLowerCase() + x.slice(1));
+    const R = {langue:"Langue : " + low(c.langue).join(" ; "), pouls:c.pouls.map(x => x.charAt(0).toUpperCase() + x.slice(1)).join(" ; "), obs:"Observation : " + low(c.obs).join(" ; "), palp:"Palpation : " + low(c.palp).join(" ; ")};
+    if(kind === "obs") say("narr", c.femme ? "Vous observez la patiente." : "Vous observez le patient."); else say("vous", Q[kind]);
+    say("exam", R[kind] + ".");
+  }
+  function decideCase(f){
+    if(CASE.answered) return;
+    skipTyping();
+    const ok = f.id === CASE.c.f.id;
+    CASE.answered = ok ? "ok" : "ko"; CASE.picked = f;
+    CASE.total++;
+    if(ok) CASE.score += Math.max(3, 10 - Math.max(0, CASE.asked - 2));
+    renderCase();
+  }
+  function renderCase(){
+    const c = CASE.c;
+    const bar = '<div class="gbar"><label>Catégorie <select id="cCat"><option value="">toutes</option>' + CATS.map(([id, n]) => '<option value="' + esc(id) + '"' + (id === GAME.cat ? " selected" : "") + ">" + esc(n) + "</option>").join("") + "</select></label>" +
+      '<label>Vitesse de parole <select id="cSpeed">' + [["lent", "lente"], ["normal", "normale"], ["rapide", "rapide"]].map(([k, l]) => '<option value="' + k + '"' + (k === CASE.speed ? " selected" : "") + ">" + l + "</option>").join("") + "</select></label>" +
+      '<span class="score">' + CASE.score + " pts · " + CASE.total + " cas</span></div>";
+    if(!c){ main.innerHTML = bar + '<p class="msg">Pas de tableau clinique exploitable dans cette catégorie.</p>'; bindCaseBar(); return; }
+    const chat = '<div class="chat" id="cChat" title="Clic : afficher tout de suite">' + CASE.log.map((l, i) => {
+      const who = {patient:c.femme ? "La patiente" : "Le patient", vous:"Vous", exam:"Examen", narr:""}[l.who];
+      return '<p class="line ' + l.who + '" data-i="' + i + '">' + (who ? '<span class="who">' + who + "</span>" : "") + '<span class="txt2">' + esc(l.text.slice(0, l.shown)) + (l.shown < l.text.length ? '<span class="caret"></span>' : "") + "</span></p>";
+    }).join("") + "</div>";
+    const busy = !!CASE.typing || CASE.log.some(l => l.shown < l.text.length);
+    const dis = k => CASE.answered || busy || (k !== "more" && (CASE.done[k] || !c[k].length)) ? " disabled" : "";
+    const asks = '<div class="asks">' +
+      '<button type="button" class="tool" data-ask="more"' + (CASE.answered || busy || CASE.said > c.spoken.length ? " disabled" : "") + ">💬 Autre chose ?</button>" +
+      '<button type="button" class="tool" data-ask="langue"' + dis("langue") + ">👅 Regarder la langue</button>" +
+      '<button type="button" class="tool" data-ask="pouls"' + dis("pouls") + ">🫀 Prendre le pouls</button>" +
+      (c.obs.length ? '<button type="button" class="tool" data-ask="obs"' + dis("obs") + ">👁 Observer</button>" : "") +
+      (c.palp.length ? '<button type="button" class="tool" data-ask="palp"' + dis("palp") + ">✋ Palper l’abdomen</button>" : "") +
+      '<span class="srcinfo">informations demandées : ' + CASE.asked + "</span></div>";
+    let decide = '<div class="decide"><b>Quelle formule conseillez-vous ?</b><div class="choices">' + CASE.choices.map((f, i) => {
+      const cls = CASE.answered ? (f.id === c.f.id ? "good" : (CASE.picked && f.id === CASE.picked.id ? "badc" : "")) : "";
+      return '<button type="button" data-pick="' + i + '" class="' + cls + '"' + (CASE.answered ? " disabled" : "") + ">" + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + '<br><small style="font-weight:400">' + esc(f.nom_fr || "") + "</small></button>";
+    }).join("") + "</div></div>";
+    if(CASE.answered){
+      decide += '<div class="reveal"><div class="verdict ' + CASE.answered + '">' + (CASE.answered === "ok" ? "✔ Bonne formule" + " (+" + Math.max(3, 10 - Math.max(0, CASE.asked - 2)) + " pts)" : "✘ Ce cas relevait de " + esc(c.f.pinyin)) + "</div>" +
+        (c.label ? "<p><b>Syndrome :</b> " + esc(c.label) + "</p>" : "") +
+        '<p class="txt"><b>Tableau clinique complet :</b> ' + esc(c.all.join(", ")) + ".</p>" +
+        '<div class="hint"><button type="button" class="tool on" id="cNext">Patient suivant</button> <button type="button" class="tool" id="cSee">Voir la fiche de la formule</button></div></div>';
+    }
+    main.innerHTML = bar + chat + asks + decide;
+    const box = document.getElementById("cChat"); if(box){ box.scrollTop = box.scrollHeight; box.addEventListener("click", skipTyping); }
+    bindCaseBar();
+    main.querySelectorAll("[data-ask]").forEach(b => b.addEventListener("click", () => ask(b.dataset.ask)));
+    main.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => decideCase(CASE.choices[+b.dataset.pick])));
+    const nx = document.getElementById("cNext"); if(nx) nx.addEventListener("click", () => { newCase(); });
+    const se = document.getElementById("cSee"); if(se) se.addEventListener("click", () => { current = c.f.id; setView("browse"); });
+  }
+  function bindCaseBar(){
+    const c = document.getElementById("cCat"), s = document.getElementById("cSpeed");
+    c.addEventListener("change", () => { GAME.cat = c.value; saveGame(); skipTyping(); newCase(); });
+    s.addEventListener("change", () => { CASE.speed = s.value; try{ localStorage.setItem("mtc_formules_case_speed", s.value); }catch(e){} });
+  }
+
   function setView(v){
     view = v;
+    if(v !== "case" && CASE.typing){ clearTimeout(CASE.typing); CASE.typing = null; }
     document.getElementById("tabBrowse").classList.toggle("on", v === "browse");
     document.getElementById("tabGame").classList.toggle("on", v === "game");
+    document.getElementById("tabCase").classList.toggle("on", v === "case");
     renderNav();
-    if(v === "browse") renderBrowse(); else renderGame();
+    if(v === "browse") renderBrowse(); else if(v === "game") renderGame();
+    else{ if(!CASE.c) newCase(); else{ CASE.typing = null; pump(); } }
     window.scrollTo(0, 0);
-    try{ history.replaceState(null, "", v === "game" ? "#jeu" : "#" + current); }catch(e){}
+    try{ history.replaceState(null, "", v === "game" ? "#jeu" : v === "case" ? "#cas" : "#" + current); }catch(e){}
   }
   document.getElementById("tabBrowse").addEventListener("click", () => setView("browse"));
   document.getElementById("tabGame").addEventListener("click", () => setView("game"));
+  document.getElementById("tabCase").addEventListener("click", () => setView("case"));
   const h = decodeURIComponent(location.hash.slice(1));
   if(h === "jeu") setView("game");
+  else if(h === "cas") setView("case");
   else{ if(FORMS.some(f => f.id === h)) current = h; setView("browse"); }
   })();
 </script>
