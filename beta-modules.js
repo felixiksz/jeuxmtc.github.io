@@ -14,6 +14,7 @@
       {sel:"nav", title:"Les canaux", text:"Choisis un canal régulier ou un merveilleux vaisseau. Sa fiche s’ouvre : le texte du cours, son illustration et un plan façon métro, trajet par trajet (principal, luò, distinct, tendineux…)."},
       {sel:() => isSmall() ? "#typeToggle" : "#typeFilter", title:"Types de trajets", text:"Coche les trajets à afficher : branches externes ou internes du canal principal, luò, distinct, tendineux, merveilleux vaisseaux.\nLe choix s’applique aux plans, au réseau global et aux correspondances."},
       {sel:"main section .plan, main section", title:"Texte, image et plan", text:"Pour chaque trajet : le texte du cours, l’illustration et le plan.\nClique une station du plan : le texte défile jusqu’à sa mention, surlignée. Survole une station : les autres canaux qui passent par là s’affichent."},
+      {sel:".verifybtn", title:"✅ Vérifier un trajet", text:"Tu as comparé un trajet au cours et à son illustration, et il est juste ? Clique « Vérifier » à côté de son titre, puis réagis avec 👍 dans le fil qui s’ouvre. Chaque 👍 compte comme une vérification publique : « vérifié par N » s’affiche à côté du trajet."},
       {sel:"#allPlaces", title:"Correspondances", text:"L’index de tous les lieux et de tous les points. Clique un lieu pour voir tous les trajets qui y passent, regroupés par famille de zones."},
       {sel:"#netToggle", title:"Réseau global", text:"Le plan de ville de tous les canaux. Les quartiers sont les zones du corps, les carrefours les points d’intersection, les fleuves rèn mài et dū mài, les rivières les merveilleux vaisseaux. Les pointillés gris sont les relais d’un canal au suivant.\nOn y trouve aussi deux jeux : Démêler et Itinéraire."},
       {sel:"#corrBtn", title:"💬 Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction sur le canal affiché (ou le réseau). Les commentaires sont publics : indique si possible ta source (page du cours, livre)."},
@@ -99,7 +100,7 @@
         if(module === "formules" && main.querySelector("#gCat") && !localStorage.getItem("mtc_tour_jeu_v1") && localStorage.getItem("mtc_tour_formules_v1")) setTimeout(() => tour("jeu"), 400);
       }catch(e){}
     };
-    if(main) new MutationObserver(() => { clearTimeout(check.t); check.t = setTimeout(check, 300); }).observe(main, {childList:true});
+    if(main) new MutationObserver(() => { if(window.mtcPaintVerify) window.mtcPaintVerify(main); clearTimeout(check.t); check.t = setTimeout(check, 300); }).observe(main, {childList:true});
     window.addEventListener("mtc-beta-accepted", check);
     setTimeout(check, 800);
   };

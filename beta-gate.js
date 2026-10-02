@@ -50,6 +50,9 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
 .mtc-corr-panel .x{ font:inherit; font-size:20px; border:0; background:none; cursor:pointer; }
 .mtc-corr-panel .body{ overflow-y:auto; padding:12px 14px; flex:1; }
 .mtc-corr-panel .hint{ color:#555; font-size:13px; margin:0 0 10px; }
+.verifybtn{ font:inherit; font-size:.72rem; font-weight:700; margin-left:10px; border:1px solid #bfe3cb; background:#f2fbf4; color:#2c7a4b; border-radius:999px; padding:1px 9px; cursor:pointer; vertical-align:middle; white-space:nowrap; }
+.verifybtn:hover{ border-color:#2c9a5c; }
+.verifybtn.me{ background:#2c9a5c; border-color:#2c9a5c; color:#fff; }
 @media (prefers-reduced-motion: reduce){ .mtc-corr-panel{ transition:none; } }
 `;
     document.head.appendChild(s);
@@ -78,8 +81,8 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
   }
 
   // ---- panneau « Corrections » : fil de commentaires giscus propre à chaque élément ----
-  let panel = null, currentTerm = "";
-  function openCorrections(term, label){
+  let panel = null, currentTerm = "", currentMode = "";
+  function openCorrections(term, label, mode){
     style();
     const g = cfg().giscus || {};
     if(!panel){
@@ -92,9 +95,11 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
     }
     const body = panel.querySelector(".body");
     panel.classList.add("open");
-    if(term === currentTerm && body.querySelector(".giscus")) return;
-    currentTerm = term;
-    const intro = '<p class="hint">Commentaires de correction pour <b>' + esc(label) + "</b>. Ils sont publics : indique ce qui te semble faux et, si possible, ta source (page du cours, livre). Merci !</p>";
+    if(term === currentTerm && body.querySelector(".giscus") && mode === currentMode) return;
+    currentTerm = term; currentMode = mode;
+    const intro = mode === "verify"
+      ? '<p class="hint"><b>Vérifier « ' + esc(label) + ' »</b></p><p class="hint">Tu as comparé ce trajet au cours et à son illustration, et il est juste ? Connecte-toi puis réagis avec <b>👍 sous le titre de la discussion</b> : chaque 👍 compte comme une vérification, visible par tous. Tu as trouvé une erreur ? Laisse plutôt un commentaire de correction, avec ta source si possible.</p>'
+      : '<p class="hint">Commentaires de correction pour <b>' + esc(label) + "</b>. Ils sont publics : indique ce qui te semble faux et, si possible, ta source (page du cours, livre). Merci !</p>";
     if(!(g.repo && g.repoId && g.categoryId)){
       body.innerHTML = intro + '<p class="hint"><b>Les commentaires ne sont pas encore activés.</b>' + (isAdmin() ? " (Admin : activer les Discussions du dépôt, installer l’app giscus, créer la catégorie « " + esc(g.category || "Corrections bêta") + " », puis renseigner categoryId dans beta-config.js.)" : "") + "</p>";
       return;
@@ -105,12 +110,40 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
     s.async = true;
     s.crossOrigin = "anonymous";
     Object.entries({"data-repo":g.repo, "data-repo-id":g.repoId, "data-category":g.category, "data-category-id":g.categoryId,
-      "data-mapping":"specific", "data-term":term, "data-strict":"1", "data-reactions-enabled":"1", "data-emit-metadata":"0",
+      "data-mapping":"specific", "data-term":term, "data-strict":"1", "data-reactions-enabled":"1", "data-emit-metadata":"1",
       "data-input-position":"top", "data-theme":"light", "data-lang":"fr", "data-loading":"lazy"}).forEach(([k, v]) => s.setAttribute(k, v));
     body.appendChild(s);
   }
 
+  const VKEY = "mtc_verify_counts_v1";
+  const vcache = () => { try{ return JSON.parse(localStorage.getItem(VKEY) || "{}"); }catch(e){ return {}; } };
+  function paintVerify(root){
+    const c = vcache();
+    (root || document).querySelectorAll(".verifybtn[data-verify]").forEach(b => {
+      const v = c[b.dataset.verify], n = v ? v.n : 0;
+      b.classList.toggle("me", !!(v && v.me));
+      b.querySelector("span").textContent = n ? "vérifié par " + n : "Vérifier";
+      b.title = (v && v.me ? "Tu as vérifié ce trajet. " : "") + (n ? n + " vérification" + (n > 1 ? "s" : "") + " publique" + (n > 1 ? "s" : "") : "Vérifier ce trajet (vérification publique)");
+    });
+  }
+  window.addEventListener("message", e => {
+    if(e.origin !== "https://giscus.app" || !e.data || !e.data.giscus || !e.data.giscus.discussion || !currentTerm) return;
+    const r = (e.data.giscus.discussion.reactions || {}).THUMBS_UP || {};
+    const c = vcache();
+    c[currentTerm] = {n:r.count || 0, me:!!r.viewerHasReacted, at:Date.now()};
+    try{ localStorage.setItem(VKEY, JSON.stringify(c)); }catch(err){}
+    paintVerify();
+  });
+  document.addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest(".verifybtn[data-verify]");
+    if(!b) return;
+    e.preventDefault(); e.stopPropagation();
+    openCorrections(b.dataset.verify, b.dataset.label || b.dataset.verify, "verify");
+  }, true);
+  window.mtcPaintVerify = paintVerify;
+
   window.mtcBetaGate = function(opts){
+    style();
     const admin = isAdmin();
     if(admin) return true;
     if(!cfg().public){
