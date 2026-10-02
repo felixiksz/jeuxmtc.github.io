@@ -235,6 +235,18 @@
   #tip .crow{ font-size:.85rem; padding:1px 0; cursor:default; }
   #tip .orb{ font-size:.68rem; }
   #tip .none{ color:var(--muted); }
+  .jhint{ font-size:.82rem; color:var(--muted); margin:4px 0 8px; }
+  .jtable{ border-collapse:collapse; width:100%; font-size:.85rem; margin-bottom:10px; }
+  .jtable th{ text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); border-bottom:1px solid #dde; padding:3px 4px; }
+  .jtable td{ border-bottom:1px solid #f0f0f6; padding:4px; vertical-align:top; }
+  .jtable td:first-child{ white-space:nowrap; }
+  .cchip.metal{ background:#fff; color:#1d1d1f; border:1.5px solid #1d1d1f; text-shadow:none; }
+  .jtable a.pfiche{ font-weight:800; color:var(--accent); text-decoration:none; white-space:nowrap; }
+  .jtable a.pfiche:hover{ text-decoration:underline; }
+  .cchip{ display:inline-block; font-size:.7rem; font-weight:800; color:#fff; background:var(--c); border-radius:5px; padding:0 5px; margin:1px 0; text-shadow:0 0 2px rgba(0,0,0,.4); }
+  .places-index h4, #corrBody h4{ font-size:.82rem; margin:12px 0 4px; color:var(--text); }
+  .fhead{ font-size:1rem; margin:8px 0 4px; }
+  .ftxt{ white-space:pre-line; font-family:"Libre Baskerville", Georgia, serif; font-size:.85rem; line-height:1.6; margin:0 0 6px; }
   .places-index h3{ margin:14px 0 4px; color:var(--text); font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; }
   .places-index button{ font:inherit; font-size:.85rem; border:1px solid #dde; background:#fafaff; border-radius:999px; padding:1px 9px; margin:2px; cursor:pointer; }
 </style>
@@ -645,12 +657,73 @@
     });
     const order = ["familles", "tête", "membre supérieur", "tronc", "membre inférieur", "organes", "canaux", "points", "ajoutés"];
     document.getElementById("corrTitle").textContent = "Correspondances — lieux de passage";
+    const placeButtons = list => list.sort((a, b) => PLACES[a].label.localeCompare(PLACES[b].label, "fr", {numeric:true}))
+      .map(pid => '<button type="button" data-pid="' + esc(pid) + '">' + esc(PLACES[pid].label) + " (" + sectionsThrough(pid).length + ")</button>").join("");
     document.getElementById("corrBody").innerHTML = '<div class="places-index">' + order.filter(g => groups[g]).map(g =>
-      "<h3>" + esc(g) + "</h3>" + groups[g].sort((a, b) => PLACES[a].label.localeCompare(PLACES[b].label, "fr", {numeric:true}))
-        .map(pid => '<button type="button" data-pid="' + esc(pid) + '">' + esc(PLACES[pid].label) + " (" + sectionsThrough(pid).length + ")</button>").join("")
+      "<h3>" + esc(g) + "</h3>" + (g === "points" ? intersectionTable() + "<h4>Autres points cités dans les trajets</h4>" + placeButtons(groups[g].filter(pid => !JIAOHUI[pid.slice(3)])) : placeButtons(groups[g]))
     ).join("") + "</div>";
     document.getElementById("corr").classList.add("open");
   }
+  // tableau des points d'intersection (jiāo huì) : chaque point ouvre sa fiche détaillée
+  const chip = c => '<span class="cchip' + (ELEMENT[c] === "metal" ? " metal" : "") + '" style="--c:' + netColor(c) + '">' + esc(sigle(c)) + "</span>";
+  const ptOrder = k => { const m = /^(\S+) (\d+)$/.exec(k); return m ? [CANAL_ORDER.indexOf(m[1]), Number(m[2])] : [99, 0]; };
+  function intersectionTable(){
+    const rows = Object.keys(JIAOHUI).sort((a, b) => { const x = ptOrder(a), y = ptOrder(b); return x[0] - y[0] || x[1] - y[1]; });
+    return '<p class="jhint">Les ' + rows.length + " points d’intersection (jiāo huì) du tableau. Clique un point pour ouvrir sa fiche ; le nombre entre parenthèses ouvre ses trajets.</p>" +
+      '<table class="jtable"><thead><tr><th>Point</th><th>Canaux qui s’y rejoignent</th><th>Selon certains</th></tr></thead><tbody>' +
+      rows.map(k => {
+        const v = JIAOHUI[k], pid = "pt:" + k, n = PLACES[pid] ? sectionsThrough(pid).length : 0;
+        return '<tr><td><a href="#" class="pfiche" data-point="' + esc(k) + '">' + esc(k) + "</a>" +
+          (n ? ' <button type="button" class="linkish jcount" data-pid="' + esc(pid) + '" title="Trajets qui passent par ce point">(' + n + ")</button>" : "") + "</td>" +
+          "<td>" + (v.canaux || []).map(chip).join(" ") + "</td><td>" + (v.certains || []).map(chip).join(" ") + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  }
+  // fiche détaillée d'un point (fiches du jeu : 02-01-point-details-data.js, avec les corrections publiées)
+  let pointDataPromise = null;
+  function loadPointDetails(){
+    if(!pointDataPromise) pointDataPromise = (async () => {
+      if(!window.POINT_DETAILS) await loadScript("../02-01-point-details-data.js");
+      if(!window.MTC_FICHE_CORRECTIONS) await loadScript("../fiches-corrections.js");
+      const corr = (window.MTC_FICHE_CORRECTIONS || {}).points || {};
+      Object.entries(corr).forEach(([id, f]) => { if(window.POINT_DETAILS && window.POINT_DETAILS[id]) Object.assign(window.POINT_DETAILS[id], f); });
+      return window.POINT_DETAILS || {};
+    })();
+    return pointDataPromise;
+  }
+  async function openPointFiche(code){
+    const body = document.getElementById("corrBody");
+    document.getElementById("corrTitle").textContent = "Fiche : " + code;
+    body.innerHTML = '<p class="jhint">Chargement de la fiche…</p>';
+    document.getElementById("corr").classList.add("open");
+    const all = await loadPointDetails(), d = all[code.replace(" ", "")];
+    const pid = "pt:" + code, n = PLACES[pid] ? sectionsThrough(pid).length : 0, jh = JIAOHUI[code];
+    const back = '<button type="button" class="linkish" id="ficheBack">← Tableau des points d’intersection</button>';
+    if(!d){ body.innerHTML = back + '<p class="jhint">Pas de fiche pour ce point.</p>'; }
+    else{
+      const sec = (title, v) => v && String(v).trim() && String(v).trim() !== "Aucune" ? "<h4>" + esc(title) + '</h4><p class="ftxt">' + esc(String(v).trim()) + "</p>" : "";
+      body.innerHTML = back +
+        '<div class="fhead"><b>' + esc(code) + "</b> · " + esc(d.pinyin || "") + " " + esc(d.hanzi || "") + (d.nom_francais ? ' · <i>' + esc(d.nom_francais) + "</i>" : "") + "</div>" +
+        (jh ? '<p class="jhint">Intersection : ' + (jh.canaux || []).map(chip).join(" ") + ((jh.certains || []).length ? " · selon certains : " + jh.certains.map(chip).join(" ") : "") + "</p>" : "") +
+        (n ? '<p><button type="button" class="linkish jcount" data-pid="' + esc(pid) + '">Voir les ' + n + " trajet" + (n > 1 ? "s" : "") + " qui passent par ce point</button></p>" : "") +
+        sec("Localisation", d.localisation) + sec("Méthode de localisation", d.methode_localisation) + sec("Méthode de travail", d.methode_travail) +
+        sec("Catégories du point", d.categories_du_point) + sec("Correspondances", d.correspondances) + sec("Actions", d.actions) +
+        sec("Indications", d.indications) + sec("Associations", d.associations) + sec("Notes", d.notes);
+    }
+    const b = document.getElementById("ficheBack"); if(b) b.addEventListener("click", () => { openIndex(); const h = [...document.querySelectorAll("#corrBody h3")].find(x => x.textContent === "points"); if(h) h.scrollIntoView(); });
+    body.scrollTop = 0;
+  }
+  document.addEventListener("click", e => {
+    const a = e.target.closest && e.target.closest("a.pfiche[data-point]");
+    if(!a) return;
+    e.preventDefault();
+    openPointFiche(a.dataset.point);
+  });
+  document.addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest("button.jcount[data-pid]");
+    if(!b) return;
+    e.preventDefault(); e.stopPropagation();
+    openCorr(b.dataset.pid);
+  }, true);
 
   // Plan vectoriel vertical : chaque branche est une seule ligne verticale,
   // lieux dans l'ordre du texte ; une branche secondaire part, à droite, du
