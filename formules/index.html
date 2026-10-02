@@ -82,6 +82,7 @@
   .line.vous{ text-align:right; color:var(--accent); font-weight:700; }
   .line.exam .txt2{ font-family:"Tomorrow", "Archivo", sans-serif; background:#f1f6ff; border-radius:8px; padding:3px 8px; display:inline-block; }
   .line.narr{ color:var(--muted); font-style:italic; }
+  .line.tip .txt2{ background:#fff6d6; border-radius:8px; padding:3px 8px; display:inline-block; }
   .caret{ display:inline-block; width:.5em; border-bottom:2px solid currentColor; animation:blink 1s steps(1) infinite; }
   @keyframes blink{ 50%{ opacity:0; } }
   .asks{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
@@ -440,7 +441,7 @@
     c.femme = FEMALE.test(all.join(" "));
     return c;
   }
-  const CASE = {speed:"normal", score:0, total:0, c:null, choices:[], asked:0, said:0, done:{}, answered:null, log:[], typing:null};
+  const CASE = {speed:"normal", score:0, total:0, c:null, choices:[], tips:[], tipN:0, asked:0, said:0, done:{}, answered:null, log:[], typing:null};
   try{ CASE.speed = localStorage.getItem("mtc_formules_case_speed") || "normal"; }catch(e){}
   const SPEED = {lent:95, normal:62, rapide:30};
   function newCase(){
@@ -454,6 +455,11 @@
     const same = shuffle(FORMS.filter(f => f.id !== c.f.id && f._catId === c.f._catId));
     const other = shuffle(FORMS.filter(f => f.id !== c.f.id && f._catId !== c.f._catId));
     CASE.choices = shuffle([c.f].concat(same.concat(other).slice(0, 2)));
+    const othersKeys = new Set(CASE.choices.filter(f => f.id !== c.f.id).flatMap(f => f._items.flatMap(i => i.keys)));
+    const ORDER = {shi:0, zuo:1, chen:2, jun:3};
+    CASE.tips = shuffle(c.f._items.filter(i => i.keys.length && !i.keys.some(k => othersKeys.has(k))))
+      .sort((a, b) => (ORDER[a.role] ?? 1) - (ORDER[b.role] ?? 1));
+    CASE.tipN = 0;
     say("narr", (c.femme ? "Une patiente" : "Un patient") + " entre et s’assoit.");
     say("vous", "Bonjour, qu’est-ce qui vous amène ?");
     sayNext();
@@ -501,6 +507,11 @@
     if(!c || CASE.answered) return;
     CASE.asked++;
     if(kind === "more"){ say("vous", rnd(["Autre chose ?", "Et à part ça ?", "Pouvez-vous m’en dire plus ?", "D’autres symptômes ?"])); sayNext(); return; }
+    if(kind === "astuce"){
+      const i = CASE.tips[CASE.tipN++];
+      if(i) say("tip", "La bonne formule contient " + i.name + (i.hanzi ? " " + i.hanzi : "") + (i.role ? " (" + ROLE_LABEL[i.role].split(" · ")[0] + ")" : "") + " ; les deux autres propositions, non.");
+      return;
+    }
     CASE.done[kind] = true;
     const Q = {langue:"Pouvez-vous me montrer votre langue ?", pouls:"Je vais prendre votre pouls.", obs:"(vous observez le patient)", palp:"Je vais palper votre abdomen."};
     const low = l => l.map(x => x.charAt(0).toLowerCase() + x.slice(1));
@@ -524,7 +535,7 @@
       '<span class="score">' + CASE.score + " pts · " + CASE.total + " cas</span></div>";
     if(!c){ main.innerHTML = bar + '<p class="msg">Pas de tableau clinique exploitable dans cette catégorie.</p>'; bindCaseBar(); return; }
     const chat = '<div class="chat" id="cChat" title="Clic : afficher tout de suite">' + CASE.log.map((l, i) => {
-      const who = {patient:c.femme ? "La patiente" : "Le patient", vous:"Vous", exam:"Examen", narr:""}[l.who];
+      const who = {patient:c.femme ? "La patiente" : "Le patient", vous:"Vous", exam:"Examen", narr:"", tip:"Astuce"}[l.who];
       return '<p class="line ' + l.who + '" data-i="' + i + '">' + (who ? '<span class="who">' + who + "</span>" : "") + '<span class="txt2">' + esc(l.text.slice(0, l.shown)) + (l.shown < l.text.length ? '<span class="caret"></span>' : "") + "</span></p>";
     }).join("") + "</div>";
     const busy = !!CASE.typing || CASE.log.some(l => l.shown < l.text.length);
@@ -535,6 +546,7 @@
       '<button type="button" class="tool" data-ask="pouls"' + dis("pouls") + ">🫀 Prendre le pouls</button>" +
       (c.obs.length ? '<button type="button" class="tool" data-ask="obs"' + dis("obs") + ">👁 Observer</button>" : "") +
       (c.palp.length ? '<button type="button" class="tool" data-ask="palp"' + dis("palp") + ">✋ Palper l’abdomen</button>" : "") +
+      '<button type="button" class="tool" data-ask="astuce"' + (CASE.answered || busy || CASE.tipN >= CASE.tips.length ? " disabled" : "") + ' title="Une substance de la bonne formule, absente des deux autres propositions">💡 Une substance de la formule' + (CASE.tips.length ? " (" + (CASE.tips.length - CASE.tipN) + ")" : "") + "</button>" +
       '<span class="srcinfo">informations demandées : ' + CASE.asked + "</span></div>";
     let decide = '<div class="decide"><b>Quelle formule conseillez-vous ?</b><div class="choices">' + CASE.choices.map((f, i) => {
       const cls = CASE.answered ? (f.id === c.f.id ? "good" : (CASE.picked && f.id === CASE.picked.id ? "badc" : "")) : "";
