@@ -419,16 +419,165 @@
   }
   const isLangue = s => /^(langue|enduit|pointe de la langue|bout de la langue|revêtement de (la )?langue|veines sublinguales)/i.test(s);
   const isPouls = s => /^pouls/i.test(s);
-  const isObs = s => /^(teint|visage|lèvres et ongles|lèvres|ongles|pommettes|patient silencieux|voix|battements des ailes du nez|yeux rouges|amaigrissement|mouvements péristaltiques visibles|éruptions|maculo|peau)/i.test(s);
-  const isPalp = s => /palpation|palpable|muscle droit|abdomen (généralement )?mou|paroi abdominale|clapot|tonus|plis cutanés|abdomen froid|pulsations/i.test(s);
+  const isObs = s => /^(teint|visage|lèvres et ongles|lèvres|ongles|pommettes|patient silencieux|voix|battements des ailes du nez|yeux rouges|amaigrissement|mouvements péristaltiques visibles|éruptions|maculo|peau|délire|paroles incohérentes|discours incohérent|trouble de l'esprit|agitation anxieuse et silencieuse)/i.test(s);
+  const isPalp = s => /palpation|palpable|muscle droit|abdomen (généralement )?mou|paroi abdominale|clapot|tonus|plis cutanés|abdomen froid|pulsations|autour de RM|dureté et tension/i.test(s);
   const FEMALE = /règles|menstru|leucorrh|utér|grossesse|accouchement|seins|lactation|vagin|métrorragie|ménorragie|aménorrhée|oligoménorrhée|dysménorrhée|avortement/i;
   const elide = (w, s) => /^([aeiouyéèêàâîïôûhœæ])/i.test(s) && !/^(hoquet|hernie|hanche|haut)/i.test(s) ? w.slice(0, -1) + "’" + s : w + " " + s;
   const OPENERS = ["Je souffre de", "Il y a aussi un souci de", "Et puis je me plains de", "Ces derniers temps, je souffre de", "J’ai aussi remarqué un problème de"];
   const ARTICLE = {manque:"un", perte:"une", baisse:"une", augmentation:"une", tendance:"une", sensation:"une", envie:"une", alternance:"une", difficulté:"une", difficultés:"des", lourdeur:"une", brûlure:"une", oppression:"une", distension:"une", tension:"une", raideur:"une", fièvre:"de la", soif:"", grande:"une"};
+  // Le patient parle avec ses mots, pas avec ceux du cours : phrases toutes faites pour les signes les plus techniques,
+  // puis remplacement des termes savants dans les autres.
+  // {e} {eux} {las} : accord au féminin pour une patiente
+  const LAY = [
+    [/^(renversement|inversion|froid renversé|manque de chaleur dans les extrémités|refroidissement des|membres\/mains\/pieds froids|extrémités froides|mains et pieds froids|doigts\/orteils ou mains\/pieds froids)/, "J’ai les mains et les pieds glacés."],
+    [/^forte aversion (pour le|au) froid/, "Je n’arrive pas à me réchauffer, j’ai horreur du froid."],
+    [/^légère aversion (pour le|au) (froid|vent)/, "Je suis un peu fril{eux}, je crains les courants d’air."],
+    [/^aversion (pour le|au) froid/, "Je crains le froid."],
+    [/^aversion (pour le|au|aux) (vent|courants)/, "Je supporte mal le vent et les courants d’air."],
+    [/^aversion pour la chaleur/, "Je supporte mal la chaleur."],
+    [/^sensibilité au froid/, "Je suis fril{eux}."],
+    [/^grande sensibilité aux attaques/, "J’attrape froid très facilement."],
+    [/^rhume récurrent/, "J’attrape des rhumes à répétition."],
+    [/^transpirations? spontanées? ou nocturnes?/, "Je transpire sans rien faire, et la nuit aussi."],
+    [/^transpirations? spontanées?/, "Je transpire sans rien faire."],
+    [/^transpirations? nocturnes?/, "Je transpire la nuit."],
+    [/^transpirations? (profuses?|abondantes?)/, "Je transpire énormément."],
+    [/^transpiration à n['’]importe quelle heure/, "Je transpire à n’importe quelle heure, de jour comme de nuit."],
+    [/^(transpiration peu abondante ou absente|peu ou pas de transpiration)/, "Je transpire peu, voire pas du tout."],
+    [/^transpiration ou absence de transpiration/, "Selon les jours, je transpire ou pas du tout."],
+    [/^absence de transpiration à mesure/, "Quand la fièvre baisse, je ne transpire pas."],
+    [/^absence de transpiration/, "Je ne transpire pas."],
+    [/^transpiration$/, "Je transpire."],
+    [/^fièvre sans transpiration/, "J’ai de la fièvre, mais je ne transpire pas."],
+    [/^fièvre par vide/, "J’ai des petites bouffées de chaleur."],
+    [/^(fébricule|fièvre légère|fièvre de faible intensité)/, "J’ai un peu de fièvre."],
+    [/^fièvre en marée/, "La fièvre revient à heure fixe, plutôt l’après-midi."],
+    [/^fièvre (nocturne|aggravée la nuit)/, "La fièvre monte surtout la nuit."],
+    [/^(fièvre élevée|forte fièvre)/, "J’ai une forte fièvre."],
+    [/^fièvre continue/, "J’ai de la fièvre en permanence."],
+    [/^fièvre et frissons/, "J’ai de la fièvre et des frissons."],
+    [/^fièvre$/, "J’ai de la fièvre."],
+    [/^(légers )?frissons/, "J’ai des frissons."],
+    [/^alternance de (frissons et de fièvre|froid et de chaleur)/, "J’ai tantôt froid, tantôt chaud, ça alterne."],
+    [/^chaleur musculaire/, "J’ai une sensation de chaleur dans les muscles."],
+    [/^céphalée frontale/, "J’ai mal au front."],
+    [/^céphalée occipitale/, "J’ai mal à l’arrière de la tête."],
+    [/^(céphalées?|maux de tête)$/, "J’ai mal à la tête."],
+    [/^migraine/, "J’ai des migraines."],
+    [/^lourdeur de la tête/, "J’ai la tête lourde."],
+    [/^dysphorie et soif/, "Je me sens agité{e}, et j’ai très soif."],
+    [/^dysphorie par chaleur des mains et des pieds/, "J’ai les paumes et la plante des pieds brûlantes, ça m’agite."],
+    [/^dysphorie/, "Je me sens agité{e}, mal dans ma peau."],
+    [/^(agitation anxieuse|anxiété et irritabilité)/, "Je suis anxi{eux} et irritable."],
+    [/^anxiété/, "Je suis anxi{eux}."],
+    [/^(légère )?irritabilité/, "Je suis irritable, je m’énerve vite."],
+    [/^agitation/, "Je me sens agité{e}."],
+    [/^humeurs dépressives/, "J’ai le moral à zéro."],
+    [/^humeurs fluctuantes/, "Mon humeur change tout le temps."],
+    [/^soupirs fréquents/, "Je soupire souvent."],
+    [/^timidité|^pusillanimité/, "Je manque d’assurance, j’ai vite peur."],
+    [/^amnésie/, "J’oublie tout, j’ai des trous de mémoire."],
+    [/^(asthénie|fatigue mentale|fatigue physique et mentale)/, "Je suis épuisé{e}, je n’ai plus d’entrain."],
+    [/^fatigue( corporelle)?$/, "Je suis fatigué{e}."],
+    [/^lassitude des quatre membres/, "J’ai les bras et les jambes las."],
+    [/^lassitude/, "Je me sens {las}."],
+    [/^sensation d['’]abattement/, "Je me sens abattu{e}."],
+    [/^sensation de lenteur générale/, "Je me sens au ralenti."],
+    [/^manque de force dans les quatre membres|^faiblesse des (quatre )?membres/, "Je n’ai pas de force dans les bras et les jambes."],
+    [/^manque de force/, "Je manque de force."],
+    [/^symptômes aggravés par la fatigue/, "Tout s’aggrave quand je suis fatigué{e} ou que je fais un effort."],
+    [/^(paresse de la parole|manque d['’]envie de parler|discours laconique)/, "Parler me fatigue, je n’en ai pas envie."],
+    [/^(souffle court|manque de souffle|essoufflement)/, "Je suis vite essoufflé{e}."],
+    [/^dyspnée/, "J’ai du mal à respirer."],
+    [/^respiration bruyante/, "Ma respiration est bruyante."],
+    [/^toux sèche sans expectoration/, "J’ai une toux sèche, je ne crache rien."],
+    [/^toux$/, "Je tousse."],
+    [/^toux (importante|chronique|productive|sèche)/, s => "J’ai une toux " + s.replace(/^toux /, "") + "."],
+    [/^peu d['’]expectoration/, "Je crache très peu."],
+    [/^éternuements/, "J’éternue beaucoup."],
+    [/^diarrhée lientérique/, "J’ai la diarrhée, avec des aliments pas digérés."],
+    [/^dysenterie avec ténesme/, "J’ai une diarrhée glaireuse, avec des envies pressantes et douloureuses."],
+    [/^diarrhée$/, "J’ai la diarrhée."],
+    [/^tendance à la diarrhée/, "J’ai souvent la diarrhée."],
+    [/^constipation$/, "Je suis constipé{e}."],
+    [/^borborygmes?/, "Mon ventre gargouille."],
+    [/^(hématochézie|sang dans les selles)/, "Il y a du sang dans mes selles."],
+    [/^(épistaxis|saignements de nez)/, "Je saigne du nez."],
+    [/^hémoptysie/, "Je crache du sang en toussant."],
+    [/^métrorragie/, "J’ai des saignements en dehors des règles."],
+    [/^ménorragie/, "J’ai parfois des règles très abondantes."],
+    [/^menace d['’]avortement/, "J’ai eu des alertes de fausse couche."],
+    [/^(polydipsie|grande soif)/, "J’ai tout le temps soif."],
+    [/^soif ou absence de soif/, "Ma soif varie : parfois j’ai soif, parfois pas."],
+    [/^soif avec ou sans envie de boire/, "J’ai la bouche qui réclame, mais pas toujours envie de boire."],
+    [/^soif de boissons? chaudes?/, "J’ai envie de boissons chaudes."],
+    [/^(soif légère|légère soif)/, "J’ai un peu soif."],
+    [/^soif$/, "J’ai soif."],
+    [/^envie de boire/, "J’ai envie de boire."],
+    [/^(perte|manque) d['’]appétit|^appétit diminué/, "Je n’ai pas d’appétit."],
+    [/^anorexie/, "Je n’ai plus faim du tout."],
+    [/^polyphagie/, "J’ai faim tout le temps."],
+    [/^nausées?$/, "J’ai la nausée."],
+    [/^vomissements secs/, "J’ai des haut-le-cœur."],
+    [/^vomissements fréquents/, "Je vomis souvent."],
+    [/^vomissements$/, "Je vomis."],
+    [/^éructations/, "Je rote souvent."],
+    [/^hoquet/, "J’ai souvent le hoquet."],
+    [/^brûlure d['’]estomac/, "J’ai des brûlures d’estomac."],
+    [/^reflux gastrique/, "J’ai des remontées acides."],
+    [/^(bouche amère|goût amer)/, "J’ai un goût amer dans la bouche."],
+    [/^bouche sèche/, "J’ai la bouche sèche."],
+    [/^gorge sèche/, "J’ai la gorge sèche."],
+    [/^palpitations violentes/, "Mon cœur bat très fort, ça me fait peur."],
+    [/^palpitations$/, "J’ai le cœur qui s’emballe."],
+    [/^lombalgie/, "J’ai mal au bas du dos."],
+    [/^douleurs périombilicales/, "J’ai mal autour du nombril."],
+    [/^masse formée/, "J’ai senti une boule dans le ventre."],
+    [/^acouphènes/, "J’ai des sifflements dans les oreilles."],
+    [/^perte d['’]audition|^surdité/, "J’entends moins bien."],
+    [/^vertiges/, "J’ai la tête qui tourne."],
+    [/^étourdissements/, "J’ai des étourdissements."],
+    [/^(éblouissements|vision trouble|baisse\/trouble de la vision)/, "Ma vue se brouille."],
+    [/^(oligoménorrhée ou aménorrhée|oligoménorrhée|aménorrhée)/, "Mes règles sont très peu abondantes, parfois elles ne viennent pas."],
+    [/^dysménorrhée/, "J’ai des règles douloureuses."],
+    [/^leucorrhées jaunes/, "J’ai des pertes jaunes."],
+    [/^prolapsus anal/, "J’ai une descente au niveau de l’anus."],
+    [/^prolapsus/, "J’ai une sensation de descente d’organe."],
+    [/^purpura sous-cutané/, "Des bleus apparaissent sans que je me cogne."],
+    [/^jaunisse/, "J’ai la peau et le blanc des yeux qui jaunissent."],
+    [/^inflammations cutanées pyogènes/, "J’ai des boutons qui s’infectent."],
+    [/^(insomnie|sommeil agité)/, "Je dors mal."],
+    [/^sommeil court/, "Je dors très peu."],
+    [/^(envie constante de dormir|augmentation du désir de dormir)/, "J’ai tout le temps envie de dormir."],
+    [/recroqueviller/, "J’ai envie de rester recroquevillé{e}."],
+    [/^(augmentation (de la miction|des urines)|urines abondantes)/, "J’urine beaucoup."],
+    [/^hémorroïdes/, "J’ai des hémorroïdes."],
+    [/^amas$/, "J’ai une sensation de blocage au creux de l’estomac."],
+    [/^oppression diaphragmatique/, "Je me sens oppressé{e}, comme serré{e} sous les côtes."],
+    [/^dentalgie/, "J’ai mal aux dents, ça irradie dans la tête."]
+  ];
+  const TERMS = [
+    [/\s+par vide\b/g, ""], [/\s+du qì\b/g, ""], [/aux hypocondres|à l'hypocondre|des hypocondres/g, "sous les côtes"], [/hypocondres/g, "côtes"],
+    [/à l['’]épigastre/g, "au creux de l’estomac"], [/l['’]épigastre/g, "le creux de l’estomac"], [/épigastre/g, "creux de l’estomac"],
+    [/à la région thoracodiaphragmatique/g, "dans le haut du ventre"], [/plénitude/g, "sensation de trop-plein"], [/distension/g, "ballonnement"],
+    [/céphalées?/g, "mal de tête"], [/asthénie psychique/g, "épuisement moral"],
+    [/à l['’]abdomen inférieur/g, "au bas-ventre"], [/à l['’]abdomen supérieur/g, "au haut du ventre"], [/abdomen inférieur/g, "bas-ventre"], [/abdomen supérieur/g, "haut du ventre"],
+    [/à l['’]abdomen/g, "au ventre"], [/de l['’]abdomen/g, "du ventre"], [/l['’]abdomen/g, "le ventre"], [/abdominales?/g, "au ventre"],
+    [/expectorations?/g, "glaires"], [/rhinorrhée/g, "nez qui coule"], [/mictions/g, "envies d’uriner"], [/\/douleur\b/g, ""],
+    [/\bà le /g, "au "], [/\bde le /g, "du "]
+  ];
+  const gender = s => {
+    const f = typeof CASE !== "undefined" && CASE.c && CASE.c.femme;
+    return s.replace(/\{e\}/g, f ? "e" : "").replace(/\{eux\}/g, f ? "euse" : "eux").replace(/\{las\}/g, f ? "lasse" : "las");
+  };
   function patientLine(item, n){
     let s = item.replace(/\s*\([^)]*\)/g, "").replace(/[«»"]/g, "").replace(/(^|\s)(de|à) se\s/g, "$1$2 me ").replace(/\s+/g, " ").trim();
     if(!s) return "";
     s = s.charAt(0).toLowerCase() + s.slice(1);
+    const lay = LAY.find(([rx]) => rx.test(s));
+    if(lay) return gender(typeof lay[1] === "function" ? lay[1](s) : lay[1]);
+    TERMS.forEach(([rx, to]) => { s = s.replace(rx, to); });
+    s = s.replace(/\s+/g, " ").trim();
     let out;
     if(/^absence de /i.test(s)) out = "Je n’ai pas " + elide("de", s.slice(11));
     else if(/^(aucune?|peu|beaucoup|pas|plus) /i.test(s)) out = (/^(aucune?|pas|plus) /i.test(s) ? "Je n’ai " : "J’ai ") + s;
@@ -449,7 +598,7 @@
     const seen = new Set(), all = [];
     g.items.concat(g.extra).forEach(i => { const k = key(i); if(!k || seen.has(k)) return; seen.add(k); all.push(i); });
     const c = {f, label:g.label, spoken:[], langue:[], pouls:[], obs:[], palp:[], all};
-    all.forEach(i => { (isPouls(i) ? c.pouls : isLangue(i) ? c.langue : isPalp(i) ? c.palp : isObs(i) ? c.obs : c.spoken).push(i); });
+    all.filter(i => !/chez l['’]enfant|infantile/i.test(i)).forEach(i => { (isPouls(i) ? c.pouls : isLangue(i) ? c.langue : isPalp(i) ? c.palp : isObs(i) ? c.obs : c.spoken).push(i); });
     c.femme = FEMALE.test(all.join(" "));
     c.topic = c.spoken.map(topicOf);
     return c;
