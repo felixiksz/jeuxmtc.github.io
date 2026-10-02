@@ -21,6 +21,8 @@
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment. Bonne exploration !"}
     ],
     reseau: [
+      {sel:".netmode", title:"Schéma ou plan de ville", text:"Schéma : les points d’intersection du tableau (jiāo huì), une colonne par canal, de la tête aux pieds ; un point relie les canaux qui s’y rejoignent (grand cercle = canal du point).
+Plan de ville : la version anatomique avec quartiers, relais, et les jeux Démêler et Itinéraire."},
       {sel:"nav", title:"Afficher ou masquer un canal", text:"Dans le réseau, un clic sur un canal de la barre de gauche le masque ou le réaffiche (grisé = masqué). « tout afficher » et « tout masquer » sont dans la légende."},
       {sel:".netzoom", title:"Se déplacer dans le plan", text:"Molette ou pincement : zoom. Glisser : se déplacer. ⟲ : tout voir. ◐ : fond sombre.\nClique une station pour voir ses correspondances."},
       {sel:() => isSmall() ? ".netinfo" : ".netlegend", title:"Légende", text:"Lignes pleines : branches externes ; fines : branches internes ; tirets : luò, distinct, tendineux. ⛵ point de transport, ☀ yuán, ⛓ luò, ⛏ xì, ⚓ embarcadère (point d’ouverture d’un merveilleux vaisseau)."},
