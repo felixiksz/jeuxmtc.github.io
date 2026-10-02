@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Formules</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#fff; --text:#111; --accent:#2b2bff; --muted:#666; --navw:210px;
+         --jun:#c0392b; --chen:#d68910; --zuo:#2e86c1; --shi:#7d3c98; --ok:#2c9a5c; --bad:#d23a33; }
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:"Archivo", system-ui, sans-serif; line-height:1.5; }
+  header{ position:sticky; top:0; background:var(--bg); border-bottom:1px solid #ddd; padding:10px 16px; z-index:3;
+          margin-left:var(--navw); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  h1{ font-size:1.1rem; margin:0; }
+  .beta{ font-size:.7em; color:var(--accent); font-weight:800; }
+  .tool{ font:inherit; font-weight:700; border:1px solid #ccd; background:#fff; color:inherit; border-radius:999px; padding:3px 11px; cursor:pointer; text-decoration:none; }
+  .tool.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .tool:disabled{ opacity:.45; cursor:default; }
+  .tools{ margin-left:auto; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .srcinfo{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:.75rem; color:var(--muted); }
+  nav{ position:fixed; top:0; left:0; bottom:0; width:var(--navw); box-sizing:border-box; overflow-y:auto; z-index:6;
+       padding:10px 8px; background:#f7f7fc; border-right:1px solid #ddd; }
+  nav h4{ font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:10px 2px 3px; line-height:1.25; }
+  nav button{ display:block; width:100%; text-align:left; font:inherit; font-size:.86rem; font-weight:700; border:1px solid #dde; background:#fff;
+              border-radius:8px; padding:3px 8px; margin:2px 0; cursor:pointer; line-height:1.25; }
+  nav button.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  main{ margin-left:var(--navw); padding:16px 22px 60px; max-width:980px; }
+  .pick{ display:none; }
+  @media (max-width:760px){ :root{ --navw:0px; } nav{ display:none; } header{ padding:6px 10px; } main{ padding:12px 12px 60px; }
+    .pick{ display:block; width:100%; font:inherit; padding:6px; margin-bottom:10px; border-radius:8px; border:1px solid #ccd; } }
+  h2{ font-size:1.35rem; margin:4px 0 2px; }
+  .hz{ font-weight:400; color:#444; margin-left:6px; }
+  .fr{ font-family:"Libre Baskerville", Georgia, serif; font-style:italic; color:#333; margin:0 0 4px; }
+  .cat{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:.78rem; color:var(--muted); margin-bottom:12px; }
+  h3{ font-size:.95rem; margin:18px 0 6px; color:var(--accent); }
+  .txt{ font-family:"Libre Baskerville", Georgia, serif; font-size:.9rem; line-height:1.7; white-space:pre-line; margin:0; }
+  table.comp{ border-collapse:collapse; width:100%; font-size:.92rem; }
+  table.comp td, table.comp th{ border-bottom:1px solid #eee; padding:5px 6px; text-align:left; vertical-align:top; }
+  table.comp th{ font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .sub{ font-weight:700; }
+  .sub.linked{ text-decoration:underline dotted #999; text-underline-offset:3px; cursor:help; }
+  .outside{ font-size:.7rem; color:#a07a00; margin-left:4px; white-space:nowrap; }
+  .role{ display:inline-block; font-size:.72rem; font-weight:800; color:#fff; border-radius:999px; padding:1px 8px; white-space:nowrap; }
+  .role.jun{ background:var(--jun); } .role.chen{ background:var(--chen); } .role.zuo{ background:var(--zuo); } .role.shi{ background:var(--shi); } .role.none{ background:#999; }
+  .rnote{ display:block; font-size:.72rem; color:var(--muted); margin-top:2px; }
+  details.verif{ margin-top:16px; background:#fff8e1; border:1px solid #f0dca0; border-radius:10px; padding:6px 10px; font-size:.85rem; }
+  details.verif summary{ cursor:pointer; font-weight:700; color:#8a6200; }
+  .stats{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:.8rem; color:var(--muted); margin-bottom:10px; }
+  .msg{ padding:30px 10px; color:var(--muted); }
+  /* jeu */
+  .gbar{ display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; background:#f7f7fc; border:1px solid #e4e4f0; border-radius:12px; padding:8px 12px; margin-bottom:14px; font-size:.88rem; }
+  .gbar select{ font:inherit; padding:3px 6px; border-radius:8px; border:1px solid #ccd; max-width:260px; }
+  .gbar label{ display:inline-flex; align-items:center; gap:4px; cursor:pointer; }
+  .score{ margin-left:auto; font-weight:800; }
+  .qcard{ border:1px solid #e4e4f0; border-radius:14px; padding:14px 16px; }
+  tr.hidden-row td{ background:#fffbe6; }
+  .qmark{ display:inline-block; min-width:110px; border-bottom:2px dashed #b07a00; color:#b07a00; font-weight:800; }
+  tr.revealed td{ background:#eaf7ef; }
+  tr.revealed.wrong td{ background:#fdecea; }
+  .choices{ display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:8px; margin:14px 0 4px; }
+  .choices button{ font:inherit; font-weight:700; padding:9px 10px; border-radius:10px; border:1px solid #ccd; background:#fff; cursor:pointer; text-align:left; }
+  .choices button .hz{ font-size:.85em; }
+  .choices button:hover:not(:disabled){ border-color:var(--accent); }
+  .choices button.good{ background:#eaf7ef; border-color:var(--ok); }
+  .choices button.badc{ background:#fdecea; border-color:var(--bad); }
+  .choices button:disabled{ cursor:default; }
+  .free{ display:flex; gap:8px; margin:14px 0 4px; flex-wrap:wrap; }
+  .free input{ flex:1; min-width:200px; font:inherit; padding:7px 10px; border-radius:10px; border:1px solid #ccd; }
+  .verdict{ margin-top:10px; font-weight:800; }
+  .verdict.ok{ color:var(--ok); } .verdict.ko{ color:var(--bad); }
+  .mini{ margin-top:8px; font-size:.85rem; background:#fafaff; border:1px solid #eee; border-radius:10px; padding:8px 10px; }
+  .mini b{ font-weight:800; }
+  .hint{ margin-top:10px; font-size:.88rem; }
+</style>
+</head>
+<body>
+<nav id="nav"></nav>
+<header>
+  <a class="tool" href="../index.html?admin=1" title="Retour au jeu">← Jeu</a>
+  <h1>Formules <sup class="beta" title="Version bêta">β</sup></h1>
+  <div class="tools">
+    <span class="srcinfo" id="srcinfo"></span>
+    <button type="button" class="tool on" id="tabBrowse">Formules</button>
+    <button type="button" class="tool" id="tabGame">🎲 Substance manquante</button>
+  </div>
+</header>
+<main id="main"><p class="msg">Chargement des formules…</p></main>
+<script src="../22-20-pharma-data.js?v=20261001-qinghao"></script>
+<script src="../fiches-corrections.js"></script>
+<script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
+<script>
+  // accès admin seulement (même règle que les trajets)
+  let __admin = new URLSearchParams(location.search).get("admin") === "1";
+  try{ if(__admin) localStorage.setItem("mtc_admin", "1"); __admin = __admin || localStorage.getItem("mtc_admin") === "1"; }catch(e){}
+  if(!__admin){
+    document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
+    throw new Error("formules : accès admin requis");
+  }
+  (async () => {
+  "use strict";
+  const main = document.getElementById("main"), nav = document.getElementById("nav");
+  const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  // ---- données : copie locale (tests) sinon dépôt GitHub PRIVÉ de l'Outil diagnostique ----
+  // Les formules viennent du cours : elles ne sont pas sur le site public. La page les lit dans le dépôt
+  // configuré dans la synchro GitHub du jeu (même navigateur, même clé), dossier formules/.
+  let source = "";
+  function loadScript(src){
+    return new Promise(resolve => {
+      const s = document.createElement("script");
+      s.src = src; s.onload = () => resolve(true); s.onerror = () => { s.remove(); resolve(false); };
+      document.head.appendChild(s);
+    });
+  }
+  function syncCfg(){
+    const g = k => { try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } };
+    return {token:g("mtc_github_sync_token"), owner:g("mtc_github_sync_owner"), repo:g("mtc_github_sync_repo"), branch:g("mtc_github_sync_branch") || "main"};
+  }
+  async function privateJson(path){
+    const c = syncCfg();
+    const url = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) +
+      "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(c.branch);
+    const r = await fetch(url, {headers:{Authorization:"Bearer " + c.token, Accept:"application/vnd.github.raw"}, cache:"no-store"});
+    if(!r.ok) throw new Error("GitHub " + r.status + " pour " + path);
+    return r.json();
+  }
+  async function loadFormulas(){
+    if(await loadScript("formules-data.js?v=" + Date.now()) && window.MTC_FORMULES){
+      source = "copie locale";
+      return window.MTC_FORMULES;
+    }
+    const c = syncCfg();
+    if(!(c.token && c.owner && c.repo)) throw new Error("La synchro GitHub n’est pas configurée dans ce navigateur : ouvre le jeu, bouton « Sync », puis reviens ici.");
+    const index = await privateJson("formules/index.json");
+    const formules = {};
+    await Promise.all(index.map(async e => { try{ formules[e.id] = await privateJson("formules/" + e.chemin); }catch(err){ console.warn(err); } }));
+    source = "Outil diagnostique (dépôt privé)";
+    return {index, formules};
+  }
+
+  // ---- substances : rattachement à la pharmacopée du jeu ----
+  const HERBS = Array.isArray(window.PHARMA_HERBS) ? window.PHARMA_HERBS : [];
+  const key = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z]/g, "");
+  const HERB_BY_KEY = {}, HERB_BY_HANZI = {};
+  HERBS.forEach(h => { HERB_BY_KEY[key(h.pinyinSansTons || h.pinyin)] = h; if(h.hanzi) HERB_BY_HANZI[h.hanzi] = h; });
+  // préparations (zhì gān cǎo, shēng dì huáng…) et autres noms de la même substance
+  const PREP = /^(zhi|sheng|chao|jiu|shu|cu|yan|duan|pao|xian|wei)(?=[a-z]{4,})/;
+  const ALIAS = {baishaoyao:"baishao", maimendong:"maidong", jingmi:"gengmi", shaoyao:"baishao"};
+  function herbFor(name, hz){
+    const k = key(name);
+    if(HERB_BY_KEY[k]) return HERB_BY_KEY[k];
+    if(hz && HERB_BY_HANZI[hz]) return HERB_BY_HANZI[hz];
+    if(ALIAS[k] && HERB_BY_KEY[ALIAS[k]]) return HERB_BY_KEY[ALIAS[k]];
+    const k2 = k.replace(PREP, "");
+    return HERB_BY_KEY[k2] || null;
+  }
+  // « a, b » hors parenthèses
+  const splitTop = (s, sep) => { const out = []; let d = 0, cur = ""; for(const ch of String(s || "")){ if(ch === "(") d++; else if(ch === ")") d = Math.max(0, d - 1); if(d === 0 && sep.test(ch)){ out.push(cur); cur = ""; } else cur += ch; } out.push(cur); return out.map(x => x.trim()).filter(Boolean); };
+  const ROLE_LABEL = {jun:"empereur · jūn", chen:"ministre · chén", zuo:"assistant · zuǒ", shi:"guide · shǐ"};
+  function roleOf(r){
+    const m = /^(jun|chen|zuo|shi)\b/i.exec(String(r || "").trim());
+    const base = m ? m[1].toLowerCase() : null;
+    const note = String(r || "").replace(/^(jun|chen|zuo|shi)\s*\([^)]*\)\s*/i, "").replace(/^[—–-]\s*/, "").trim();
+    return {role:base, note:base ? note : String(r || "").trim()};
+  }
+  function normalizeComposition(f){
+    const items = [];
+    (f.composition || []).forEach(c => {
+      const names = splitTop(c.substance_pinyin || c.substance || c.pinyin || "", /,/);
+      const hzs = String(c.hanzi || "").split(/[，,]/).map(x => x.trim());
+      const doses = splitTop(c.dose || "", /,/);
+      const {role, note} = roleOf(c.role_hierarchique);
+      names.forEach((n, i) => {
+        const alts = n.split(/\s+ou\s+/i).map(x => x.trim()).filter(Boolean);
+        const hz = names.length === hzs.length ? hzs[i] : (names.length === 1 ? String(c.hanzi || "") : "");
+        const herb = alts.length === 1 ? herbFor(alts[0], hz) : null;
+        items.push({name:n, alts, hanzi:hz, dose:names.length === doses.length ? doses[i] : (c.dose || ""), role, note, herb,
+          keys:alts.map(key).concat(herb ? [key(herb.pinyinSansTons || herb.pinyin)] : []),
+          hideable:alts.length === 1 && !/\+/.test(n) && key(n).length > 2});
+      });
+    });
+    return items;
+  }
+
+  // ---- chargement ----
+  let DB;
+  try{ DB = await loadFormulas(); }
+  catch(err){ main.innerHTML = '<p class="msg">' + esc(err.message) + "</p>"; return; }
+  const FORMS = DB.index.map(e => DB.formules[e.id] ? Object.assign({}, DB.formules[e.id], {_cat:e.categorie_nom || DB.formules[e.id].categorie_nom, _catId:e.categorie_id}) : null).filter(Boolean);
+  FORMS.forEach(f => { f._items = normalizeComposition(f); });
+  const CATS = [...new Map(FORMS.map(f => [f._catId, f._cat])).entries()];
+  const allItems = FORMS.flatMap(f => f._items);
+  const linked = allItems.filter(i => i.herb).length;
+  document.getElementById("srcinfo").textContent = FORMS.length + " formules · " + source;
+
+  // ---- consultation ----
+  let current = FORMS[0] && FORMS[0].id, view = "browse";
+  function renderNav(){
+    nav.innerHTML = CATS.map(([cid, cname]) => "<h4>" + esc(cname) + "</h4>" +
+      FORMS.filter(f => f._catId === cid).map(f => '<button type="button" data-f="' + esc(f.id) + '"' + (view === "browse" && f.id === current ? ' class="on"' : "") + ">" + esc(f.pinyin) + "</button>").join("")).join("");
+    nav.querySelectorAll("button[data-f]").forEach(b => b.addEventListener("click", () => { current = b.dataset.f; setView("browse"); }));
+  }
+  function herbTitle(h){
+    return [h.pinyin + (h.hanzi ? " " + h.hanzi : ""), h.nom, "Nature : " + (h.nature || "—"), "Saveur : " + (h.saveur || "—"), "Tropisme : " + (h.tropisme || "—"), "Classe : " + (h.classe || "—")].join("\n");
+  }
+  function subCell(i){
+    return '<span class="sub' + (i.herb ? ' linked" title="' + esc(herbTitle(i.herb)) + '"' : '"') + ">" + esc(i.name) + "</span>" +
+      (i.hanzi ? '<span class="hz">' + esc(i.hanzi) + "</span>" : "") +
+      (!i.herb && i.alts.length === 1 ? '<span class="outside" title="Pas (encore) de fiche de cette substance dans la pharmacopée du jeu">hors pharmacopée du jeu</span>' : "");
+  }
+  const roleBadge = i => '<span class="role ' + (i.role || "none") + '">' + esc(i.role ? ROLE_LABEL[i.role] : "rôle non précisé") + "</span>" + (i.note ? '<span class="rnote">' + esc(i.note) + "</span>" : "");
+  function compTable(f, hideIdx, reveal){
+    return '<table class="comp"><thead><tr><th>Substance</th><th>Rôle</th><th>Dose</th></tr></thead><tbody>' +
+      f._items.map((i, k) => {
+        if(k === hideIdx && !reveal) return '<tr class="hidden-row"><td><span class="qmark">？</span></td><td>' + (GAME.showRole ? roleBadge(i) : "") + "</td><td>" + (GAME.showDose ? esc(i.dose) : "") + "</td></tr>";
+        return "<tr" + (k === hideIdx ? ' class="revealed' + (reveal === "ko" ? " wrong" : "") + '"' : "") + "><td>" + subCell(i) + "</td><td>" + roleBadge(i) + "</td><td>" + esc(i.dose) + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  }
+  const section = (title, text) => text ? "<h3>" + esc(title) + '</h3><p class="txt">' + esc(text) + "</p>" : "";
+  function renderBrowse(){
+    const f = FORMS.find(x => x.id === current) || FORMS[0];
+    const verif = Array.isArray(f.a_verifier) ? f.a_verifier.filter(Boolean) : (f.a_verifier ? [f.a_verifier] : []);
+    main.innerHTML = '<select class="pick" id="pick">' + FORMS.map(x => '<option value="' + esc(x.id) + '"' + (x.id === f.id ? " selected" : "") + ">" + esc(x.pinyin) + "</option>").join("") + "</select>" +
+      '<div class="stats">' + FORMS.length + " formules · " + allItems.length + " substances citées, dont " + linked + " reliées à une fiche de la pharmacopée du jeu (survol : nature, saveur, tropisme)</div>" +
+      "<h2>" + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
+      '<p class="fr">' + esc(f.nom_fr || "") + "</p>" +
+      '<div class="cat">' + esc(f._cat || "") + (f.sous_type ? " · " + esc(f.sous_type) : "") + "</div>" +
+      "<h3>Composition</h3>" + compTable(f, -1) +
+      section("Préparation et posologie", f.mode_de_preparation_posologie) +
+      section("Actions thérapeutiques", f.actions_therapeutiques) +
+      section("Indications (syndrome)", f.indications_syndrome) +
+      section("Tableau clinique", f.tableau_clinique) +
+      section("Contre-indications et précautions", f.contre_indications_precautions) +
+      section("Modifications courantes", f.modifications_courantes) +
+      section("Comparaison avec des formules proches", f.comparaison_formules_proches) +
+      (verif.length ? '<details class="verif"><summary>À vérifier (' + verif.length + ")</summary><ul>" + verif.map(v => "<li>" + esc(typeof v === "string" ? v : JSON.stringify(v)) + "</li>").join("") + "</ul></details>" : "");
+    const pick = document.getElementById("pick");
+    pick.addEventListener("change", () => { current = pick.value; renderBrowse(); renderNav(); });
+  }
+
+  // ---- jeu : la substance qui manque ----
+  const GAME = {cat:"", mode:"qcm", showRole:true, showDose:true, score:0, total:0, streak:0, q:null};
+  try{ Object.assign(GAME, JSON.parse(localStorage.getItem("mtc_formules_game_v1") || "{}"), {q:null}); }catch(e){}
+  const saveGame = () => { try{ localStorage.setItem("mtc_formules_game_v1", JSON.stringify({cat:GAME.cat, mode:GAME.mode, showRole:GAME.showRole, showDose:GAME.showDose})); }catch(e){} };
+  const rnd = a => a[Math.floor(Math.random() * a.length)];
+  const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  function newQuestion(){
+    const pool = FORMS.filter(f => (!GAME.cat || f._catId === GAME.cat) && f._items.filter(i => i.hideable).length >= 2);
+    if(!pool.length){ GAME.q = null; return; }
+    let f = rnd(pool);
+    if(GAME.q && pool.length > 1) while(f.id === GAME.q.f.id) f = rnd(pool);
+    const idxs = f._items.map((i, k) => i.hideable ? k : -1).filter(k => k >= 0);
+    const k = rnd(idxs), ans = f._items[k];
+    const inFormula = new Set(f._items.flatMap(i => i.keys));
+    // leurres : substances d'autres formules, de préférence même rôle et même catégorie
+    const seen = new Set(), cands = [];
+    FORMS.forEach(g => { if(g.id === f.id) return; g._items.forEach(i => { const kk = key(i.name); if(!i.hideable || seen.has(kk) || i.keys.some(x => inFormula.has(x))) return; seen.add(kk); cands.push({i, w:(i.role === ans.role ? 2 : 0) + (g._catId === f._catId ? 1 : 0) + Math.random() * 1.5}); }); });
+    cands.sort((a, b) => b.w - a.w);
+    const choices = shuffle([ans].concat(cands.slice(0, 3).map(c => c.i)));
+    GAME.q = {f, k, ans, choices, answered:null, picked:null, hint:false};
+  }
+  function isAnswer(text){
+    const k = key(text);
+    if(!k) return false;
+    return GAME.q.ans.keys.includes(k) || GAME.q.ans.keys.includes(k.replace(PREP, "")) || (GAME.q.ans.herb && key(GAME.q.ans.herb.pinyinSansTons) === k);
+  }
+  function answer(ok, picked){
+    const q = GAME.q;
+    if(q.answered) return;
+    q.answered = ok ? "ok" : "ko"; q.picked = picked;
+    GAME.total++; if(ok){ GAME.score++; GAME.streak++; } else GAME.streak = 0;
+    renderGame();
+  }
+  function renderGame(){
+    if(!GAME.q) newQuestion();
+    const q = GAME.q;
+    const bar = '<div class="gbar"><label>Catégorie <select id="gCat"><option value="">toutes</option>' + CATS.map(([id, n]) => '<option value="' + esc(id) + '"' + (id === GAME.cat ? " selected" : "") + ">" + esc(n) + "</option>").join("") + "</select></label>" +
+      '<label>Réponse <select id="gMode"><option value="qcm"' + (GAME.mode === "qcm" ? " selected" : "") + '>4 choix</option><option value="libre"' + (GAME.mode === "libre" ? " selected" : "") + ">saisie libre</option></select></label>" +
+      '<label><input type="checkbox" id="gRole"' + (GAME.showRole ? " checked" : "") + "> rôle</label>" +
+      '<label><input type="checkbox" id="gDose"' + (GAME.showDose ? " checked" : "") + "> dose</label>" +
+      '<span class="score">' + GAME.score + " / " + GAME.total + (GAME.streak > 1 ? " · série " + GAME.streak + " 🔥" : "") + "</span></div>";
+    if(!q){ main.innerHTML = bar + '<p class="msg">Pas de formule jouable dans cette catégorie.</p>'; bindBar(); return; }
+    const f = q.f, ans = q.ans;
+    let body = '<div class="qcard"><h2>' + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
+      '<p class="fr">' + esc(f.nom_fr || "") + '</p><div class="cat">' + esc(f._cat || "") + "</div>" +
+      "<p><b>Quelle substance manque ?</b></p>" + compTable(f, q.k, q.answered);
+    if(GAME.mode === "qcm"){
+      body += '<div class="choices">' + q.choices.map((c, i) => {
+        const cls = q.answered ? (c === ans ? " good" : (c === q.picked ? " badc" : "")) : "";
+        return '<button type="button" data-c="' + i + '" class="' + cls.trim() + '"' + (q.answered ? " disabled" : "") + "><small>" + (i + 1) + ".</small> " + esc(c.name) + (c.hanzi ? '<span class="hz">' + esc(c.hanzi) + "</span>" : "") + "</button>";
+      }).join("") + "</div>";
+    }else{
+      body += '<form class="free" id="gFree"><input id="gInput" list="gList" autocomplete="off" placeholder="Pinyin de la substance (les tons ne comptent pas)"' + (q.answered ? " disabled" : "") + '><button type="submit" class="tool"' + (q.answered ? " disabled" : "") + ">Valider</button></form>" +
+        '<datalist id="gList">' + [...new Set(allItems.filter(i => i.hideable).map(i => i.name))].sort().map(n => '<option value="' + esc(n) + '">').join("") + "</datalist>";
+    }
+    if(!q.answered) body += '<div class="hint">' + (q.hint ? "<b>Indice — actions de la formule :</b> " + esc(f.actions_therapeutiques || "—") : '<button type="button" class="tool" id="gHint">Indice</button> <button type="button" class="tool" id="gSkip">Passer</button>') + "</div>";
+    else{
+      const h = ans.herb;
+      body += '<div class="verdict ' + q.answered + '">' + (q.answered === "ok" ? "✔ Oui : " : "✘ Non, c’était ") + esc(ans.name) + (ans.hanzi ? " " + esc(ans.hanzi) : "") + "</div>" +
+        (h ? '<div class="mini"><b>' + esc(h.pinyin) + "</b> " + esc(h.hanzi || "") + " — " + esc(h.nom || "") + "<br>Nature : " + esc(h.nature || "—") + " · Saveur : " + esc(h.saveur || "—") + " · Tropisme : " + esc(h.tropisme || "—") + "<br>Classe : " + esc(h.classe || "—") + "</div>" : "") +
+        '<div class="hint"><button type="button" class="tool on" id="gNext">Suivante ⏎</button> <button type="button" class="tool" id="gSee">Voir la fiche de la formule</button></div>';
+    }
+    main.innerHTML = bar + body + "</div>";
+    bindBar();
+    main.querySelectorAll(".choices button[data-c]").forEach(b => b.addEventListener("click", () => { const c = q.choices[+b.dataset.c]; answer(c === ans, c); }));
+    const free = document.getElementById("gFree");
+    if(free){ const inp = document.getElementById("gInput"); if(!q.answered) inp.focus(); free.addEventListener("submit", e => { e.preventDefault(); if(inp.value.trim()) answer(isAnswer(inp.value), null); }); }
+    const on = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener("click", fn); };
+    on("gHint", () => { q.hint = true; renderGame(); });
+    on("gSkip", () => { GAME.total++; GAME.streak = 0; newQuestion(); renderGame(); });
+    on("gNext", () => { newQuestion(); renderGame(); });
+    on("gSee", () => { current = f.id; setView("browse"); });
+    const nx = document.getElementById("gNext"); if(nx) nx.focus();
+  }
+  function bindBar(){
+    const c = document.getElementById("gCat"), m = document.getElementById("gMode"), r = document.getElementById("gRole"), d = document.getElementById("gDose");
+    c.addEventListener("change", () => { GAME.cat = c.value; saveGame(); newQuestion(); renderGame(); });
+    m.addEventListener("change", () => { GAME.mode = m.value; saveGame(); renderGame(); });
+    r.addEventListener("change", () => { GAME.showRole = r.checked; saveGame(); renderGame(); });
+    d.addEventListener("change", () => { GAME.showDose = d.checked; saveGame(); renderGame(); });
+  }
+  document.addEventListener("keydown", e => {
+    if(view !== "game" || !GAME.q || e.target.closest("input, select, textarea")) return;
+    if(!GAME.q.answered && GAME.mode === "qcm" && /^[1-4]$/.test(e.key)){ const c = GAME.q.choices[+e.key - 1]; if(c) answer(c === GAME.q.ans, c); }
+  });
+
+  function setView(v){
+    view = v;
+    document.getElementById("tabBrowse").classList.toggle("on", v === "browse");
+    document.getElementById("tabGame").classList.toggle("on", v === "game");
+    renderNav();
+    if(v === "browse") renderBrowse(); else renderGame();
+    window.scrollTo(0, 0);
+    try{ history.replaceState(null, "", v === "game" ? "#jeu" : "#" + current); }catch(e){}
+  }
+  document.getElementById("tabBrowse").addEventListener("click", () => setView("browse"));
+  document.getElementById("tabGame").addEventListener("click", () => setView("game"));
+  const h = decodeURIComponent(location.hash.slice(1));
+  if(h === "jeu") setView("game");
+  else{ if(FORMS.some(f => f.id === h)) current = h; setView("browse"); }
+  })();
+</script>
+</body>
+</html>
