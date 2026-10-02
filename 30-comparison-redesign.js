@@ -347,7 +347,7 @@
     if(!herb) return "";
     const pinyin = text(herb.pinyin || herb.pinyinSansTons || herb.code);
     const hanzi = herbHanzi(herb);
-    return [pinyin, hanzi].filter(Boolean).join(" ");
+    return [hanzi, pinyin].filter(Boolean).join(" ");
   }
 
   function herbCommon(herb){ return text(herb?.nom || ""); }
@@ -458,6 +458,12 @@
   }
 
   function pointTitle(point){
+    // comparaison : code · hanzi · pinyin · nom français (le hanzi avant le pinyin)
+    const d = getPointDetails(point) || {};
+    if(d.hanzi || d.pinyin){
+      const code = typeof window.formatPointCode === "function" ? window.formatPointCode(point) : point;
+      return [code, d.hanzi, d.pinyin, d.nom_francais || d.nom_complet].filter(Boolean).join(" · ");
+    }
     if(typeof window.searchPointTitle === "function") return window.searchPointTitle(point);
     if(typeof window.formatPointCode === "function") return window.formatPointCode(point);
     return point;
@@ -985,8 +991,8 @@
 
     const rows = [
       ["Esprit", slot => editableAcuCellHtml(slot.id, "esprit", acuEsprit(slot.id, getPointDetails(slot.id))), {html:true, rowKind:"esprit", cellClass:"acu-esprit-cell"}],
-      ["Pinyin", slot => getPointDetails(slot.id).pinyin, {}],
       ["Hanzi", slot => getPointDetails(slot.id).hanzi, {}],
+      ["Pinyin", slot => getPointDetails(slot.id).pinyin, {}],
       ["Nom en français", slot => getPointDetails(slot.id).nom_francais || getPointDetails(slot.id).nom_complet, {}],
       ["Localisation", slot => getPointDetails(slot.id).localisation, {}],
       ["Méthode de localisation", slot => getPointDetails(slot.id).methode_localisation, {}],
