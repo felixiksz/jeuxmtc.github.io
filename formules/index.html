@@ -215,6 +215,8 @@
   catch(err){ main.innerHTML = '<p class="msg">' + esc(err.message) + "</p>"; return; }
   const FORMS = DB.index.map(e => DB.formules[e.id] ? Object.assign({}, DB.formules[e.id], {_cat:e.categorie_nom || DB.formules[e.id].categorie_nom, _catId:e.categorie_id}) : null).filter(Boolean);
   FORMS.forEach(f => { f._items = normalizeComposition(f); });
+  // noms de formules toujours en majuscules (tons conservés : GUĪ PÍ TĀNG)
+  const fname = f => String(f.pinyin || f.id).toLocaleUpperCase("fr-FR");
   const CATS = [...new Map(FORMS.map(f => [f._catId, f._cat])).entries()];
   const allItems = FORMS.flatMap(f => f._items);
   const linked = allItems.filter(i => i.herb).length;
@@ -224,7 +226,7 @@
   let current = FORMS[0] && FORMS[0].id, view = "browse";
   function renderNav(){
     nav.innerHTML = CATS.map(([cid, cname]) => "<h4>" + esc(cname) + "</h4>" +
-      FORMS.filter(f => f._catId === cid).map(f => '<button type="button" data-f="' + esc(f.id) + '"' + (view === "browse" && f.id === current ? ' class="on"' : "") + ">" + esc(f.pinyin) + "</button>").join("")).join("");
+      FORMS.filter(f => f._catId === cid).map(f => '<button type="button" data-f="' + esc(f.id) + '"' + (view === "browse" && f.id === current ? ' class="on"' : "") + ">" + esc(fname(f)) + "</button>").join("")).join("");
     nav.querySelectorAll("button[data-f]").forEach(b => b.addEventListener("click", () => { current = b.dataset.f; setView("browse"); }));
   }
   function herbTitle(h){
@@ -256,9 +258,9 @@
   function renderBrowse(){
     const f = FORMS.find(x => x.id === current) || FORMS[0];
     const verif = Array.isArray(f.a_verifier) ? f.a_verifier.filter(Boolean) : (f.a_verifier ? [f.a_verifier] : []);
-    main.innerHTML = '<select class="pick" id="pick">' + FORMS.map(x => '<option value="' + esc(x.id) + '"' + (x.id === f.id ? " selected" : "") + ">" + esc(x.pinyin) + "</option>").join("") + "</select>" +
+    main.innerHTML = '<select class="pick" id="pick">' + FORMS.map(x => '<option value="' + esc(x.id) + '"' + (x.id === f.id ? " selected" : "") + ">" + esc(fname(x)) + "</option>").join("") + "</select>" +
       '<div class="stats">' + FORMS.length + " formules · " + allItems.length + " substances citées, dont " + linked + " reliées à une fiche de la pharmacopée du jeu (survol : nature, saveur, tropisme)</div>" +
-      "<h2>" + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
+      "<h2>" + esc(fname(f)) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
       '<p class="fr">' + esc(f.nom_fr || "") + "</p>" +
       '<div class="cat">' + esc(f._cat || "") + (f.sous_type ? " · " + esc(f.sous_type) : "") + "</div>" +
       "<h3>Composition</h3>" + compTable(f, -1, null, true) +
@@ -317,7 +319,7 @@
       '<span class="score">' + GAME.score + " / " + GAME.total + (GAME.streak > 1 ? " · série " + GAME.streak + " 🔥" : "") + "</span></div>";
     if(!q){ main.innerHTML = bar + '<p class="msg">Pas de formule jouable dans cette catégorie.</p>'; bindBar(); return; }
     const f = q.f, ans = q.ans;
-    let body = '<div class="qcard"><h2>' + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
+    let body = '<div class="qcard"><h2>' + esc(fname(f)) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
       '<p class="fr">' + esc(f.nom_fr || "") + '</p><div class="cat">' + esc(f._cat || "") + "</div>" +
       "<p><b>Quelle substance manque ?</b></p>" + compTable(f, q.k, q.answered);
     if(GAME.mode === "qcm"){
@@ -771,10 +773,10 @@
       }).join("") + "</div>";
     let decide = '<div class="decide"><b>Quelle formule conseillez-vous ?</b><div class="choices">' + CASE.choices.map((f, i) => {
       const cls = CASE.answered ? (f.id === c.f.id ? "good" : (CASE.picked && f.id === CASE.picked.id ? "badc" : "")) : "";
-      return '<button type="button" data-pick="' + i + '" class="' + cls + '"' + (CASE.answered ? " disabled" : "") + ">" + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + '<br><small style="font-weight:400">' + esc(f.nom_fr || "") + "</small></button>";
+      return '<button type="button" data-pick="' + i + '" class="' + cls + '"' + (CASE.answered ? " disabled" : "") + ">" + esc(fname(f)) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + '<br><small style="font-weight:400">' + esc(f.nom_fr || "") + "</small></button>";
     }).join("") + "</div></div>";
     if(CASE.answered){
-      decide += '<div class="reveal"><div class="verdict ' + CASE.answered + '">' + (CASE.answered === "ok" ? "✔ Bonne formule" + " (+" + Math.max(3, 10 - Math.max(0, CASE.asked - 2)) + " pts)" : "✘ Ce cas relevait de " + esc(c.f.pinyin)) + "</div>" +
+      decide += '<div class="reveal"><div class="verdict ' + CASE.answered + '">' + (CASE.answered === "ok" ? "✔ Bonne formule" + " (+" + Math.max(3, 10 - Math.max(0, CASE.asked - 2)) + " pts)" : "✘ Ce cas relevait de " + esc(fname(c.f))) + "</div>" +
         (c.label ? "<p><b>Syndrome :</b> " + esc(c.label) + "</p>" : "") +
         '<p class="txt"><b>Tableau clinique complet</b>\n' + esc([["Symptômes", c.spoken], ["Langue", c.langue], ["Pouls", c.pouls], ["Observation", c.obs], ["Palpation", c.palp]]
           .filter(([, l]) => l.length).map(([n, l]) => n + " : " + l.join(", ") + ".").join("\n")) + "</p>" +
