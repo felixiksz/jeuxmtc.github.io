@@ -30,7 +30,7 @@
     ],
     formules: [
       {sel:() => isSmall() ? "#pick" : "nav", title:"Les formules", text:"Toutes les formules, rangées par catégorie. Choisis une formule pour ouvrir sa fiche."},
-      {sel:"table.comp", title:"La composition", text:"Chaque substance avec son rôle (empereur, ministre, assistant, guide) et sa dose. Son nom français est sous le pinyin.\nSurvole un nom souligné pour voir la nature, la saveur et le tropisme. « hors pharmacopée du jeu » : pas encore de fiche pour cette substance."},
+      {sel:"table.comp", title:"La composition", text:"Chaque substance avec son rôle (jūn, chén, zuǒ, shǐ) et sa dose. Son nom français est sous le pinyin.\nSurvole un nom souligné pour voir la nature, la saveur et le tropisme. « hors pharmacopée du jeu » : pas encore de fiche pour cette substance."},
       {sel:"main h3 ~ h3", title:"Le reste de la fiche", text:"Préparation, actions, indications, tableau clinique, précautions, modifications et comparaisons. L’encadré « À vérifier » liste les points encore incertains."},
       {sel:"#tabGame", title:"🎲 Substance manquante", text:"Une formule s’affiche avec une substance cachée : retrouve-la parmi 4 choix (touches 1 à 4) ou en saisie libre. Le rôle et la dose servent d’indices (à décocher pour corser le jeu). « Indice » montre les actions de la formule."},
       {sel:"#tabCase", title:"🩺 Cas clinique", text:"Un patient vient te consulter. Interroge-le, examine-le, puis conseille une formule parmi trois. Moins tu demandes d’informations, plus tu marques de points."},
