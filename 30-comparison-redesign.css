@@ -1996,3 +1996,23 @@
     font-size:.68rem !important;
   }
 }
+
+/* === Comparaison : la coloration alternée des lignes couvre aussi la première colonne ===
+   Le libellé s'étire sur toute la hauteur de sa ligne (son fond alterné suit la ligne entière) ;
+   seuls son texte et son bouton restent collés sous l'en-tête pendant le défilement vertical. */
+#comparisonPanelContent .mtc-compare-row-label:not(.mtc-compare-corner):not(.is-compare-row-collapsed){
+  align-self:stretch !important;
+  top:auto !important;
+  max-height:none !important;
+  overflow:visible !important;
+  align-items:flex-start !important;
+}
+#comparisonPanelContent .mtc-compare-row-label:not(.mtc-compare-corner) > *{
+  position:sticky !important;
+  top:var(--mtc-compare-sticky-row-top, 58px) !important;
+}
+@media(max-width:699px){
+  #comparisonPanelContent .mtc-compare-row-label:not(.mtc-compare-corner):not(.is-compare-row-collapsed){
+    max-height:none !important;
+  }
+}
