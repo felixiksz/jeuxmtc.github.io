@@ -42,6 +42,7 @@
   table.comp th{ font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
   .sub{ font-weight:700; }
   .sub.linked{ text-decoration:underline dotted #999; text-underline-offset:3px; cursor:help; }
+  .subfr{ display:block; font-family:"Libre Baskerville", Georgia, serif; font-style:italic; font-size:.8rem; color:#555; margin-top:1px; }
   .outside{ font-size:.7rem; color:#a07a00; margin-left:4px; white-space:nowrap; }
   .role{ display:inline-block; font-size:.72rem; font-weight:800; color:#fff; border-radius:999px; padding:1px 8px; white-space:nowrap; }
   .role.jun{ background:var(--jun); } .role.chen{ background:var(--chen); } .role.zuo{ background:var(--zuo); } .role.shi{ background:var(--shi); } .role.none{ background:#999; }
@@ -225,17 +226,18 @@
   function herbTitle(h){
     return [h.pinyin + (h.hanzi ? " " + h.hanzi : ""), h.nom, "Nature : " + (h.nature || "—"), "Saveur : " + (h.saveur || "—"), "Tropisme : " + (h.tropisme || "—"), "Classe : " + (h.classe || "—")].join("\n");
   }
-  function subCell(i){
+  function subCell(i, fr){
     return '<span class="sub' + (i.herb ? ' linked" title="' + esc(herbTitle(i.herb)) + '"' : '"') + ">" + esc(i.name) + "</span>" +
       (i.hanzi ? '<span class="hz">' + esc(i.hanzi) + "</span>" : "") +
-      (!i.herb && i.alts.length === 1 ? '<span class="outside" title="Pas (encore) de fiche de cette substance dans la pharmacopée du jeu">hors pharmacopée du jeu</span>' : "");
+      (!i.herb && i.alts.length === 1 ? '<span class="outside" title="Pas (encore) de fiche de cette substance dans la pharmacopée du jeu">hors pharmacopée du jeu</span>' : "") +
+      (fr && i.herb && i.herb.nom ? '<span class="subfr">' + esc(i.herb.nom) + "</span>" : "");
   }
   const roleBadge = i => '<span class="role ' + (i.role || "none") + '">' + esc(i.role ? ROLE_LABEL[i.role] : "rôle non précisé") + "</span>" + (i.note ? '<span class="rnote">' + esc(i.note) + "</span>" : "");
-  function compTable(f, hideIdx, reveal){
+  function compTable(f, hideIdx, reveal, fr){
     return '<table class="comp"><thead><tr><th>Substance</th><th>Rôle</th><th>Dose</th></tr></thead><tbody>' +
       f._items.map((i, k) => {
         if(k === hideIdx && !reveal) return '<tr class="hidden-row"><td><span class="qmark">？</span></td><td>' + (GAME.showRole ? roleBadge(i) : "") + "</td><td>" + (GAME.showDose ? esc(i.dose) : "") + "</td></tr>";
-        return "<tr" + (k === hideIdx ? ' class="revealed' + (reveal === "ko" ? " wrong" : "") + '"' : "") + "><td>" + subCell(i) + "</td><td>" + roleBadge(i) + "</td><td>" + esc(i.dose) + "</td></tr>";
+        return "<tr" + (k === hideIdx ? ' class="revealed' + (reveal === "ko" ? " wrong" : "") + '"' : "") + "><td>" + subCell(i, fr) + "</td><td>" + roleBadge(i) + "</td><td>" + esc(i.dose) + "</td></tr>";
       }).join("") + "</tbody></table>";
   }
   // longs paragraphes : une variante (A., B.…) ou une note par ligne, et une phrase par ligne au-delà de 300 signes
@@ -255,7 +257,7 @@
       "<h2>" + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
       '<p class="fr">' + esc(f.nom_fr || "") + "</p>" +
       '<div class="cat">' + esc(f._cat || "") + (f.sous_type ? " · " + esc(f.sous_type) : "") + "</div>" +
-      "<h3>Composition</h3>" + compTable(f, -1) +
+      "<h3>Composition</h3>" + compTable(f, -1, null, true) +
       section("Préparation et posologie", f.mode_de_preparation_posologie) +
       section("Actions thérapeutiques", f.actions_therapeutiques) +
       section("Indications (syndrome)", f.indications_syndrome) +
@@ -449,23 +451,38 @@
     const c = {f, label:g.label, spoken:[], langue:[], pouls:[], obs:[], palp:[], all};
     all.forEach(i => { (isPouls(i) ? c.pouls : isLangue(i) ? c.langue : isPalp(i) ? c.palp : isObs(i) ? c.obs : c.spoken).push(i); });
     c.femme = FEMALE.test(all.join(" "));
-    c.topic = c.spoken.map(s => (TOPICS.find(q => (!q.femme || c.femme) && q.rx.test(s)) || {id:"autre"}).id);
+    c.topic = c.spoken.map(topicOf);
     return c;
+  }
+  // thème d'un symptôme : celui du premier mot-clé du texte (parenthèses ignorées) ; les règles d'abord pour une
+  // patiente ; « douleurs, membres » seulement si aucun autre thème ne correspond
+  function topicOf(s){
+    const txt = s.replace(/\([^)]*\)/g, " ");
+    const fem = TOPICS.find(q => q.id === "femme");
+    if(fem.rx.test(txt) && FEMALE.test(txt)) return "femme";
+    let best = null;
+    TOPICS.forEach(q => {
+      if(q.id === "femme" || q.id === "corps") return;
+      const m = q.rx.exec(txt);
+      if(m && (!best || m.index < best[0])) best = [m.index, q.id];
+    });
+    if(best) return best[1];
+    return TOPICS.find(q => q.id === "corps").rx.test(txt) ? "corps" : "autre";
   }
   // interrogatoire : le joueur choisit sa question, le patient ne répond que sur ce point
   const TOPICS = [
-    {id:"femme", femme:true, label:"🌸 Règles, gynécologie", q:"Et vos règles ? D’autres troubles gynécologiques ?", rx:/règles|menstru|leucorrh|utér|grossesse|accouchement|seins|lactation|vagin|métrorragie|ménorragie|aménorrhée|oligoménorrhée|dysménorrhée|avortement|fœtus/i},
-    {id:"chaud", label:"🌡 Froid, chaleur, fièvre", q:"Avez-vous froid, chaud ? De la fièvre ?", rx:/fièvre|fébri|froid|chaleur|frisson|refroidis|chaud|canicule/i},
-    {id:"sueur", label:"💧 Transpiration", q:"Et la transpiration ?", rx:/transpir|sueur/i},
-    {id:"tete", label:"🤕 Tête, vertiges", q:"Avez-vous mal à la tête, des vertiges ?", rx:/céphal|tête|vertige|étourdis|migraine|éblouis/i},
-    {id:"souffle", label:"🫁 Toux, respiration", q:"Toussez-vous ? Comment respirez-vous ?", rx:/toux|expector|dyspn|souffle|respir|essouffl|poitrine|thora|mucus|mucosit|rhume|asthme/i},
-    {id:"digestion", label:"🍽 Appétit, soif, digestion", q:"Comment sont votre appétit, votre soif, votre digestion ?", rx:/appétit|soif|boire|boisson|goût|bouche|nausée|vomiss|éructa|hoquet|reflux|estomac|épigastre|digest|polyphagie|anorexie|ballon|brûlure|salivation|haleine/i},
-    {id:"orl", label:"👁 Yeux, oreilles, nez, gorge", q:"Vos yeux, vos oreilles, votre nez, votre gorge ?", rx:/yeux|vision|oreille|audit|acouph|surdité|nez|nasal|rhin|éternu|gorge|écoulement|dent|gencive|lèvre|langue|joue/i},
-    {id:"transit", label:"🚽 Selles et urines", q:"Et les selles, les urines ?", rx:/selle|diarrh|constip|dysent|urin|miction|borborygme|hémorro|énurésie|anal|ténesme|hématoch|oligurie|intestin/i},
-    {id:"esprit", label:"💭 Sommeil, cœur, humeur", q:"Comment dormez-vous ? Et le moral ?", rx:/palpit|insomnie|sommeil|dormir|anxi|irrit|agitation|dysphorie|humeur|délire|amnésie|esprit|soupir|timid|pusillan|paroles|discours|abattement|dépress|rêve/i},
-    {id:"peau", label:"🩹 Peau, saignements", q:"Avez-vous des saignements, des problèmes de peau ?", rx:/saign|hémo|épistaxis|purpura|abcès|furoncle|éruption|peau|eczéma|jaunisse|macul|urticaire|démangeaison/i},
-    {id:"energie", label:"🔋 Énergie, fatigue", q:"Et votre énergie, votre fatigue ?", rx:/fatigue|lassitude|asthénie|force|parole|faiblesse|parler|lenteur|abattement|épuis/i},
-    {id:"corps", label:"🦴 Douleurs, membres", q:"Avez-vous des douleurs ? Comment vont vos membres ?", rx:/douleur|raideur|nuque|lomb|membre|courbature|spasme|crampe|extrémité|mains|pieds|lourdeur|taille|épaule|dos|hypocondre|abdom|ventre|œdème|engourdis|masse|prolapsus|contracture/i}
+    {id:"femme", none:"Mes règles sont régulières, rien de particulier de ce côté-là.", femme:true, label:"🌸 Règles, gynécologie", q:"Et vos règles ? D’autres troubles gynécologiques ?", rx:/règles|menstru|leucorrh|utér|grossesse|accouchement|seins|lactation|vagin|métrorragie|ménorragie|aménorrhée|oligoménorrhée|dysménorrhée|avortement|fœtus/i},
+    {id:"chaud", none:"Ni froid ni chaud particulièrement, et pas de fièvre.", label:"🌡 Froid, chaleur, fièvre", q:"Avez-vous froid, chaud ? De la fièvre ?", rx:/fièvre|fébri|aversion|frisson|refroidis|chaleur|canicule|froids?(?![a-zé])/i},
+    {id:"sueur", none:"Je transpire normalement.", label:"💧 Transpiration", q:"Et la transpiration ?", rx:/transpir|sueur/i},
+    {id:"tete", none:"Pas de maux de tête, pas de vertiges.", label:"🤕 Tête, vertiges", q:"Avez-vous mal à la tête, des vertiges ?", rx:/céphal|tête|vertige|étourdis|migraine|éblouis/i},
+    {id:"souffle", none:"Je ne tousse pas, je respire bien.", label:"🫁 Toux, respiration", q:"Toussez-vous ? Comment respirez-vous ?", rx:/toux|expector|dyspn|souffle|respir|essouffl|poitrine|thora|mucus|mucosit|rhume|asthme/i},
+    {id:"digestion", none:"L’appétit et la digestion vont bien, je bois normalement.", label:"🍽 Appétit, soif, digestion", q:"Comment sont votre appétit, votre soif, votre digestion ?", rx:/appétit|soif|boire|boisson|goût|bouche|nausée|vomiss|éructa|hoquet|reflux|estomac|épigastre|digest|polyphagie|anorexie|ballon|brûlure|salivation|haleine/i},
+    {id:"orl", none:"Rien de particulier aux yeux, aux oreilles, au nez ni à la gorge.", label:"👁 Yeux, oreilles, nez, gorge", q:"Vos yeux, vos oreilles, votre nez, votre gorge ?", rx:/yeux|vision|oreille|audit|acouph|surdité|nez|nasal|rhin|éternu|gorge|écoulement|dent|gencive|lèvre|langue|joue/i},
+    {id:"transit", none:"Les selles et les urines sont normales.", label:"🚽 Selles et urines", q:"Et les selles, les urines ?", rx:/selle|diarrh|constip|dysent|urin|miction|borborygme|hémorro|énurésie|anal|ténesme|hématoch|oligurie|intestin/i},
+    {id:"esprit", none:"Je dors correctement, et le moral va.", label:"💭 Sommeil, cœur, humeur", q:"Comment dormez-vous ? Et le moral ?", rx:/palpit|insomnie|sommeil|dormir|anxi|irrit|agitation|dysphorie|humeur|délire|amnésie|esprit|soupir|timid|pusillan|paroles|discours|abattement|dépress|rêve/i},
+    {id:"peau", none:"Pas de saignements, rien sur la peau.", label:"🩹 Peau, saignements", q:"Avez-vous des saignements, des problèmes de peau ?", rx:/saign|hémo|épistaxis|purpura|abcès|furoncle|éruption|peau|eczéma|jaunisse|macul|urticaire|démangeaison/i},
+    {id:"energie", none:"Côté énergie, rien de particulier.", label:"🔋 Énergie, fatigue", q:"Et votre énergie, votre fatigue ?", rx:/fatigue|lassitude|asthénie|force|parole|faiblesse|parler|lenteur|abattement|épuis/i},
+    {id:"corps", none:"Pas de douleurs particulières.", label:"🦴 Douleurs, membres", q:"Avez-vous des douleurs ? Comment vont vos membres ?", rx:/douleur|raideur|nuque|lomb|membre|courbature|spasme|crampe|extrémité|mains|pieds|lourdeur|taille|épaule|dos|hypocondre|abdom|ventre|œdème|engourdis|masse|prolapsus|contracture/i}
   ];
   const CASE = {speed:"normal", score:0, total:0, c:null, choices:[], tips:[], tipN:0, asked:0, said:0, done:{}, answered:null, log:[], typing:null};
   try{ CASE.speed = localStorage.getItem("mtc_formules_case_speed") || "normal"; }catch(e){}
@@ -497,18 +514,25 @@
       CASE.said.add(k);
     }else{ say("patient", "Je crois que je vous ai tout dit."); CASE.told = true; }
   }
+  // réponse à une question : la première phrase sans « aussi » ni « et puis »
+  const answerLines = idx => idx.map((i, j) => patientLine(CASE.c.spoken[i], j === 0 ? (CASE.lineN++ % 2 ? 3 : 0) : [1, 2, 4][(j - 1) % 3])).join("\n");
   const topicLeft = id => CASE.c.spoken.map((s, i) => i).filter(i => CASE.c.topic[i] === id && !CASE.said.has(i));
   function askTopic(id){
     const c = CASE.c, q = TOPICS.find(x => x.id === id);
     if(!c || !q || CASE.answered) return;
     CASE.asked++;
-    say("vous", CASE.topicAsked[id] ? "Et encore, de ce côté-là ?" : q.q);
-    CASE.topicAsked[id] = true;
+    say("vous", CASE.topicAsked[id] ? "Autre chose de ce côté-là ?" : q.q);
+    if(!CASE.topicAsked[id]) CASE.topicAsked[id] = 1;
     const left = topicLeft(id).slice(0, 3);
-    if(!left.length){ say("patient", rnd(["Non, rien de particulier.", "Non, pas vraiment.", "Non, ça va de ce côté-là."])); return; }
+    if(!left.length){
+      // déjà raconté (via « Autre chose ? ») : le patient le rappelle au lieu de dire que tout va bien
+      const told = c.spoken.map((s, i) => i).filter(i => c.topic[i] === id);
+      say("patient", told.length ? "Comme je vous l’ai dit :\n" + answerLines(told.slice(0, 3)) : q.none);
+      return;
+    }
     left.forEach(i => CASE.said.add(i));
     // une phrase par ligne : la réponse reste lisible
-    say("patient", "Oui.\n" + left.map(i => patientLine(c.spoken[i], CASE.lineN++)).join("\n"));
+    say("patient", answerLines(left));
   }
   function say(who, text){
     CASE.log.push({who, text, shown:who === "vous" || who === "narr" ? text.length : 0});
