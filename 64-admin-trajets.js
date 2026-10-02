@@ -25,6 +25,14 @@
     button.title = "Trajets des canaux (admin)";
     button.addEventListener("click", () => { window.location.href = "trajets/index.html?admin=1"; });
     bar.appendChild(button);
+    // module Formules (formules de l'Outil diagnostique, jeux de la substance manquante)
+    const formulas = document.createElement("button");
+    formulas.type = "button";
+    formulas.id = "mtcAdminFormules";
+    formulas.textContent = "Formules β";
+    formulas.title = "Formules de l'Outil diagnostique (admin)";
+    formulas.addEventListener("click", () => { window.location.href = "formules/index.html?admin=1"; });
+    bar.appendChild(formulas);
     // lien pour revenir au mode public (sous les réglages d'affichage)
     const presets = document.querySelector("#settingsPanel .settings-presets");
     if(presets && !document.getElementById("mtcAdminExit")){
