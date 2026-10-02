@@ -97,7 +97,9 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
     panel.classList.add("open");
     if(term === currentTerm && body.querySelector(".giscus") && mode === currentMode) return;
     currentTerm = term; currentMode = mode;
-    const intro = mode === "verify"
+    const intro = mode === "notes"
+      ? '<p class="hint"><b>Notes des contributeurs — ' + esc(label) + '</b></p><p class="hint">Écris ta note ci-dessous : elle est visible par les contributeurs et signée de ton nom de profil GitHub, pour qu’on puisse te contacter en cas d’incompréhension. Indique ta source si possible (cours, livre, enseignant).</p>'
+      : mode === "verify"
       ? '<p class="hint"><b>Vérifier « ' + esc(label) + ' »</b></p><p class="hint">Tu as comparé ce trajet au cours et à son illustration, et il est juste ? Connecte-toi puis réagis avec <b>👍 sous le titre de la discussion</b> : chaque 👍 compte comme une vérification, visible par tous. Tu as trouvé une erreur ? Laisse plutôt un commentaire de correction, avec ta source si possible.</p>'
       : '<p class="hint">Commentaires de correction pour <b>' + esc(label) + "</b>. Ils sont publics : indique ce qui te semble faux et, si possible, ta source (page du cours, livre). Merci !</p>";
     if(!(g.repo && g.repoId && g.categoryId)){
