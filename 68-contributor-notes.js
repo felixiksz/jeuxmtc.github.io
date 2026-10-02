@@ -18,6 +18,12 @@
     pharma:{esprits:"Esprit", notes:"Notes", associations:"Associations", formules:"Formules", vs:"VS.", precautions:"Précaution", synonymes:"Synonymes",
       syntheses:"Synthèse", ingredients:"Ingrédients", recherches_modernes:"Recherches modernes", indications:"Indications", contre_indications:"Contre-indications", preparations:"Préparation"}
   };
+  // une couleur fixe par auteur (calculée depuis son nom) : ses notes sont reconnaissables sans répéter sa signature
+  function authorColor(name){
+    let h = 0;
+    for(const ch of String(name || "")) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+    return "hsl(" + (h % 360) + ", 62%, 42%)";
+  }
   const isAdmin = () => { try{ return localStorage.getItem("mtc_admin") === "1" || new URLSearchParams(location.search).get("admin") === "1"; }catch(e){ return false; } };
   const enabled = () => isAdmin() || !!(window.MTC_BETA && window.MTC_BETA.public);
   const isContributor = () => { try{ return !!localStorage.getItem(KEY); }catch(e){ return false; } };
@@ -45,7 +51,10 @@
 .mtc-contrib summary{ cursor:pointer; font-weight:800; }
 .mtc-contrib h5{ margin:10px 0 2px; font-size:.82em; text-transform:uppercase; letter-spacing:.04em; opacity:.7; }
 .mtc-contrib .txt{ white-space:pre-line; margin:0; line-height:1.5; }
-.mtc-contrib .sig{ margin:8px 0 2px; font-size:.82em; font-style:italic; opacity:.75; text-align:right; }
+.mtc-contrib .legend{ margin:8px 0 4px; font-size:.82em; display:flex; align-items:center; gap:6px; opacity:.85; }
+.mtc-contrib .dot{ width:11px; height:11px; border-radius:50%; background:var(--a); flex:none; }
+.mtc-contrib .note{ border-left:4px solid var(--a); background:color-mix(in srgb, var(--a) 9%, transparent); border-radius:0 8px 8px 0; padding:4px 10px 6px; margin:6px 0; }
+.mtc-contrib .note h5{ margin:2px 0; color:var(--a); opacity:1; }
 .mtc-contrib .row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
 .mtc-contrib .row button{ font:inherit; font-size:.85em; font-weight:700; border:1px solid currentColor; background:transparent; color:inherit; border-radius:999px; padding:3px 11px; cursor:pointer; }
 .mtc-contrib .row .quit{ border:0; text-decoration:underline; font-weight:400; opacity:.6; padding:0; }
@@ -93,8 +102,10 @@
     const shared = window.MTC_SHARED_NOTES, mine = shared && shared[domain] && shared[domain][id];
     const fields = mine ? Object.entries(mine) : [];
     const labels = LABELS[domain] || {};
+    const author = (shared && shared.author) || "emesepap, admin", col = authorColor(author);
     return '<div class="mtc-contrib"><details' + (fields.length ? " open" : "") + "><summary>📝 Notes des contributeurs" + (fields.length ? " (" + fields.length + ")" : "") + "</summary>" +
-      (fields.length ? fields.map(([k, v]) => "<h5>" + esc(labels[k] || k) + '</h5><p class="txt">' + esc(v) + "</p>").join("") + '<p class="sig">— ' + esc(shared.author || "emesepap, admin") + "</p>"
+      (fields.length ? '<p class="legend"><span class="dot" style="--a:' + col + '"></span>' + esc(author) + "</p>" +
+        fields.map(([k, v]) => '<div class="note" style="--a:' + col + '" title="' + esc(author) + '"><h5>' + esc(labels[k] || k) + '</h5><p class="txt">' + esc(v) + "</p></div>").join("")
         : (shared ? "<p class=\"txt\">Pas encore de note partagée sur cette fiche.</p>" : "<p class=\"txt\">Chargement…</p>")) +
       '<div class="row"><button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">💬 Notes signées des contributeurs</button>' +
       '<button type="button" class="quit" data-contrib="quit">ne plus contribuer</button></div></details></div>';
