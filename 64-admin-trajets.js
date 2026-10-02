@@ -15,24 +15,27 @@
   window.mtcIsAdmin = isAdmin;
 
   function boot(){
-    if(!isAdmin() || document.getElementById("mtcAdminTrajets")) return;
+    const admin = isAdmin(), beta = !!(window.MTC_BETA && window.MTC_BETA.public);
+    if(!(admin || beta) || document.getElementById("mtcAdminTrajets")) return;
+    const q = admin ? "?admin=1" : "";
     const bar = document.querySelector(".topbar-main-buttons");
     if(!bar) return;
     const button = document.createElement("button");
     button.type = "button";
     button.id = "mtcAdminTrajets";
     button.textContent = "Trajets β";
-    button.title = "Trajets des canaux (admin)";
-    button.addEventListener("click", () => { window.location.href = "trajets/index.html?admin=1"; });
+    button.title = admin ? "Trajets des canaux (admin)" : "Trajets des canaux (bêta)";
+    button.addEventListener("click", () => { window.location.href = "trajets/index.html" + q; });
     bar.appendChild(button);
     // module Formules (formules de l'Outil diagnostique, jeux de la substance manquante)
     const formulas = document.createElement("button");
     formulas.type = "button";
     formulas.id = "mtcAdminFormules";
     formulas.textContent = "Formules β";
-    formulas.title = "Formules de l'Outil diagnostique (admin)";
-    formulas.addEventListener("click", () => { window.location.href = "formules/index.html?admin=1"; });
+    formulas.title = admin ? "Formules de l'Outil diagnostique (admin)" : "Formules (bêta)";
+    formulas.addEventListener("click", () => { window.location.href = "formules/index.html" + q; });
     bar.appendChild(formulas);
+    if(!admin) return;
     // lien pour revenir au mode public (sous les réglages d'affichage)
     const presets = document.querySelector("#settingsPanel .settings-presets");
     if(presets && !document.getElementById("mtcAdminExit")){
