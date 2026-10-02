@@ -111,10 +111,10 @@
 <script src="../22-20-pharma-data.js?v=20261001-qinghao"></script>
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
-<script src="../beta-config.js?v=20261002-beta3"></script>
-<script src="../beta-gate.js?v=20261002-beta3"></script>
-<script src="../beta-tour.js?v=20261002-beta3"></script>
-<script src="../beta-modules.js?v=20261002-beta3"></script>
+<script src="../beta-config.js?v=20261002-beta4"></script>
+<script src="../beta-gate.js?v=20261002-beta4"></script>
+<script src="../beta-tour.js?v=20261002-beta4"></script>
+<script src="../beta-modules.js?v=20261002-beta4"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -183,7 +183,7 @@
   }
   // « a, b » hors parenthèses
   const splitTop = (s, sep) => { const out = []; let d = 0, cur = ""; for(const ch of String(s || "")){ if(ch === "(") d++; else if(ch === ")") d = Math.max(0, d - 1); if(d === 0 && sep.test(ch)){ out.push(cur); cur = ""; } else cur += ch; } out.push(cur); return out.map(x => x.trim()).filter(Boolean); };
-  const ROLE_LABEL = {jun:"empereur · jūn", chen:"ministre · chén", zuo:"assistant · zuǒ", shi:"guide · shǐ"};
+  const ROLE_LABEL = {jun:"jūn", chen:"chén", zuo:"zuǒ", shi:"shǐ"};
   function roleOf(r){
     const m = /^(jun|chen|zuo|shi)\b/i.exec(String(r || "").trim());
     const base = m ? m[1].toLowerCase() : null;
