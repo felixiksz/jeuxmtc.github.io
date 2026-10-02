@@ -111,14 +111,17 @@
 <script src="../22-20-pharma-data.js?v=20261001-qinghao"></script>
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
+<script src="../beta-config.js?v=20261002-beta"></script>
+<script src="../beta-gate.js?v=20261002-beta"></script>
+<script src="../beta-tour.js?v=20261002-beta"></script>
+<script src="../beta-modules.js?v=20261002-beta"></script>
 <script>
-  // accès admin seulement (même règle que les trajets)
-  let __admin = new URLSearchParams(location.search).get("admin") === "1";
-  try{ if(__admin) localStorage.setItem("mtc_admin", "1"); __admin = __admin || localStorage.getItem("mtc_admin") === "1"; }catch(e){}
-  if(!__admin){
-    document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
-    throw new Error("formules : accès admin requis");
+  // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
+  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
+    if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
+    throw new Error("formules : accès réservé");
   }
+  window.mtcBetaModule("formules");
   (async () => {
   "use strict";
   const main = document.getElementById("main"), nav = document.getElementById("nav");
@@ -153,6 +156,7 @@
       return window.MTC_FORMULES;
     }
     const c = syncCfg();
+    if(!(window.mtcIsAdminPage && window.mtcIsAdminPage())) throw new Error("Les formules ne sont pas encore publiées pour la bêta. Reviens bientôt !");
     if(!(c.token && c.owner && c.repo)) throw new Error("La synchro GitHub n’est pas configurée dans ce navigateur : ouvre le jeu, bouton « Sync », puis reviens ici.");
     const index = await privateJson("formules/index.json");
     const formules = {};

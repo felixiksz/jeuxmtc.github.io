@@ -253,14 +253,17 @@
   <div id="corrBody"></div>
 </aside>
 <div id="tip" role="tooltip"></div>
+<script src="../beta-config.js?v=20261002-beta"></script>
+<script src="../beta-gate.js?v=20261002-beta"></script>
+<script src="../beta-tour.js?v=20261002-beta"></script>
+<script src="../beta-modules.js?v=20261002-beta"></script>
 <script>
-  // accès admin seulement (lien proposé dans le jeu avec ?admin=1)
-  let __admin = new URLSearchParams(location.search).get("admin") === "1";
-  try{ if(__admin) localStorage.setItem("mtc_admin", "1"); __admin = __admin || localStorage.getItem("mtc_admin") === "1"; }catch(e){}
-  if(!__admin){
-    document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
-    throw new Error("trajets : accès admin requis");
+  // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
+  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
+    if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
+    throw new Error("trajets : accès réservé");
   }
+  window.mtcBetaModule("trajets");
   (async () => {
   // ---- données : fichiers locaux (copie de travail) sinon dépôt GitHub PRIVÉ de la synchro ----
   // Les textes et images du cours ne sont pas sur le site public : la page les lit dans le
