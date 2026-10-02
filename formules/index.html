@@ -78,7 +78,9 @@
   .chat{ border:1px solid #e4e4f0; border-radius:14px; padding:12px 14px; min-height:220px; max-height:52vh; overflow-y:auto; background:#fcfcff; cursor:pointer; }
   .line{ margin:0 0 9px; font-size:.95rem; line-height:1.55; }
   .line .who{ display:block; font-family:"Tomorrow", "Archivo", sans-serif; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
-  .line.patient .txt2{ font-family:"Libre Baskerville", Georgia, serif; }
+  .line.patient .txt2{ font-family:"Libre Baskerville", Georgia, serif; white-space:pre-line; }
+  .asks.topics{ margin-top:0; }
+  .asks .lbl{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:.75rem; color:var(--muted); align-self:center; margin-right:2px; }
   .line.vous{ text-align:right; color:var(--accent); font-weight:700; }
   .line.exam .txt2{ font-family:"Tomorrow", "Archivo", sans-serif; background:#f1f6ff; border-radius:8px; padding:3px 8px; display:inline-block; }
   .line.narr{ color:var(--muted); font-style:italic; }
@@ -236,7 +238,15 @@
         return "<tr" + (k === hideIdx ? ' class="revealed' + (reveal === "ko" ? " wrong" : "") + '"' : "") + "><td>" + subCell(i) + "</td><td>" + roleBadge(i) + "</td><td>" + esc(i.dose) + "</td></tr>";
       }).join("") + "</tbody></table>";
   }
-  const section = (title, text) => text ? "<h3>" + esc(title) + '</h3><p class="txt">' + esc(text) + "</p>" : "";
+  // longs paragraphes : une variante (A., B.…) ou une note par ligne, et une phrase par ligne au-delà de 300 signes
+  function readable(text){
+    return String(text || "").split(/\n/).map(par => {
+      let p = par.replace(/([.:;)])\s+(?=[A-H]\.\s)/g, "$1\n").replace(/([.;])\s+(?=\d+[.)]\s)/g, "$1\n").replace(/\s*•\s*/g, "\n• ")
+        .replace(/([.)])\s+(?=(Note|Remarque|Attention|Variations?|Application|Indications|Symptômes clés|Syndrome|Selon|D['’]après|Également|Egalement|Peut aussi)\b)/g, "$1\n\n");
+      return p.split("\n").map(l => l.length > 300 ? sentences(l).join("\n") : l).join("\n");
+    }).join("\n").replace(/^\n+/, "");
+  }
+  const section = (title, text) => text ? "<h3>" + esc(title) + '</h3><p class="txt">' + esc(readable(text)) + "</p>" : "";
   function renderBrowse(){
     const f = FORMS.find(x => x.id === current) || FORMS[0];
     const verif = Array.isArray(f.a_verifier) ? f.a_verifier.filter(Boolean) : (f.a_verifier ? [f.a_verifier] : []);
@@ -439,8 +449,24 @@
     const c = {f, label:g.label, spoken:[], langue:[], pouls:[], obs:[], palp:[], all};
     all.forEach(i => { (isPouls(i) ? c.pouls : isLangue(i) ? c.langue : isPalp(i) ? c.palp : isObs(i) ? c.obs : c.spoken).push(i); });
     c.femme = FEMALE.test(all.join(" "));
+    c.topic = c.spoken.map(s => (TOPICS.find(q => (!q.femme || c.femme) && q.rx.test(s)) || {id:"autre"}).id);
     return c;
   }
+  // interrogatoire : le joueur choisit sa question, le patient ne répond que sur ce point
+  const TOPICS = [
+    {id:"femme", femme:true, label:"🌸 Règles, gynécologie", q:"Et vos règles ? D’autres troubles gynécologiques ?", rx:/règles|menstru|leucorrh|utér|grossesse|accouchement|seins|lactation|vagin|métrorragie|ménorragie|aménorrhée|oligoménorrhée|dysménorrhée|avortement|fœtus/i},
+    {id:"chaud", label:"🌡 Froid, chaleur, fièvre", q:"Avez-vous froid, chaud ? De la fièvre ?", rx:/fièvre|fébri|froid|chaleur|frisson|refroidis|chaud|canicule/i},
+    {id:"sueur", label:"💧 Transpiration", q:"Et la transpiration ?", rx:/transpir|sueur/i},
+    {id:"tete", label:"🤕 Tête, vertiges", q:"Avez-vous mal à la tête, des vertiges ?", rx:/céphal|tête|vertige|étourdis|migraine|éblouis/i},
+    {id:"souffle", label:"🫁 Toux, respiration", q:"Toussez-vous ? Comment respirez-vous ?", rx:/toux|expector|dyspn|souffle|respir|essouffl|poitrine|thora|mucus|mucosit|rhume|asthme/i},
+    {id:"digestion", label:"🍽 Appétit, soif, digestion", q:"Comment sont votre appétit, votre soif, votre digestion ?", rx:/appétit|soif|boire|boisson|goût|bouche|nausée|vomiss|éructa|hoquet|reflux|estomac|épigastre|digest|polyphagie|anorexie|ballon|brûlure|salivation|haleine/i},
+    {id:"orl", label:"👁 Yeux, oreilles, nez, gorge", q:"Vos yeux, vos oreilles, votre nez, votre gorge ?", rx:/yeux|vision|oreille|audit|acouph|surdité|nez|nasal|rhin|éternu|gorge|écoulement|dent|gencive|lèvre|langue|joue/i},
+    {id:"transit", label:"🚽 Selles et urines", q:"Et les selles, les urines ?", rx:/selle|diarrh|constip|dysent|urin|miction|borborygme|hémorro|énurésie|anal|ténesme|hématoch|oligurie|intestin/i},
+    {id:"esprit", label:"💭 Sommeil, cœur, humeur", q:"Comment dormez-vous ? Et le moral ?", rx:/palpit|insomnie|sommeil|dormir|anxi|irrit|agitation|dysphorie|humeur|délire|amnésie|esprit|soupir|timid|pusillan|paroles|discours|abattement|dépress|rêve/i},
+    {id:"peau", label:"🩹 Peau, saignements", q:"Avez-vous des saignements, des problèmes de peau ?", rx:/saign|hémo|épistaxis|purpura|abcès|furoncle|éruption|peau|eczéma|jaunisse|macul|urticaire|démangeaison/i},
+    {id:"energie", label:"🔋 Énergie, fatigue", q:"Et votre énergie, votre fatigue ?", rx:/fatigue|lassitude|asthénie|force|parole|faiblesse|parler|lenteur|abattement|épuis/i},
+    {id:"corps", label:"🦴 Douleurs, membres", q:"Avez-vous des douleurs ? Comment vont vos membres ?", rx:/douleur|raideur|nuque|lomb|membre|courbature|spasme|crampe|extrémité|mains|pieds|lourdeur|taille|épaule|dos|hypocondre|abdom|ventre|œdème|engourdis|masse|prolapsus|contracture/i}
+  ];
   const CASE = {speed:"normal", score:0, total:0, c:null, choices:[], tips:[], tipN:0, asked:0, said:0, done:{}, answered:null, log:[], typing:null};
   try{ CASE.speed = localStorage.getItem("mtc_formules_case_speed") || "normal"; }catch(e){}
   const SPEED = {lent:95, normal:62, rapide:30};
@@ -449,7 +475,7 @@
     let c = null;
     for(const f of pool){ if(CASE.c && pool.length > 1 && f.id === CASE.c.f.id) continue; c = buildCase(f); if(c) break; }
     if(CASE.typing){ clearTimeout(CASE.typing); CASE.typing = null; }
-    CASE.c = c; CASE.asked = 0; CASE.said = 0; CASE.done = {}; CASE.answered = null; CASE.log = []; CASE.typing = null;
+    CASE.c = c; CASE.asked = 0; CASE.said = new Set(); CASE.lineN = 0; CASE.told = false; CASE.topicAsked = {}; CASE.done = {}; CASE.answered = null; CASE.log = []; CASE.typing = null;
     if(!c) return;
     // deux autres formules, de préférence de la même catégorie
     const same = shuffle(FORMS.filter(f => f.id !== c.f.id && f._catId === c.f._catId));
@@ -465,12 +491,24 @@
     sayNext();
   }
   function sayNext(){
-    const c = CASE.c;
-    if(CASE.said < c.spoken.length){
-      const line = patientLine(c.spoken[CASE.said], CASE.said);
-      say("patient", (CASE.said === 0 ? "Bonjour. " : "") + line);
-      CASE.said++;
-    }else{ say("patient", "Je crois que je vous ai tout dit."); CASE.said++; }
+    const c = CASE.c, k = c.spoken.findIndex((s, i) => !CASE.said.has(i));
+    if(k >= 0){
+      say("patient", (CASE.said.size === 0 ? "Bonjour. " : "") + patientLine(c.spoken[k], CASE.lineN++));
+      CASE.said.add(k);
+    }else{ say("patient", "Je crois que je vous ai tout dit."); CASE.told = true; }
+  }
+  const topicLeft = id => CASE.c.spoken.map((s, i) => i).filter(i => CASE.c.topic[i] === id && !CASE.said.has(i));
+  function askTopic(id){
+    const c = CASE.c, q = TOPICS.find(x => x.id === id);
+    if(!c || !q || CASE.answered) return;
+    CASE.asked++;
+    say("vous", CASE.topicAsked[id] ? "Et encore, de ce côté-là ?" : q.q);
+    CASE.topicAsked[id] = true;
+    const left = topicLeft(id).slice(0, 3);
+    if(!left.length){ say("patient", rnd(["Non, rien de particulier.", "Non, pas vraiment.", "Non, ça va de ce côté-là."])); return; }
+    left.forEach(i => CASE.said.add(i));
+    // une phrase par ligne : la réponse reste lisible
+    say("patient", "Oui.\n" + left.map(i => patientLine(c.spoken[i], CASE.lineN++)).join("\n"));
   }
   function say(who, text){
     CASE.log.push({who, text, shown:who === "vous" || who === "narr" ? text.length : 0});
@@ -541,13 +579,19 @@
     const busy = !!CASE.typing || CASE.log.some(l => l.shown < l.text.length);
     const dis = k => CASE.answered || busy || (k !== "more" && (CASE.done[k] || !c[k].length)) ? " disabled" : "";
     const asks = '<div class="asks">' +
-      '<button type="button" class="tool" data-ask="more"' + (CASE.answered || busy || CASE.said > c.spoken.length ? " disabled" : "") + ">💬 Autre chose ?</button>" +
+      '<span class="lbl">Examen :</span>' +
+      '<button type="button" class="tool" data-ask="more"' + (CASE.answered || busy || CASE.told ? " disabled" : "") + ">💬 Autre chose ?</button>" +
       '<button type="button" class="tool" data-ask="langue"' + dis("langue") + ">👅 Regarder la langue</button>" +
       '<button type="button" class="tool" data-ask="pouls"' + dis("pouls") + ">🫀 Prendre le pouls</button>" +
       (c.obs.length ? '<button type="button" class="tool" data-ask="obs"' + dis("obs") + ">👁 Observer</button>" : "") +
       (c.palp.length ? '<button type="button" class="tool" data-ask="palp"' + dis("palp") + ">✋ Palper l’abdomen</button>" : "") +
       '<button type="button" class="tool" data-ask="astuce"' + (CASE.answered || busy || CASE.tipN >= CASE.tips.length ? " disabled" : "") + ' title="Une substance de la bonne formule, absente des deux autres propositions">💡 Une substance de la formule' + (CASE.tips.length ? " (" + (CASE.tips.length - CASE.tipN) + ")" : "") + "</button>" +
-      '<span class="srcinfo">informations demandées : ' + CASE.asked + "</span></div>";
+      '<span class="srcinfo">informations demandées : ' + CASE.asked + "</span></div>" +
+      '<div class="asks topics"><span class="lbl">Questions :</span>' + TOPICS.filter(q => !q.femme || c.femme).map(q => {
+        const asked = CASE.topicAsked[q.id], left = topicLeft(q.id).length;
+        const off = CASE.answered || busy || (asked && !left);
+        return '<button type="button" class="tool" data-topic="' + q.id + '"' + (off ? " disabled" : "") + ">" + q.label + (asked && left ? " (encore)" : "") + "</button>";
+      }).join("") + "</div>";
     let decide = '<div class="decide"><b>Quelle formule conseillez-vous ?</b><div class="choices">' + CASE.choices.map((f, i) => {
       const cls = CASE.answered ? (f.id === c.f.id ? "good" : (CASE.picked && f.id === CASE.picked.id ? "badc" : "")) : "";
       return '<button type="button" data-pick="' + i + '" class="' + cls + '"' + (CASE.answered ? " disabled" : "") + ">" + esc(f.pinyin) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + '<br><small style="font-weight:400">' + esc(f.nom_fr || "") + "</small></button>";
@@ -555,13 +599,15 @@
     if(CASE.answered){
       decide += '<div class="reveal"><div class="verdict ' + CASE.answered + '">' + (CASE.answered === "ok" ? "✔ Bonne formule" + " (+" + Math.max(3, 10 - Math.max(0, CASE.asked - 2)) + " pts)" : "✘ Ce cas relevait de " + esc(c.f.pinyin)) + "</div>" +
         (c.label ? "<p><b>Syndrome :</b> " + esc(c.label) + "</p>" : "") +
-        '<p class="txt"><b>Tableau clinique complet :</b> ' + esc(c.all.join(", ")) + ".</p>" +
+        '<p class="txt"><b>Tableau clinique complet</b>\n' + esc([["Symptômes", c.spoken], ["Langue", c.langue], ["Pouls", c.pouls], ["Observation", c.obs], ["Palpation", c.palp]]
+          .filter(([, l]) => l.length).map(([n, l]) => n + " : " + l.join(", ") + ".").join("\n")) + "</p>" +
         '<div class="hint"><button type="button" class="tool on" id="cNext">Patient suivant</button> <button type="button" class="tool" id="cSee">Voir la fiche de la formule</button></div></div>';
     }
     main.innerHTML = bar + chat + asks + decide;
     const box = document.getElementById("cChat"); if(box){ box.scrollTop = box.scrollHeight; box.addEventListener("click", skipTyping); }
     bindCaseBar();
     main.querySelectorAll("[data-ask]").forEach(b => b.addEventListener("click", () => ask(b.dataset.ask)));
+    main.querySelectorAll("[data-topic]").forEach(b => b.addEventListener("click", () => askTopic(b.dataset.topic)));
     main.querySelectorAll("[data-pick]").forEach(b => b.addEventListener("click", () => decideCase(CASE.choices[+b.dataset.pick])));
     const nx = document.getElementById("cNext"); if(nx) nx.addEventListener("click", () => { newCase(); });
     const se = document.getElementById("cSee"); if(se) se.addEventListener("click", () => { current = c.f.id; setView("browse"); });
