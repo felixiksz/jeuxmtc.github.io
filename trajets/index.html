@@ -388,11 +388,12 @@
   }
   async function loadTrajetsData(){
     // ?v= : un fichier de données modifié ne doit pas rester servi par le cache du navigateur
-    const V = "?v=20261005-jh";
+    const V = "?v=20261005-dist";
     if(await loadScript("trajets-data.js" + V)){
       await loadScript("trajets-places-rx.js" + V);
       await loadScript("trajets-complements.js" + V);
       await loadScript("trajets-jiaohui.js" + V);
+      await loadScript("trajets-distincts.js" + V);
       await loadScript("trajets-point-zones.js" + V);
       return;
     }
@@ -404,6 +405,7 @@
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-places-rx.js")).text())(); }catch(e){}
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-complements.js")).text())(); }catch(e){}
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-jiaohui.js")).text())(); }catch(e){}
+    if(!window.MTC_TRAJETS_DISTINCTS) await loadScript("trajets-distincts.js?v=20261005-dist");
     try{ new Function(await (await privateFetch(PRIVATE_DIR + "/trajets-point-zones.js")).text())(); }catch(e){}
   }
   // images : directes en local, lues dans le dépôt privé sinon
@@ -1395,8 +1397,15 @@
   try{ Object.assign(NET_HL, JSON.parse(localStorage.getItem("mtc_trajets_net_hl") || "{}")); }catch(e){}
   // points luò : canal couplé (biǎo / lǐ) ; RM 15, DM 1 et le grand luò de la rate (Rt 21) n'ont pas de canal couplé
   // canaux distincts (jīng bié) : points cités dans leur trajet du cours → {point: [canaux distincts qui y passent]}
+  // + mentions des fiches des points (trajets-distincts.js) ; DIST_SRC[point][canal] = source (cours, fiche, selon …)
+  const DIST_SRC = {};
   function distinctPoints(){
     const out = {};
+    Object.entries(window.MTC_TRAJETS_DISTINCTS || {}).forEach(([k, cs]) => Object.entries(cs).forEach(([c, src]) => {
+      if(!POINT_ZONE_DATA[k]) return;
+      (out[k] = out[k] || []).includes(c) || out[k].push(c);
+      (DIST_SRC[k] = DIST_SRC[k] || {})[c] = src;
+    }));
     data.forEach(c => (c.sections || []).filter(s => s.type === "distinct").forEach(s => {
       const txt = [s.title || ""].concat(s.paragraphs || []).join(" ");
       (txt.match(/\b(GI|IG|Rt|Rn|EC|TF|VB|RM|DM|P|E|C|V|F) ?(\d{1,2})\b/g) || []).forEach(m => {
@@ -1530,7 +1539,7 @@
       if(s.maybe.length) info.push("selon certain·es auteur·ices : " + s.maybe.map(sigle).join(", "));
       if(s.open) info.push("point d’ouverture du " + sigle(s.open));
       if(s.luo) info.push("point luò" + (s.luo !== s.own ? " vers " + sigle(s.luo) : ""));
-      if(isDist) info.push("canal distinct " + s.dist.map(c => "du " + sigle(c)).join(", "));
+      if(isDist) info.push("canal distinct " + s.dist.map(c => "du " + sigle(c) + (((DIST_SRC[s.code] || {})[c] || "").match(/selon[^)]*/) ? " (" + DIST_SRC[s.code][c].match(/selon[^)]*/)[0] + ")" : "")).join(", "));
       if(s.plain) info.push("sans correspondance");
       let g = '<g class="node netstop schema' + (s.plain ? " plain" : "") + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : NET_HL.luo && isLuo ? " hl-luo" : " hl-dist") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '" data-canals="' + s.canals.join(" ") + '"><title>' + esc(info.join(" · ")) + "</title>";
       // trait plein : intersection et ouverture ; trait pointillé : liaison luò vers le canal couplé
