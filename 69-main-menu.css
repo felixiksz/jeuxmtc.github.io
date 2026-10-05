@@ -129,6 +129,12 @@ body.mtc-menu-open{ overflow:hidden; }
 
 /* « Hors connexion » est dans Réglages (la règle d'origine du bouton est très prioritaire) */
 html body.mtc-menu-ui #mtcBottomMetaLine #mtcOfflineButton{ display:none !important; }
-/* la ligne « Nouveauté » laisse la place à l’enveloppe */
-body.mtc-menu-ui #mtcBottomMetaLine{ right:52px !important; }
+/* la ligne d'état des notes et la « Nouveauté » sont dans le menu (Réglages) : le bas de l'écran ne garde que
+   la série, la goutte et l'enveloppe */
+html body.mtc-menu-ui #mtcBottomMetaLine{ display:none !important; }
 body.mtc-menu-open #mtcBottomMetaLine{ display:none !important; }
+/* vies / astuce / modes : sous la grille, dans le flux (la barre du bas n'existe plus, rien ne se superpose) */
+html body.mtc-menu-ui .bottom-actions{
+  position:relative !important; left:auto !important; right:auto !important; bottom:auto !important; top:auto !important;
+  transform:none !important; margin:26px auto 96px !important;
+}

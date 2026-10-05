@@ -187,27 +187,6 @@
   .schemasvg .rtring.start{ stroke:#1a8a3a; } .schemasvg .rtring.end{ stroke:#c0392b; }
   .schemasvg .rtring.cur{ stroke:#0000ff; stroke-dasharray:4 3; }
   .schemasvg .netline.rt-curline{ stroke-width:9; filter:drop-shadow(0 0 5px #ffd84d); }
-  .balbar{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:.85rem; margin:0 0 10px; }
-  .balsysbtn{ font:inherit; font-weight:800; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--text-color); background:transparent; color:var(--text-color); cursor:pointer; padding:0; }
-  .balsysbtn.on{ background:var(--text-color); color:var(--page-bg); }
-  .balbar label{ display:inline-flex; gap:5px; align-items:center; cursor:pointer; }
-  .balscore{ margin-left:auto; font-weight:800; }
-  .ballay{ display:grid; grid-template-columns:minmax(260px, 420px) minmax(0, 1fr); gap:10px 22px; align-items:start; }
-  @media (max-width:760px){ .ballay{ grid-template-columns:1fr; } }
-  .balclock{ width:100%; height:auto; aspect-ratio:1 / 1; max-height:none; color:var(--text-color); }
-  .balnode{ cursor:pointer; } .balnode.off{ opacity:.3; cursor:default; }
-  .balnode:hover circle:not([stroke-dasharray]){ filter:drop-shadow(0 0 5px var(--shadow-color)); }
-  .ballbl{ font:700 12px "Archivo", sans-serif; } .balsys{ font:700 10px "Archivo", sans-serif; fill:var(--shadow-color); }
-  .balhint{ font:800 10px "Archivo", sans-serif; fill:var(--shadow-color); } .balflow{ font:9px "Archivo", sans-serif; letter-spacing:.08em; fill:currentColor; opacity:.6; }
-  .ballbltop{ font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
-  .balcase{ font-family:"Libre Baskerville", Georgia, serif; font-size:1.05rem; margin:4px 0 10px; }
-  .balc{ letter-spacing:.02em; }
-  .balcov{ list-style:none; margin:0 0 10px; padding:0; font-size:.9rem; }
-  .balcov li{ padding:6px 0; border-bottom:1px solid var(--hair, #ddd); display:flex; gap:7px; align-items:baseline; flex-wrap:wrap; }
-  .balok{ color:#1a8a3a; font-weight:800; } .balno{ color:#c0392b; font-weight:800; }
-  .balsm{ font-size:.78rem; color:var(--muted); }
-  .balact{ display:flex; gap:6px; flex-wrap:wrap; margin:10px 0; }
-  .balres{ font-family:"Libre Baskerville", Georgia, serif; font-size:.9rem; line-height:1.6; }
   .schemasvg .slink.dist{ stroke-width:2.2; stroke-dasharray:1 4; }
   .schemasvg .netstop.schema.hl-dist circle{ filter:drop-shadow(0 0 4px #7a4fd1) drop-shadow(0 0 2px #7a4fd1); }
   .schemasvg .sdist{ fill:#7a4fd1; font-weight:800; }
@@ -361,7 +340,6 @@
     </span>
     <button type="button" class="tool" id="editToggle" aria-pressed="false">✎ Modifier</button>
     <button type="button" class="tool" id="netToggle">Plan des intersections</button>
-    <button type="button" class="tool" id="balToggle">Équilibrer</button>
     <button type="button" class="tool" id="allPlaces">Correspondances…</button>
   </div>
 </header>
@@ -374,7 +352,7 @@
 <script src="../beta-config.js?v=20261005-c"></script>
 <script src="../beta-gate.js?v=20261005-d"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-j"></script>
+<script src="../beta-modules.js?v=20261005-k"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -1894,127 +1872,7 @@
   }
 
 
-  // ---------- Jeu « Équilibrer » : canaux atteints → le moins de canaux équilibrants possible (six systèmes de Dr Tán) ----------
-  // Horloge chinoise des douze canaux ; rèn mài et dū mài hors de l'horloge, sur le passage du yíng qì (F → RM → DM → P),
-  // seulement pour le système 1. Un canal atteint peut en équilibrer un autre (pas lui-même).
-  const BAL_ORD = ["P", "GI", "E", "Rt", "C", "IG", "V", "Rn", "EC", "TF", "VB", "F"];
-  const BAL_ALL = BAL_ORD.concat(["RM", "DM"]);
-  let BAL = {on:new Set([1, 2, 3, 4, 5]), aff:[], pick:new Set(), done:false, hint:false, score:0, played:0};
-  try{ const s = JSON.parse(localStorage.getItem("mtc_trajets_balance") || "{}"); if(Array.isArray(s.on) && s.on.length) BAL.on = new Set(s.on); BAL.hint = !!s.hint; BAL.score = s.score || 0; BAL.played = s.played || 0; }catch(e){}
-  const balSave = () => { try{ localStorage.setItem("mtc_trajets_balance", JSON.stringify({on:[...BAL.on], hint:BAL.hint, score:BAL.score, played:BAL.played})); }catch(e){} };
-  const balLinks = (b, a) => b === a ? [] : [...BAL.on].filter(n => TAN_SYSTEMS[n] && TAN_SYSTEMS[n].pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
-  const balPos = c => {
-    const pol = (a, r) => [170 + r * Math.cos(a), 170 + r * Math.sin(a)];
-    if(c === "RM") return pol(-112 * Math.PI / 180, 188);
-    if(c === "DM") return pol(-96 * Math.PI / 180, 188);
-    return pol(-Math.PI / 2 + BAL_ORD.indexOf(c) * Math.PI / 6, 125);
-  };
-  const balInk = c => ELEMENT[c] === "metal" ? "var(--text-color)" : netColor(c);
-  function balOptimum(){
-    for(let k = 1; k <= BAL_ALL.length; k++){
-      const sols = [];
-      const rec = (s, i) => {
-        if(s.length === k){ if(BAL.aff.every(a => s.some(b => balLinks(b, a).length))) sols.push(s.slice()); return; }
-        for(let j = i; j < BAL_ALL.length; j++){ s.push(BAL_ALL[j]); rec(s, j + 1); s.pop(); }
-      };
-      rec([], 0);
-      if(sols.length) return sols;
-    }
-    return [];
-  }
-  function balNewCase(){
-    const n = 2 + Math.floor(Math.random() * 3);
-    const pool = BAL.on.has(1) && Math.random() < .2 ? BAL_ALL.slice() : BAL_ORD.slice();
-    BAL.aff = [];
-    while(BAL.aff.length < n){
-      const c = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
-      if((c === "RM" || c === "DM") && BAL.aff.some(x => x === "RM" || x === "DM")) continue;
-      BAL.aff.push(c);
-    }
-    if(BAL.aff.some(a => !BAL_ALL.some(b => balLinks(b, a).length))) return balNewCase();
-    BAL.pick = new Set(); BAL.done = false; BAL.result = "";
-  }
-  function showBalance(){
-    if(view !== "balance" && current) lastCanal = current;
-    if(GAME) gameEnd();
-    RT = null;
-    view = "balance"; current = null;
-    nav.querySelectorAll("button[data-code]").forEach(b => b.classList.remove("on"));
-    const nt = document.getElementById("netToggle"); if(nt) nt.classList.remove("on");
-    document.getElementById("balToggle").classList.add("on");
-    if(!BAL.aff.length) balNewCase();
-    balRender();
-    try{ history.replaceState(null, "", "#equilibrer"); }catch(e){}
-  }
-  function balRender(){
-    const name = c => (data.find(d => d.code === c) || {}).name || c;
-    const chip = c => '<b class="balc" style="color:' + balInk(c) + '" title="' + esc(name(c)) + '">' + esc(sigle(c)) + "</b>";
-    let g = '<circle cx="170" cy="170" r="125" fill="none" stroke="currentColor" stroke-opacity=".2"/>';
-    const [f, rm, dm, pp] = ["F", "RM", "DM", "P"].map(balPos);
-    g += '<path d="M' + f[0] + " " + f[1] + " Q" + (f[0] - 30) + " " + (f[1] - 45) + " " + rm[0] + " " + (rm[1] + 20) + " M" + (rm[0] + 20) + " " + rm[1] + " L" + (dm[0] - 20) + " " + dm[1] +
-      " M" + dm[0] + " " + (dm[1] + 20) + " Q" + (dm[0] + 10) + " " + (pp[1] - 20) + " " + pp[0] + " " + (pp[1] - 20) + '" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-dasharray="3 4"/>';
-    g += '<text x="' + (rm[0] + dm[0]) / 2 + '" y="' + (rm[1] - 30) + '" text-anchor="middle" class="balflow">YÍNG QÌ</text>';
-    BAL.pick.forEach(b => BAL.aff.forEach(a => {
-      const l = balLinks(b, a); if(!l.length) return;
-      const [p1, p2] = [balPos(b), balPos(a)], mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2;
-      g += '<line x1="' + p1[0] + '" y1="' + p1[1] + '" x2="' + p2[0] + '" y2="' + p2[1] + '" stroke="var(--shadow-color)" stroke-width="1.8"/>' +
-        '<rect x="' + (mx - 14) + '" y="' + (my - 8) + '" width="28" height="16" fill="var(--page-bg)" stroke="var(--shadow-color)"/>' +
-        '<text x="' + mx + '" y="' + (my + 3.5) + '" text-anchor="middle" class="balsys">' + l.join("·") + "</text>";
-    }));
-    BAL_ALL.forEach(c => {
-      const [x, y] = balPos(c), isA = BAL.aff.includes(c), isP = BAL.pick.has(c), mv = c === "RM" || c === "DM", off = mv && !BAL.on.has(1);
-      g += '<g class="balnode' + (off ? " off" : "") + '" data-c="' + c + '"><title>' + esc(name(c)) + (off ? " — seulement dans le système 1" : "") + "</title>";
-      if(isA) g += '<circle cx="' + x + '" cy="' + y + '" r="24" fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="4 3"/>';
-      g += '<circle cx="' + x + '" cy="' + y + '" r="18" fill="' + (isP ? "var(--text-color)" : "var(--page-bg)") + '" stroke="' + balInk(c) + '" stroke-width="' + (isP ? 2.6 : 1.6) + '"/>';
-      g += '<text x="' + x + '" y="' + (y + 4) + '" text-anchor="middle" class="ballbl" style="fill:' + (isP ? "var(--page-bg)" : balInk(c)) + '">' + esc(c) + "</text>";
-      if(BAL.hint){ const n = BAL.aff.filter(a => balLinks(c, a).length).length; if(n) g += '<text x="' + (x + 19) + '" y="' + (y - 14) + '" class="balhint">' + n + "</text>"; }
-      g += "</g>";
-    });
-    const cov = BAL.aff.map(a => {
-      const by = [...BAL.pick].map(b => [b, balLinks(b, a)]).filter(x => x[1].length);
-      return "<li>" + (by.length ? '<span class="balok">✓</span>' : '<span class="balno">—</span>') + chip(a) +
-        (by.length ? ' <span class="balsm">équilibré par</span> ' + by.map(([b, l]) => chip(b) + ' <span class="balsm">(syst. ' + l.join(", ") + ")</span>").join(", ") : ' <span class="balsm">pas encore équilibré</span>') + "</li>";
-    }).join("");
-    main.innerHTML = "<h2>Équilibrer</h2>" +
-      '<p class="src">Des canaux sont atteints : choisis le moins de canaux possible pour les rééquilibrer tous, selon les six systèmes de Dr Tán. Un canal atteint peut en équilibrer un autre. Rèn mài et dū mài ne comptent que pour le système 1.</p>' +
-      '<div class="balbar">Systèmes ' + [1, 2, 3, 4, 5].map(n => '<button type="button" class="balsysbtn' + (BAL.on.has(n) ? " on" : "") + '" data-n="' + n + '" title="' + esc(TAN_SYSTEMS[n].name) + '">' + n + "</button>").join("") +
-      '<label><input type="checkbox" id="balHint"' + (BAL.hint ? " checked" : "") + "> afficher le nombre de canaux équilibrés</label>" +
-      '<span class="balscore">' + BAL.score + " / " + BAL.played + "</span></div>" +
-      '<div class="ballay"><svg class="balclock" viewBox="-40 -50 420 420" role="img" aria-label="Horloge chinoise des douze canaux">' + g + "</svg>" +
-      '<div class="balside"><div class="ballbltop">Canaux atteints</div><p class="balcase">' + BAL.aff.map(chip).join(" · ") + "</p><ul class=\"balcov\">" + cov + "</ul>" +
-      '<div class="balact"><button type="button" class="tool" id="balVal"' + (BAL.done ? " disabled" : "") + '>Valider</button><button type="button" class="tool" id="balNext">Nouveau cas</button><button type="button" class="tool" id="balClr"' + (BAL.done ? " disabled" : "") + ">Effacer</button></div>" +
-      '<div class="balres">' + (BAL.result || "") + "</div></div></div>";
-    main.querySelectorAll(".balnode").forEach(n => n.addEventListener("click", () => {
-      const c = n.dataset.c;
-      if(BAL.done || ((c === "RM" || c === "DM") && !BAL.on.has(1))) return;
-      BAL.pick.has(c) ? BAL.pick.delete(c) : BAL.pick.add(c);
-      balRender();
-    }));
-    main.querySelectorAll(".balsysbtn").forEach(b => b.addEventListener("click", () => {
-      const n = +b.dataset.n;
-      if(BAL.on.has(n) && BAL.on.size > 1) BAL.on.delete(n); else BAL.on.add(n);
-      balSave(); balNewCase(); balRender();
-    }));
-    document.getElementById("balHint").addEventListener("change", e => { BAL.hint = e.target.checked; balSave(); balRender(); });
-    document.getElementById("balNext").addEventListener("click", () => { balNewCase(); balRender(); });
-    document.getElementById("balClr").addEventListener("click", () => { BAL.pick.clear(); balRender(); });
-    document.getElementById("balVal").addEventListener("click", () => {
-      const all = BAL.aff.every(a => [...BAL.pick].some(b => balLinks(b, a).length));
-      if(!all){ BAL.result = '<span class="balno">Il reste des canaux non équilibrés.</span>'; balRender(); return; }
-      const opt = balOptimum(), k = opt.length ? opt[0].length : 0;
-      BAL.done = true; BAL.played++;
-      if(BAL.pick.size === k) BAL.score++;
-      balSave();
-      BAL.result = (BAL.pick.size === k ? '<span class="balok">Parfait : ' + k + (k > 1 ? " canaux" : " canal") + ", c’est le minimum.</span>"
-        : "Tout est équilibré avec " + BAL.pick.size + " canaux ; le minimum est <b>" + k + "</b>.") +
-        '<br><span class="balsm">Solutions minimales' + (opt.length > 1 ? " (" + opt.length + ")" : "") + " :</span><br>" +
-        opt.slice(0, 8).map(s => s.map(chip).join(" + ")).join("<br>");
-      balRender();
-    });
-  }
-
   function showNetwork(){
-    const bt0 = document.getElementById("balToggle"); if(bt0) bt0.classList.remove("on");
     if(view !== "network" && current) lastCanal = current;
     view = "network";
     current = null;
@@ -2771,7 +2629,6 @@
     current = canal.code;
     view = "canal";
     const nt = document.getElementById("netToggle"); if(nt) nt.classList.remove("on");
-    const bt = document.getElementById("balToggle"); if(bt) bt.classList.remove("on");
     nav.querySelectorAll(".navrow.muted").forEach(r => r.classList.remove("muted"));
     const ce = editing ? ' contenteditable="true" spellcheck="true"' : "";
     const scrollY = window.scrollY;
@@ -3122,9 +2979,8 @@
   document.addEventListener("keydown", e => { if(e.key === "Escape") document.getElementById("corr").classList.remove("open"); });
 
   document.getElementById("netToggle").addEventListener("click", () => { if(view === "network") show(lastCanal || (data[0] && data[0].code)); else showNetwork(); });
-  document.getElementById("balToggle").addEventListener("click", () => { if(view === "balance") show(lastCanal || (data[0] && data[0].code)); else showBalance(); });
   if(location.hash === "#reseau") showNetwork();
-  else if(location.hash === "#equilibrer") showBalance();
+  else if(location.hash === "#equilibrer") location.replace("../equilibrer/index.html");   // le jeu Équilibrer a sa propre page
   else if(location.hash === "#itineraire"){ showNetwork(); rtStart(); }
   else show(location.hash.slice(1) || (data[0] && data[0].code));
   // lien direct vers une liste de correspondances : index.html?lieu=yeux

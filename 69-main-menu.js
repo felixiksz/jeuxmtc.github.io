@@ -43,6 +43,15 @@
     call("toggleStatsPanel");
     setTimeout(() => { const card = byId("mtcQuizMasteryCard"); if(card) card.scrollIntoView({block:"start", behavior:"smooth"}); }, 350);
   }
+  // ligne d'état des notes (28-26) et bouton « Nouveauté » (47) : rangés dans le menu au lieu du bas de l'écran
+  function notesStatus(){
+    const d = document.querySelector("#mtcPersonalDataStatus .mtc-status-dates");
+    return d && d.textContent.trim() ? " (" + d.textContent.trim() + ")" : "";
+  }
+  function noveltyButton(){
+    const b = byId("mtcPharmaImportNovelty");
+    return b && !b.disabled && b.classList.contains("visible") ? b : null;
+  }
   function reminderState(){
     const b = byId("mtcDailyReminderButton");
     return b && b.getAttribute("aria-pressed") === "true" ? "activé" : "désactivé";
@@ -60,7 +69,7 @@
       ] : [
         ["Grille", "Le jeu principal : retrouver les groupes de quatre points.", () => {}],
         window.MTCQuizTest && ["Quiz", "Questions à choix sur les points.", () => window.MTCQuizTest.open()],
-        (admin || isPublic("trajets")) && ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("trajets", "equilibrer"), "b"],
+        ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("equilibrer"), "b"],
         (admin || isPublic("trajets")) && ["Itinéraire", "Relier deux points par le plan des intersections.", () => module("trajets", "itineraire"), "b"]
       ],
       reviser: [
@@ -82,7 +91,8 @@
         ["Affichage", "Thèmes de couleurs, son, prononciation.", openSettings],
         ["Aide", "Les tutoriels de chaque écran.", () => setTimeout(() => call("startTour"), 30)],
         admin && byId("mtcGithubSyncButton") && ["Synchronisation", "Tes notes sur plusieurs appareils.", () => clickId("mtcGithubSyncButton")],
-        ["Notes", "Exporter ou importer tes notes et images.", null, null, [["Exporter", () => call("exportPersonalNotes")], ["Importer", () => call("openImportPersonalNotesDialog")]]],
+        ["Notes", "Exporter ou importer tes notes et images." + notesStatus(), null, null, [["Exporter", () => call("exportPersonalNotes")], ["Importer", () => call("openImportPersonalNotesDialog")]]],
+        pharma && noveltyButton() && ["Fiches pharma complètes", "Nouveauté : ajouter les fiches complètes des substances.", () => noveltyButton().click()],
         ["Corrections", "Les commentaires publics des modules bêta.", () => window.open(DISCUSSIONS_URL, "_blank", "noopener")],
         byId("mtcOfflineButton") && ["Hors connexion", "Préparer le jeu pour jouer sans internet.", () => clickId("mtcOfflineButton")]
       ]
