@@ -61,7 +61,7 @@
         ["Grille", "Le jeu principal : retrouver les groupes de quatre points.", () => {}],
         window.MTCQuizTest && ["Quiz", "Questions à choix sur les points.", () => window.MTCQuizTest.open()],
         (admin || isPublic("trajets")) && ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("trajets", "equilibrer"), "b"],
-        ["Itinéraire", "Relier deux points par le plan des intersections.", null, "s"]
+        (admin || isPublic("trajets")) && ["Itinéraire", "Relier deux points par le plan des intersections.", () => module("trajets", "itineraire"), "b"]
       ],
       reviser: [
         ["Mémo", pharma ? "Toutes les substances, rangées par catégorie." : "Tous les points, rangés par catégorie.", () => call("openCheatsheetPanel")],

@@ -166,6 +166,27 @@
   .schemasvg .netstop.schema.hl-luo circle{ filter:drop-shadow(0 0 4px #e67e22) drop-shadow(0 0 2px #e67e22); }
   .schemasvg .netstop.schema.hl .slabel{ font-size:12.5px; }
   .schemasvg .slink.luo{ stroke-dasharray:6 4; stroke:#e67e22; }
+  .rtbar{ border-top:1px solid var(--text-color); border-bottom:1px solid var(--text-color); padding:8px 0; margin:0 0 10px; font-size:.88rem; display:flex; flex-direction:column; gap:6px; }
+  .rtrow{ display:flex; flex-wrap:wrap; gap:6px 12px; align-items:center; }
+  .rtrow label{ display:inline-flex; gap:5px; align-items:center; cursor:pointer; }
+  .rttitle{ font-family:"Libre Baskerville", Georgia, serif; font-size:1.05rem; }
+  .rtlvl{ font:inherit; font-weight:800; width:26px; height:26px; border-radius:50%; border:1.5px solid var(--text-color); background:transparent; color:var(--text-color); cursor:pointer; padding:0; }
+  .rtlvl.on{ background:var(--text-color); color:var(--page-bg); }
+  .rtscore{ margin-left:auto; font-weight:800; }
+  .rtmission{ font-family:"Libre Baskerville", Georgia, serif; font-size:1.05rem; }
+  .rtstart{ color:#1a8a3a; } .rtend{ color:#c0392b; }
+  .rtchip{ display:inline-block; color:#fff; background:var(--c); border-radius:5px; padding:0 6px; font-size:.8rem; }
+  .rtchange{ font:inherit; font-weight:800; font-size:.8rem; color:#fff; background:var(--c); border:0; border-radius:5px; padding:2px 8px; cursor:pointer; }
+  .rtchange:hover{ box-shadow:0 4px 12px var(--shadow-color); }
+  .rtsm{ font-size:.78rem; color:var(--muted); }
+  .rtmsg{ color:#c0392b; font-weight:700; }
+  .rtres{ font-family:"Libre Baskerville", Georgia, serif; line-height:1.6; }
+  .rtok{ color:#1a8a3a; font-weight:700; }
+  .schemasvg .rtpath line{ stroke:#ffd84d; stroke-width:11; stroke-linecap:round; opacity:.85; }
+  .schemasvg .rtring{ fill:none; stroke-width:3.5; }
+  .schemasvg .rtring.start{ stroke:#1a8a3a; } .schemasvg .rtring.end{ stroke:#c0392b; }
+  .schemasvg .rtring.cur{ stroke:#0000ff; stroke-dasharray:4 3; }
+  .schemasvg .netline.rt-curline{ stroke-width:9; filter:drop-shadow(0 0 5px #ffd84d); }
   .balbar{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:.85rem; margin:0 0 10px; }
   .balsysbtn{ font:inherit; font-weight:800; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--text-color); background:transparent; color:var(--text-color); cursor:pointer; padding:0; }
   .balsysbtn.on{ background:var(--text-color); color:var(--page-bg); }
@@ -353,7 +374,7 @@
 <script src="../beta-config.js?v=20261005-c"></script>
 <script src="../beta-gate.js?v=20261005-d"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-i"></script>
+<script src="../beta-modules.js?v=20261005-j"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -1462,26 +1483,207 @@
     if(ca === cb && !isNaN(na) && !isNaN(nb)) return (Number(na) - Number(nb)) * (SCHEMA_UP.has(ca) ? -1 : 1);
     return a.code.localeCompare(b.code, "fr", {numeric:true});
   }
+
+  // ---------- Jeu « Itinéraire » sur le plan des intersections ----------
+  // Une mission : aller d'un point à un autre en voyageant le long des canaux (lignes) et en ne changeant de ligne
+  // qu'aux points où elles se croisent. Un bon trajet a le moins de correspondances possible.
+  // Niveau 1 : canaux réguliers + rèn mài et dū mài ; 2 : + les six autres merveilleux vaisseaux et les points d'ouverture ;
+  // 3 : + vaisseaux luò et canaux distincts (passerelles). Options : trajet imposé par une zone, défi chronométré (5 missions).
+  const MV6 = new Set(["CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"]);
+  const RT_LEVELS = {1:"lignes principales", 2:"+ merveilleux vaisseaux", 3:"+ luò et canaux distincts"};
+  let RT = null;
+  let RT_OPT = {level:1, zone:false, chrono:false, perfect:0, played:0};
+  try{ Object.assign(RT_OPT, JSON.parse(localStorage.getItem("mtc_trajets_route") || "{}")); }catch(e){}
+  const rtSave = () => { try{ localStorage.setItem("mtc_trajets_route", JSON.stringify(RT_OPT)); }catch(e){} };
+  const bandOf = h => SCHEMA_BANDS.find(b => h < b[0])[1];
+  // stations du jeu : {code, canals, band}
+  function rtStations(level){
+    const codes = new Set(data.map(c => c.code));
+    const allowed = c => codes.has(c) && (level >= 2 || !MV6.has(c));
+    const m = {};
+    const add = (k, cs) => { const e = m[k] = m[k] || new Set([k.split(" ")[0]]); cs.forEach(c => e.add(c)); };
+    Object.entries(JIAOHUI).forEach(([k, v]) => add(k, v.canaux || []));
+    if(level >= 2) Object.entries(OPENING).forEach(([v, k]) => add(k, [v]));
+    if(level >= 3){ Object.entries(LUO_POINTS).forEach(([k, pr]) => add(k, pr ? [pr] : [])); Object.entries(distinctPoints()).forEach(([k, cs]) => add(k, cs)); }
+    return Object.entries(m).map(([code, set]) => ({code, canals:[...set].filter(allowed), band:bandOf(pointHeight(code))})).filter(s => s.canals.length);
+  }
+  // moins de correspondances : parcours en largeur sur les lignes (état = ligne, zone déjà visitée)
+  function rtSolve(st, startLines, endLines, zone){
+    const zoneLine = new Set(), adj = {};
+    st.forEach(s => s.canals.forEach(a => {
+      if(zone && s.band === zone) zoneLine.add(a);
+      s.canals.forEach(b => { if(a !== b){ adj[a] = adj[a] || new Map(); if(!adj[a].has(b)) adj[a].set(b, s.code); } });
+    }));
+    const key = (l, f) => l + "|" + (f ? 1 : 0), prev = {};
+    let q = [];
+    startLines.forEach(l => { const f = !zone || zoneLine.has(l), k = key(l, f); if(!(k in prev)){ prev[k] = null; q.push([l, f]); } });
+    while(q.length){
+      const nq = [];
+      for(const [l, f] of q){
+        if(endLines.includes(l) && f){
+          const path = []; let k = key(l, f);
+          while(k){ const pr = prev[k]; path.unshift({line:k.split("|")[0], via:pr ? pr.via : null}); k = pr ? pr.k : null; }
+          return path;
+        }
+        (adj[l] ? [...adj[l]] : []).forEach(([b, via]) => { const f2 = f || zoneLine.has(b), k2 = key(b, f2); if(!(k2 in prev)){ prev[k2] = {k:key(l, f), via}; nq.push([b, f2]); } });
+      }
+      q = nq;
+    }
+    return null;
+  }
+  function rtNewMission(){
+    const st = rtStations(RT.level), lines = new Set(st.flatMap(s => s.canals)), at = {};
+    st.forEach(s => { at[s.code] = s.canals; });
+    const pts = Object.keys(POINT_ZONE_DATA).filter(k => lines.has(k.split(" ")[0]));
+    const bands = SCHEMA_BANDS.map(b => b[1]);
+    for(let tries = 0; tries < 600; tries++){
+      const a = pts[Math.floor(Math.random() * pts.length)], b = pts[Math.floor(Math.random() * pts.length)];
+      if(a === b) continue;
+      const la = at[a] || [a.split(" ")[0]], lb = at[b] || [b.split(" ")[0]];
+      if(la.some(l => lb.includes(l))) continue;
+      const zone = RT.zoneOpt ? bands[Math.floor(Math.random() * bands.length)] : null;
+      const ba = bandOf(pointHeight(a)), bb = bandOf(pointHeight(b));
+      if(zone && (ba === zone || bb === zone)) continue;
+      const all = st.concat([a, b].filter(k => !at[k]).map(k => ({code:k, canals:[k.split(" ")[0]], band:bandOf(pointHeight(k))})));
+      const sol = rtSolve(all, la, lb, zone);
+      if(!sol || sol.length - 1 < 1 || sol.length - 1 > 3) continue;
+      Object.assign(RT, {start:a, end:b, zone, opt:sol.length - 1, sol, st:all, phase:"play", moves:[], msg:"", result:"", focus:true});
+      RT.linesAt = {}; RT.band = {};
+      all.forEach(s => { RT.linesAt[s.code] = s.canals; RT.band[s.code] = s.band; });
+      rtReplay();
+      return;
+    }
+    RT.msg = "Pas de mission trouvée avec ces réglages, réessaie.";
+  }
+  function rtReplay(){
+    RT.cur = {code:RT.start, line:RT.start.split(" ")[0]}; RT.transfers = 0; RT.left = false; RT.zoneOk = false;
+    RT.moves.forEach(m => {
+      if(m.type === "ride"){ RT.cur.code = m.to; RT.left = true; if(RT.zone && RT.band[m.to] === RT.zone) RT.zoneOk = true; }
+      else{ if(m.counted) RT.transfers++; RT.cur.line = m.to; }
+    });
+  }
+  function rtStart(){
+    RT = {level:RT_OPT.level, zoneOpt:RT_OPT.zone, chrono:RT_OPT.chrono, series:RT_OPT.chrono ? {n:1, perfect:0, t0:Date.now()} : null};
+    rtNewMission();
+    showNetwork();
+  }
+  function rtClick(code){
+    if(!RT || RT.phase !== "play") return;
+    const lines = RT.linesAt[code] || [code.split(" ")[0]];
+    if(code === RT.cur.code) return;
+    if(!lines.includes(RT.cur.line)){ RT.msg = code + " n’est pas sur la ligne " + sigle(RT.cur.line) + " : change de ligne à un point de correspondance."; showNetwork(); return; }
+    RT.moves.push({type:"ride", from:RT.cur.code, to:code, line:RT.cur.line});
+    rtReplay(); RT.msg = "";
+    if(code === RT.end){
+      if(RT.zone && !RT.zoneOk) RT.msg = "Arrivée atteinte, mais sans t’arrêter dans la zone « " + RT.zone + " » : annule ton dernier trajet et passe par cette zone.";
+      else return rtFinish(false);
+    }
+    showNetwork();
+  }
+  function rtChange(line){
+    if(!RT || RT.phase !== "play" || line === RT.cur.line) return;
+    RT.moves.push({type:"change", at:RT.cur.code, from:RT.cur.line, to:line, counted:RT.left});
+    rtReplay(); RT.msg = "";
+    showNetwork();
+  }
+  // un arrêt possible dans la zone imposée, sur une des lignes de la solution
+  function rtZoneExample(){
+    for(const s of RT.sol){ const z = RT.st.find(x => x.band === RT.zone && x.canals.includes(s.line)); if(z) return ", par exemple à " + esc(z.code) + " sur " + esc(sigle(s.line)); }
+    return "";
+  }
+  function rtSolText(){
+    return RT.sol.map((s, i) => (i ? "→ <b>" + esc(s.via) + "</b> → " : "") + '<b style="color:' + (ELEMENT[s.line] === "metal" ? "var(--text-color)" : netColor(s.line)) + '">' + esc(sigle(s.line)) + "</b>").join(" ") +
+      (RT.zone ? " <span class=\"rtsm\">(avec un arrêt dans la zone « " + esc(RT.zone) + " »" + rtZoneExample() + ")</span>" : "");
+  }
+  function rtFinish(gaveUp){
+    RT.phase = "done";
+    const perfect = !gaveUp && RT.transfers === RT.opt;
+    RT_OPT.played++; if(perfect) RT_OPT.perfect++; rtSave();
+    if(RT.series && perfect) RT.series.perfect++;
+    RT.result = (gaveUp ? "Solution :" : perfect ? '<span class="rtok">Parfait : ' + RT.transfers + " correspondance" + (RT.transfers > 1 ? "s" : "") + ", c’est le minimum.</span>"
+      : "Arrivée en " + RT.transfers + " correspondance" + (RT.transfers > 1 ? "s" : "") + " ; le minimum est <b>" + RT.opt + "</b>.") + "<br>" + rtSolText();
+    if(RT.series && RT.series.n >= 5){
+      const s = Math.round((Date.now() - RT.series.t0) / 1000);
+      RT.result += '<br><b>Défi terminé : ' + RT.series.perfect + " / 5 trajets parfaits en " + Math.floor(s / 60) + " min " + String(s % 60).padStart(2, "0") + " s.</b>";
+      RT.series.over = true;
+    }
+    showNetwork();
+  }
+  function rtNext(){
+    if(!RT) return rtStart();
+    if(RT.series){ if(RT.series.over) RT.series = {n:1, perfect:0, t0:Date.now()}; else RT.series.n++; }
+    rtNewMission(); showNetwork();
+  }
+  function rtPanel(){
+    const chip = c => '<b class="rtchip" style="--c:' + (ELEMENT[c] === "metal" ? "#1d1d1f" : netColor(c)) + '">' + esc(sigle(c)) + "</b>";
+    const here = (RT.linesAt[RT.cur.code] || [RT.cur.line]).filter(c => c !== RT.cur.line);
+    return '<div class="rtbar">' +
+      '<div class="rtrow"><b class="rttitle">Itinéraire</b> Niveau ' + [1, 2, 3].map(n => '<button type="button" class="rtlvl' + (RT.level === n ? " on" : "") + '" data-rtlvl="' + n + '" title="' + RT_LEVELS[n] + '">' + n + "</button>").join("") +
+      ' <span class="rtsm">' + RT_LEVELS[RT.level] + "</span>" +
+      '<label><input type="checkbox" id="rtZone"' + (RT.zoneOpt ? " checked" : "") + "> trajet imposé par une zone</label>" +
+      '<label><input type="checkbox" id="rtChrono"' + (RT.chrono ? " checked" : "") + "> défi chronométré (5 missions)</label>" +
+      '<span class="rtscore">' + RT_OPT.perfect + " / " + RT_OPT.played + (RT.series ? ' · mission ' + RT.series.n + "/5 · <span id=\"rtClock\"></span>" : "") + "</span></div>" +
+      (RT.start ? '<div class="rtmission">De <b class="rtstart">' + esc(RT.start) + "</b> à <b class=\"rtend\">" + esc(RT.end) + "</b>" + (RT.zone ? " en t’arrêtant dans la zone <b>« " + esc(RT.zone) + " »</b>" : "") + "</div>" : "") +
+      (RT.phase === "play" ? '<div class="rtrow">Tu es à <b>' + esc(RT.cur.code) + "</b>, sur la ligne " + chip(RT.cur.line) + " · correspondances : <b>" + RT.transfers + "</b>" +
+        (here.length ? ' · <span class="rtsm">changer ici pour :</span> ' + here.map(c => '<button type="button" class="rtchange" data-rtline="' + c + '" style="--c:' + (ELEMENT[c] === "metal" ? "#1d1d1f" : netColor(c)) + '">' + esc(sigle(c)) + "</button>").join("") : "") + "</div>" +
+        '<div class="rtsm">Clique sur un point de ta ligne pour t’y rendre ; aux points de correspondance, choisis ta nouvelle ligne ci-dessus.</div>' : "") +
+      (RT.msg ? '<div class="rtmsg">' + RT.msg + "</div>" : "") +
+      (RT.result ? '<div class="rtres">' + RT.result + "</div>" : "") +
+      '<div class="rtrow">' + (RT.phase === "play" ? '<button type="button" class="tool" id="rtUndo"' + (RT.moves.length ? "" : " disabled") + '>Annuler</button><button type="button" class="tool" id="rtGive">Solution</button>' : "") +
+      '<button type="button" class="tool" id="rtNext">' + (RT.series && RT.series.over ? "Nouveau défi" : "Mission suivante") + '</button><button type="button" class="tool" id="rtQuit">Quitter le jeu</button></div></div>';
+  }
+  function rtBind(){
+    if(!RT) return;
+    main.querySelectorAll("[data-rtlvl]").forEach(b => b.addEventListener("click", () => { RT_OPT.level = +b.dataset.rtlvl; rtSave(); rtStart(); }));
+    const z = document.getElementById("rtZone"); if(z) z.addEventListener("change", e => { RT_OPT.zone = e.target.checked; rtSave(); rtStart(); });
+    const ch = document.getElementById("rtChrono"); if(ch) ch.addEventListener("change", e => { RT_OPT.chrono = e.target.checked; rtSave(); rtStart(); });
+    main.querySelectorAll("[data-rtline]").forEach(b => b.addEventListener("click", () => rtChange(b.dataset.rtline)));
+    const u = document.getElementById("rtUndo"); if(u) u.addEventListener("click", () => { RT.moves.pop(); rtReplay(); RT.msg = ""; showNetwork(); });
+    const gv = document.getElementById("rtGive"); if(gv) gv.addEventListener("click", () => rtFinish(true));
+    document.getElementById("rtNext").addEventListener("click", rtNext);
+    document.getElementById("rtQuit").addEventListener("click", () => { RT = null; showNetwork(); });
+    const clock = document.getElementById("rtClock");
+    if(clock && RT.series){
+      const tick = () => { if(!document.body.contains(clock)) return clearInterval(iv); const s = Math.round((Date.now() - RT.series.t0) / 1000); clock.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+      const iv = setInterval(tick, 1000); tick();
+    }
+  }
+  // tracé du trajet sur le plan
+  function rtOverlay(stations, cx, ry){
+    const idx = {}; stations.forEach((s, i) => { idx[s.code] = i; });
+    let g = '<g class="rtpath">';
+    RT.moves.forEach(m => {
+      if(m.type === "ride" && m.from in idx && m.to in idx) g += '<line x1="' + cx(m.line) + '" x2="' + cx(m.line) + '" y1="' + ry(idx[m.from]) + '" y2="' + ry(idx[m.to]) + '"/>';
+      else if(m.type === "change" && m.at in idx) g += '<line x1="' + cx(m.from) + '" x2="' + cx(m.to) + '" y1="' + ry(idx[m.at]) + '" y2="' + ry(idx[m.at]) + '"/>';
+    });
+    const ring = (code, cls) => code in idx ? '<circle class="' + cls + '" cx="' + cx(RT.linesAt[code] && RT.linesAt[code].includes(code.split(" ")[0]) ? code.split(" ")[0] : (RT.linesAt[code] || [code.split(" ")[0]])[0]) + '" cy="' + ry(idx[code]) + '" r="12"/>' : "";
+    g += ring(RT.start, "rtring start") + ring(RT.end, "rtring end");
+    if(RT.phase === "play" && RT.cur.code in idx) g += '<circle class="rtring cur" cx="' + cx(RT.cur.line) + '" cy="' + ry(idx[RT.cur.code]) + '" r="15"/>';
+    return g + "</g>";
+  }
+
   function showSchema(){
     const codes = new Set(data.map(c => c.code));
-    const visible = c => codes.has(c) && !NET_HIDDEN.has(c);
+    const visible = c => codes.has(c) && (RT ? RT.level >= 2 || !MV6.has(c) : !NET_HIDDEN.has(c));
     const byCode = {};
     const station = k => byCode[k] || (byCode[k] = {pid:"pt:" + k, code:k, own:k.split(" ")[0], canals:[], base:[], maybe:[], h:pointHeight(k), open:null, luo:null});
     Object.entries(JIAOHUI).forEach(([k, v]) => { const s = station(k); s.canals = [...new Set(v.canaux || [])]; s.base = s.canals.slice(); s.maybe = v.certains || []; s.jh = true; });
     // points d'ouverture des merveilleux vaisseaux : correspondance entre le canal du point et le vaisseau qu'il ouvre
-    Object.entries(OPENING).forEach(([vessel, k]) => { const s = station(k); [s.own, vessel].forEach(c => { if(!s.canals.includes(c)) s.canals.push(c); if(!s.base.includes(c)) s.base.push(c); }); s.open = vessel; });
+    if(!RT || RT.level >= 2) Object.entries(OPENING).forEach(([vessel, k]) => { const s = station(k); [s.own, vessel].forEach(c => { if(!s.canals.includes(c)) s.canals.push(c); if(!s.base.includes(c)) s.base.push(c); }); s.open = vessel; });
     // points luò : vers le canal couplé (seulement quand la surbrillance luò est active)
-    if(NET_HL.luo) Object.entries(LUO_POINTS).forEach(([k, pair]) => { const s = station(k); if(!s.canals.includes(s.own)) s.canals.push(s.own); if(!s.base.includes(s.own)) s.base.push(s.own); s.luo = pair || s.own; if(pair && !s.canals.includes(pair)) s.canals.push(pair); });
+    if(RT ? RT.level >= 3 : NET_HL.luo) Object.entries(LUO_POINTS).forEach(([k, pair]) => { const s = station(k); if(!s.canals.includes(s.own)) s.canals.push(s.own); if(!s.base.includes(s.own)) s.base.push(s.own); s.luo = pair || s.own; if(pair && !s.canals.includes(pair)) s.canals.push(pair); });
     // canaux distincts : le point rejoint la colonne de chaque canal distinct qui y passe (trait pointillé fin)
-    if(NET_HL.dist) Object.entries(distinctPoints()).forEach(([k, cs]) => {
+    if(RT ? RT.level >= 3 : NET_HL.dist) Object.entries(distinctPoints()).forEach(([k, cs]) => {
       const s = station(k);
       if(!s.canals.includes(s.own)) s.canals.push(s.own);
       if(!s.base.includes(s.own)) s.base.push(s.own);
       s.dist = cs;
       cs.forEach(c => { if(!s.canals.includes(c)) s.canals.push(c); });
     });
+    // jeu Itinéraire : départ et arrivée de la mission, même sans correspondance
+    if(RT && RT.start) [RT.start, RT.end].forEach(k => { if(!byCode[k]){ const s = station(k); s.canals = [s.own]; s.base = [s.own]; s.plain = true; } });
     // option : tous les points de chaque canal (VB 1 à VB 44…), y compris ceux sans correspondance
-    if(NET_TAN.plain){
+    if(NET_TAN.plain && !RT){
       Object.keys(POINT_ZONE_DATA).forEach(k => {
         const own = k.split(" ")[0];
         if(byCode[k]) return;
@@ -1534,7 +1736,7 @@
       const y = ry(i), xs = s.canals.map(cx), xa = Math.min(...xs), xb = Math.max(...xs);
       const isMv = s.canals.some(c => RIVER.has(c)), isLuo = !!s.luo;
       const isDist = !!(s.dist && s.dist.length);
-      const hl = (NET_HL.mv && isMv) || (NET_HL.luo && isLuo) || (NET_HL.dist && isDist), dim = (NET_HL.mv || NET_HL.luo || NET_HL.dist) && !hl;
+      const hl = !RT && ((NET_HL.mv && isMv) || (NET_HL.luo && isLuo) || (NET_HL.dist && isDist)), dim = !RT && (NET_HL.mv || NET_HL.luo || NET_HL.dist) && !hl;
       const info = [s.code + " — " + s.canals.map(sigle).join(", ")];
       if(s.maybe.length) info.push("selon certain·es auteur·ices : " + s.maybe.map(sigle).join(", "));
       if(s.open) info.push("point d’ouverture du " + sigle(s.open));
@@ -1560,6 +1762,7 @@
       g += '<text class="slabel" x="' + lx + '" y="' + ly + '">' + (s.open ? '<tspan class="sopen">⚓\uFE0E</tspan> ' : "") + (s.luo ? '<tspan class="sluo">⛓\uFE0E</tspan> ' : "") + (isDist ? '<tspan class="sdist">⁝</tspan> ' : "") + esc((PLACES[s.pid] || {label:s.code}).label) + "</text></g>";
       svg += g;
     });
+    if(RT && RT.start) svg += rtOverlay(stations, cx, ry);
     svg += tags;
     // bandeau des noms de lignes, toujours visible en haut du plan (suit le zoom et le déplacement)
     cols.forEach(c => {
@@ -1570,13 +1773,13 @@
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     const small = window.innerWidth < 760;
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
-    main.innerHTML = "<h2>Plan des intersections</h2>" +
-      '<div class="nethl">Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label><label><input type="checkbox" data-hl="dist"' + (NET_HL.dist ? " checked" : "") + '> canaux distincts</label>' +
+    main.innerHTML = "<h2>Plan des intersections" + (RT ? "" : ' <button type="button" class="tool" id="rtStartBtn">Jouer : Itinéraire</button>') + "</h2>" +
+      (RT ? rtPanel() : "") + '<div class="nethl"' + (RT ? ' style="display:none"' : "") + '>Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label><label><input type="checkbox" data-hl="dist"' + (NET_HL.dist ? " checked" : "") + '> canaux distincts</label>' +
       '<label class="nettan"><input type="checkbox" id="tanOn"' + (NET_TAN.on ? " checked" : "") + '> six systèmes (Dr Tán) :</label> <select id="tanSys" aria-label="Système">' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select> <span id="tanInfo" class="nettaninfo"></span></div>' +
-      '<div class="nethl netplain"><label><input type="checkbox" id="tanPlain"' + (NET_TAN.plain ? " checked" : "") + '> points sans correspondance</label><span class="nethlkey">tous les points de chaque canal</span></div>' +
+      '<div class="nethl netplain"' + (RT ? ' style="display:none"' : "") + '><label><input type="checkbox" id="tanPlain"' + (NET_TAN.plain ? " checked" : "") + '> points sans correspondance</label><span class="nethlkey">tous les points de chaque canal</span></div>' +
       (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Les ' + stations.length + " points d’intersection du tableau (jiāo huì), de la tête aux pieds ; chaque canal est une colonne. Clic sur un point : ses correspondances. Clic sur un nom de canal en haut : ses canaux couplés selon les six systèmes de Dr Tán. Barre de gauche : afficher / masquer un canal. Molette ou deux doigts : défiler · Ctrl + molette ou pincer : zoom · glisser : se déplacer.</div>" +
-      legend + (small ? "</details>" : "") +
+      (RT ? "" : legend) + (small ? "</details>" : "") +
       '<div class="netwrap schemawrap"><div class="schemaheads" aria-hidden="true">' + heads + '</div><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre">◐</button></div>' +
       '<svg class="netsvg schemasvg" role="img" aria-label="Schéma des points d’intersection" viewBox="0 0 ' + width + " " + height + '">' + svg + "</svg></div>";
     const wrap = main.querySelector(".netwrap");
@@ -1596,6 +1799,12 @@
     // téléphone : on démarre sur le haut, environ 6 colonnes lisibles ; ailleurs, toute la largeur
     const startW = window.innerWidth < 760 ? Math.min(width + 20, 6 * COLW + 260) : width + 20;
     if(!NET_VB && r.width > 50 && r.height > 50) NET_VB = {x:-10, y:0, w:startW, h:startW * r.height / r.width};
+    // nouvelle mission : le plan se place sur le point de départ
+    if(RT && RT.focus && r.width > 50 && r.height > 50){
+      const i = stations.findIndex(s => s.code === RT.start), h = startW * r.height / r.width;
+      if(i >= 0) NET_VB = {x:-10, y:Math.max(0, ry(i) - h * .3), w:startW, h};
+      RT.focus = false;
+    }
     initNetZoom(main.querySelector(".netsvg"));
     const svgEl = main.querySelector(".netsvg"), headEls = [...wrap.querySelectorAll(".shead")];
     const placeHeads = () => {
@@ -1669,7 +1878,10 @@
     window.addEventListener("resize", placeHeads);
     placeHeads();
     bindGame(); bindIti();
-    try{ history.replaceState(null, "", "#reseau"); }catch(e){}
+    const rsb = document.getElementById("rtStartBtn"); if(rsb) rsb.addEventListener("click", rtStart);
+    rtBind();
+    if(RT && RT.phase === "play") main.querySelectorAll('.netline[data-code="' + RT.cur.line + '"]').forEach(l => l.classList.add("rt-curline"));
+    try{ history.replaceState(null, "", RT ? "#itineraire" : "#reseau"); }catch(e){}
   }
   function bindNetMode(){
     main.querySelectorAll("[data-netmode]").forEach(b => b.addEventListener("click", () => {
@@ -1725,6 +1937,7 @@
   function showBalance(){
     if(view !== "balance" && current) lastCanal = current;
     if(GAME) gameEnd();
+    RT = null;
     view = "balance"; current = null;
     nav.querySelectorAll("button[data-code]").forEach(b => b.classList.remove("on"));
     const nt = document.getElementById("netToggle"); if(nt) nt.classList.remove("on");
@@ -2553,7 +2766,7 @@
   let current = null;
   function show(code, sectionIndex, keepScroll){
     if(GAME) gameEnd();
-    ITI = null;
+    ITI = null; RT = null;
     const canal = data.find(c => c.code === code) || data[0];
     current = canal.code;
     view = "canal";
@@ -2761,6 +2974,7 @@
     if(node){
       // station du plan : seulement la mention dans le texte (le panneau cacherait la carte) ;
       // la liste complète des correspondances s'ouvre au double-clic
+      if(RT && RT.phase === "play" && node.classList.contains("netstop")){ rtClick(node.dataset.pid.slice(3)); return; }
       if(node.classList.contains("plain")){ openPointFiche(node.dataset.pid.slice(3)); return; }
       if(node.classList.contains("netstop")){ if(ITI && ITI.phase === "play") itiClick(node.dataset.pid); else if(!GAME || GAME.phase === "setup") openCorr(corrKey(node.dataset.pid)); return; }
       if(node.dataset.cp){ complementClick(node); return; }
@@ -2911,6 +3125,7 @@
   document.getElementById("balToggle").addEventListener("click", () => { if(view === "balance") show(lastCanal || (data[0] && data[0].code)); else showBalance(); });
   if(location.hash === "#reseau") showNetwork();
   else if(location.hash === "#equilibrer") showBalance();
+  else if(location.hash === "#itineraire"){ showNetwork(); rtStart(); }
   else show(location.hash.slice(1) || (data[0] && data[0].code));
   // lien direct vers une liste de correspondances : index.html?lieu=yeux
   const lieu = new URLSearchParams(location.search).get("lieu");
