@@ -627,10 +627,13 @@
       ' <small>' + esc(t[1].toLowerCase()) + "</small></span>" + rmBtn + "</div>";
   }
 
+  // correspondances d'un point sans ses « auto-correspondances » (les trajets de son propre canal)
+  const ownCanal = pid => { const m = /^pt:(\S+) \d+$/.exec(pid); return m ? m[1] : null; };
+  const corrItems = pid => { const own = ownCanal(pid); return sectionsThrough(pid).filter(it => !own || it.c.code !== own); };
   let corrPid = null;
   function openCorr(pid){
     const place = PLACES[pid] || {label:pid};
-    const items = sectionsThrough(pid);
+    const items = corrItems(pid), own = ownCanal(pid);
     document.getElementById("corrTitle").textContent = "Correspondances : " + place.label;
     let html = "", lastLayer = null;
     items.forEach(it => {
@@ -648,7 +651,7 @@
     });
     document.getElementById("corrBody").innerHTML =
       '<div class="rename"><label for="renameInput">Nom du lieu</label><input id="renameInput" data-pid="' + esc(pid) + '" value="' + esc(place.label) + '"></div>' +
-      (html || "<p>Aucun trajet.</p>");
+      (html || (own ? "<p>Aucune correspondance : seuls les trajets de son propre canal (" + esc(sigle(own)) + ") passent par ce point.</p>" : "<p>Aucun trajet.</p>"));
     corrPid = pid;
     document.getElementById("corr").classList.add("open");
     document.querySelectorAll(".node").forEach(n => n.classList.toggle("sel", n.dataset.pid === pid));
@@ -662,8 +665,9 @@
     });
     const order = ["familles", "tête", "membre supérieur", "tronc", "membre inférieur", "organes", "canaux", "points", "ajoutés"];
     document.getElementById("corrTitle").textContent = "Correspondances — lieux de passage";
-    const placeButtons = list => list.sort((a, b) => PLACES[a].label.localeCompare(PLACES[b].label, "fr", {numeric:true}))
-      .map(pid => '<button type="button" data-pid="' + esc(pid) + '">' + esc(PLACES[pid].label) + " (" + sectionsThrough(pid).length + ")</button>").join("");
+    const placeButtons = list => list.map(pid => [pid, corrItems(pid).length]).filter(([pid, n]) => n || !ownCanal(pid))
+      .sort((a, b) => PLACES[a[0]].label.localeCompare(PLACES[b[0]].label, "fr", {numeric:true}))
+      .map(([pid, n]) => '<button type="button" data-pid="' + esc(pid) + '">' + esc(PLACES[pid].label) + " (" + n + ")</button>").join("");
     document.getElementById("corrBody").innerHTML = '<div class="places-index">' + order.filter(g => groups[g]).map(g =>
       "<h3>" + esc(g) + "</h3>" + (g === "points" ? intersectionTable() + "<h4>Autres points cités dans les trajets</h4>" + placeButtons(groups[g].filter(pid => !JIAOHUI[pid.slice(3)])) : placeButtons(groups[g]))
     ).join("") + "</div>";
@@ -677,7 +681,7 @@
     return '<p class="jhint">Les ' + rows.length + " points d’intersection (jiāo huì) du tableau. Clique un point pour ouvrir sa fiche ; le nombre entre parenthèses ouvre ses trajets.</p>" +
       '<table class="jtable"><thead><tr><th>Point</th><th>Canaux qui s’y rejoignent</th><th>Selon certains</th></tr></thead><tbody>' +
       rows.map(k => {
-        const v = JIAOHUI[k], pid = "pt:" + k, n = PLACES[pid] ? sectionsThrough(pid).length : 0;
+        const v = JIAOHUI[k], pid = "pt:" + k, n = PLACES[pid] ? corrItems(pid).length : 0;
         return '<tr><td><a href="#" class="pfiche" data-point="' + esc(k) + '">' + esc(k) + "</a>" +
           (n ? ' <button type="button" class="linkish jcount" data-pid="' + esc(pid) + '" title="Trajets qui passent par ce point">(' + n + ")</button>" : "") + "</td>" +
           "<td>" + (v.canaux || []).map(chip).join(" ") + "</td><td>" + (v.certains || []).map(chip).join(" ") + "</td></tr>";
@@ -701,7 +705,7 @@
     body.innerHTML = '<p class="jhint">Chargement de la fiche…</p>';
     document.getElementById("corr").classList.add("open");
     const all = await loadPointDetails(), d = all[code.replace(" ", "")];
-    const pid = "pt:" + code, n = PLACES[pid] ? sectionsThrough(pid).length : 0, jh = JIAOHUI[code];
+    const pid = "pt:" + code, n = PLACES[pid] ? corrItems(pid).length : 0, jh = JIAOHUI[code];
     const back = '<button type="button" class="linkish" id="ficheBack">← Tableau des points d’intersection</button>';
     if(!d){ body.innerHTML = back + '<p class="jhint">Pas de fiche pour ce point.</p>'; }
     else{
