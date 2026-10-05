@@ -1,0 +1,91 @@
+/* ============================================================
+   modules-theme.css
+   Design des modules Trajets et Formules aligné sur le jeu :
+   couleurs du thème d'affichage choisi dans le jeu (fond, lettres,
+   halo : voir modules-theme.js), boutons en texte majuscule avec
+   halo, titres en Libre Baskerville. Chargé après le style propre
+   de chaque page : ne fait que le surcharger.
+   ============================================================ */
+:root{
+  --page-bg:#FCFCFA; --text-color:#271629; --shadow-color:#0000FF; --mtc-accent:#0000FF;
+  --bg:var(--page-bg); --text:var(--text-color); --accent:var(--mtc-accent);
+  --muted:color-mix(in srgb, var(--text-color) 60%, var(--page-bg));
+  --hair:color-mix(in srgb, var(--text-color) 15%, var(--page-bg));
+  --surface:color-mix(in srgb, var(--text-color) 5%, var(--page-bg));
+  --surface2:color-mix(in srgb, var(--text-color) 9%, var(--page-bg));
+}
+body{ background:var(--page-bg); color:var(--text-color); }
+
+/* barre du haut : boutons en texte, halo sous l'onglet actif, fine ligne lumineuse */
+header{ background:var(--page-bg); border-bottom:0; box-shadow:0 1px 0 var(--hair), 0 6px 12px -10px var(--shadow-color); }
+h1{ font-size:.86rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
+.beta{ color:#ff3b8d; font-size:.62em; font-weight:700; text-transform:none; letter-spacing:0; vertical-align:super; }
+.tool{ border:0; background:transparent; color:var(--text-color); font-weight:800; font-size:.74rem; text-transform:uppercase; letter-spacing:.04em;
+  padding:5px 9px; border-radius:999px; transition:transform .12s ease, box-shadow .12s ease; }
+.tool:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 6px 14px var(--shadow-color); }
+@media (max-width:700px){ .tools .tool{ font-size:.68rem; padding:4px 6px; } h1{ font-size:.78rem; } }
+.tool.on{ background:transparent; color:var(--text-color); border:0; box-shadow:0 4px 14px var(--shadow-color); }
+
+/* barre de gauche */
+nav{ background:var(--page-bg); border-right:1px solid var(--hair); }
+nav button{ background:transparent; border:0; color:var(--text-color); font-weight:800; border-radius:999px; transition:transform .12s ease, box-shadow .12s ease; }
+nav button:hover{ transform:translateX(2px); box-shadow:0 4px 12px color-mix(in srgb, var(--shadow-color) 55%, transparent); }
+nav button.on{ background:transparent; color:var(--text-color); border:0; box-shadow:0 3px 12px var(--shadow-color); }
+nav h4{ color:var(--muted); }
+nav .navrow.muted button{ background:transparent; }
+.sigle-legend, .check-legend{ border-color:var(--hair); color:var(--muted); }
+.sigle-legend b{ color:var(--text-color); }
+
+/* titres et textes */
+h2{ font-family:"Libre Baskerville", Georgia, serif; font-weight:700; }
+h3{ color:var(--accent); }
+section{ border-top-color:var(--hair); }
+.linkish{ color:var(--accent); }
+details{ color:color-mix(in srgb, var(--text-color) 82%, var(--page-bg)); }
+.hz, .fr, .subfr, .cname small, .crow .where{ color:var(--muted); }
+.el-none{ color:var(--text-color); }
+
+/* champs */
+select, input[type="text"], input[type="search"], input:not([type]), textarea, .pick{
+  background:var(--page-bg); color:var(--text-color); border:1px solid var(--hair); border-radius:8px; }
+input[type="checkbox"]{ accent-color:var(--accent); }
+
+/* surfaces : panneaux, encadrés, tableaux */
+#corr, #tip{ background:var(--page-bg); color:var(--text-color); border-color:var(--hair); }
+.crow:hover{ background:var(--surface); }
+.crow .where{ background:var(--surface); }
+.crow .rm{ background:var(--page-bg); }
+.orb{ background:var(--page-bg); }
+.plan{ background:var(--surface); border-color:var(--hair); }
+.tgroup{ border-color:var(--hair); }
+.jtable th{ border-bottom-color:var(--hair); }
+.jtable td{ border-bottom-color:var(--surface2); }
+.places-index button{ background:transparent; border-color:var(--hair); color:var(--text-color); }
+.crow small.jh{ background:color-mix(in srgb, #f0b400 22%, var(--page-bg)); color:var(--text-color); }
+details li:target{ background:color-mix(in srgb, #ffd84d 45%, var(--page-bg)); }
+body.editing [contenteditable="true"]{ background:color-mix(in srgb, #ffe680 18%, var(--page-bg)); }
+body.editing [contenteditable="true"]:focus{ background:var(--page-bg); }
+
+/* Formules */
+table.comp td, table.comp th{ border-bottom-color:var(--hair); }
+.gbar, .mini{ background:var(--surface); border-color:var(--hair); }
+.qcard, .chat{ border-color:var(--hair); }
+.chat{ background:var(--surface); }
+.choices button{ background:transparent; color:var(--text-color); border:1px solid var(--hair); transition:transform .12s ease, box-shadow .12s ease; }
+.choices button:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 6px 14px var(--shadow-color); border-color:var(--hair); }
+.choices button.good, tr.revealed td{ background:color-mix(in srgb, var(--ok) 16%, var(--page-bg)); }
+.choices button.badc, tr.revealed.wrong td{ background:color-mix(in srgb, var(--bad) 16%, var(--page-bg)); }
+tr.hidden-row td{ background:color-mix(in srgb, #f0b400 14%, var(--page-bg)); }
+details.verif{ background:color-mix(in srgb, #f0b400 12%, var(--page-bg)); border-color:color-mix(in srgb, #f0b400 40%, var(--page-bg)); }
+details.verif summary{ color:inherit; }
+.line.exam .txt2{ background:color-mix(in srgb, #3d7bff 14%, var(--page-bg)); }
+.line.tip .txt2{ background:color-mix(in srgb, #f0b400 18%, var(--page-bg)); }
+.decide{ border-top-color:var(--hair); }
+
+/* fond sombre : surlignages jaunes lisibles */
+html.mtc-dark mark.mtc-mention{ color:#000; }
+html.mtc-dark{ color-scheme:dark; }
+/* le plan reste une carte claire : ses boutons gardent des lettres sombres */
+.netzoom button{ color:#1d1d1f; }
+/* questions du cas clinique : phrases, plus lisibles en minuscules */
+.asks .tool{ text-transform:none; letter-spacing:0; font-size:.86rem; font-weight:700; }
