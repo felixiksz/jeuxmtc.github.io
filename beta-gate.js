@@ -69,7 +69,7 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
       '<h2 id="mtcBetaTitle">' + esc(opts.title) + ' <span class="b">β</span></h2>' +
       "<p>Ce module est en <b>phase bêta</b> : il est encore en construction et en cours de vérification.</p>" +
       '<label><input type="checkbox" id="mtcBeta1"><span>J’ai compris que le contenu peut contenir des erreurs ou des imprécisions, et qu’il ne remplace pas le cours.</span></label>' +
-      '<label><input type="checkbox" id="mtcBeta2"><span>J’accepte de signaler les erreurs que je repère en laissant des <b>commentaires de correction en ligne, visibles par tout le monde</b> (bouton « 💬 Corrections »). <small>Un compte GitHub est nécessaire pour écrire.</small></span></label>' +
+      '<label><input type="checkbox" id="mtcBeta2"><span>J’accepte de signaler les erreurs que je repère en laissant des <b>commentaires de correction en ligne, visibles par tout le monde</b> (bouton « Corrections »). <small>Un compte GitHub est nécessaire pour écrire.</small></span></label>' +
       '<div class="row"><a class="btn" href="../index.html">Retour au jeu</a><button type="button" class="go" id="mtcBetaGo" disabled>J’accepte et j’entre</button></div></div>';
     document.body.appendChild(veil);
     const c1 = veil.querySelector("#mtcBeta1"), c2 = veil.querySelector("#mtcBeta2"), go = veil.querySelector("#mtcBetaGo");
@@ -92,7 +92,7 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
       panel = document.createElement("aside");
       panel.className = "mtc-corr-panel";
       panel.setAttribute("aria-label", "Commentaires de correction");
-      panel.innerHTML = '<header><b>💬 Corrections</b><button type="button" class="x" aria-label="Fermer">×</button></header><div class="body"></div>';
+      panel.innerHTML = '<header><b>Corrections</b><button type="button" class="x" aria-label="Fermer">×</button></header><div class="body"></div>';
       document.body.appendChild(panel);
       panel.querySelector(".x").addEventListener("click", () => panel.classList.remove("open"));
     }

@@ -89,3 +89,7 @@ html.mtc-dark{ color-scheme:dark; }
 .netzoom button{ color:#1d1d1f; }
 /* questions du cas clinique : phrases, plus lisibles en minuscules */
 .asks .tool{ text-transform:none; letter-spacing:0; font-size:.86rem; font-weight:700; }
+/* « ✓ Vérifier » : petit bouton texte */
+html .verifybtn{ background:transparent; border:0; border-bottom:1px solid currentColor; border-radius:0; padding:0 1px; color:var(--muted); font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; }
+html .verifybtn:hover{ color:var(--text-color); box-shadow:0 6px 8px -7px var(--shadow-color); }
+html .verifybtn.me{ background:transparent; color:#2c9a5c; border-color:#2c9a5c; }

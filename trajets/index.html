@@ -288,7 +288,7 @@
   .places-index h3{ margin:14px 0 4px; color:var(--text); font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; }
   .places-index button{ font:inherit; font-size:.85rem; border:1px solid #dde; background:#fafaff; border-radius:999px; padding:1px 9px; margin:2px; cursor:pointer; }
 </style>
-<link href="../modules-theme.css?v=20261005-a" rel="stylesheet">
+<link href="../modules-theme.css?v=20261005-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
 </head>
 <body>
@@ -325,9 +325,9 @@
 </aside>
 <div id="tip" role="tooltip"></div>
 <script src="../beta-config.js?v=20261005-c"></script>
-<script src="../beta-gate.js?v=20261005-b"></script>
+<script src="../beta-gate.js?v=20261005-c"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-e"></script>
+<script src="../beta-modules.js?v=20261005-f"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -2084,7 +2084,7 @@
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     const small = window.innerWidth < 760;
     document.body.classList.toggle("netgame-on", !!GAME && GAME.phase !== "setup");
-    main.innerHTML = '<h2>Réseau global des trajets <span class="netmode"><button type="button" class="tool" data-netmode="schema"' + (GAME || ITI ? " hidden" : "") + '>Schéma</button><button type="button" class="tool on" data-netmode="ville"' + (GAME || ITI ? " hidden" : "") + '>Plan de ville</button></span> <button type="button" class="tool gamebtn" id="netGameBtn"' + (GAME ? " hidden" : "") + '>🎲 Démêler</button><button type="button" class="tool gamebtn" id="netItiBtn"' + (GAME || ITI ? " hidden" : "") + '>🚇 Itinéraire</button></h2>' + gamePanel() + itiPanel() + (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
+    main.innerHTML = '<h2>Réseau global des trajets <span class="netmode"><button type="button" class="tool" data-netmode="schema"' + (GAME || ITI ? " hidden" : "") + '>Schéma</button><button type="button" class="tool on" data-netmode="ville"' + (GAME || ITI ? " hidden" : "") + '>Plan de ville</button></span> <button type="button" class="tool gamebtn" id="netGameBtn"' + (GAME ? " hidden" : "") + '>Démêler</button><button type="button" class="tool gamebtn" id="netItiBtn"' + (GAME || ITI ? " hidden" : "") + '>Itinéraire</button></h2>' + gamePanel() + itiPanel() + (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Chaque canal régulier est une ligne dont les stations sont ses points ; RM et DM forment un fleuve, les merveilleux vaisseaux des rivières avec leur navette ; les zones du corps sont des quartiers (centre-ville : organes). Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer · clic : correspondances · en mode ✎ Modifier : glisser une station dans son quartier.</div>' +
       legend + (small ? "</details>" : "") + '<div class="netwrap"><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre / plan de ville">◐</button></div>' +
       '<svg class="netsvg" role="img"><defs><pattern id="streets" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><path d="M0 23 H46 M23 0 V46" stroke="#ffffff" stroke-width="1.3" opacity=".6"/><path d="M0 0 L46 46" stroke="#ffffff" stroke-width=".8" opacity=".35"/></pattern></defs>' +
@@ -2180,7 +2180,7 @@
     if(!GAME || GAME.phase === "ref") return "";
     const chip = code => '<button type="button" class="gchip' + (GAME.codes.includes(code) ? " on" : "") + '" data-gc="' + code + '" style="--c:' + netColor(code) + '">' + esc(sigle(code)) + "</button>";
     if(GAME.phase === "setup"){
-      return '<div class="netgame"><div class="grow"><b>🎲 Démêlage</b> — les stations des lignes choisies sont mélangées : glisse-les jusqu’à leur place sur la carte corrigée (bon quartier, bonne face, bon ordre).</div>' +
+      return '<div class="netgame"><div class="grow"><b>Démêlage</b> — les stations des lignes choisies sont mélangées : glisse-les jusqu’à leur place sur la carte corrigée (bon quartier, bonne face, bon ordre).</div>' +
         '<div class="grow">Lignes : ' + gameCanals().map(chip).join("") + ' <button type="button" class="linkish" data-g="rand">au hasard (3)</button></div>' +
         '<div class="grow">Niveau : <select data-g="level">' + Object.entries(GAME_LEVELS).map(([k, v]) => '<option value="' + k + '"' + (k === GAME.level ? " selected" : "") + ">" + v + "</option>").join("") + "</select> " +
         '<button type="button" class="tool" data-g="start"' + (GAME.codes.length ? "" : " disabled") + '>Mélanger</button> <button type="button" class="linkish" data-g="quit">fermer</button></div></div>';
@@ -2191,11 +2191,11 @@
     else if(GAME.checked && !GAME.hint){
       const v = Object.values(GAME.checked), ok = v.filter(x => x === "ok").length, near = v.filter(x => x === "near").length, bad = v.length - ok - near;
       const score = Math.round((ok * 2 + near) / (2 * n) * 100);
-      res = ok === n ? "🎉 Démêlé ! " + GAME.moves + " déplacements, " + Math.round((Date.now() - GAME.t0) / 1000) + " s."
+      res = ok === n ? "Démêlé ! " + GAME.moves + " déplacements, " + Math.round((Date.now() - GAME.t0) / 1000) + " s."
         : '<span class="g-ok">● ' + ok + " bien placées</span> · " + '<span class="g-near">● ' + near + " bon quartier</span> · " + '<span class="g-bad">● ' + bad + " à déplacer</span> · score " + score + " %";
     }
     else if(GAME.hint) res = "Indice : la station en jaune va dans le cercle pointillé.";
-    return '<div class="netgame"><div class="grow"><b>🎲 Démêlage</b> ' + GAME.codes.map(code => '<span class="gchip on" style="--c:' + netColor(code) + '">' + esc(sigle(code)) + "</span>").join("") +
+    return '<div class="netgame"><div class="grow"><b>Démêlage</b> ' + GAME.codes.map(code => '<span class="gchip on" style="--c:' + netColor(code) + '">' + esc(sigle(code)) + "</span>").join("") +
       " · " + esc(GAME_LEVELS[GAME.level].split(" — ")[0]) + " · " + n + " stations · déplacements : " + GAME.moves +
       " · croisements : <b>" + (GAME.cross == null ? "…" : GAME.cross) + "</b> (carte corrigée : " + GAME.refCross + ")</div>" +
       '<div class="grow">' + (GAME.phase === "play" ? '<button type="button" class="tool" data-g="check">Vérifier</button> <button type="button" class="tool" data-g="hint">Indice</button> <button type="button" class="tool" data-g="solve">Solution</button> ' : "") +
@@ -2323,7 +2323,7 @@
     if(pid === ITI.b){
       const legs = ITI.path.length - 1;
       ITI.phase = "done";
-      ITI.msg = legs <= ITI.best ? "🎉 Itinéraire optimal : " + (legs - 1) + " correspondance" + (legs > 2 ? "s" : "") + " !"
+      ITI.msg = legs <= ITI.best ? "Itinéraire optimal : " + (legs - 1) + " correspondance" + (legs > 2 ? "s" : "") + " !"
         : "Arrivé avec " + (legs - 1) + " correspondances — le meilleur en demande " + (ITI.best - 1) + ".";
     }
     showNetwork();
@@ -2335,7 +2335,7 @@
   function itiPanel(){
     if(!ITI) return "";
     const lv = '<select data-i="level">' + Object.entries(ITI_LEVELS).map(([k, v]) => '<option value="' + k + '"' + (String(k) === String(ITI.level) ? " selected" : "") + ">" + v + "</option>").join("") + "</select>";
-    let html = '<div class="netgame iti"><div class="grow"><b>🚇 Itinéraire</b> ';
+    let html = '<div class="netgame iti"><div class="grow"><b>Itinéraire</b> ';
     if(ITI.phase === "setup" || !ITI.a){
       html += "— va d’une station à une autre avec le moins de changements de ligne possible : clique sur les stations où tu changes de ligne, puis l’arrivée. Les lignes affichées comptent (types et canaux choisis en haut et à gauche), ainsi que les relais entre canaux.</div>" +
         '<div class="grow">Niveau : ' + lv + ' <button type="button" class="tool" data-i="go">Nouveau trajet</button> <button type="button" class="linkish" data-i="quit">fermer</button>' +
@@ -2385,7 +2385,7 @@
         // vérification publique du trajet (réaction 👍 sur son fil de corrections, voir beta-modules.js)
         const vterm = "Trajets — " + canal.code + " — " + s.label;
         return '<section id="sec-' + si + '"><h3>' + esc(s.label) +
-          '<button type="button" class="verifybtn" data-verify="' + esc(vterm) + '" data-label="' + esc(canal.code + " — " + s.label) + '" title="Vérifier ce trajet (vérification publique)">✅ <span>Vérifier</span></button></h3>' +
+          '<button type="button" class="verifybtn" data-verify="' + esc(vterm) + '" data-label="' + esc(canal.code + " — " + s.label) + '" title="Vérifier ce trajet (vérification publique)">✓ <span>Vérifier</span></button></h3>' +
           '<div class="cols"><div class="desc">' +
             s.paragraphs.map((p, pi) => {
               const k = canal.code + "|" + si + "|" + pi, bullet = /^- /.test(p);

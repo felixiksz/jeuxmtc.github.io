@@ -1,6 +1,6 @@
 /* ============================================================
    beta-modules.js
-   Boutons « 💬 Corrections » et « ? » des modules bêta, et textes
+   Boutons « Corrections » et « ? » des modules bêta, et textes
    des tutoriels (Trajets, Formules). Chargé après beta-gate.js et
    beta-tour.js, avant le script de la page.
    mtcBetaModule("trajets" | "formules")
@@ -14,10 +14,10 @@
       {sel:"nav", title:"Les canaux", text:"Choisis un canal régulier ou un merveilleux vaisseau. Sa fiche s’ouvre : le texte du cours, son illustration et un plan façon métro, trajet par trajet (principal, luò, distinct, tendineux…)."},
       {sel:() => isSmall() ? "#typeToggle" : "#typeFilter", title:"Types de trajets", text:"Coche les trajets à afficher : branches externes ou internes du canal principal, luò, distinct, tendineux, merveilleux vaisseaux.\nLe choix s’applique aux plans, au réseau global et aux correspondances."},
       {sel:"main section .plan, main section", title:"Texte, image et plan", text:"Pour chaque trajet : le texte du cours, l’illustration et le plan.\nClique sur une station du plan : le texte défile jusqu’à sa mention, surlignée. Survole une station : les autres canaux qui passent par là s’affichent."},
-      {sel:".verifybtn", title:"✅ Vérifier un trajet", text:"Tu as comparé un trajet au cours et à son illustration, et il est juste ? Clique sur « Vérifier » à côté de son titre, puis réagis avec 👍 dans le fil qui s’ouvre. Chaque 👍 compte comme une vérification publique : « vérifié par N » s’affiche à côté du trajet."},
+      {sel:".verifybtn", title:"Vérifier un trajet", text:"Tu as comparé un trajet au cours et à son illustration, et il est juste ? Clique sur « Vérifier » à côté de son titre, puis réagis avec 👍 dans le fil qui s’ouvre. Chaque 👍 compte comme une vérification publique : « vérifié par N » s’affiche à côté du trajet."},
       {sel:"#allPlaces", title:"Correspondances", text:"L’index de tous les lieux et de tous les points. Clique sur un lieu pour voir tous les trajets qui y passent, regroupés par famille de zones."},
       {sel:"#netToggle", title:"Réseau global", text:"Le réseau des points d’intersection, façon carte de métro : une colonne par canal, de la tête aux pieds, et les points où les canaux se rejoignent."},
-      {sel:"#corrBtn", title:"💬 Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction sur le canal affiché (ou le réseau). Les commentaires sont publics : indique si possible ta source (page du cours, livre)."},
+      {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction sur le canal affiché (ou le réseau). Les commentaires sont publics : indique si possible ta source (page du cours, livre)."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment. Bonne exploration !"}
     ],
     reseau: [
@@ -31,9 +31,9 @@
       {sel:() => isSmall() ? "#pick" : "nav", title:"Les formules", text:"Toutes les formules, rangées par catégorie. Choisis une formule pour ouvrir sa fiche."},
       {sel:"table.comp", title:"La composition", text:"Chaque substance avec son rôle (jūn, chén, zuǒ, shǐ) et sa dose. Son nom français est sous le pinyin.\nSurvole un nom souligné pour voir la nature, la saveur et le tropisme. « hors pharmacopée du jeu » : pas encore de fiche pour cette substance."},
       {sel:"main h3 ~ h3", title:"Le reste de la fiche", text:"Préparation, actions, indications, tableau clinique, précautions, modifications et comparaisons. L’encadré « À vérifier » liste les points encore incertains."},
-      {sel:"#tabGame", title:"🎲 Substance manquante", text:"Une formule s’affiche avec une substance cachée : retrouve-la parmi 4 choix (touches 1 à 4) ou en saisie libre. Le rôle et la dose servent d’indices (à décocher pour corser le jeu). « Indice » montre les actions de la formule."},
-      {sel:"#tabCase", title:"🩺 Cas clinique", text:"Un patient vient te consulter. Interroge-le, examine-le, puis conseille une formule parmi trois. Moins tu demandes d’informations, plus tu marques de points."},
-      {sel:"#corrBtn", title:"💬 Corrections", text:"Tu repères une erreur dans une fiche ou un cas ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source."},
+      {sel:"#tabGame", title:"Substance manquante", text:"Une formule s’affiche avec une substance cachée : retrouve-la parmi 4 choix (touches 1 à 4) ou en saisie libre. Le rôle et la dose servent d’indices (à décocher pour corser le jeu). « Indice » montre les actions de la formule."},
+      {sel:"#tabCase", title:"Cas clinique", text:"Un patient vient te consulter. Interroge-le, examine-le, puis conseille une formule parmi trois. Moins tu demandes d’informations, plus tu marques de points."},
+      {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur dans une fiche ou un cas ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
     jeu: [
@@ -45,7 +45,7 @@
     cas: [
       {sel:"#cChat", title:"La consultation", text:"Le patient parle à la vitesse de la parole. Clique dans la conversation pour afficher tout de suite la fin de la phrase."},
       {sel:".asks.topics", title:"Interroger", text:"Choisis ta question : froid et chaleur, transpiration, tête, respiration, digestion, selles et urines, sommeil, douleurs… Le patient ne répond que sur ce point. « (encore) » : il a d’autres choses à dire sur ce sujet."},
-      {sel:".asks:not(.topics)", title:"Examiner", text:"« Autre chose ? » laisse le patient raconter librement. Regarde la langue, prends le pouls, observe, palpe l’abdomen.\n« 💡 Une substance de la formule » donne un ingrédient de la bonne formule, absent des deux autres propositions."},
+      {sel:".asks:not(.topics)", title:"Examiner", text:"« Autre chose ? » laisse le patient raconter librement. Regarde la langue, prends le pouls, observe, palpe l’abdomen.\n« Une substance de la formule » donne un ingrédient de la bonne formule, absent des deux autres propositions."},
       {sel:".decide", title:"Conseiller une formule", text:"Décide quand tu veux. Une bonne réponse rapporte 10 points, moins 1 par information demandée au-delà de deux (au minimum 3). Ensuite : le syndrome, le tableau clinique complet et la fiche de la formule."},
       {sel:"#cSpeed", title:"Vitesse de parole", text:"Lente, normale ou rapide, selon ta vitesse de lecture."}
     ]
@@ -76,7 +76,7 @@
   window.mtcBetaModule = function(module){
     const tools = document.querySelector("header .tools");
     if(tools && !document.getElementById("corrBtn")){
-      tools.insertAdjacentHTML("beforeend", '<button type="button" class="tool" id="corrBtn" title="Laisser un commentaire de correction (public)">💬 Corrections</button>' +
+      tools.insertAdjacentHTML("beforeend", '<button type="button" class="tool" id="corrBtn" title="Laisser un commentaire de correction (public)">Corrections</button>' +
         '<button type="button" class="tool" id="tourBtn" title="Revoir les explications" aria-label="Revoir les explications">?</button>');
       document.getElementById("corrBtn").addEventListener("click", () => { const [term, label] = corrTarget(module); window.mtcOpenCorrections(term, label); });
       document.getElementById("tourBtn").addEventListener("click", () => {

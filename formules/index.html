@@ -94,7 +94,7 @@
   .decide .choices{ grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); }
   .reveal{ margin-top:12px; font-size:.9rem; }
 </style>
-<link href="../modules-theme.css?v=20261005-a" rel="stylesheet">
+<link href="../modules-theme.css?v=20261005-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
 </head>
 <body>
@@ -105,8 +105,8 @@
   <div class="tools">
     <span class="srcinfo" id="srcinfo"></span>
     <button type="button" class="tool on" id="tabBrowse">Formules</button>
-    <button type="button" class="tool" id="tabGame">🎲 Substance manquante</button>
-    <button type="button" class="tool" id="tabCase">🩺 Cas clinique</button>
+    <button type="button" class="tool" id="tabGame">Substance manquante</button>
+    <button type="button" class="tool" id="tabCase">Cas clinique</button>
   </div>
 </header>
 <main id="main"><p class="msg">Chargement des formules…</p></main>
@@ -114,9 +114,9 @@
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
 <script src="../beta-config.js?v=20261005-c"></script>
-<script src="../beta-gate.js?v=20261005-b"></script>
+<script src="../beta-gate.js?v=20261005-c"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-e"></script>
+<script src="../beta-modules.js?v=20261005-f"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -330,7 +330,7 @@
       '<label>Réponse <select id="gMode"><option value="qcm"' + (GAME.mode === "qcm" ? " selected" : "") + '>4 choix</option><option value="libre"' + (GAME.mode === "libre" ? " selected" : "") + ">saisie libre</option></select></label>" +
       '<label><input type="checkbox" id="gRole"' + (GAME.showRole ? " checked" : "") + "> rôle</label>" +
       '<label><input type="checkbox" id="gDose"' + (GAME.showDose ? " checked" : "") + "> dose</label>" +
-      '<span class="score">' + GAME.score + " / " + GAME.total + (GAME.streak > 1 ? " · série " + GAME.streak + " 🔥" : "") + "</span></div>";
+      '<span class="score">' + GAME.score + " / " + GAME.total + (GAME.streak > 1 ? " · série " + GAME.streak : "") + "</span></div>";
     if(!q){ main.innerHTML = bar + '<p class="msg">Pas de formule jouable dans cette catégorie.</p>'; bindBar(); return; }
     const f = q.f, ans = q.ans;
     let body = '<div class="qcard"><h2>' + esc(fname(f)) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
@@ -640,18 +640,18 @@
   }
   // interrogatoire : le joueur choisit sa question, le patient ne répond que sur ce point
   const TOPICS = [
-    {id:"femme", none:"Mes règles sont régulières, rien de particulier de ce côté-là.", femme:true, label:"🌸 Règles, gynécologie", q:"Et vos règles ? D’autres troubles gynécologiques ?", rx:/règles|menstru|leucorrh|utér|grossesse|accouchement|seins|lactation|vagin|métrorragie|ménorragie|aménorrhée|oligoménorrhée|dysménorrhée|avortement|fœtus/i},
-    {id:"chaud", none:"Ni froid ni chaud particulièrement, et pas de fièvre.", label:"🌡 Froid, chaleur, fièvre", q:"Avez-vous froid, chaud ? De la fièvre ?", rx:/fièvre|fébri|aversion|frisson|refroidis|chaleur|canicule|froids?(?![a-zé])/i},
-    {id:"sueur", none:"Je transpire normalement.", label:"💧 Transpiration", q:"Et la transpiration ?", rx:/transpir|sueur/i},
-    {id:"tete", none:"Pas de maux de tête, pas de vertiges.", label:"🤕 Tête, vertiges", q:"Avez-vous mal à la tête, des vertiges ?", rx:/céphal|tête|vertige|étourdis|migraine|éblouis/i},
-    {id:"souffle", none:"Je ne tousse pas, je respire bien.", label:"🫁 Toux, respiration", q:"Toussez-vous ? Comment respirez-vous ?", rx:/toux|expector|dyspn|souffle|respir|essouffl|poitrine|thora|mucus|mucosit|rhume|asthme/i},
-    {id:"digestion", none:"L’appétit et la digestion vont bien, je bois normalement.", label:"🍽 Appétit, soif, digestion", q:"Comment sont votre appétit, votre soif, votre digestion ?", rx:/appétit|soif|boire|boisson|goût|bouche|nausée|vomiss|éructa|hoquet|reflux|estomac|épigastre|digest|polyphagie|anorexie|ballon|brûlure|salivation|haleine/i},
-    {id:"orl", none:"Rien de particulier aux yeux, aux oreilles, au nez ni à la gorge.", label:"👁 Yeux, oreilles, nez, gorge", q:"Vos yeux, vos oreilles, votre nez, votre gorge ?", rx:/yeux|vision|oreille|audit|acouph|surdité|nez|nasal|rhin|éternu|gorge|écoulement|dent|gencive|lèvre|langue|joue/i},
-    {id:"transit", none:"Les selles et les urines sont normales.", label:"🚽 Selles et urines", q:"Et les selles, les urines ?", rx:/selle|diarrh|constip|dysent|urin|miction|borborygme|hémorro|énurésie|anal|ténesme|hématoch|oligurie|intestin/i},
-    {id:"esprit", none:"Je dors correctement, et le moral va.", label:"💭 Sommeil, cœur, humeur", q:"Comment dormez-vous ? Et le moral ?", rx:/palpit|insomnie|sommeil|dormir|anxi|irrit|agitation|dysphorie|humeur|délire|amnésie|esprit|soupir|timid|pusillan|paroles|discours|abattement|dépress|rêve/i},
-    {id:"peau", none:"Pas de saignements, rien sur la peau.", label:"🩹 Peau, saignements", q:"Avez-vous des saignements, des problèmes de peau ?", rx:/saign|hémo|épistaxis|purpura|abcès|furoncle|éruption|peau|eczéma|jaunisse|macul|urticaire|démangeaison/i},
-    {id:"energie", none:"Côté énergie, rien de particulier.", label:"🔋 Énergie, fatigue", q:"Et votre énergie, votre fatigue ?", rx:/fatigue|lassitude|asthénie|force|parole|faiblesse|parler|lenteur|abattement|épuis/i},
-    {id:"corps", none:"Pas de douleurs particulières.", label:"🦴 Douleurs, membres", q:"Avez-vous des douleurs ? Comment vont vos membres ?", rx:/douleur|raideur|nuque|lomb|membre|courbature|spasme|crampe|extrémité|mains|pieds|lourdeur|taille|épaule|dos|hypocondre|abdom|ventre|œdème|engourdis|masse|prolapsus|contracture/i}
+    {id:"femme", none:"Mes règles sont régulières, rien de particulier de ce côté-là.", femme:true, label:"Règles, gynécologie", q:"Et vos règles ? D’autres troubles gynécologiques ?", rx:/règles|menstru|leucorrh|utér|grossesse|accouchement|seins|lactation|vagin|métrorragie|ménorragie|aménorrhée|oligoménorrhée|dysménorrhée|avortement|fœtus/i},
+    {id:"chaud", none:"Ni froid ni chaud particulièrement, et pas de fièvre.", label:"Froid, chaleur, fièvre", q:"Avez-vous froid, chaud ? De la fièvre ?", rx:/fièvre|fébri|aversion|frisson|refroidis|chaleur|canicule|froids?(?![a-zé])/i},
+    {id:"sueur", none:"Je transpire normalement.", label:"Transpiration", q:"Et la transpiration ?", rx:/transpir|sueur/i},
+    {id:"tete", none:"Pas de maux de tête, pas de vertiges.", label:"Tête, vertiges", q:"Avez-vous mal à la tête, des vertiges ?", rx:/céphal|tête|vertige|étourdis|migraine|éblouis/i},
+    {id:"souffle", none:"Je ne tousse pas, je respire bien.", label:"Toux, respiration", q:"Toussez-vous ? Comment respirez-vous ?", rx:/toux|expector|dyspn|souffle|respir|essouffl|poitrine|thora|mucus|mucosit|rhume|asthme/i},
+    {id:"digestion", none:"L’appétit et la digestion vont bien, je bois normalement.", label:"Appétit, soif, digestion", q:"Comment sont votre appétit, votre soif, votre digestion ?", rx:/appétit|soif|boire|boisson|goût|bouche|nausée|vomiss|éructa|hoquet|reflux|estomac|épigastre|digest|polyphagie|anorexie|ballon|brûlure|salivation|haleine/i},
+    {id:"orl", none:"Rien de particulier aux yeux, aux oreilles, au nez ni à la gorge.", label:"Yeux, oreilles, nez, gorge", q:"Vos yeux, vos oreilles, votre nez, votre gorge ?", rx:/yeux|vision|oreille|audit|acouph|surdité|nez|nasal|rhin|éternu|gorge|écoulement|dent|gencive|lèvre|langue|joue/i},
+    {id:"transit", none:"Les selles et les urines sont normales.", label:"Selles et urines", q:"Et les selles, les urines ?", rx:/selle|diarrh|constip|dysent|urin|miction|borborygme|hémorro|énurésie|anal|ténesme|hématoch|oligurie|intestin/i},
+    {id:"esprit", none:"Je dors correctement, et le moral va.", label:"Sommeil, cœur, humeur", q:"Comment dormez-vous ? Et le moral ?", rx:/palpit|insomnie|sommeil|dormir|anxi|irrit|agitation|dysphorie|humeur|délire|amnésie|esprit|soupir|timid|pusillan|paroles|discours|abattement|dépress|rêve/i},
+    {id:"peau", none:"Pas de saignements, rien sur la peau.", label:"Peau, saignements", q:"Avez-vous des saignements, des problèmes de peau ?", rx:/saign|hémo|épistaxis|purpura|abcès|furoncle|éruption|peau|eczéma|jaunisse|macul|urticaire|démangeaison/i},
+    {id:"energie", none:"Côté énergie, rien de particulier.", label:"Énergie, fatigue", q:"Et votre énergie, votre fatigue ?", rx:/fatigue|lassitude|asthénie|force|parole|faiblesse|parler|lenteur|abattement|épuis/i},
+    {id:"corps", none:"Pas de douleurs particulières.", label:"Douleurs, membres", q:"Avez-vous des douleurs ? Comment vont vos membres ?", rx:/douleur|raideur|nuque|lomb|membre|courbature|spasme|crampe|extrémité|mains|pieds|lourdeur|taille|épaule|dos|hypocondre|abdom|ventre|œdème|engourdis|masse|prolapsus|contracture/i}
   ];
   const CASE = {speed:"normal", score:0, total:0, c:null, choices:[], tips:[], tipN:0, asked:0, said:0, done:{}, answered:null, log:[], typing:null};
   try{ CASE.speed = localStorage.getItem("mtc_formules_case_speed") || "normal"; }catch(e){}
@@ -773,12 +773,12 @@
     const dis = k => CASE.answered || busy || (k !== "more" && (CASE.done[k] || !c[k].length)) ? " disabled" : "";
     const asks = '<div class="asks">' +
       '<span class="lbl">Examen :</span>' +
-      '<button type="button" class="tool" data-ask="more"' + (CASE.answered || busy || CASE.told ? " disabled" : "") + ">💬 Autre chose ?</button>" +
-      '<button type="button" class="tool" data-ask="langue"' + dis("langue") + ">👅 Regarder la langue</button>" +
-      '<button type="button" class="tool" data-ask="pouls"' + dis("pouls") + ">🫀 Prendre le pouls</button>" +
-      (c.obs.length ? '<button type="button" class="tool" data-ask="obs"' + dis("obs") + ">👁 Observer</button>" : "") +
-      (c.palp.length ? '<button type="button" class="tool" data-ask="palp"' + dis("palp") + ">✋ Palper l’abdomen</button>" : "") +
-      '<button type="button" class="tool" data-ask="astuce"' + (CASE.answered || busy || CASE.tipN >= CASE.tips.length ? " disabled" : "") + ' title="Une substance de la bonne formule, absente des deux autres propositions">💡 Une substance de la formule' + (CASE.tips.length ? " (" + (CASE.tips.length - CASE.tipN) + ")" : "") + "</button>" +
+      '<button type="button" class="tool" data-ask="more"' + (CASE.answered || busy || CASE.told ? " disabled" : "") + ">Autre chose ?</button>" +
+      '<button type="button" class="tool" data-ask="langue"' + dis("langue") + ">Regarder la langue</button>" +
+      '<button type="button" class="tool" data-ask="pouls"' + dis("pouls") + ">Prendre le pouls</button>" +
+      (c.obs.length ? '<button type="button" class="tool" data-ask="obs"' + dis("obs") + ">Observer</button>" : "") +
+      (c.palp.length ? '<button type="button" class="tool" data-ask="palp"' + dis("palp") + ">Palper l’abdomen</button>" : "") +
+      '<button type="button" class="tool" data-ask="astuce"' + (CASE.answered || busy || CASE.tipN >= CASE.tips.length ? " disabled" : "") + ' title="Une substance de la bonne formule, absente des deux autres propositions">Une substance de la formule' + (CASE.tips.length ? " (" + (CASE.tips.length - CASE.tipN) + ")" : "") + "</button>" +
       '<span class="srcinfo">informations demandées : ' + CASE.asked + "</span></div>" +
       '<div class="asks topics"><span class="lbl">Questions :</span>' + TOPICS.filter(q => !q.femme || c.femme).map(q => {
         const asked = CASE.topicAsked[q.id], left = topicLeft(q.id).length;
