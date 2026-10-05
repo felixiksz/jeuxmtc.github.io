@@ -143,7 +143,7 @@
   .schemasvg .netstop.schema.tan-dim{ opacity:.12; }
   .schemasvg .netstop.schema.tan-link .slink{ stroke:#b8860b; }
   .schemasvg .netstop.schema.tan-link circle{ filter:drop-shadow(0 0 4px #b8860b) drop-shadow(0 0 2px #b8860b); }
-  .nethl .nettan{ cursor:default; }
+
   .nettan select{ font-weight:400; }
   .nettaninfo{ flex-basis:100%; }
   .nettaninfo:empty{ display:none; }
@@ -1385,6 +1385,9 @@
   let NET_TAN = {sys:"", canal:null};
   try{ Object.assign(NET_TAN, JSON.parse(localStorage.getItem("mtc_trajets_net_tan") || "{}")); }catch(e){}
   if(!TAN_CANALS.has(NET_TAN.canal)) NET_TAN.canal = null;
+  // case « Six systèmes » : surbrillance activée ou non (le système choisi est gardé)
+  if(typeof NET_TAN.on !== "boolean") NET_TAN.on = !!NET_TAN.sys;
+  if(!NET_TAN.sys) NET_TAN.sys = "all";
   // canaux couplés au canal c : {code: [numéros des systèmes]}
   function tanPartners(c, sys){
     const out = {};
@@ -1508,7 +1511,7 @@
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
     main.innerHTML = "<h2>Réseau des points d’intersection</h2>" +
       '<div class="nethl">Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label>' +
-      '<label class="nettan">Six systèmes (Dr Tán) : <select id="tanSys"><option value="">—</option>' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select></label> <span id="tanInfo" class="nettaninfo"></span></div>' +
+      '<label class="nettan"><input type="checkbox" id="tanOn"' + (NET_TAN.on ? " checked" : "") + '> six systèmes (Dr Tán) :</label> <select id="tanSys" aria-label="Système">' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select> <span id="tanInfo" class="nettaninfo"></span></div>' +
       '<div class="nethl netplain"><label><input type="checkbox" id="tanPlain"' + (NET_TAN.plain ? " checked" : "") + '> points sans correspondance</label><span class="nethlkey">tous les points de chaque canal</span></div>' +
       (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Les ' + stations.length + " points d’intersection du tableau (jiāo huì), de la tête aux pieds ; chaque canal est une colonne. Clic sur un point : ses correspondances. Clic sur un nom de canal en haut : ses canaux couplés selon les six systèmes de Dr Tán. Barre de gauche : afficher / masquer un canal. Molette ou deux doigts : défiler · Ctrl + molette ou pincer : zoom · glisser : se déplacer.</div>" +
@@ -1549,8 +1552,9 @@
     // six systèmes : clic sur un nom de canal (bandeau, ligne ou bout de ligne) → canaux couplés en surbrillance
     const saveTan = () => { try{ localStorage.setItem("mtc_trajets_net_tan", JSON.stringify(NET_TAN)); }catch(e){} };
     const applyTan = () => {
-      const sel = NET_TAN.sys && NET_TAN.canal && cols.includes(NET_TAN.canal) ? NET_TAN.canal : null;
-      const partners = sel ? tanPartners(sel, NET_TAN.sys) : {};
+      const SYSV = NET_TAN.on ? NET_TAN.sys : "";
+      const sel = SYSV && NET_TAN.canal && cols.includes(NET_TAN.canal) ? NET_TAN.canal : null;
+      const partners = sel ? tanPartners(sel, SYSV) : {};
       const on = c => c === sel || c in partners;
       svgEl.classList.toggle("tan-active", !!sel);   // la surbrillance des six systèmes prime sur celle des vaisseaux
       wrap.querySelectorAll(".netline[data-code], .netcase[data-code], .terminus[data-code], .shead[data-code]").forEach(el => {
@@ -1561,7 +1565,7 @@
       });
       headEls.forEach(h => {
         let b = h.querySelector(".tanbadge");
-        const n = sel && NET_TAN.sys === "all" && partners[h.dataset.code];
+        const n = sel && SYSV === "all" && partners[h.dataset.code];
         if(n){ if(!b){ b = document.createElement("sup"); b.className = "tanbadge"; h.appendChild(b); } b.textContent = n.join("·"); }
         else if(b) b.remove();
       });
@@ -1572,15 +1576,15 @@
         g.classList.toggle("tan-dim", !!sel && !cs.some(on));
       });
       const info = document.getElementById("tanInfo");
-      if(!NET_TAN.sys) info.textContent = "";
-      else if(!sel) info.textContent = "clique sur un nom de canal en haut du plan" + (NET_TAN.sys === "all" ? "" : " · " + TAN_SYSTEMS[NET_TAN.sys].name);
+      if(!SYSV) info.textContent = "";
+      else if(!sel) info.textContent = "clique sur un nom de canal en haut du plan" + (SYSV === "all" ? "" : " · " + TAN_SYSTEMS[SYSV].name);
       else{
         const ps = Object.keys(partners);
         const hidden = ps.filter(c => !cols.includes(c));
-        info.innerHTML = "<b>" + esc(sigle(sel)) + "</b> " + (NET_TAN.sys === "all"
+        info.innerHTML = "<b>" + esc(sigle(sel)) + "</b> " + (SYSV === "all"
           ? (ps.length ? "↔ " + ps.map(c => "<b>" + esc(sigle(c)) + "</b> (" + partners[c].join(", ") + ")").join(" · ") : "pas de canal couplé dans les systèmes 1 à 5")
-          : NET_TAN.sys === "6" ? "↔ " + esc(sigle(sel)) + " · " + esc(TAN_SYSTEMS[6].name)
-          : (ps.length ? "↔ " + ps.map(c => "<b>" + esc(sigle(c)) + "</b>").join(", ") : "pas de canal couplé dans ce système") + " · " + esc(TAN_SYSTEMS[NET_TAN.sys].name)) +
+          : SYSV === "6" ? "↔ " + esc(sigle(sel)) + " · " + esc(TAN_SYSTEMS[6].name)
+          : (ps.length ? "↔ " + ps.map(c => "<b>" + esc(sigle(c)) + "</b>").join(", ") : "pas de canal couplé dans ce système") + " · " + esc(TAN_SYSTEMS[SYSV].name)) +
           (hidden.length ? " · <i>masqué : " + hidden.map(c => esc(sigle(c))).join(", ") + "</i>" : "") +
           ' <button type="button" class="linkish" id="tanClear">effacer</button>';
         document.getElementById("tanClear").addEventListener("click", () => { NET_TAN.canal = null; saveTan(); applyTan(); });
@@ -1591,14 +1595,15 @@
         document.getElementById("tanInfo").textContent = sigle(c) + " : les merveilleux vaisseaux (sauf RM et DM) ne sont pas concernés par les six systèmes";
         return;
       }
-      if(!NET_TAN.sys){ NET_TAN.sys = "all"; document.getElementById("tanSys").value = "all"; }
+      if(!NET_TAN.on){ NET_TAN.on = true; document.getElementById("tanOn").checked = true; }
       NET_TAN.canal = NET_TAN.canal === c ? null : c;
       saveTan(); applyTan();
     };
     document.getElementById("tanPlain").addEventListener("change", e => { NET_TAN.plain = e.target.checked; saveTan(); showNetwork(); });
     headEls.forEach(h => { h.classList.toggle("tan-na", !TAN_CANALS.has(h.dataset.code)); h.addEventListener("click", () => pickTan(h.dataset.code)); });
     svgEl.addEventListener("click", e => { const el = e.target.closest && e.target.closest(".netline[data-code], .terminus[data-code]"); if(el) pickTan(el.dataset.code); });
-    document.getElementById("tanSys").addEventListener("change", e => { NET_TAN.sys = e.target.value; saveTan(); applyTan(); });
+    document.getElementById("tanSys").addEventListener("change", e => { NET_TAN.sys = e.target.value; NET_TAN.on = true; document.getElementById("tanOn").checked = true; saveTan(); applyTan(); });
+    document.getElementById("tanOn").addEventListener("change", e => { NET_TAN.on = e.target.checked; saveTan(); applyTan(); });
     applyTan();
     window.addEventListener("resize", placeHeads);
     placeHeads();
