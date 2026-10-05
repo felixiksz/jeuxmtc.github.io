@@ -111,10 +111,10 @@
 <script src="../22-20-pharma-data.js?v=20261001-qinghao"></script>
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
-<script src="../beta-config.js?v=20261002-beta5"></script>
-<script src="../beta-gate.js?v=20261002-beta5"></script>
-<script src="../beta-tour.js?v=20261002-beta5"></script>
-<script src="../beta-modules.js?v=20261002-beta5"></script>
+<script src="../beta-config.js?v=20261005-a"></script>
+<script src="../beta-gate.js?v=20261005-a"></script>
+<script src="../beta-tour.js?v=20261005-a"></script>
+<script src="../beta-modules.js?v=20261005-a"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -147,6 +147,8 @@
     const url = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) +
       "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(c.branch);
     const r = await fetch(url, {headers:{Authorization:"Bearer " + c.token, Accept:"application/vnd.github.raw"}, cache:"no-store"});
+    if(r.status === 401) throw new Error("La clé GitHub enregistrée dans ce navigateur est refusée (expirée ou invalide). Ouvre le jeu → bouton « Sync », enregistre une nouvelle clé, puis reviens ici.");
+    if(r.status === 403 || r.status === 404) throw new Error("La clé GitHub de ce navigateur n’a pas accès au dépôt de l’Outil diagnostique (« " + c.repo + " »). Vérifie dans le jeu → « Sync » le dépôt et les droits de la clé (lecture du contenu).");
     if(!r.ok) throw new Error("GitHub " + r.status + " pour " + path);
     return r.json();
   }

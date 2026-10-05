@@ -284,10 +284,10 @@
   <div id="corrBody"></div>
 </aside>
 <div id="tip" role="tooltip"></div>
-<script src="../beta-config.js?v=20261002-beta5"></script>
-<script src="../beta-gate.js?v=20261002-beta5"></script>
-<script src="../beta-tour.js?v=20261002-beta5"></script>
-<script src="../beta-modules.js?v=20261002-beta5"></script>
+<script src="../beta-config.js?v=20261005-a"></script>
+<script src="../beta-gate.js?v=20261005-a"></script>
+<script src="../beta-tour.js?v=20261005-a"></script>
+<script src="../beta-modules.js?v=20261005-a"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -1331,8 +1331,7 @@
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     const small = window.innerWidth < 760;
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
-    main.innerHTML = '<h2>Réseau global des trajets <span class="netmode"><button type="button" class="tool on" data-netmode="schema">Schéma</button><button type="button" class="tool" data-netmode="ville">Plan de ville</button></span>' +
-      ' <button type="button" class="tool gamebtn" id="netGameBtn">🎲 Démêler</button><button type="button" class="tool gamebtn" id="netItiBtn">🚇 Itinéraire</button></h2>' +
+    main.innerHTML = "<h2>Réseau des points d’intersection</h2>" +
       (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Les ' + stations.length + " points d’intersection du tableau (jiāo huì), de la tête aux pieds ; chaque canal est une colonne. Clic sur un point : ses correspondances. Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer.</div>" +
       legend + (small ? "</details>" : "") +
@@ -1369,7 +1368,8 @@
     nav.querySelectorAll("button[data-code]").forEach(b => b.classList.remove("on"));
     document.getElementById("netToggle").classList.add("on");
     refreshNavHidden();
-    if(NET_MODE === "schema" && !GAME && !ITI){ showSchema(); return; }
+    // seule la vue « carte de métro » schématique est proposée (plan de ville, Démêler et Itinéraire abandonnés pour l'instant)
+    showSchema(); return;
     // 1. positions anatomiques : zones fixées à la main, points entre leurs voisins (tous les textes)
     const pos = {}, raw = [];
     data.forEach(c => c.sections.forEach(s => (s.branches || []).forEach(b => { const pids = b.places.filter(p => !p.startsWith("c:")); if(pids.length) raw.push(pids); })));
