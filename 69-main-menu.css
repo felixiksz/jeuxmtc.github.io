@@ -1,0 +1,134 @@
+/* ============================================================
+   69-main-menu.css
+   Grand menu « Jouer / Réviser / Mon suivi / Réglages » (proposition C) :
+   l'écran garde la grille ; « ≡ Menu » ouvre un grand menu typographique.
+   Grandes lettres en Libre Baskerville, le reste en Archivo. Pas de gris :
+   les entrées inactives sont une teinte plus légère de la couleur des
+   lettres du thème choisi.
+   ============================================================ */
+
+/* anciens points d'entrée, désormais dans le menu */
+body.mtc-menu-ui #mtcTopbarMoreButton,
+body.mtc-menu-ui #mtcDailyReminderButton,
+body.mtc-menu-ui .topbar-main-buttons > button[onclick*="toggleSettings"],
+body.mtc-menu-ui .topbar-main-buttons > button[onclick*="startTour"],
+body.mtc-menu-ui #mtcGithubSyncButton,
+body.mtc-menu-ui #mtcAdminTrajets,
+body.mtc-menu-ui #mtcAdminFormules,
+body.mtc-menu-ui #fullscreenToggleButton,
+body.mtc-menu-ui .study-domain-topline,
+body.mtc-menu-ui #dailyStreakBadge,
+body.mtc-menu-ui #footerMainTools,
+body.mtc-menu-ui #exportNotesButton,
+body.mtc-menu-ui #importNotesButton,
+body.mtc-menu-ui #pharmaCardsButton,
+body.mtc-menu-ui #mtcOfflineButton{
+  display:none !important;
+}
+
+/* barre du haut : Menu à gauche, Nouvelle partie au centre, Acu / Pharma à droite */
+body.mtc-menu-ui .topbar-main-row{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  width:100%;
+}
+#mtcMenuButton{ order:-1; }
+body.mtc-menu-ui .topbar-main-buttons{ order:0; }
+#mtcTopDomainSwitch{ order:1; }
+#mtcMenuButton, .mtc-domain-switch button{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none;
+  color:var(--text-color);
+  font-family:'Archivo', sans-serif;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+#mtcMenuButton{ padding:6px 4px !important; white-space:nowrap; }
+.mtc-domain-switch{ display:inline-flex; align-items:baseline; gap:2px; white-space:nowrap; font-family:'Archivo', sans-serif; }
+.mtc-domain-switch button{ padding:6px 3px !important; }
+.mtc-domain-switch button.on{ text-decoration:underline; text-decoration-color:var(--shadow-color); text-decoration-thickness:2px; text-underline-offset:5px; }
+.mtc-domain-switch button:hover, #mtcMenuButton:hover{ transform:none !important; box-shadow:none !important; text-shadow:0 3px 12px var(--shadow-color); }
+
+/* éléments permanents : série en bas à gauche, enveloppe en bas à droite, sans fond */
+#mtcStreakCorner{
+  position:fixed; left:16px; bottom:18px; z-index:9050;
+  background:transparent !important; border:0 !important; box-shadow:none !important; padding:2px 0 !important;
+  color:var(--text-color); font-family:'Archivo', sans-serif; font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.07em; cursor:pointer;
+}
+#mtcStreakCorner small{ font-size:inherit; font-weight:400; margin-left:3px; }
+#mtcStreakCorner:hover{ transform:none !important; text-shadow:0 3px 12px var(--shadow-color); }
+body.mtc-menu-ui #suggestionMailButton{
+  position:fixed !important; right:16px !important; bottom:14px !important; top:auto !important; left:auto !important;
+  margin:0 !important; transform:none !important; z-index:9050;
+  background:transparent !important; box-shadow:none !important; border:0 !important;
+}
+
+/* le grand menu */
+#mtcMainMenu{
+  position:fixed; inset:0; z-index:9500; display:none;
+  background:var(--page-bg); color:var(--text-color);
+  font-family:'Archivo', sans-serif; overflow:auto;
+}
+#mtcMainMenu.open{ display:block; animation:mtcMenuIn .16s ease-out both; }
+@keyframes mtcMenuIn{ from{ opacity:0; } to{ opacity:1; } }
+body.mtc-menu-open{ overflow:hidden; }
+#mtcMainMenu .mm-head{
+  display:flex; justify-content:space-between; align-items:baseline;
+  max-width:1100px; margin:0 auto; padding:18px 28px 10px;
+}
+#mtcMainMenu .mm-head button{ font-size:13px; }
+#mtcMainMenu .mm-body{
+  display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); gap:40px;
+  max-width:1100px; margin:0 auto; padding:16px 28px 90px;
+}
+#mtcMainMenu .mm-entries{ text-align:right; }
+#mtcMainMenu .mm-entry{
+  display:block; width:100%; text-align:inherit; background:transparent !important; border:0 !important; box-shadow:none !important;
+  padding:2px 0 !important; margin:0; cursor:pointer; text-transform:none; letter-spacing:-.01em;
+  font-family:'Libre Baskerville', Georgia, serif; font-weight:700; font-size:clamp(34px, 5.4vw, 64px); line-height:1.12;
+  color:color-mix(in srgb, var(--text-color) 34%, var(--page-bg));
+  transition:color .15s ease, text-shadow .15s ease;
+}
+#mtcMainMenu .mm-entry.on{ color:var(--text-color); }
+#mtcMainMenu .mm-entry:hover{ color:var(--text-color); text-shadow:0 4px 22px var(--shadow-color); transform:none !important; }
+#mtcMainMenu .mm-list{ align-self:start; margin-top:14px; }
+#mtcMainMenu .mm-item{
+  display:grid; grid-template-columns:170px minmax(0, 1fr); gap:14px; align-items:baseline;
+  width:100%; text-align:left; padding:11px 0 !important; margin:0; border:0 !important; border-radius:0 !important;
+  border-bottom:1px solid var(--text-color) !important; background:transparent !important; box-shadow:none !important;
+  color:var(--text-color); cursor:pointer; text-transform:none; letter-spacing:0; font-weight:400;
+}
+#mtcMainMenu .mm-item:first-child{ border-top:1px solid var(--text-color) !important; }
+#mtcMainMenu .mm-item:hover{ transform:none !important; }
+#mtcMainMenu .mm-item:hover .mm-n{ text-shadow:0 3px 12px var(--shadow-color); }
+#mtcMainMenu .mm-item.soon{ cursor:default; }
+#mtcMainMenu .mm-n{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+#mtcMainMenu .mm-d{ font-size:13.5px; line-height:1.45; }
+#mtcMainMenu .mm-d .mm-sub{ margin-right:14px; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+#mtcMainMenu .mm-d .mm-sub:hover{ text-shadow:0 3px 12px var(--shadow-color); }
+#mtcMainMenu .mm-tag{ font-size:9px; font-weight:400; letter-spacing:.06em; margin-left:6px; color:#ff3b8d; vertical-align:super; }
+#mtcMainMenu .mm-tag.soon{ color:var(--shadow-color); }
+#mtcMainMenu .mm-phone-list{ display:none; }
+
+@media (max-width:760px){
+  #mtcMainMenu .mm-head{ padding:14px 16px 6px; }
+  #mtcMainMenu .mm-body{ display:block; padding:8px 16px 90px; }
+  #mtcMainMenu .mm-entries{ text-align:left; }
+  #mtcMainMenu .mm-entry{ font-size:34px; padding:4px 0 !important; }
+  #mtcMainMenu .mm-list{ display:none; }
+  #mtcMainMenu .mm-phone-list{ display:block; margin:8px 0 18px; }
+  #mtcMainMenu .mm-item{ grid-template-columns:1fr; gap:3px; padding:9px 0 !important; }
+  #mtcStreakCorner{ left:12px; bottom:18px; }
+  body.mtc-menu-ui #suggestionMailButton{ right:12px !important; }
+}
+
+/* « Hors connexion » est dans Réglages (la règle d'origine du bouton est très prioritaire) */
+html body.mtc-menu-ui #mtcBottomMetaLine #mtcOfflineButton{ display:none !important; }
+/* la ligne « Nouveauté » laisse la place à l’enveloppe */
+body.mtc-menu-ui #mtcBottomMetaLine{ right:52px !important; }
+body.mtc-menu-open #mtcBottomMetaLine{ display:none !important; }

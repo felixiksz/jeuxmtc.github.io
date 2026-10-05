@@ -17,6 +17,7 @@
       {sel:".verifybtn", title:"Vérifier un trajet", text:"Tu as comparé un trajet au cours et à son illustration, et il est juste ? Clique sur « Vérifier » à côté de son titre, puis réagis avec 👍 dans le fil qui s’ouvre. Chaque 👍 compte comme une vérification publique : « vérifié par N » s’affiche à côté du trajet."},
       {sel:"#allPlaces", title:"Correspondances", text:"L’index de tous les lieux et de tous les points. Clique sur un lieu pour voir tous les trajets qui y passent, regroupés par famille de zones."},
       {sel:"#netToggle", title:"Plan des intersections", text:"Le plan des points d’intersection, façon carte de métro : une colonne par canal, de la tête aux pieds, et les points où les canaux se rejoignent."},
+      {sel:"#balToggle", title:"Équilibrer", text:"Un jeu sur les six systèmes de Dr Tán : des canaux sont atteints, clique sur le moins de canaux possible pour les rééquilibrer tous. « Valider » montre les solutions minimales."},
       {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction sur le canal affiché (ou le plan des intersections). Les commentaires sont publics : indique si possible ta source (page du cours, livre)."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment. Bonne exploration !"}
     ],
