@@ -15,8 +15,9 @@
   window.mtcIsAdmin = isAdmin;
 
   function boot(){
-    const admin = isAdmin(), beta = !!(window.MTC_BETA && window.MTC_BETA.public);
-    if(!(admin || beta) || document.getElementById("mtcAdminTrajets")) return;
+    const pub = m => { const p = window.MTC_BETA && window.MTC_BETA.public; return p && typeof p === "object" ? !!p[m] : !!p; };
+    const admin = isAdmin(), betaT = pub("trajets"), betaF = pub("formules");
+    if(!(admin || betaT || betaF) || document.getElementById("mtcAdminTrajets")) return;
     const q = admin ? "?admin=1" : "";
     const bar = document.querySelector(".topbar-main-buttons");
     if(!bar) return;
@@ -38,8 +39,8 @@
     // côté ACU : Trajets ; côté Pharma : Formules
     const syncDomain = () => {
       const pharma = document.documentElement.getAttribute("data-study-domain") === "pharmacology";
-      button.hidden = pharma;
-      formulas.hidden = !pharma;
+      button.hidden = pharma || !(admin || betaT);
+      formulas.hidden = !pharma || !(admin || betaF);
     };
     syncDomain();
     new MutationObserver(syncDomain).observe(document.documentElement, {attributes:true, attributeFilter:["data-study-domain"]});

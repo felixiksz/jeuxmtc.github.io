@@ -1,15 +1,15 @@
 /* ============================================================
    beta-config.js
    Réglages des modules bêta (Trajets, Formules).
-   - public : false = réservés aux admins ; true = ouverts à tous les
-     joueurs, après acceptation de la phase bêta et des commentaires
-     de correction publics.
+   - public : par module, false = réservé aux admins ; true = ouvert à
+     tous les joueurs, après acceptation de la phase bêta et des
+     commentaires de correction publics.
    - giscus : commentaires publics (Discussions du dépôt GitHub du jeu).
      Tant que categoryId est vide, le panneau « Corrections » indique
      que les commentaires ne sont pas encore activés.
    ============================================================ */
 window.MTC_BETA = {
-  public: false,
+  public: {trajets: false, formules: true},
   giscus: {
     repo: "felixiksz/jeuxmtc.github.io",
     repoId: "R_kgDOS3f7kg",

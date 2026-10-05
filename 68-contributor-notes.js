@@ -25,7 +25,7 @@
     return "hsl(" + (h % 360) + ", 62%, 42%)";
   }
   const isAdmin = () => { try{ return localStorage.getItem("mtc_admin") === "1" || new URLSearchParams(location.search).get("admin") === "1"; }catch(e){ return false; } };
-  const enabled = () => isAdmin() || !!(window.MTC_BETA && window.MTC_BETA.public);
+  const enabled = () => { const p = window.MTC_BETA && window.MTC_BETA.public; return isAdmin() || (p && typeof p === "object" ? Object.values(p).some(Boolean) : !!p); };
   const isContributor = () => { try{ return !!localStorage.getItem(KEY); }catch(e){ return false; } };
 
   let loading = null;

@@ -111,10 +111,10 @@
 <script src="../22-20-pharma-data.js?v=20261001-qinghao"></script>
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
-<script src="../beta-config.js?v=20261005-a"></script>
-<script src="../beta-gate.js?v=20261005-a"></script>
-<script src="../beta-tour.js?v=20261005-a"></script>
-<script src="../beta-modules.js?v=20261005-a"></script>
+<script src="../beta-config.js?v=20261005-b"></script>
+<script src="../beta-gate.js?v=20261005-b"></script>
+<script src="../beta-tour.js?v=20261005-b"></script>
+<script src="../beta-modules.js?v=20261005-b"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -152,19 +152,29 @@
     if(!r.ok) throw new Error("GitHub " + r.status + " pour " + path);
     return r.json();
   }
-  async function loadFormulas(){
-    if(await loadScript("formules-data.js?v=" + Date.now()) && window.MTC_FORMULES){
-      source = "copie locale";
-      return window.MTC_FORMULES;
-    }
-    const c = syncCfg();
-    if(!(window.mtcIsAdminPage && window.mtcIsAdminPage())) throw new Error("Les formules ne sont pas encore publiées pour la bêta. Reviens bientôt !");
-    if(!(c.token && c.owner && c.repo)) throw new Error("La synchro GitHub n’est pas configurée dans ce navigateur : ouvre le jeu, bouton « Sync », puis reviens ici.");
+  // Joueurs : la version publiée (formules-data.js). Admin avec la synchro configurée : la version à jour de
+  // l'Outil diagnostique (nouvelles formules visibles tout de suite), sinon la version publiée.
+  async function loadPrivate(){
     const index = await privateJson("formules/index.json");
     const formules = {};
     await Promise.all(index.map(async e => { try{ formules[e.id] = await privateJson("formules/" + e.chemin); }catch(err){ console.warn(err); } }));
-    source = "Outil diagnostique (dépôt privé)";
     return {index, formules};
+  }
+  async function loadFormulas(){
+    const c = syncCfg(), admin = window.mtcIsAdminPage && window.mtcIsAdminPage();
+    let privErr = null;
+    if(admin && c.token && c.owner && c.repo){
+      try{ const db = await loadPrivate(); source = "Outil diagnostique, version à jour"; return db; }
+      catch(err){ privErr = err; }
+    }
+    if(await loadScript("formules-data.js?v=" + Date.now()) && window.MTC_FORMULES){
+      const d = window.MTC_FORMULES.publishedAt;
+      source = (d ? "version publiée du " + new Date(d).toLocaleDateString("fr-FR") : "copie locale") + (privErr ? " (clé GitHub refusée : version à jour indisponible)" : "");
+      return window.MTC_FORMULES;
+    }
+    if(privErr) throw privErr;
+    if(!admin) throw new Error("Les formules ne sont pas encore publiées pour la bêta. Reviens bientôt !");
+    throw new Error("La synchro GitHub n’est pas configurée dans ce navigateur : ouvre le jeu, bouton « Sync », puis reviens ici.");
   }
 
   // ---- substances : rattachement à la pharmacopée du jeu ----

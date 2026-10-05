@@ -13,6 +13,9 @@
   "use strict";
   const CONSENT_KEY = "mtc_beta_consent_v1";
   const cfg = () => window.MTC_BETA || {public:false, giscus:{}};
+  // ouverture aux joueurs : un booléen pour tous les modules, ou un objet {trajets, formules}
+  const isPublic = module => { const p = cfg().public; return p && typeof p === "object" ? (module ? !!p[module] : Object.values(p).some(Boolean)) : !!p; };
+  window.mtcBetaIsPublic = isPublic;
   const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
   function isAdmin(){
@@ -148,7 +151,7 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
     style();
     const admin = isAdmin();
     if(admin) return true;
-    if(!cfg().public){
+    if(!isPublic(opts && opts.module)){
       document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
       return false;
     }
