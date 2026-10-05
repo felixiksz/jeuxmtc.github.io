@@ -22,7 +22,7 @@
     ],
     reseau: [
       {sel:".schemasvg", title:"Le réseau des points d’intersection", text:"Chaque canal est une colonne, de la tête aux pieds. Chaque point d’intersection du tableau (jiāo huì) est une station sur la colonne de chacun de ses canaux, reliées par un trait : le grand cercle est le canal du point, les petits sont les canaux qui le rejoignent."},
-      {sel:"nav", title:"Afficher ou masquer un canal", text:"Un clic sur un canal de la barre de gauche le masque ou le réaffiche (grisé = masqué) ; les colonnes se réorganisent. « tout afficher » et « tout masquer » sont dans la légende."},
+      {sel:"nav", title:"Afficher ou masquer un canal", text:"Un clic sur un canal de la barre de gauche le masque ou le réaffiche (grisé = masqué) ; les colonnes se réorganisent. « tout afficher » et « tout masquer » sont au-dessus du plan."},
       {sel:".netzoom", title:"Se déplacer dans le plan", text:"Molette ou pincement : zoom. Glisser : se déplacer. ⟲ : tout voir. ◐ : fond sombre.\nClique un point pour voir ses correspondances."}
     ],
     formules: [
