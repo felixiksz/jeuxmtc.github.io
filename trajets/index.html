@@ -39,6 +39,7 @@
   .linkish{ font:inherit; font-size:inherit; border:0; background:none; padding:0; color:var(--accent); text-decoration:underline; cursor:pointer; }
   .sigle-legend{ order:99; margin-top:10px; padding-top:8px; border-top:1px solid #dde; font-family:"Tomorrow", "Archivo", sans-serif; font-size:.7rem; line-height:1.45; color:var(--muted); }
   .sigle-legend b{ color:var(--text); }
+  .sopenkey{ color:#13858a; font-weight:800; } .sluokey{ color:#c8661a; font-weight:800; }
   .check-legend{ font-size:.68rem; color:var(--muted); margin:0 0 4px; line-height:1.2; }
   main{ margin:0 0 0 var(--navw); padding:16px 20px; }
   nav .short{ display:none; }
@@ -131,6 +132,7 @@
   .schemaheads{ position:absolute; left:0; right:0; top:0; height:32px; z-index:1; pointer-events:none; background:linear-gradient(#fff 70%, rgba(255,255,255,0)); }
   .shead{ position:absolute; top:6px; transform:translateX(-50%); font-size:11px; font-weight:800; padding:1px 6px; border-radius:5px; border:1.5px solid; white-space:nowrap; pointer-events:auto; cursor:pointer; transition:opacity .15s; }
   .shead.tan-dim{ opacity:.25; }
+  .shead.tan-na{ cursor:default; }
   .shead.tan-sel{ box-shadow:0 0 0 2px #fff, 0 0 0 4px #1d1d1f; }
   .shead.tan-on{ box-shadow:0 0 0 2px #fff, 0 0 0 4px #b8860b; }
   .tanbadge{ margin-left:3px; font-size:9px; font-weight:800; }
@@ -143,6 +145,11 @@
   .schemasvg .netstop.schema.tan-link circle{ filter:drop-shadow(0 0 4px #b8860b) drop-shadow(0 0 2px #b8860b); }
   .nettan{ font-size:.85rem; margin:0 0 8px; }
   .nettan label{ font-weight:700; }
+  .nettan .tanplain{ font-weight:400; margin-left:6px; white-space:nowrap; }
+  .nettan .tanplain input{ accent-color:var(--accent); }
+  .schemasvg .splain{ fill:#fff; stroke:#1d1d1f; stroke-width:2; }
+  .schemasvg .netstop.schema.plain .slabel{ font-weight:600; font-size:10.5px; fill:#555; }
+  .schemasvg .netstop.schema.plain:hover .splain{ fill:#ffd84d; }
   .nettan select{ font:inherit; }
   .nettaninfo{ color:var(--muted); }
   .netwrap.dark .schemaheads{ background:linear-gradient(#171a22 70%, rgba(23,26,34,0)); }
@@ -1364,15 +1371,18 @@
   try{ NET_MODE = localStorage.getItem("mtc_trajets_net_mode") || "schema"; }catch(e){}
   // les six systèmes des canaux unis (Dr Richard Tán) : canaux qui se rééquilibrent (cours « Les six systèmes des canaux unis »)
   const TAN_SYSTEMS = {
-    1:{name:"grands canaux de même nom (tóng míng)", pairs:[["P", "Rt"], ["GI", "E"], ["C", "Rn"], ["IG", "V"], ["EC", "F"], ["TF", "VB"], ["DM", "RM"]]},
+    1:{name:"grands canaux de même nom (tóng míng)", pairs:[["P", "Rt"], ["GI", "E"], ["C", "Rn"], ["IG", "V"], ["EC", "F"], ["TF", "VB"]]},
     2:{name:"six couches (zàng fǔ bié tōng) : tài yīn ↔ tài yáng, shào yīn ↔ shào yáng, jué yīn ↔ yáng míng", pairs:[["P", "V"], ["GI", "F"], ["E", "EC"], ["Rt", "IG"], ["C", "VB"], ["Rn", "TF"]]},
     3:{name:"biǎo / lǐ (surface / interne)", pairs:[["P", "GI"], ["E", "Rt"], ["C", "IG"], ["V", "Rn"], ["EC", "TF"], ["VB", "F"]]},
     4:{name:"horloge opposée (zǐ wǔ)", pairs:[["P", "V"], ["GI", "Rn"], ["E", "EC"], ["Rt", "TF"], ["C", "VB"], ["IG", "F"]]},
     5:{name:"canaux voisins sur l’horloge (liú zhù)", pairs:[["P", "F"], ["GI", "E"], ["Rt", "C"], ["IG", "V"], ["Rn", "EC"], ["TF", "VB"]]},
     6:{name:"même canal (zì jǐ) : le canal se rééquilibre lui-même (image et reflet inversés)", pairs:[]}
   };
+  // seuls les douze canaux réguliers : les merveilleux vaisseaux (RM et DM compris) ne sont pas concernés
+  const TAN_CANALS = new Set(["P", "GI", "E", "Rt", "C", "IG", "V", "Rn", "EC", "TF", "VB", "F"]);
   let NET_TAN = {sys:"", canal:null};
   try{ Object.assign(NET_TAN, JSON.parse(localStorage.getItem("mtc_trajets_net_tan") || "{}")); }catch(e){}
+  if(!TAN_CANALS.has(NET_TAN.canal)) NET_TAN.canal = null;
   // canaux couplés au canal c : {code: [numéros des systèmes]}
   function tanPartners(c, sys){
     const out = {};
@@ -1387,8 +1397,17 @@
     const d = POINT_ZONE_DATA[code] || {};
     const z = d.zone, b = NET_POS[z] || NET_POS[{narine:"nez", rotule:"genou", cheville:"malleole", pied:"dos-pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux"}[z]];
     if(!b) return 500;
-    // bras : de l'épaule vers la main, à hauteur du thorax
-    return b[0] < 470 ? b[1] + (470 - b[0]) * 0.05 : b[1];
+    // bras : de l'épaule vers la main (bras, coude, avant-bras, poignet, doigts), à hauteur du thorax
+    return b[0] < 470 ? 330 + (470 - b[0]) * 0.3 : b[1];
+  }
+  // même zone sur le même canal : ordre de la numérotation dans le sens tête → pieds
+  // (GI, TF, IG, Rt, Rn, F, RM et DM montent : numéros décroissants vers le bas)
+  const SCHEMA_UP = new Set(["GI", "TF", "IG", "Rt", "Rn", "F", "RM", "DM"]);
+  function schemaOrder(a, b){
+    if(a.h !== b.h) return a.h - b.h;
+    const [ca, na] = a.code.split(" "), [cb, nb] = b.code.split(" ");
+    if(ca === cb && !isNaN(na) && !isNaN(nb)) return (Number(na) - Number(nb)) * (SCHEMA_UP.has(ca) ? -1 : 1);
+    return a.code.localeCompare(b.code, "fr", {numeric:true});
   }
   function showSchema(){
     const codes = new Set(data.map(c => c.code));
@@ -1400,9 +1419,18 @@
     Object.entries(OPENING).forEach(([vessel, k]) => { const s = station(k); [s.own, vessel].forEach(c => { if(!s.canals.includes(c)) s.canals.push(c); if(!s.base.includes(c)) s.base.push(c); }); s.open = vessel; });
     // points luò : vers le canal couplé (seulement quand la surbrillance luò est active)
     if(NET_HL.luo) Object.entries(LUO_POINTS).forEach(([k, pair]) => { const s = station(k); if(!s.canals.includes(s.own)) s.canals.push(s.own); if(!s.base.includes(s.own)) s.base.push(s.own); s.luo = pair || s.own; if(pair && !s.canals.includes(pair)) s.canals.push(pair); });
+    // option : tous les points des canaux en surbrillance (six systèmes), y compris ceux sans correspondance
+    if(NET_TAN.plain && NET_TAN.sys && NET_TAN.canal){
+      const lit = [NET_TAN.canal, ...Object.keys(tanPartners(NET_TAN.canal, NET_TAN.sys))];
+      Object.keys(POINT_ZONE_DATA).forEach(k => {
+        const own = k.split(" ")[0];
+        if(!lit.includes(own) || byCode[k]) return;
+        const s = station(k); s.canals = [own]; s.base = [own]; s.plain = true;
+      });
+    }
     const stations = Object.values(byCode).map(s => Object.assign(s, {canals:s.canals.filter(visible)}))
       .filter(s => s.canals.length)
-      .sort((a, b) => a.h - b.h || a.code.localeCompare(b.code, "fr", {numeric:true}));
+      .sort(schemaOrder);
     const cols0 = CANAL_ORDER.filter(c => stations.some(s => s.canals.includes(c)));
     // ordre des colonnes : échanges successifs tant que la longueur totale des correspondances diminue
     const cost = order => { const ix = {}; order.forEach((c, i) => { ix[c] = i; }); return stations.reduce((sum, s) => { const xs = s.canals.map(c => ix[c]); return sum + (Math.max(...xs) - Math.min(...xs)); }, 0); };
@@ -1450,14 +1478,16 @@
       if(s.maybe.length) info.push("selon certains auteurs : " + s.maybe.map(sigle).join(", "));
       if(s.open) info.push("point d’ouverture du " + sigle(s.open));
       if(s.luo) info.push("point luò" + (s.luo !== s.own ? " vers " + sigle(s.luo) : ""));
-      let g = '<g class="node netstop schema' + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : " hl-luo") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '" data-canals="' + s.canals.join(" ") + '"><title>' + esc(info.join(" · ")) + "</title>";
+      if(s.plain) info.push("sans correspondance");
+      let g = '<g class="node netstop schema' + (s.plain ? " plain" : "") + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : " hl-luo") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '" data-canals="' + s.canals.join(" ") + '"><title>' + esc(info.join(" · ")) + "</title>";
       // trait plein : intersection et ouverture ; trait pointillé : liaison luò vers le canal couplé
       const solid = s.canals.filter(c => s.base.includes(c)).map(cx);
       if(solid.length > 1){ const sa = Math.min(...solid), sb = Math.max(...solid); g += '<line class="slink-case" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/><line class="slink" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/>'; }
       if(s.luo && s.luo !== s.own && s.canals.includes(s.luo) && s.canals.includes(s.own)) g += '<line class="slink-case" x1="' + cx(s.own) + '" x2="' + cx(s.luo) + '" y1="' + (y + 3) + '" y2="' + (y + 3) + '"/><line class="slink luo" x1="' + cx(s.own) + '" x2="' + cx(s.luo) + '" y1="' + (y + 3) + '" y2="' + (y + 3) + '"/>';
       // canal du point : grand rond blanc ; autres canaux : rond rempli de la couleur de leur ligne
       s.canals.forEach(c => {
-        if(c === s.own) g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="7" class="sown"/>';
+        if(s.plain) g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="4" class="splain"/>';
+        else if(c === s.own) g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="7" class="sown"/>';
         else g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="5.5" class="sother" style="fill:' + (ELEMENT[c] === "metal" ? "#fff" : netColor(c)) + '"/>';
       });
       // nom du point à côté de son propre canal (au-dessus du trait), sinon à droite du dernier rond
@@ -1476,8 +1506,8 @@
     const small = window.innerWidth < 760;
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
     main.innerHTML = "<h2>Réseau des points d’intersection</h2>" +
-      '<div class="nethl">Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label><span class="nethlkey">⚓ point d’ouverture · ⛓ point luò</span></div>' +
-      '<div class="nettan"><label>Six systèmes (Dr Tán) : <select id="tanSys"><option value="">—</option>' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select></label> <span id="tanInfo" class="nettaninfo"></span></div>' +
+      '<div class="nethl">Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label></div>' +
+      '<div class="nettan"><label>Six systèmes (Dr Tán) : <select id="tanSys"><option value="">—</option>' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select></label> <label class="tanplain"><input type="checkbox" id="tanPlain"' + (NET_TAN.plain ? " checked" : "") + '> points sans correspondance</label> <span id="tanInfo" class="nettaninfo"></span></div>' +
       (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Les ' + stations.length + " points d’intersection du tableau (jiāo huì), de la tête aux pieds ; chaque canal est une colonne. Clic sur un point : ses correspondances. Clic sur un nom de canal en haut : ses canaux couplés selon les six systèmes de Dr Tán. Barre de gauche : afficher / masquer un canal. Molette ou deux doigts : défiler · Ctrl + molette ou pincer : zoom · glisser : se déplacer.</div>" +
       legend + (small ? "</details>" : "") +
@@ -1551,17 +1581,23 @@
           : (ps.length ? "↔ " + ps.map(c => "<b>" + esc(sigle(c)) + "</b>").join(", ") : "pas de canal couplé dans ce système") + " · " + esc(TAN_SYSTEMS[NET_TAN.sys].name)) +
           (hidden.length ? " · <i>masqué : " + hidden.map(c => esc(sigle(c))).join(", ") + "</i>" : "") +
           ' <button type="button" class="linkish" id="tanClear">effacer</button>';
-        document.getElementById("tanClear").addEventListener("click", () => { NET_TAN.canal = null; saveTan(); applyTan(); });
+        document.getElementById("tanClear").addEventListener("click", () => { NET_TAN.canal = null; saveTan(); if(NET_TAN.plain) showNetwork(); else applyTan(); });
       }
     };
     const pickTan = c => {
+      if(!TAN_CANALS.has(c)){
+        document.getElementById("tanInfo").textContent = sigle(c) + " : les merveilleux vaisseaux ne sont pas concernés par les six systèmes";
+        return;
+      }
       if(!NET_TAN.sys){ NET_TAN.sys = "all"; document.getElementById("tanSys").value = "all"; }
       NET_TAN.canal = NET_TAN.canal === c ? null : c;
-      saveTan(); applyTan();
+      saveTan();
+      if(NET_TAN.plain) showNetwork(); else applyTan();
     };
-    headEls.forEach(h => h.addEventListener("click", () => pickTan(h.dataset.code)));
+    document.getElementById("tanPlain").addEventListener("change", e => { NET_TAN.plain = e.target.checked; saveTan(); if(NET_TAN.canal && NET_TAN.sys) showNetwork(); });
+    headEls.forEach(h => { h.classList.toggle("tan-na", !TAN_CANALS.has(h.dataset.code)); h.addEventListener("click", () => pickTan(h.dataset.code)); });
     svgEl.addEventListener("click", e => { const el = e.target.closest && e.target.closest(".netline[data-code], .terminus[data-code]"); if(el) pickTan(el.dataset.code); });
-    document.getElementById("tanSys").addEventListener("change", e => { NET_TAN.sys = e.target.value; saveTan(); applyTan(); });
+    document.getElementById("tanSys").addEventListener("change", e => { NET_TAN.sys = e.target.value; saveTan(); if(NET_TAN.plain && NET_TAN.canal) showNetwork(); else applyTan(); });
     applyTan();
     window.addEventListener("resize", placeHeads);
     placeHeads();
@@ -2384,7 +2420,7 @@
 
   applyEdits();
   // nomenclature des merveilleux vaisseaux, toujours visible sous la liste des canaux
-  nav.insertAdjacentHTML("beforeend", '<div class="sigle-legend"><b>▲</b> yáng · <b>▼</b> yīn<br><b>QM</b> qiāo mài<br><b>WM</b> wéi mài<br><b>ChM</b> chōng mài<br><b>DaiM</b> dài mài</div>');
+  nav.insertAdjacentHTML("beforeend", '<div class="sigle-legend"><b>▲</b> yáng · <b>▼</b> yīn<br><b>QM</b> qiāo mài<br><b>WM</b> wéi mài<br><b>ChM</b> chōng mài<br><b>DaiM</b> dài mài<br><span class="sopenkey">⚓\uFE0E</span> point d’ouverture<br><span class="sluokey">⛓\uFE0E</span> point luò</div>');
   nav.insertAdjacentHTML("afterbegin", '<p class="check-legend">☑ = vérifié · <button type="button" id="toggleChecks" class="linkish">masquer</button></p>');
   const CHECKS_KEY = "mtc_trajets_hide_checks";
   const setChecks = hide => {
@@ -2537,6 +2573,7 @@
     if(node){
       // station du plan : seulement la mention dans le texte (le panneau cacherait la carte) ;
       // la liste complète des correspondances s'ouvre au double-clic
+      if(node.classList.contains("plain")){ openPointFiche(node.dataset.pid.slice(3)); return; }
       if(node.classList.contains("netstop")){ if(ITI && ITI.phase === "play") itiClick(node.dataset.pid); else if(!GAME || GAME.phase === "setup") openCorr(corrKey(node.dataset.pid)); return; }
       if(node.dataset.cp){ complementClick(node); return; }
       if(node.classList.contains("node")) highlightMention(node);
