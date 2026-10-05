@@ -4,7 +4,7 @@
    - groupes variables de 2 à 4 substances ;
    - validation automatique quand la classe active est complète ;
    - compteur n/N de la classe active uniquement ;
-   - si on clique une autre classe, la sélection précédente est réinitialisée ;
+   - si on clique sur une autre classe, la sélection précédente est réinitialisée ;
    - le moteur ACU est conservé et seulement routé via newGame(). */
 (function(){
   "use strict";
