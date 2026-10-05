@@ -183,7 +183,12 @@
   .rtres{ font-family:"Libre Baskerville", Georgia, serif; line-height:1.6; }
   .rtok{ color:#1a8a3a; font-weight:700; }
   .schemasvg .rtpath line{ stroke:#ffd84d; stroke-width:11; stroke-linecap:round; opacity:.85; }
-  .schemasvg .rtring{ fill:none; stroke-width:3.5; }
+  .schemasvg .rtring{ fill:none; stroke-width:3.5; pointer-events:none; }
+  .schemasvg .rtpath{ pointer-events:none; }
+  .schemasvg .netstop.schema.rt-off{ opacity:.22; }
+  .schemasvg .netstop.schema.rt-on circle[data-line]:hover{ stroke-width:4; filter:drop-shadow(0 0 6px #ffd84d) drop-shadow(0 0 3px #ffd84d); }
+  .rthelp{ margin:0; padding-left:1.3em; font-size:.84rem; }
+  .rthelp li{ margin:1px 0; }
   .schemasvg .rtring.start{ stroke:#1a8a3a; } .schemasvg .rtring.end{ stroke:#c0392b; }
   .schemasvg .rtring.cur{ stroke:#0000ff; stroke-dasharray:4 3; }
   .schemasvg .netline.rt-curline{ stroke-width:9; filter:drop-shadow(0 0 5px #ffd84d); }
@@ -352,7 +357,7 @@
 <script src="../beta-config.js?v=20261005-c"></script>
 <script src="../beta-gate.js?v=20261005-d"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-k"></script>
+<script src="../beta-modules.js?v=20261005-l"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -1545,13 +1550,15 @@
     rtNewMission();
     showNetwork();
   }
-  function rtClick(code){
+  // clic sur un point : on s'y rend le long de sa ligne ; clic sur la pastille d'une autre ligne : on s'y rend et on change
+  function rtClick(code, wanted){
     if(!RT || RT.phase !== "play") return;
     const lines = RT.linesAt[code] || [code.split(" ")[0]];
-    if(code === RT.cur.code) return;
-    if(!lines.includes(RT.cur.line)){ RT.msg = code + " n’est pas sur la ligne " + sigle(RT.cur.line) + " : change de ligne à un point de correspondance."; showNetwork(); return; }
+    if(code === RT.cur.code){ if(wanted && wanted !== RT.cur.line && lines.includes(wanted)) rtChange(wanted); return; }
+    if(!lines.includes(RT.cur.line)){ RT.msg = code + " n’est pas sur ta ligne (" + sigle(RT.cur.line) + ") : les points que tu peux atteindre sont ceux qui restent nets sur le plan."; showNetwork(); return; }
     RT.moves.push({type:"ride", from:RT.cur.code, to:code, line:RT.cur.line});
     rtReplay(); RT.msg = "";
+    if(code !== RT.end && wanted && wanted !== RT.cur.line && lines.includes(wanted)) return rtChange(wanted);
     if(code === RT.end){
       if(RT.zone && !RT.zoneOk) RT.msg = "Arrivée atteinte, mais sans t’arrêter dans la zone « " + RT.zone + " » : annule ton dernier trajet et passe par cette zone.";
       else return rtFinish(false);
@@ -1620,7 +1627,8 @@
       (RT.start ? '<div class="rtmission">De <b class="rtstart">' + esc(RT.start) + "</b> à <b class=\"rtend\">" + esc(RT.end) + "</b>" + (RT.zone ? " en t’arrêtant dans la zone <b>« " + esc(RT.zone) + " »</b>" : "") + "</div>" : "") +
       (RT.phase === "play" ? '<div class="rtrow">Tu es à <b>' + esc(RT.cur.code) + "</b>, sur la ligne " + chip(RT.cur.line) + " · correspondances : <b>" + RT.transfers + "</b>" +
         (here.length ? ' · <span class="rtsm">changer ici pour :</span> ' + here.map(c => '<button type="button" class="rtchange" data-rtline="' + c + '" style="--c:' + (ELEMENT[c] === "metal" ? "#1d1d1f" : netColor(c)) + '">' + esc(sigle(c)) + "</button>").join("") : "") + "</div>" +
-        '<div class="rtsm">Clique sur un point de ta ligne pour t’y rendre ; aux points de correspondance, choisis ta nouvelle ligne ci-dessus.</div>' : "") +
+        '<ol class="rthelp"><li>Les points nets sont sur ta ligne : clique sur l’un d’eux pour t’y rendre.</li>' +
+        '<li>Pour changer de ligne, clique sur la <b>pastille colorée</b> de la nouvelle ligne à ce point (ou sur les boutons ci-dessus).</li></ol>' : "") +
       (RT.msg ? '<div class="rtmsg">' + RT.msg + "</div>" : "") +
       (RT.result ? '<div class="rtres">' + RT.result + "</div>" : "") +
       '<div class="rtrow">' + (RT.phase === "play" ? '<button type="button" class="tool" id="rtUndo"' + (RT.moves.length ? "" : " disabled") + '>Annuler</button><button type="button" class="tool" id="rtGive">Solution</button>' : "") +
@@ -1737,7 +1745,8 @@
       if(s.luo) info.push("point luò" + (s.luo !== s.own ? " vers " + sigle(s.luo) : ""));
       if(isDist) info.push("canal distinct " + s.dist.map(c => "du " + sigle(c) + (((DIST_SRC[s.code] || {})[c] || "").match(/selon[^)]*/) ? " (" + DIST_SRC[s.code][c].match(/selon[^)]*/)[0] + ")" : "")).join(", "));
       if(s.plain) info.push("sans correspondance");
-      let g = '<g class="node netstop schema' + (s.plain ? " plain" : "") + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : NET_HL.luo && isLuo ? " hl-luo" : " hl-dist") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '" data-canals="' + s.canals.join(" ") + '"><title>' + esc(info.join(" · ")) + "</title>";
+      const rtCls = RT && RT.phase === "play" ? (s.canals.includes(RT.cur.line) ? " rt-on" : " rt-off") : "";
+      let g = '<g class="node netstop schema' + rtCls + (s.plain ? " plain" : "") + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : NET_HL.luo && isLuo ? " hl-luo" : " hl-dist") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '" data-canals="' + s.canals.join(" ") + '"><title>' + esc(info.join(" · ")) + "</title>";
       // trait plein : intersection et ouverture ; trait pointillé : liaison luò vers le canal couplé
       const solid = s.canals.filter(c => s.base.includes(c)).map(cx);
       if(solid.length > 1){ const sa = Math.min(...solid), sb = Math.max(...solid); g += '<line class="slink-case" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/><line class="slink" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/>'; }
@@ -1747,9 +1756,9 @@
       if(s.luo && s.luo !== s.own && s.canals.includes(s.luo) && s.canals.includes(s.own)) g += '<line class="slink-case" x1="' + cx(s.own) + '" x2="' + cx(s.luo) + '" y1="' + (y + 3) + '" y2="' + (y + 3) + '"/><line class="slink luo" x1="' + cx(s.own) + '" x2="' + cx(s.luo) + '" y1="' + (y + 3) + '" y2="' + (y + 3) + '"/>';
       // canal du point : grand rond blanc ; autres canaux : rond rempli de la couleur de leur ligne
       s.canals.forEach(c => {
-        if(s.plain) g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="4" class="splain"/>';
-        else if(c === s.own) g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="7" class="sown"/>';
-        else g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="5.5" class="sother" style="fill:' + (ELEMENT[c] === "metal" ? "#fff" : netColor(c)) + '"/>';
+        if(s.plain) g += '<circle data-line="' + c + '" cx="' + cx(c) + '" cy="' + y + '" r="4" class="splain"/>';
+        else if(c === s.own) g += '<circle data-line="' + c + '" cx="' + cx(c) + '" cy="' + y + '" r="7" class="sown"/>';
+        else g += '<circle data-line="' + c + '" cx="' + cx(c) + '" cy="' + y + '" r="5.5" class="sother" style="fill:' + (ELEMENT[c] === "metal" ? "#fff" : netColor(c)) + '"/>';
       });
       // nom du point à côté de son propre canal (au-dessus du trait), sinon à droite du dernier rond
       const lx = s.canals.includes(s.own) ? cx(s.own) + 9 : xb + 12, ly = s.canals.includes(s.own) && xs.length > 1 ? y - 8 : y + 4;
@@ -2848,7 +2857,7 @@
     if(node){
       // station du plan : seulement la mention dans le texte (le panneau cacherait la carte) ;
       // la liste complète des correspondances s'ouvre au double-clic
-      if(RT && RT.phase === "play" && node.classList.contains("netstop")){ rtClick(node.dataset.pid.slice(3)); return; }
+      if(RT && RT.phase === "play" && node.classList.contains("netstop")){ const lc = event.target.closest && event.target.closest("[data-line]"); rtClick(node.dataset.pid.slice(3), lc ? lc.dataset.line : null); return; }
       if(node.classList.contains("plain")){ openPointFiche(node.dataset.pid.slice(3)); return; }
       if(node.classList.contains("netstop")){ if(ITI && ITI.phase === "play") itiClick(node.dataset.pid); else if(!GAME || GAME.phase === "setup") openCorr(corrKey(node.dataset.pid)); return; }
       if(node.dataset.cp){ complementClick(node); return; }
