@@ -1569,9 +1569,23 @@
     for(const s of RT.sol){ const z = RT.st.find(x => x.band === RT.zone && x.canals.includes(s.line)); if(z) return ", par exemple à " + esc(z.code) + " sur " + esc(sigle(s.line)); }
     return "";
   }
+  const rtLine = l => '<b style="color:' + (ELEMENT[l] === "metal" ? "var(--text-color)" : netColor(l)) + '">' + esc(sigle(l)) + "</b>";
+  // solution : pour chaque changement de ligne, tous les points où il est possible (pas seulement le premier trouvé)
   function rtSolText(){
-    return RT.sol.map((s, i) => (i ? "→ <b>" + esc(s.via) + "</b> → " : "") + '<b style="color:' + (ELEMENT[s.line] === "metal" ? "var(--text-color)" : netColor(s.line)) + '">' + esc(sigle(s.line)) + "</b>").join(" ") +
+    return RT.sol.map((s, i) => {
+      if(!i) return rtLine(s.line);
+      const prev = RT.sol[i - 1].line;
+      const vias = RT.st.filter(x => x.canals.includes(prev) && x.canals.includes(s.line)).map(x => x.code)
+        .sort((a, b) => a.localeCompare(b, "fr", {numeric:true}));
+      return "→ <b>" + vias.map(esc).join(" ou ") + "</b> → " + rtLine(s.line);
+    }).join(" ") +
       (RT.zone ? " <span class=\"rtsm\">(avec un arrêt dans la zone « " + esc(RT.zone) + " »" + rtZoneExample() + ")</span>" : "");
+  }
+  // le trajet de læ joueur·se, tel qu'iel l'a fait
+  function rtMyText(){
+    let s = rtLine(RT.start.split(" ")[0]);
+    RT.moves.forEach(m => { if(m.type === "change") s += " → <b>" + esc(m.at) + "</b> → " + rtLine(m.to); });
+    return s;
   }
   function rtFinish(gaveUp){
     RT.phase = "done";
@@ -1579,7 +1593,9 @@
     RT_OPT.played++; if(perfect) RT_OPT.perfect++; rtSave();
     if(RT.series && perfect) RT.series.perfect++;
     RT.result = (gaveUp ? "Solution :" : perfect ? '<span class="rtok">Parfait : ' + RT.transfers + " correspondance" + (RT.transfers > 1 ? "s" : "") + ", c’est le minimum.</span>"
-      : "Arrivée en " + RT.transfers + " correspondance" + (RT.transfers > 1 ? "s" : "") + " ; le minimum est <b>" + RT.opt + "</b>.") + "<br>" + rtSolText();
+      : "Arrivée en " + RT.transfers + " correspondance" + (RT.transfers > 1 ? "s" : "") + " ; le minimum est <b>" + RT.opt + "</b>.") +
+      (gaveUp ? "" : '<br><span class="rtsm">Ton trajet :</span> ' + rtMyText()) +
+      '<br><span class="rtsm">' + (perfect ? "Toutes les correspondances possibles :" : "Le meilleur trajet :") + "</span> " + rtSolText();
     if(RT.series && RT.series.n >= 5){
       const s = Math.round((Date.now() - RT.series.t0) / 1000);
       RT.result += '<br><b>Défi terminé : ' + RT.series.perfect + " / 5 trajets parfaits en " + Math.floor(s / 60) + " min " + String(s % 60).padStart(2, "0") + " s.</b>";
