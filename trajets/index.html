@@ -229,7 +229,7 @@
   ::highlight(mtc-mention){ background-color:#ffd84d; color:#000; }
   mark.mtc-mention{ background:#ffd84d; color:#000; border-radius:3px; }
   /* survol d'un lieu du plan : autres canaux qui y passent */
-  #tip{ position:fixed; z-index:20; pointer-events:none; max-width:340px; background:#fff; border:1px solid #d6d6ea; border-radius:10px;
+  #tip{ position:fixed; z-index:20; pointer-events:none; max-width:min(340px, calc(100vw - 16px)); background:#fff; border:1px solid #d6d6ea; border-radius:10px;
         box-shadow:0 6px 20px rgba(0,0,0,.14); padding:8px 10px; font-size:.82rem; display:none; }
   #tip b{ display:block; margin-bottom:4px; }
   #tip .crow{ font-size:.85rem; padding:1px 0; cursor:default; }
@@ -2378,9 +2378,11 @@
   }, true);
   // survol d'un lieu du plan : les autres canaux qui passent par ce lieu
   const tip = document.getElementById("tip");
+  // écran tactile : pas d'info-bulle (le toucher ouvre déjà les correspondances, et la bulle sortirait de l'écran)
+  const noHover = () => { try{ return matchMedia("(hover: none)").matches; }catch(e){ return false; } };
   document.addEventListener("mouseover", event => {
-    const node = event.target.closest(".node");
-    if(!node){ tip.style.display = "none"; return; }
+    const node = event.target.closest && event.target.closest(".node");
+    if(!node || noHover()){ tip.style.display = "none"; return; }
     const pid = node.dataset.pid;
     // tous les trajets qui passent ici, sauf celui qu'on regarde (les autres trajets du même
     // canal — tendineux, distinct… — restent listés)
@@ -2403,6 +2405,8 @@
     let x = event.clientX + 14, y = event.clientY + 14;
     if(x + w > innerWidth - 8) x = event.clientX - w - 14;
     if(y + h > innerHeight - 8) y = Math.max(8, innerHeight - h - 8);
+    x = Math.max(8, Math.min(x, innerWidth - w - 8));     // toujours dans l'écran
+    y = Math.max(8, y);
     tip.style.left = x + "px"; tip.style.top = y + "px";
   });
   document.getElementById("editToggle").addEventListener("click", () => {
