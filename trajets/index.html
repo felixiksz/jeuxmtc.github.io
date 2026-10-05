@@ -1816,7 +1816,7 @@
     // six systèmes : clic sur un nom de canal (bandeau, ligne ou bout de ligne) → canaux couplés en surbrillance
     const saveTan = () => { try{ localStorage.setItem("mtc_trajets_net_tan", JSON.stringify(NET_TAN)); }catch(e){} };
     const applyTan = () => {
-      const SYSV = NET_TAN.on ? NET_TAN.sys : "";
+      const SYSV = NET_TAN.on && !RT ? NET_TAN.sys : "";   // pas de surbrillance des six systèmes pendant le jeu Itinéraire
       const sel = SYSV && NET_TAN.canal && cols.includes(NET_TAN.canal) ? NET_TAN.canal : null;
       const partners = sel ? tanPartners(sel, SYSV) : {};
       const on = c => c === sel || c in partners;
@@ -1855,6 +1855,7 @@
       }
     };
     const pickTan = c => {
+      if(RT) return;
       if(!TAN_CANALS.has(c)){
         document.getElementById("tanInfo").textContent = sigle(c) + " : les merveilleux vaisseaux (sauf RM et DM) ne sont pas concernés par les six systèmes";
         return;
