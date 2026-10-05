@@ -139,6 +139,16 @@
   .schemasvg .sother{ fill:#fff; stroke:#1d1d1f; stroke-width:2; }
   .schemasvg .slabel{ font-size:11.5px; font-weight:800; fill:#222; paint-order:stroke; stroke:#fff; stroke-width:4px; }
   .schemasvg .netstop.schema{ cursor:pointer; }
+  .schemasvg .netstop.schema.dim{ opacity:.18; }
+  .schemasvg .netstop.schema.hl-mv circle{ filter:drop-shadow(0 0 4px #13a6a6) drop-shadow(0 0 2px #13a6a6); }
+  .schemasvg .netstop.schema.hl-luo circle{ filter:drop-shadow(0 0 4px #e67e22) drop-shadow(0 0 2px #e67e22); }
+  .schemasvg .netstop.schema.hl .slabel{ font-size:12.5px; }
+  .schemasvg .slink.luo{ stroke-dasharray:6 4; stroke:#e67e22; }
+  .schemasvg .sopen{ fill:#13858a; } .schemasvg .sluo{ fill:#c8661a; }
+  .nethl{ display:flex; flex-wrap:wrap; gap:4px 14px; align-items:center; font-size:.85rem; margin:0 0 8px; }
+  .nethl label{ display:inline-flex; align-items:center; gap:5px; cursor:pointer; font-weight:700; }
+  .nethl input{ accent-color:var(--accent); }
+  .nethlkey{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:.75rem; color:var(--muted); }
   .schemasvg .netstop.schema:hover .sown, .schemasvg .netstop.schema:hover .sother{ fill:#ffd84d; }
   .schemasvg .terminus text{ font-size:11px; font-weight:800; }
   .netwrap.dark.schemawrap{ background:#171a22; }
@@ -677,6 +687,7 @@
     });
     document.getElementById("corrBody").innerHTML =
       '<div class="rename"><label for="renameInput">Nom du lieu</label><input id="renameInput" data-pid="' + esc(pid) + '" value="' + esc(place.label) + '"></div>' +
+      Object.entries(OPENING).filter(([, k]) => "pt:" + k === pid).map(([vessel]) => '<p class="jhint">⚓ Point d’ouverture du ' + esc((data.find(d => d.code === vessel) || {name:vessel}).name.replace(/ — .*/, "")) + "</p>").join("") +
       (html || (own ? "<p>Aucune correspondance : seuls les trajets de son propre canal (" + esc(sigle(own)) + ") passent par ce point.</p>" : "<p>Aucun trajet.</p>"));
     corrPid = pid;
     corrAddBack();
@@ -713,7 +724,13 @@
         return '<tr><td><a href="#" class="pfiche" data-point="' + esc(k) + '">' + esc(k) + "</a>" +
           (n ? ' <button type="button" class="linkish jcount" data-pid="' + esc(pid) + '" title="Trajets qui passent par ce point">(' + n + ")</button>" : "") + "</td>" +
           "<td>" + (v.canaux || []).filter(c => c !== k.split(" ")[0]).map(chip).join(" ") + "</td><td>" + (v.certains || []).filter(c => c !== k.split(" ")[0]).map(chip).join(" ") + "</td></tr>";
-      }).join("") + "</tbody></table>";
+      }).join("") + "</tbody></table>" +
+      // points d'ouverture des merveilleux vaisseaux : aussi des points de correspondance
+      "<h4>⚓ Points d’ouverture des merveilleux vaisseaux</h4>" +
+      '<table class="jtable"><thead><tr><th>Point</th><th>Ouvre</th></tr></thead><tbody>' +
+      Object.entries(OPENING).sort((a, b) => { const x = ptOrder(a[1]), y = ptOrder(b[1]); return x[0] - y[0] || x[1] - y[1]; })
+        .map(([vessel, k]) => '<tr><td><a href="#" class="pfiche" data-point="' + esc(k) + '">' + esc(k) + "</a></td><td>" + chip(vessel) + " " + esc((data.find(d => d.code === vessel) || {name:""}).name.replace(/ — .*/, "").replace(/\s*\(.*$/, "")) + "</td></tr>").join("") +
+      "</tbody></table>";
   }
   // fiche détaillée d'un point (fiches du jeu : 02-01-point-details-data.js, avec les corrections publiées)
   let pointDataPromise = null;
@@ -741,7 +758,8 @@
       const sec = (title, v) => v && String(v).trim() && String(v).trim() !== "Aucune" ? "<h4>" + esc(title) + '</h4><p class="ftxt">' + esc(String(v).trim()) + "</p>" : "";
       body.innerHTML = back +
         '<div class="fhead"><b>' + esc(code) + "</b> · " + esc(d.pinyin || "") + " " + esc(d.hanzi || "") + (d.nom_francais ? ' · <i>' + esc(d.nom_francais) + "</i>" : "") + "</div>" +
-        (jh ? '<p class="jhint">Intersection : ' + (jh.canaux || []).map(chip).join(" ") + ((jh.certains || []).length ? " · selon certains : " + jh.certains.map(chip).join(" ") : "") + "</p>" : "") +
+        (jh ? '<p class="jhint">Intersection : ' + (jh.canaux || []).filter(c => c !== code.split(" ")[0]).map(chip).join(" ") + ((jh.certains || []).length ? " · selon certains : " + jh.certains.map(chip).join(" ") : "") + "</p>" : "") +
+        Object.entries(OPENING).filter(([, k]) => k === code).map(([vessel]) => '<p class="jhint">⚓ Point d’ouverture du ' + chip(vessel) + "</p>").join("") +
         (n ? '<p><button type="button" class="linkish jcount" data-pid="' + esc(pid) + '">Voir les ' + n + " trajet" + (n > 1 ? "s" : "") + " qui passent par ce point</button></p>" : "") +
         sec("Localisation", d.localisation) + sec("Méthode de localisation", d.methode_localisation) + sec("Méthode de travail", d.methode_travail) +
         sec("Catégories du point", d.categories_du_point) + sec("Correspondances", d.correspondances) + sec("Actions", d.actions) +
@@ -1301,6 +1319,12 @@
   // aux pieds ; un point est une station sur la colonne de chacun de ses canaux, reliées par un trait de correspondance.
   // L'ordre des colonnes rapproche les canaux qui se croisent souvent (correspondances plus courtes).
   let NET_MODE = "schema";
+  // surbrillance des correspondances : merveilleux vaisseaux, vaisseaux luò
+  let NET_HL = {mv:false, luo:false};
+  try{ Object.assign(NET_HL, JSON.parse(localStorage.getItem("mtc_trajets_net_hl") || "{}")); }catch(e){}
+  // points luò : canal couplé (biǎo / lǐ) ; RM 15, DM 1 et le grand luò de la rate (Rt 21) n'ont pas de canal couplé
+  const LUO_POINTS = {"P 7":"GI", "GI 6":"P", "E 40":"Rt", "Rt 4":"E", "C 5":"IG", "IG 7":"C", "V 58":"Rn", "Rn 4":"V", "EC 6":"TF", "TF 5":"EC",
+    "VB 37":"F", "F 5":"VB", "RM 15":null, "DM 1":null, "Rt 21":null};
   try{ NET_MODE = localStorage.getItem("mtc_trajets_net_mode") || "schema"; }catch(e){}
   const SCHEMA_BANDS = [[230, "Tête"], [300, "Cou et épaules"], [450, "Thorax et bras"], [720, "Abdomen et bassin"], [9999, "Membres inférieurs"]];
   function pointHeight(code){
@@ -1313,7 +1337,14 @@
   function showSchema(){
     const codes = new Set(data.map(c => c.code));
     const visible = c => codes.has(c) && !NET_HIDDEN.has(c);
-    const stations = Object.entries(JIAOHUI).map(([k, v]) => ({pid:"pt:" + k, code:k, own:k.split(" ")[0], canals:[...new Set(v.canaux || [])].filter(visible), maybe:v.certains || [], h:pointHeight(k)}))
+    const byCode = {};
+    const station = k => byCode[k] || (byCode[k] = {pid:"pt:" + k, code:k, own:k.split(" ")[0], canals:[], base:[], maybe:[], h:pointHeight(k), open:null, luo:null});
+    Object.entries(JIAOHUI).forEach(([k, v]) => { const s = station(k); s.canals = [...new Set(v.canaux || [])]; s.base = s.canals.slice(); s.maybe = v.certains || []; s.jh = true; });
+    // points d'ouverture des merveilleux vaisseaux : correspondance entre le canal du point et le vaisseau qu'il ouvre
+    Object.entries(OPENING).forEach(([vessel, k]) => { const s = station(k); [s.own, vessel].forEach(c => { if(!s.canals.includes(c)) s.canals.push(c); if(!s.base.includes(c)) s.base.push(c); }); s.open = vessel; });
+    // points luò : vers le canal couplé (seulement quand la surbrillance luò est active)
+    if(NET_HL.luo) Object.entries(LUO_POINTS).forEach(([k, pair]) => { const s = station(k); if(!s.canals.includes(s.own)) s.canals.push(s.own); if(!s.base.includes(s.own)) s.base.push(s.own); s.luo = pair || s.own; if(pair && !s.canals.includes(pair)) s.canals.push(pair); });
+    const stations = Object.values(byCode).map(s => Object.assign(s, {canals:s.canals.filter(visible)}))
       .filter(s => s.canals.length)
       .sort((a, b) => a.h - b.h || a.code.localeCompare(b.code, "fr", {numeric:true}));
     const cols0 = CANAL_ORDER.filter(c => stations.some(s => s.canals.includes(c)));
@@ -1357,8 +1388,17 @@
     // stations : un cercle par canal, reliés par le trait de correspondance ; étiquette à droite
     stations.forEach((s, i) => {
       const y = ry(i), xs = s.canals.map(cx), xa = Math.min(...xs), xb = Math.max(...xs);
-      let g = '<g class="node netstop schema" data-pid="' + esc(s.pid) + '"><title>' + esc(s.code + " — " + s.canals.map(sigle).join(", ") + (s.maybe.length ? " (selon certains auteurs : " + s.maybe.map(sigle).join(", ") + ")" : "")) + "</title>";
-      if(xs.length > 1) g += '<line class="slink-case" x1="' + xa + '" x2="' + xb + '" y1="' + y + '" y2="' + y + '"/><line class="slink" x1="' + xa + '" x2="' + xb + '" y1="' + y + '" y2="' + y + '"/>';
+      const isMv = s.canals.some(c => RIVER.has(c)), isLuo = !!s.luo;
+      const hl = (NET_HL.mv && isMv) || (NET_HL.luo && isLuo), dim = (NET_HL.mv || NET_HL.luo) && !hl;
+      const info = [s.code + " — " + s.canals.map(sigle).join(", ")];
+      if(s.maybe.length) info.push("selon certains auteurs : " + s.maybe.map(sigle).join(", "));
+      if(s.open) info.push("point d’ouverture du " + sigle(s.open));
+      if(s.luo) info.push("point luò" + (s.luo !== s.own ? " vers " + sigle(s.luo) : ""));
+      let g = '<g class="node netstop schema' + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : " hl-luo") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '"><title>' + esc(info.join(" · ")) + "</title>";
+      // trait plein : intersection et ouverture ; trait pointillé : liaison luò vers le canal couplé
+      const solid = s.canals.filter(c => s.base.includes(c)).map(cx);
+      if(solid.length > 1){ const sa = Math.min(...solid), sb = Math.max(...solid); g += '<line class="slink-case" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/><line class="slink" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/>'; }
+      if(s.luo && s.luo !== s.own && s.canals.includes(s.luo) && s.canals.includes(s.own)) g += '<line class="slink-case" x1="' + cx(s.own) + '" x2="' + cx(s.luo) + '" y1="' + (y + 3) + '" y2="' + (y + 3) + '"/><line class="slink luo" x1="' + cx(s.own) + '" x2="' + cx(s.luo) + '" y1="' + (y + 3) + '" y2="' + (y + 3) + '"/>';
       // canal du point : grand rond blanc ; autres canaux : rond rempli de la couleur de leur ligne
       s.canals.forEach(c => {
         if(c === s.own) g += '<circle cx="' + cx(c) + '" cy="' + y + '" r="7" class="sown"/>';
@@ -1366,7 +1406,7 @@
       });
       // nom du point à côté de son propre canal (au-dessus du trait), sinon à droite du dernier rond
       const lx = s.canals.includes(s.own) ? cx(s.own) + 9 : xb + 12, ly = s.canals.includes(s.own) && xs.length > 1 ? y - 8 : y + 4;
-      g += '<text class="slabel" x="' + lx + '" y="' + ly + '">' + esc((PLACES[s.pid] || {label:s.code}).label) + "</text></g>";
+      g += '<text class="slabel" x="' + lx + '" y="' + ly + '">' + (s.open ? '<tspan class="sopen">⚓\uFE0E</tspan> ' : "") + (s.luo ? '<tspan class="sluo">⛓\uFE0E</tspan> ' : "") + esc((PLACES[s.pid] || {label:s.code}).label) + "</text></g>";
       svg += g;
     });
     svg += tags;
@@ -1380,6 +1420,7 @@
     const small = window.innerWidth < 760;
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
     main.innerHTML = "<h2>Réseau des points d’intersection</h2>" +
+      '<div class="nethl">Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label><span class="nethlkey">⚓ point d’ouverture · ⛓ point luò</span></div>' +
       (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
       '<div class="src">Les ' + stations.length + " points d’intersection du tableau (jiāo huì), de la tête aux pieds ; chaque canal est une colonne. Clic sur un point : ses correspondances. Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer.</div>" +
       legend + (small ? "</details>" : "") +
@@ -1390,6 +1431,11 @@
     wrap.querySelector('[data-z="dark"]').addEventListener("click", () => { wrap.classList.toggle("dark"); try{ localStorage.setItem("mtc_trajets_net_dark", wrap.classList.contains("dark") ? "1" : ""); }catch(e){} });
     main.querySelectorAll("[data-net]").forEach(b => b.addEventListener("click", () => { if(b.dataset.net === "all") NET_HIDDEN.clear(); else data.forEach(c => NET_HIDDEN.add(c.code)); saveHidden(); showNetwork(); }));
     bindNetMode();
+    main.querySelectorAll("[data-hl]").forEach(cb => cb.addEventListener("change", () => {
+      NET_HL[cb.dataset.hl] = cb.checked;
+      try{ localStorage.setItem("mtc_trajets_net_hl", JSON.stringify(NET_HL)); }catch(e){}
+      showNetwork();
+    }));
     // vue de départ : toute la largeur, en haut (la tête) ; on descend en glissant
     const vbq = new URLSearchParams(location.search).get("vb");
     if(vbq && !NET_VB){ const [x, y, w, h] = vbq.split(",").map(Number); if(w && h) NET_VB = {x, y, w, h}; }
