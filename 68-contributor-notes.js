@@ -4,7 +4,7 @@
    qui accepte de contribuer accède, dans les fiches des points et des
    substances, aux notes partagées :
    - les notes perso de l'admin (notes-admin.js, signées « emesepap, admin ») ;
-   - un fil « Notes des contributeurs » par fiche (giscus), où chaque note
+   - un fil « Notes des contributeur·ices » par fiche (giscus), où chaque note
      est signée du nom de profil GitHub de son auteur, pour pouvoir le
      contacter en cas d'incompréhension.
    Visible seulement pour l'admin, ou pour tous quand MTC_BETA.public.
@@ -78,7 +78,7 @@
     veil.className = "mtc-contrib-veil";
     veil.innerHTML = '<div class="mtc-contrib-box" role="dialog" aria-modal="true" aria-labelledby="mtcContribTitle">' +
       '<h2 id="mtcContribTitle">Contribuer aux modules bêta</h2>' +
-      "<p>En contribuant à Trajets et Formules, tu accèdes aux <b>notes des autres contributeurs</b> dans les fiches des points et des substances.</p>" +
+      "<p>En contribuant à Trajets et Formules, tu accèdes aux <b>notes des autres contributeur·ices</b> dans les fiches des points et des substances.</p>" +
       '<label><input type="checkbox" class="c1"><span>Je participe à la vérification et à l’amélioration des modules (corrections, vérifications, notes).</span></label>' +
       '<label><input type="checkbox" class="c2"><span>Mes notes seront signées de <b>mon nom de profil GitHub</b>, pour qu’on puisse me contacter en cas d’incompréhension. Pas encore de profil ? <a href="https://github.com/signup" target="_blank" rel="noopener">Créer un profil GitHub</a>.</span></label>' +
       '<label><input type="checkbox" class="c3"><span>J’utilise les notes des autres pour mon apprentissage et je ne les diffuse pas en dehors du jeu.</span></label>' +
@@ -97,17 +97,17 @@
   function block(domain, id, label){
     if(!enabled() || !id) return "";
     style();
-    if(!isContributor()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes des autres contributeurs">Contribuer — notes des contributeurs</button></div>';
+    if(!isContributor()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes des autres contributeur·ices">Contribuer — notes des contributeurs</button></div>';
     loadNotes();
     const shared = window.MTC_SHARED_NOTES, mine = shared && shared[domain] && shared[domain][id];
     const fields = mine ? Object.entries(mine) : [];
     const labels = LABELS[domain] || {};
     const author = (shared && shared.author) || "emesepap, admin", col = authorColor(author);
-    return '<div class="mtc-contrib"><details' + (fields.length ? " open" : "") + "><summary>Notes des contributeurs" + (fields.length ? " (" + fields.length + ")" : "") + "</summary>" +
+    return '<div class="mtc-contrib"><details' + (fields.length ? " open" : "") + "><summary>Notes des contributeur·ices" + (fields.length ? " (" + fields.length + ")" : "") + "</summary>" +
       (fields.length ? '<p class="legend"><span class="dot" style="--a:' + col + '"></span>' + esc(author) + "</p>" +
         fields.map(([k, v]) => '<div class="note" style="--a:' + col + '" title="' + esc(author) + '"><h5>' + esc(labels[k] || k) + '</h5><p class="txt">' + esc(v) + "</p></div>").join("")
         : (shared ? "<p class=\"txt\">Pas encore de note partagée sur cette fiche.</p>" : "<p class=\"txt\">Chargement…</p>")) +
-      '<div class="row"><button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">Notes signées des contributeurs</button>' +
+      '<div class="row"><button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">Notes signées des contributeur·ices</button>' +
       '<button type="button" class="quit" data-contrib="quit">ne plus contribuer</button></div></details></div>';
   }
 

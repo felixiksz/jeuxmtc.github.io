@@ -325,9 +325,9 @@
 </aside>
 <div id="tip" role="tooltip"></div>
 <script src="../beta-config.js?v=20261005-c"></script>
-<script src="../beta-gate.js?v=20261005-c"></script>
+<script src="../beta-gate.js?v=20261005-d"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-f"></script>
+<script src="../beta-modules.js?v=20261005-g"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -622,7 +622,7 @@
         });
       });
     }
-    // point d'intersection (jiāo huì) : les canaux du tableau s'y rejoignent (gris = selon certains auteurs)
+    // point d'intersection (jiāo huì) : les canaux du tableau s'y rejoignent (gris = selon certain·es auteur·ices)
     const jh = pm && TYPES_ON.externe !== false && JIAOHUI[pid.slice(3)];
     if(jh){
       [["canaux", false], ["certains", true]].forEach(([k, certain]) => (jh[k] || []).forEach(code => {
@@ -649,7 +649,7 @@
     const go = ' data-go="' + c.code + "|" + si + '"';
     const meta = CANAL[c.code];
     const orb = code => '<span class="orb el-' + (ELEMENT[code] || "none") + '">' + esc(code) + "</span>";
-    const rmBtn = (item.jh ? '<small class="jh">' + (item.certain ? "intersection, selon certains auteurs" : "point d’intersection") + "</small>" : "") +
+    const rmBtn = (item.jh ? '<small class="jh">' + (item.certain ? "intersection, selon certain·es auteur·ices" : "point d’intersection") + "</small>" : "") +
       '<button type="button" class="rm" data-rm="' + c.code + "|" + si + '" title="Retirer ce lieu de ce trajet">retirer</button>';
     if(!meta){
       const name = c.name.replace(/ — .*/, "") + (s.type === "luo" ? " luò mài" : "");
@@ -1479,7 +1479,7 @@
       const isMv = s.canals.some(c => RIVER.has(c)), isLuo = !!s.luo;
       const hl = (NET_HL.mv && isMv) || (NET_HL.luo && isLuo), dim = (NET_HL.mv || NET_HL.luo) && !hl;
       const info = [s.code + " — " + s.canals.map(sigle).join(", ")];
-      if(s.maybe.length) info.push("selon certains auteurs : " + s.maybe.map(sigle).join(", "));
+      if(s.maybe.length) info.push("selon certain·es auteur·ices : " + s.maybe.map(sigle).join(", "));
       if(s.open) info.push("point d’ouverture du " + sigle(s.open));
       if(s.luo) info.push("point luò" + (s.luo !== s.own ? " vers " + sigle(s.luo) : ""));
       if(s.plain) info.push("sans correspondance");

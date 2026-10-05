@@ -114,9 +114,9 @@
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
 <script src="../beta-config.js?v=20261005-c"></script>
-<script src="../beta-gate.js?v=20261005-c"></script>
+<script src="../beta-gate.js?v=20261005-d"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-f"></script>
+<script src="../beta-modules.js?v=20261005-g"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -447,7 +447,7 @@
   const ARTICLE = {manque:"un", perte:"une", baisse:"une", augmentation:"une", tendance:"une", sensation:"une", envie:"une", alternance:"une", difficulté:"une", difficultés:"des", lourdeur:"une", brûlure:"une", oppression:"une", distension:"une", tension:"une", raideur:"une", fièvre:"de la", soif:"", grande:"une"};
   // Le patient parle avec ses mots, pas avec ceux du cours : phrases toutes faites pour les signes les plus techniques,
   // puis remplacement des termes savants dans les autres.
-  // {e} {eux} {las} : accord au féminin pour une patiente
+  // {e} {eux} {las} : accords en écriture inclusive (fatigué·e, frileux·se, las·se)
   const LAY = [
     [/^(renversement|inversion|froid renversé|manque de chaleur dans les extrémités|refroidissement des|membres\/mains\/pieds froids|extrémités froides|mains et pieds froids|doigts\/orteils ou mains\/pieds froids)/, "J’ai les mains et les pieds glacés."],
     [/^forte aversion (pour le|au) froid/, "Je n’arrive pas à me réchauffer, j’ai horreur du froid."],
@@ -587,8 +587,7 @@
     [/\bà le /g, "au "], [/\bde le /g, "du "]
   ];
   const gender = s => {
-    const f = typeof CASE !== "undefined" && CASE.c && CASE.c.femme;
-    return s.replace(/\{e\}/g, f ? "e" : "").replace(/\{eux\}/g, f ? "euse" : "eux").replace(/\{las\}/g, f ? "lasse" : "las");
+    return s.replace(/\{e\}/g, "·e").replace(/\{eux\}/g, "eux·se").replace(/\{las\}/g, "las·se");
   };
   function patientLine(item, n){
     let s = item.replace(/\s*\([^)]*\)/g, "").replace(/[«»"]/g, "").replace(/(^|\s)(de|à) se\s/g, "$1$2 me ").replace(/\s+/g, " ").trim();
@@ -672,7 +671,7 @@
     CASE.tips = shuffle(c.f._items.filter(i => i.keys.length && !i.keys.some(k => othersKeys.has(k))))
       .sort((a, b) => (ORDER[a.role] ?? 1) - (ORDER[b.role] ?? 1));
     CASE.tipN = 0;
-    say("narr", (c.femme ? "Une patiente" : "Un patient") + " entre et s’assoit.");
+    say("narr", "Un·e patient·e entre et s’assoit.");
     say("vous", "Bonjour, qu’est-ce qui vous amène ?");
     sayNext();
   }
@@ -744,10 +743,10 @@
       return;
     }
     CASE.done[kind] = true;
-    const Q = {langue:"Pouvez-vous me montrer votre langue ?", pouls:"Je vais prendre votre pouls.", obs:"(vous observez le patient)", palp:"Je vais palper votre abdomen."};
+    const Q = {langue:"Pouvez-vous me montrer votre langue ?", pouls:"Je vais prendre votre pouls.", obs:"(vous observez læ patient·e)", palp:"Je vais palper votre abdomen."};
     const low = l => l.map(x => x.charAt(0).toLowerCase() + x.slice(1));
     const R = {langue:"Langue : " + low(c.langue).join(" ; "), pouls:c.pouls.map(x => x.charAt(0).toUpperCase() + x.slice(1)).join(" ; "), obs:"Observation : " + low(c.obs).join(" ; "), palp:"Palpation : " + low(c.palp).join(" ; ")};
-    if(kind === "obs") say("narr", c.femme ? "Vous observez la patiente." : "Vous observez le patient."); else say("vous", Q[kind]);
+    if(kind === "obs") say("narr", "Vous observez læ patient·e."); else say("vous", Q[kind]);
     say("exam", R[kind] + ".");
   }
   function decideCase(f){
@@ -766,7 +765,7 @@
       '<span class="score">' + CASE.score + " pts · " + CASE.total + " cas</span></div>";
     if(!c){ main.innerHTML = bar + '<p class="msg">Pas de tableau clinique exploitable dans cette catégorie.</p>'; bindCaseBar(); return; }
     const chat = '<div class="chat" id="cChat" title="Clic : afficher tout de suite">' + CASE.log.map((l, i) => {
-      const who = {patient:c.femme ? "La patiente" : "Le patient", vous:"Vous", exam:"Examen", narr:"", tip:"Astuce"}[l.who];
+      const who = {patient:"Patient·e", vous:"Vous", exam:"Examen", narr:"", tip:"Astuce"}[l.who];
       return '<p class="line ' + l.who + '" data-i="' + i + '">' + (who ? '<span class="who">' + who + "</span>" : "") + '<span class="txt2">' + esc(l.text.slice(0, l.shown)) + (l.shown < l.text.length ? '<span class="caret"></span>' : "") + "</span></p>";
     }).join("") + "</div>";
     const busy = !!CASE.typing || CASE.log.some(l => l.shown < l.text.length);
@@ -794,7 +793,7 @@
         (c.label ? "<p><b>Syndrome :</b> " + esc(c.label) + "</p>" : "") +
         '<p class="txt"><b>Tableau clinique complet</b>\n' + esc([["Symptômes", c.spoken], ["Langue", c.langue], ["Pouls", c.pouls], ["Observation", c.obs], ["Palpation", c.palp]]
           .filter(([, l]) => l.length).map(([n, l]) => n + " : " + l.join(", ") + ".").join("\n")) + "</p>" +
-        '<div class="hint"><button type="button" class="tool on" id="cNext">Patient suivant</button> <button type="button" class="tool" id="cSee">Voir la fiche de la formule</button></div></div>';
+        '<div class="hint"><button type="button" class="tool on" id="cNext">Patient·e suivant·e</button> <button type="button" class="tool" id="cSee">Voir la fiche de la formule</button></div></div>';
     }
     main.innerHTML = bar + chat + asks + decide;
     const box = document.getElementById("cChat"); if(box){ box.scrollTop = box.scrollHeight; box.addEventListener("click", skipTyping); }

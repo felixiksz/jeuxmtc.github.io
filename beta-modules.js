@@ -32,7 +32,7 @@
       {sel:"table.comp", title:"La composition", text:"Chaque substance avec son rôle (jūn, chén, zuǒ, shǐ) et sa dose. Son nom français est sous le pinyin.\nSurvole un nom souligné pour voir la nature, la saveur et le tropisme. « hors pharmacopée du jeu » : pas encore de fiche pour cette substance."},
       {sel:"main h3 ~ h3", title:"Le reste de la fiche", text:"Préparation, actions, indications, tableau clinique, précautions, modifications et comparaisons. L’encadré « À vérifier » liste les points encore incertains."},
       {sel:"#tabGame", title:"Substance manquante", text:"Une formule s’affiche avec une substance cachée : retrouve-la parmi 4 choix (touches 1 à 4) ou en saisie libre. Le rôle et la dose servent d’indices (à décocher pour corser le jeu). « Indice » montre les actions de la formule."},
-      {sel:"#tabCase", title:"Cas clinique", text:"Un patient vient te consulter. Interroge-le, examine-le, puis conseille une formule parmi trois. Moins tu demandes d’informations, plus tu marques de points."},
+      {sel:"#tabCase", title:"Cas clinique", text:"Un·e patient·e vient te consulter. Interroge-læ, examine-læ, puis conseille une formule parmi trois options. Moins tu demandes d’informations, plus tu marques de points."},
       {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur dans une fiche ou un cas ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
@@ -43,9 +43,9 @@
       {sel:".score", title:"Score", text:"Bonnes réponses / questions, et ta série en cours."}
     ],
     cas: [
-      {sel:"#cChat", title:"La consultation", text:"Le patient parle à la vitesse de la parole. Clique dans la conversation pour afficher tout de suite la fin de la phrase."},
-      {sel:".asks.topics", title:"Interroger", text:"Choisis ta question : froid et chaleur, transpiration, tête, respiration, digestion, selles et urines, sommeil, douleurs… Le patient ne répond que sur ce point. « (encore) » : il a d’autres choses à dire sur ce sujet."},
-      {sel:".asks:not(.topics)", title:"Examiner", text:"« Autre chose ? » laisse le patient raconter librement. Regarde la langue, prends le pouls, observe, palpe l’abdomen.\n« Une substance de la formule » donne un ingrédient de la bonne formule, absent des deux autres propositions."},
+      {sel:"#cChat", title:"La consultation", text:"Læ patient·e parle à la vitesse de la parole. Clique dans la conversation pour afficher tout de suite la fin de la phrase."},
+      {sel:".asks.topics", title:"Interroger", text:"Choisis ta question : froid et chaleur, transpiration, tête, respiration, digestion, selles et urines, sommeil, douleurs… Læ patient·e ne répond que sur ce point. « (encore) » : iel a d’autres choses à dire sur ce sujet."},
+      {sel:".asks:not(.topics)", title:"Examiner", text:"« Autre chose ? » laisse læ patient·e raconter librement. Regarde la langue, prends le pouls, observe, palpe l’abdomen.\n« Une substance de la formule » donne un ingrédient de la bonne formule, absent des deux autres propositions."},
       {sel:".decide", title:"Conseiller une formule", text:"Décide quand tu veux. Une bonne réponse rapporte 10 points, moins 1 par information demandée au-delà de deux (au minimum 3). Ensuite : le syndrome, le tableau clinique complet et la fiche de la formule."},
       {sel:"#cSpeed", title:"Vitesse de parole", text:"Lente, normale ou rapide, selon ta vitesse de lecture."}
     ]
