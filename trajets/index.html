@@ -245,6 +245,7 @@
   .jtable th{ text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); border-bottom:1px solid #dde; padding:3px 4px; }
   .jtable td{ border-bottom:1px solid #f0f0f6; padding:4px; vertical-align:top; }
   .jtable td:first-child{ white-space:nowrap; }
+  .corrback{ display:inline-block; margin:0 0 10px; font-weight:700; text-decoration:none; }
   .cchip.metal{ background:#fff; color:#1d1d1f; border:1.5px solid #1d1d1f; text-shadow:none; }
   .jtable a.pfiche{ font-weight:800; color:var(--accent); text-decoration:none; white-space:nowrap; }
   .jtable a.pfiche:hover{ text-decoration:underline; }
@@ -630,8 +631,33 @@
   // correspondances d'un point sans ses « auto-correspondances » (les trajets de son propre canal)
   const ownCanal = pid => { const m = /^pt:(\S+) \d+$/.exec(pid); return m ? m[1] : null; };
   const corrItems = pid => { const own = ownCanal(pid); return sectionsThrough(pid).filter(it => !own || it.c.code !== own); };
+  // panneau des correspondances : historique de navigation (liste → point → fiche…) et bouton « ← Retour »
+  let corrView = null, corrStack = [], corrRestoring = false;
+  function corrNavigate(view){
+    const panel = document.getElementById("corr"), body = document.getElementById("corrBody");
+    if(corrRestoring){ corrView = view; return; }
+    if(view.type === "index"){ corrStack = []; corrView = view; return; }
+    if(panel.classList.contains("open") && corrView && !(corrView.type === view.type && corrView.arg === view.arg)) corrStack.push(Object.assign({}, corrView, {scroll:body.scrollTop}));
+    else if(!panel.classList.contains("open")) corrStack = [];
+    corrView = view;
+  }
+  function corrAddBack(){
+    if(!corrStack.length) return;
+    document.getElementById("corrBody").insertAdjacentHTML("afterbegin", '<button type="button" class="linkish corrback">← Retour</button>');
+  }
+  function corrBack(){
+    const v = corrStack.pop();
+    if(!v) return;
+    corrRestoring = true;
+    try{
+      if(v.type === "index") openIndex(); else if(v.type === "corr") openCorr(v.arg); else if(v.type === "fiche") openPointFiche(v.arg);
+    }finally{ corrRestoring = false; }
+    setTimeout(() => { document.getElementById("corrBody").scrollTop = v.scroll || 0; }, v.type === "fiche" ? 300 : 0);
+  }
+  document.addEventListener("click", e => { if(e.target.closest && e.target.closest(".corrback")){ e.preventDefault(); e.stopPropagation(); corrBack(); } }, true);
   let corrPid = null;
   function openCorr(pid){
+    corrNavigate({type:"corr", arg:pid});
     const place = PLACES[pid] || {label:pid};
     const items = corrItems(pid), own = ownCanal(pid);
     document.getElementById("corrTitle").textContent = "Correspondances : " + place.label;
@@ -653,11 +679,13 @@
       '<div class="rename"><label for="renameInput">Nom du lieu</label><input id="renameInput" data-pid="' + esc(pid) + '" value="' + esc(place.label) + '"></div>' +
       (html || (own ? "<p>Aucune correspondance : seuls les trajets de son propre canal (" + esc(sigle(own)) + ") passent par ce point.</p>" : "<p>Aucun trajet.</p>"));
     corrPid = pid;
+    corrAddBack();
     document.getElementById("corr").classList.add("open");
     document.querySelectorAll(".node").forEach(n => n.classList.toggle("sel", n.dataset.pid === pid));
   }
 
   function openIndex(){
+    corrNavigate({type:"index"});
     const groups = {};
     Object.keys(PLACES).forEach(pid => {
       const g = PLACES[pid].group || "autres";
@@ -684,7 +712,7 @@
         const v = JIAOHUI[k], pid = "pt:" + k, n = PLACES[pid] ? corrItems(pid).length : 0;
         return '<tr><td><a href="#" class="pfiche" data-point="' + esc(k) + '">' + esc(k) + "</a>" +
           (n ? ' <button type="button" class="linkish jcount" data-pid="' + esc(pid) + '" title="Trajets qui passent par ce point">(' + n + ")</button>" : "") + "</td>" +
-          "<td>" + (v.canaux || []).map(chip).join(" ") + "</td><td>" + (v.certains || []).map(chip).join(" ") + "</td></tr>";
+          "<td>" + (v.canaux || []).filter(c => c !== k.split(" ")[0]).map(chip).join(" ") + "</td><td>" + (v.certains || []).filter(c => c !== k.split(" ")[0]).map(chip).join(" ") + "</td></tr>";
       }).join("") + "</tbody></table>";
   }
   // fiche détaillée d'un point (fiches du jeu : 02-01-point-details-data.js, avec les corrections publiées)
@@ -700,13 +728,14 @@
     return pointDataPromise;
   }
   async function openPointFiche(code){
+    corrNavigate({type:"fiche", arg:code});
     const body = document.getElementById("corrBody");
     document.getElementById("corrTitle").textContent = "Fiche : " + code;
     body.innerHTML = '<p class="jhint">Chargement de la fiche…</p>';
     document.getElementById("corr").classList.add("open");
     const all = await loadPointDetails(), d = all[code.replace(" ", "")];
     const pid = "pt:" + code, n = PLACES[pid] ? corrItems(pid).length : 0, jh = JIAOHUI[code];
-    const back = '<button type="button" class="linkish" id="ficheBack">← Tableau des points d’intersection</button>';
+    const back = "";
     if(!d){ body.innerHTML = back + '<p class="jhint">Pas de fiche pour ce point.</p>'; }
     else{
       const sec = (title, v) => v && String(v).trim() && String(v).trim() !== "Aucune" ? "<h4>" + esc(title) + '</h4><p class="ftxt">' + esc(String(v).trim()) + "</p>" : "";
@@ -718,7 +747,7 @@
         sec("Catégories du point", d.categories_du_point) + sec("Correspondances", d.correspondances) + sec("Actions", d.actions) +
         sec("Indications", d.indications) + sec("Associations", d.associations) + sec("Notes", d.notes);
     }
-    const b = document.getElementById("ficheBack"); if(b) b.addEventListener("click", () => { openIndex(); const h = [...document.querySelectorAll("#corrBody h3")].find(x => x.textContent === "points"); if(h) h.scrollIntoView(); });
+    corrAddBack();
     body.scrollTop = 0;
   }
   document.addEventListener("click", e => {
@@ -2497,7 +2526,7 @@
     const node = event.target.closest(".node");
     if(node) openCorr(corrKey(node.dataset.pid));
   });
-  document.getElementById("corrClose").addEventListener("click", () => document.getElementById("corr").classList.remove("open"));
+  document.getElementById("corrClose").addEventListener("click", () => { document.getElementById("corr").classList.remove("open"); corrStack = []; corrView = null; });
   document.getElementById("allPlaces").addEventListener("click", openIndex);
   document.addEventListener("keydown", e => { if(e.key === "Escape") document.getElementById("corr").classList.remove("open"); });
 
