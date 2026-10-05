@@ -23,7 +23,8 @@
     reseau: [
       {sel:".schemasvg", title:"Le réseau des points d’intersection", text:"Chaque canal est une colonne, de la tête aux pieds. Chaque point d’intersection du tableau (jiāo huì) est une station sur la colonne de chacun de ses canaux, reliées par un trait : le grand cercle est le canal du point, les petits sont les canaux qui le rejoignent."},
       {sel:"nav", title:"Afficher ou masquer un canal", text:"Un clic sur un canal de la barre de gauche le masque ou le réaffiche (grisé = masqué) ; les colonnes se réorganisent. « tout afficher » et « tout masquer » sont au-dessus du plan."},
-      {sel:".netzoom", title:"Se déplacer dans le plan", text:"Molette ou pincement : zoom. Glisser : se déplacer. ⟲ : tout voir. ◐ : fond sombre.\nClique un point pour voir ses correspondances."}
+      {sel:".netzoom", title:"Se déplacer dans le plan", text:"Molette ou deux doigts sur le pavé tactile : défiler. Ctrl + molette ou pincement : zoom. Glisser : se déplacer. ⟲ : tout voir. ◐ : fond sombre.\nClique un point pour voir ses correspondances."},
+      {sel:".nettan", title:"Les six systèmes de Dr Tán", text:"Choisis un système (1 à 6, ou 1 à 5 ensemble), puis clique un nom de canal en haut du plan : ses canaux couplés restent en couleur, le reste s’estompe. Les points où ils se croisent sont soulignés en or."}
     ],
     formules: [
       {sel:() => isSmall() ? "#pick" : "nav", title:"Les formules", text:"Toutes les formules, rangées par catégorie. Choisis une formule pour ouvrir sa fiche."},

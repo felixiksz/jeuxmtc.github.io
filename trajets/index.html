@@ -129,7 +129,22 @@
   .netmode .tool:first-child{ border-radius:999px 0 0 999px; } .netmode .tool:last-child{ border-radius:0 999px 999px 0; margin-left:-1px; }
   .schemawrap{ background:#fff; }
   .schemaheads{ position:absolute; left:0; right:0; top:0; height:32px; z-index:1; pointer-events:none; background:linear-gradient(#fff 70%, rgba(255,255,255,0)); }
-  .shead{ position:absolute; top:6px; transform:translateX(-50%); font-size:11px; font-weight:800; padding:1px 6px; border-radius:5px; border:1.5px solid; white-space:nowrap; }
+  .shead{ position:absolute; top:6px; transform:translateX(-50%); font-size:11px; font-weight:800; padding:1px 6px; border-radius:5px; border:1.5px solid; white-space:nowrap; pointer-events:auto; cursor:pointer; transition:opacity .15s; }
+  .shead.tan-dim{ opacity:.25; }
+  .shead.tan-sel{ box-shadow:0 0 0 2px #fff, 0 0 0 4px #1d1d1f; }
+  .shead.tan-on{ box-shadow:0 0 0 2px #fff, 0 0 0 4px #b8860b; }
+  .tanbadge{ margin-left:3px; font-size:9px; font-weight:800; }
+  .schemasvg .netline[data-code], .schemasvg .terminus[data-code]{ cursor:pointer; }
+  .schemasvg .netline.tan-dim, .schemasvg .netcase.tan-dim, .schemasvg .terminus.tan-dim{ opacity:.15; }
+  .schemasvg .netline.tan-sel, .schemasvg .netline.tan-on{ filter:drop-shadow(0 0 5px rgba(0,0,0,.35)); }
+  .schemasvg.tan-active .netstop.schema.dim:not(.tan-dim){ opacity:1; }
+  .schemasvg .netstop.schema.tan-dim{ opacity:.12; }
+  .schemasvg .netstop.schema.tan-link .slink{ stroke:#b8860b; }
+  .schemasvg .netstop.schema.tan-link circle{ filter:drop-shadow(0 0 4px #b8860b) drop-shadow(0 0 2px #b8860b); }
+  .nettan{ font-size:.85rem; margin:0 0 8px; }
+  .nettan label{ font-weight:700; }
+  .nettan select{ font:inherit; }
+  .nettaninfo{ color:var(--muted); }
   .netwrap.dark .schemaheads{ background:linear-gradient(#171a22 70%, rgba(23,26,34,0)); }
   .schemasvg .sband{ stroke:#e6e3f0; stroke-width:1; }
   .schemasvg .sbandtxt{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:12px; fill:#9a96b0; text-transform:uppercase; letter-spacing:.06em; }
@@ -303,7 +318,7 @@
 <script src="../beta-config.js?v=20261005-b"></script>
 <script src="../beta-gate.js?v=20261005-b"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-c"></script>
+<script src="../beta-modules.js?v=20261005-d"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -1066,7 +1081,28 @@
     try{ new ResizeObserver(() => { if(!touched) fit(); }).observe(wrap); }catch(e){}
     svg.addEventListener("wheel", () => { touched = true; }, {passive:true});
     svg.addEventListener("pointerdown", () => { touched = true; });
-    svg.addEventListener("wheel", e => { e.preventDefault(); zoomAt(Math.exp(e.deltaY * 0.0016), e.clientX, e.clientY); }, {passive:false});
+    svg.addEventListener("wheel", e => {
+      // Ctrl + molette (et pincement du pavé tactile, que le navigateur signale avec ctrlKey) : zoom
+      if(e.ctrlKey || e.metaKey){
+        e.preventDefault();
+        const k = e.deltaMode === 0 && Math.abs(e.deltaY) < 50 ? 0.01 : 0.0016;
+        zoomAt(Math.exp(e.deltaY * k), e.clientX, e.clientY);
+        return;
+      }
+      // molette / deux doigts sur le pavé tactile : défilement du plan (vertical, et horizontal avec deltaX ou Maj)
+      const r = svg.getBoundingClientRect();
+      if(r.width < 10 || r.height < 10) return;
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? r.height : 1;
+      let dx = e.deltaX * unit, dy = e.deltaY * unit;
+      if(e.shiftKey && !dx){ dx = dy; dy = 0; }
+      const s = Math.max(vb.w / r.width, vb.h / r.height);
+      const lim = (v, d, lo, hi) => d > 0 ? Math.min(v + d, Math.max(hi, v)) : Math.max(v + d, Math.min(lo, v));
+      const nx = lim(vb.x, dx * s, box.x - pad, box.x + box.width + pad - vb.w), ny = lim(vb.y, dy * s, box.y - pad, box.y + box.height + pad - vb.h);
+      if(Math.abs(nx - vb.x) < 0.01 && Math.abs(ny - vb.y) < 0.01) return;   // bord du plan : la page défile
+      e.preventDefault();
+      vb.x = nx; vb.y = ny;
+      apply();
+    }, {passive:false});
     const ptrs = new Map();
     let dragged = false, last = null, pinch = null;
     svg.addEventListener("pointerdown", e => {
@@ -1326,6 +1362,26 @@
   const LUO_POINTS = {"P 7":"GI", "GI 6":"P", "E 40":"Rt", "Rt 4":"E", "C 5":"IG", "IG 7":"C", "V 58":"Rn", "Rn 4":"V", "EC 6":"TF", "TF 5":"EC",
     "VB 37":"F", "F 5":"VB", "RM 15":null, "DM 1":null, "Rt 21":null};
   try{ NET_MODE = localStorage.getItem("mtc_trajets_net_mode") || "schema"; }catch(e){}
+  // les six systèmes des canaux unis (Dr Richard Tán) : canaux qui se rééquilibrent (cours « Les six systèmes des canaux unis »)
+  const TAN_SYSTEMS = {
+    1:{name:"grands canaux de même nom (tóng míng)", pairs:[["P", "Rt"], ["GI", "E"], ["C", "Rn"], ["IG", "V"], ["EC", "F"], ["TF", "VB"], ["DM", "RM"]]},
+    2:{name:"six couches (zàng fǔ bié tōng) : tài yīn ↔ tài yáng, shào yīn ↔ shào yáng, jué yīn ↔ yáng míng", pairs:[["P", "V"], ["GI", "F"], ["E", "EC"], ["Rt", "IG"], ["C", "VB"], ["Rn", "TF"]]},
+    3:{name:"biǎo / lǐ (surface / interne)", pairs:[["P", "GI"], ["E", "Rt"], ["C", "IG"], ["V", "Rn"], ["EC", "TF"], ["VB", "F"]]},
+    4:{name:"horloge opposée (zǐ wǔ)", pairs:[["P", "V"], ["GI", "Rn"], ["E", "EC"], ["Rt", "TF"], ["C", "VB"], ["IG", "F"]]},
+    5:{name:"canaux voisins sur l’horloge (liú zhù)", pairs:[["P", "F"], ["GI", "E"], ["Rt", "C"], ["IG", "V"], ["Rn", "EC"], ["TF", "VB"]]},
+    6:{name:"même canal (zì jǐ) : le canal se rééquilibre lui-même (image et reflet inversés)", pairs:[]}
+  };
+  let NET_TAN = {sys:"", canal:null};
+  try{ Object.assign(NET_TAN, JSON.parse(localStorage.getItem("mtc_trajets_net_tan") || "{}")); }catch(e){}
+  // canaux couplés au canal c : {code: [numéros des systèmes]}
+  function tanPartners(c, sys){
+    const out = {};
+    (sys === "all" ? [1, 2, 3, 4, 5] : [Number(sys)]).forEach(n => (TAN_SYSTEMS[n] ? TAN_SYSTEMS[n].pairs : []).forEach(([a, b]) => {
+      const o = a === c ? b : b === c ? a : null;
+      if(o) (out[o] = out[o] || []).push(n);
+    }));
+    return out;
+  }
   const SCHEMA_BANDS = [[230, "Tête"], [300, "Cou et épaules"], [450, "Thorax et bras"], [720, "Abdomen et bassin"], [9999, "Membres inférieurs"]];
   function pointHeight(code){
     const d = POINT_ZONE_DATA[code] || {};
@@ -1378,11 +1434,11 @@
       const rows = stations.map((s, i) => s.canals.includes(c) ? i : -1).filter(i => i >= 0);
       const x = cx(c), y1 = ry(rows[0]), y2 = ry(rows[rows.length - 1]);
       const col = netColor(c), metal = ELEMENT[c] === "metal", vessel = RIVER.has(c) && c !== "RM" && c !== "DM";
-      if(metal) svg += '<line x1="' + x + '" x2="' + x + '" y1="' + y1 + '" y2="' + y2 + '" stroke="#1d1d1f" stroke-width="9" stroke-linecap="round"/>';
+      if(metal) svg += '<line class="netcase" data-code="' + c + '" x1="' + x + '" x2="' + x + '" y1="' + y1 + '" y2="' + y2 + '" stroke="#1d1d1f" stroke-width="9" stroke-linecap="round"/>';
       svg += '<line class="netline" data-code="' + c + '" x1="' + x + '" x2="' + x + '" y1="' + y1 + '" y2="' + y2 + '" stroke="' + col + '" stroke-width="' + (vessel ? 5 : 6) + '" stroke-linecap="round"' + (vessel ? ' stroke-dasharray="10 6"' : "") + "><title>" + esc((data.find(d => d.code === c) || {}).name || c) + "</title></line>";
       [y1 - 26, y2 + 26].forEach(y => {
         const tag = sigle(c), w = 10 + tag.length * 7.5;
-        tags += '<g class="terminus"><rect x="' + (x - w / 2) + '" y="' + (y - 10) + '" width="' + w + '" height="20" rx="5" fill="' + (metal ? "#fff" : col) + '" stroke="' + (metal ? "#1d1d1f" : col) + '" stroke-width="1.6"/><text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle" fill="' + (metal ? "#1d1d1f" : "#fff") + '">' + esc(tag) + "</text></g>";
+        tags += '<g class="terminus" data-code="' + c + '"><rect x="' + (x - w / 2) + '" y="' + (y - 10) + '" width="' + w + '" height="20" rx="5" fill="' + (metal ? "#fff" : col) + '" stroke="' + (metal ? "#1d1d1f" : col) + '" stroke-width="1.6"/><text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle" fill="' + (metal ? "#1d1d1f" : "#fff") + '">' + esc(tag) + "</text></g>";
       });
     });
     // stations : un cercle par canal, reliés par le trait de correspondance ; étiquette à droite
@@ -1394,7 +1450,7 @@
       if(s.maybe.length) info.push("selon certains auteurs : " + s.maybe.map(sigle).join(", "));
       if(s.open) info.push("point d’ouverture du " + sigle(s.open));
       if(s.luo) info.push("point luò" + (s.luo !== s.own ? " vers " + sigle(s.luo) : ""));
-      let g = '<g class="node netstop schema' + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : " hl-luo") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '"><title>' + esc(info.join(" · ")) + "</title>";
+      let g = '<g class="node netstop schema' + (hl ? " hl" + (NET_HL.mv && isMv ? " hl-mv" : " hl-luo") : "") + (dim ? " dim" : "") + '" data-pid="' + esc(s.pid) + '" data-canals="' + s.canals.join(" ") + '"><title>' + esc(info.join(" · ")) + "</title>";
       // trait plein : intersection et ouverture ; trait pointillé : liaison luò vers le canal couplé
       const solid = s.canals.filter(c => s.base.includes(c)).map(cx);
       if(solid.length > 1){ const sa = Math.min(...solid), sb = Math.max(...solid); g += '<line class="slink-case" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/><line class="slink" x1="' + sa + '" x2="' + sb + '" y1="' + y + '" y2="' + y + '"/>'; }
@@ -1413,7 +1469,7 @@
     // bandeau des noms de lignes, toujours visible en haut du plan (suit le zoom et le déplacement)
     cols.forEach(c => {
       const col = netColor(c), metal = ELEMENT[c] === "metal";
-      heads += '<span class="shead" data-x="' + cx(c) + '" style="background:' + (metal ? "#fff" : col) + ";color:" + (metal ? "#1d1d1f" : "#fff") + ";border-color:" + (metal ? "#1d1d1f" : col) + '" title="' + esc((data.find(d => d.code === c) || {}).name || c) + '">' + esc(sigle(c)) + "</span>";
+      heads += '<span class="shead" data-code="' + c + '" data-x="' + cx(c) + '" style="background:' + (metal ? "#fff" : col) + ";color:" + (metal ? "#1d1d1f" : "#fff") + ";border-color:" + (metal ? "#1d1d1f" : col) + '" title="' + esc((data.find(d => d.code === c) || {}).name || c) + '">' + esc(sigle(c)) + "</span>";
     });
     const legend = '<div class="legend netlegend">' +
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
@@ -1421,8 +1477,9 @@
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
     main.innerHTML = "<h2>Réseau des points d’intersection</h2>" +
       '<div class="nethl">Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label><span class="nethlkey">⚓ point d’ouverture · ⛓ point luò</span></div>' +
+      '<div class="nettan"><label>Six systèmes (Dr Tán) : <select id="tanSys"><option value="">—</option>' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select></label> <span id="tanInfo" class="nettaninfo"></span></div>' +
       (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
-      '<div class="src">Les ' + stations.length + " points d’intersection du tableau (jiāo huì), de la tête aux pieds ; chaque canal est une colonne. Clic sur un point : ses correspondances. Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer.</div>" +
+      '<div class="src">Les ' + stations.length + " points d’intersection du tableau (jiāo huì), de la tête aux pieds ; chaque canal est une colonne. Clic sur un point : ses correspondances. Clic sur un nom de canal en haut : ses canaux couplés selon les six systèmes de Dr Tán. Barre de gauche : afficher / masquer un canal. Molette ou deux doigts : défiler · Ctrl + molette ou pincer : zoom · glisser : se déplacer.</div>" +
       legend + (small ? "</details>" : "") +
       '<div class="netwrap schemawrap"><div class="schemaheads" aria-hidden="true">' + heads + '</div><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre">◐</button></div>' +
       '<svg class="netsvg schemasvg" role="img" aria-label="Schéma des points d’intersection" viewBox="0 0 ' + width + " " + height + '">' + svg + "</svg></div>";
@@ -1457,6 +1514,55 @@
       });
     };
     new MutationObserver(placeHeads).observe(svgEl, {attributes:true, attributeFilter:["viewBox"]});
+    // six systèmes : clic sur un nom de canal (bandeau, ligne ou bout de ligne) → canaux couplés en surbrillance
+    const saveTan = () => { try{ localStorage.setItem("mtc_trajets_net_tan", JSON.stringify(NET_TAN)); }catch(e){} };
+    const applyTan = () => {
+      const sel = NET_TAN.sys && NET_TAN.canal && cols.includes(NET_TAN.canal) ? NET_TAN.canal : null;
+      const partners = sel ? tanPartners(sel, NET_TAN.sys) : {};
+      const on = c => c === sel || c in partners;
+      svgEl.classList.toggle("tan-active", !!sel);   // la surbrillance des six systèmes prime sur celle des vaisseaux
+      wrap.querySelectorAll(".netline[data-code], .netcase[data-code], .terminus[data-code], .shead[data-code]").forEach(el => {
+        const c = el.dataset.code;
+        el.classList.toggle("tan-sel", !!sel && c === sel);
+        el.classList.toggle("tan-on", !!sel && c in partners);
+        el.classList.toggle("tan-dim", !!sel && !on(c));
+      });
+      headEls.forEach(h => {
+        let b = h.querySelector(".tanbadge");
+        const n = sel && NET_TAN.sys === "all" && partners[h.dataset.code];
+        if(n){ if(!b){ b = document.createElement("sup"); b.className = "tanbadge"; h.appendChild(b); } b.textContent = n.join("·"); }
+        else if(b) b.remove();
+      });
+      wrap.querySelectorAll(".netstop.schema[data-canals]").forEach(g => {
+        const cs = g.dataset.canals.split(" ");
+        const link = !!sel && cs.includes(sel) && cs.some(c => c in partners);
+        g.classList.toggle("tan-link", link);
+        g.classList.toggle("tan-dim", !!sel && !cs.some(on));
+      });
+      const info = document.getElementById("tanInfo");
+      if(!NET_TAN.sys) info.textContent = "";
+      else if(!sel) info.textContent = "clique un nom de canal en haut du plan" + (NET_TAN.sys === "all" ? "" : " · " + TAN_SYSTEMS[NET_TAN.sys].name);
+      else{
+        const ps = Object.keys(partners);
+        const hidden = ps.filter(c => !cols.includes(c));
+        info.innerHTML = "<b>" + esc(sigle(sel)) + "</b> " + (NET_TAN.sys === "all"
+          ? (ps.length ? "↔ " + ps.map(c => "<b>" + esc(sigle(c)) + "</b> (" + partners[c].join(", ") + ")").join(" · ") : "pas de canal couplé dans les systèmes 1 à 5")
+          : NET_TAN.sys === "6" ? "↔ " + esc(sigle(sel)) + " · " + esc(TAN_SYSTEMS[6].name)
+          : (ps.length ? "↔ " + ps.map(c => "<b>" + esc(sigle(c)) + "</b>").join(", ") : "pas de canal couplé dans ce système") + " · " + esc(TAN_SYSTEMS[NET_TAN.sys].name)) +
+          (hidden.length ? " · <i>masqué : " + hidden.map(c => esc(sigle(c))).join(", ") + "</i>" : "") +
+          ' <button type="button" class="linkish" id="tanClear">effacer</button>';
+        document.getElementById("tanClear").addEventListener("click", () => { NET_TAN.canal = null; saveTan(); applyTan(); });
+      }
+    };
+    const pickTan = c => {
+      if(!NET_TAN.sys){ NET_TAN.sys = "all"; document.getElementById("tanSys").value = "all"; }
+      NET_TAN.canal = NET_TAN.canal === c ? null : c;
+      saveTan(); applyTan();
+    };
+    headEls.forEach(h => h.addEventListener("click", () => pickTan(h.dataset.code)));
+    svgEl.addEventListener("click", e => { const el = e.target.closest && e.target.closest(".netline[data-code], .terminus[data-code]"); if(el) pickTan(el.dataset.code); });
+    document.getElementById("tanSys").addEventListener("change", e => { NET_TAN.sys = e.target.value; saveTan(); applyTan(); });
+    applyTan();
     window.addEventListener("resize", placeHeads);
     placeHeads();
     bindGame(); bindIti();
