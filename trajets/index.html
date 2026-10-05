@@ -37,6 +37,8 @@
   nav .navrow.done button:not(.on){ color:#2f9a3c; border-color:#9fd3a6; }
   body.hide-checks nav .navrow input{ display:none; }
   .linkish{ font:inherit; font-size:inherit; border:0; background:none; padding:0; color:var(--accent); text-decoration:underline; cursor:pointer; }
+  .sigle-legend{ order:99; margin-top:10px; padding-top:8px; border-top:1px solid #dde; font-family:"Tomorrow", "Archivo", sans-serif; font-size:.7rem; line-height:1.45; color:var(--muted); }
+  .sigle-legend b{ color:var(--text); }
   .check-legend{ font-size:.68rem; color:var(--muted); margin:0 0 4px; line-height:1.2; }
   main{ margin:0 0 0 var(--navw); padding:16px 20px; }
   nav .short{ display:none; }
@@ -778,7 +780,7 @@
   //   droite ; une voie libérée plus haut (branche terminée) est réutilisée plus bas ;
   // - le numéro de la branche (= paragraphe) est posé à gauche de sa première station.
   // sigles des canaux : régulier = code de l'organe ; RM, DM ; ChM ; QM / WM avec ▲ yáng, ▼ yīn
-  const SIGLE = {CM:"ChM", YangQ:"QM▲", YinQ:"QM▼", YangW:"WM▲", YinW:"WM▼", DaiM:"DaiM"};
+  const SIGLE = {CM:"ChM", YangQ:"▲QM", YinQ:"▼QM", YangW:"▲WM", YinW:"▼WM", DaiM:"DaiM"};
   const sigle = code => SIGLE[code] || code;
   const SIGLE_COLOR = {terre:"#c79600", bois:"#2f9a3c", feu:"#e0261b", eau:"#1f5fd6", metal:"#444"};
   function otherCanals(pid, hereCode){
@@ -1356,7 +1358,9 @@
     const vbq = new URLSearchParams(location.search).get("vb");
     if(vbq && !NET_VB){ const [x, y, w, h] = vbq.split(",").map(Number); if(w && h) NET_VB = {x, y, w, h}; }
     const r = wrap.getBoundingClientRect();
-    if(!NET_VB && r.width > 50 && r.height > 50) NET_VB = {x:-10, y:0, w:width + 20, h:(width + 20) * r.height / r.width};
+    // téléphone : on démarre sur le haut, environ 6 colonnes lisibles ; ailleurs, toute la largeur
+    const startW = window.innerWidth < 760 ? Math.min(width + 20, 6 * COLW + 260) : width + 20;
+    if(!NET_VB && r.width > 50 && r.height > 50) NET_VB = {x:-10, y:0, w:startW, h:startW * r.height / r.width};
     initNetZoom(main.querySelector(".netsvg"));
     const svgEl = main.querySelector(".netsvg"), headEls = [...wrap.querySelectorAll(".shead")];
     const placeHeads = () => {
@@ -2191,6 +2195,8 @@
   }
 
   applyEdits();
+  // nomenclature des merveilleux vaisseaux, toujours visible sous la liste des canaux
+  nav.insertAdjacentHTML("beforeend", '<div class="sigle-legend"><b>▲</b> yáng · <b>▼</b> yīn<br><b>QM</b> qiāo mài<br><b>WM</b> wéi mài<br><b>ChM</b> chōng mài<br><b>DaiM</b> dài mài</div>');
   nav.insertAdjacentHTML("afterbegin", '<p class="check-legend">☑ = vérifié · <button type="button" id="toggleChecks" class="linkish">masquer</button></p>');
   const CHECKS_KEY = "mtc_trajets_hide_checks";
   const setChecks = hide => {
