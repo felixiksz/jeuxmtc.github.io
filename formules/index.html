@@ -620,10 +620,18 @@
     all.filter(i => !/chez l['’]enfant|infantile/i.test(i)).forEach(i => { (isPouls(i) ? c.pouls : isLangue(i) ? c.langue : isPalp(i) ? c.palp : isObs(i) ? c.obs : c.spoken).push(i); });
     c.femme = FEMALE.test(all.join(" "));
     c.topic = c.spoken.map(topicOf);
+    // un symptôme répond à tous les thèmes qui le concernent (« mains et pieds froids » : froid ET membres)
+    c.topics = c.spoken.map((s, i) => topicsOf(s, c.topic[i]));
     return c;
   }
   // thème d'un symptôme : celui du premier mot-clé du texte (parenthèses ignorées) ; les règles d'abord pour une
   // patiente ; « douleurs, membres » seulement si aucun autre thème ne correspond
+  function topicsOf(s, main){
+    const txt = s.replace(/\([^)]*\)/g, " ");
+    const out = new Set([main]);
+    TOPICS.forEach(q => { if(q.id !== "femme" && q.rx.test(txt)) out.add(q.id); });
+    return [...out];
+  }
   function topicOf(s){
     const txt = s.replace(/\([^)]*\)/g, " ");
     const fem = TOPICS.find(q => q.id === "femme");
@@ -684,7 +692,7 @@
   }
   // réponse à une question : la première phrase sans « aussi » ni « et puis »
   const answerLines = idx => idx.map((i, j) => patientLine(CASE.c.spoken[i], j === 0 ? (CASE.lineN++ % 2 ? 3 : 0) : [1, 2, 4][(j - 1) % 3])).join("\n");
-  const topicLeft = id => CASE.c.spoken.map((s, i) => i).filter(i => CASE.c.topic[i] === id && !CASE.said.has(i));
+  const topicLeft = id => CASE.c.spoken.map((s, i) => i).filter(i => CASE.c.topics[i].includes(id) && !CASE.said.has(i));
   function askTopic(id){
     const c = CASE.c, q = TOPICS.find(x => x.id === id);
     if(!c || !q || CASE.answered) return;
@@ -694,7 +702,7 @@
     const left = topicLeft(id).slice(0, 3);
     if(!left.length){
       // déjà raconté (via « Autre chose ? ») : le patient le rappelle au lieu de dire que tout va bien
-      const told = c.spoken.map((s, i) => i).filter(i => c.topic[i] === id);
+      const told = c.spoken.map((s, i) => i).filter(i => c.topics[i].includes(id));
       say("patient", told.length ? "Comme je vous l’ai dit :\n" + answerLines(told.slice(0, 3)) : q.none);
       return;
     }

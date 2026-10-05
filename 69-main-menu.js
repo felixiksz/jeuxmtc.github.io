@@ -236,8 +236,25 @@
     if(drop){
       document.body.appendChild(drop);
       const dropX = () => Math.max(6, window.innerWidth - 30 - 54);
-      try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){}
-      window.addEventListener("resize", () => { try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){} });
+      // l'animation (04-03-core-game.js) recalcule sa position à chaque image : on recale x avant chaque image
+      const pin = () => { try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){} };
+      if(typeof window.stepSupportBloodDropPhysics === "function" && !window.stepSupportBloodDropPhysics.mtcPinned){
+        const step = window.stepSupportBloodDropPhysics;
+        window.stepSupportBloodDropPhysics = function(){ pin(); return step.apply(this, arguments); };
+        window.stepSupportBloodDropPhysics.mtcPinned = true;
+      }
+      pin();
+      // fenêtre redimensionnée : on replace aussi la goutte tout de suite (sans attendre l'image suivante)
+      window.addEventListener("resize", () => {
+        pin();
+        try{
+          const s = typeof supportBloodDropState !== "undefined" ? supportBloodDropState : null;
+          if(s && drop.classList.contains("support-blooddrop-moving")){
+            s.y = Math.min(s.y, window.innerHeight - (drop.offsetHeight || 30) + 3);
+            drop.style.setProperty("transform", "translate3d(" + s.x + "px, " + s.y + "px, 0) rotate(0deg)", "important");
+          }
+        }catch(error){}
+      });
     }
     paintStreak();
     const badge = byId("dailyStreakBadge");
