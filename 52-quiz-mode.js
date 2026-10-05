@@ -398,35 +398,16 @@
       return;
     }
 
-    if(hasAnyLocalImage(points.map(item => item.point))) renderModeChoice();
-    else startQuiz("text");
+    // le quiz image a été retiré (jugé inutile) : toujours le quiz texte
+    startQuiz("text");
   }
-  function renderModeChoice(){
-    content().innerHTML = headerHtml("Quiz — sur quoi veux-tu être interrogé·e ?", "") +
-      '<div class="mtc-quiz-choice">' +
-        '<button type="button" class="mtc-quiz-choice-option" data-quiz-action="choose-mode" data-mode="text">' +
-          '<strong>Quiz texte</strong>' +
-          '<span>« Quel est le point [catégorie] du [canal] ? »</span>' +
-        '</button>' +
-        '<button type="button" class="mtc-quiz-choice-option" data-quiz-action="choose-mode" data-mode="image">' +
-          '<strong>Quiz image</strong>' +
-          '<span>Devine le point à partir de son image locale.</span>' +
-        '</button>' +
-      '</div>' +
-      '<div class="mtc-quiz-nav">' +
-        '<button type="button" data-quiz-action="close" class="secondary">Retour</button>' +
-      '</div>';
-  }
-  function chooseQuizMode(mode){
-    startQuiz(mode === "image" ? "image" : "text");
+  function chooseQuizMode(){
+    startQuiz("text");
   }
   function startQuiz(mode){
+    mode = "text";
     const questions = buildQuestions(mode);
-    if(!questions.length){
-      alert("Aucun point de cette grille n'a d'image locale importée.");
-      renderModeChoice();
-      return;
-    }
+    if(!questions.length) return;
     state.mode = mode;
     state.questions = questions;
     state.index = 0;
