@@ -231,6 +231,14 @@
     // enveloppe : sortie de la barre du bas (dont le cadre décale les éléments « fixes ») pour rester au coin
     const mail = byId("suggestionMailButton");
     if(mail) document.body.appendChild(mail);
+    // goutte de sang : rangée en bas à droite, à gauche de l'enveloppe ; elle y tombe et y rebondit (sans bouger de côté)
+    const drop = byId("supportCoffeeButton");
+    if(drop){
+      document.body.appendChild(drop);
+      const dropX = () => Math.max(6, window.innerWidth - 30 - 54);
+      try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){}
+      window.addEventListener("resize", () => { try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){} });
+    }
     paintStreak();
     const badge = byId("dailyStreakBadge");
     if(badge) new MutationObserver(paintStreak).observe(badge, {childList:true, subtree:true, characterData:true});

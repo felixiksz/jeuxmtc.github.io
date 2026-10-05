@@ -138,3 +138,7 @@ html body.mtc-menu-ui .bottom-actions{
   position:relative !important; left:auto !important; right:auto !important; bottom:auto !important; top:auto !important;
   transform:none !important; margin:26px auto 96px !important;
 }
+/* goutte de sang au repos : en bas à droite, à gauche de l'enveloppe (en mouvement, sa position est calculée par le jeu) */
+body.mtc-menu-ui #supportCoffeeButton:not(.support-blooddrop-moving){
+  position:fixed !important; right:54px !important; bottom:12px !important; left:auto !important; top:auto !important; transform:none !important;
+}
