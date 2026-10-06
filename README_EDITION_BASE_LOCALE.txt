@@ -22,7 +22,7 @@ CHAMP ASSOCIATIONS (POINTS ACU)
 - Je peux le corriger dans la fiche et dans le panneau Comparaison ; il part avec l'export.
 
 SOUTIENS (« PROJET SOUTENU PAR : … MERCI ! » EN BAS DU MENU)
-- Les donateur·ices écrivent leur prénom dans la note PayPal (le jeu le leur demande).
+- Les donateur·ices indiquent leur prénom ou alias dans la note PayPal (le jeu le leur demande).
 - En mode admin : Menu → Réglages → Soutiens. Je modifie la liste (prénoms séparés par des virgules),
   le jeu publie soutiens.js tout seul avec ma clé GitHub (la même que pour publier les fiches).
 - Sinon, je peux aussi modifier soutiens.js directement sur GitHub (crayon « Edit »).
