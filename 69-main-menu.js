@@ -188,6 +188,51 @@
     const n = streakCount();
     el.innerHTML = "Série " + n + "<small>jour" + (n > 1 ? "s" : "") + "</small>";
   }
+  // soutien : une demande discrète, une seule fois par série, le jour où elle atteint 30 jours
+  // (la série est identifiée par son premier jour, pour ne pas redemander pendant la même série)
+  const SUPPORT_ASK_KEY = "mtc_support_ask_series_v1";
+  function supportLink(){ const d = byId("supportCoffeeButton"); return (d && d.getAttribute("href")) || "https://paypal.me/emesepap1"; }
+  function maybeAskSupport(){
+    let s;
+    try{ s = JSON.parse(localStorage.getItem("mtc_daily_streak_v1") || "{}"); }catch(error){ return; }
+    const n = streakCount();
+    if(n < 30 || !s.lastPlayedDate || byId("mtcSupportAsk")) return;
+    const start = new Date(s.lastPlayedDate + "T12:00:00"); start.setDate(start.getDate() - (Number(s.count) - 1));
+    const seriesId = start.toISOString().slice(0, 10);
+    try{ if(localStorage.getItem(SUPPORT_ASK_KEY) === seriesId) return; localStorage.setItem(SUPPORT_ASK_KEY, seriesId); }catch(error){ return; }
+    const box = document.createElement("div");
+    box.id = "mtcSupportAsk";
+    box.setAttribute("role", "status");
+    box.innerHTML = '<p><b>' + n + " jours de révision d’affilée, bravo !</b> Connections MTC est gratuit et sans publicité. " +
+      "S’il t’aide dans tes révisions, un petit soutien le fait vivre.</p>" +
+      '<div class="mtc-ask-actions"><a href="' + esc(supportLink()) + '" target="_blank" rel="noopener noreferrer" id="mtcSupportAskGo">Soutenir le jeu</a>' +
+      '<button type="button" id="mtcSupportAskLater">Plus tard</button></div>';
+    document.body.appendChild(box);
+    const close = () => box.remove();
+    byId("mtcSupportAskLater").addEventListener("click", close);
+    byId("mtcSupportAskGo").addEventListener("click", () => setTimeout(close, 300));
+  }
+  // « Soutenir le jeu » écrit à côté de la goutte (même lien), seulement quand la goutte est visible
+  function ensureSupportLabel(){
+    const drop = byId("supportCoffeeButton");
+    let label = byId("mtcSupportLabel");
+    if(!label){
+      label = document.createElement("a");
+      label.id = "mtcSupportLabel";
+      label.textContent = "Soutenir le jeu";
+      label.target = "_blank"; label.rel = "noopener noreferrer";
+      label.addEventListener("click", e => { const d = byId("supportCoffeeButton"); if(d){ e.preventDefault(); d.click(); } });
+      document.body.appendChild(label);
+    }
+    label.href = supportLink();
+    const r = drop && drop.getBoundingClientRect();
+    const shown = !!(r && r.width && getComputedStyle(drop).display !== "none" && getComputedStyle(drop).visibility !== "hidden");
+    label.style.display = shown ? "" : "none";
+    if(shown){
+      label.style.right = Math.max(8, window.innerWidth - r.left + 6) + "px";
+      label.style.top = (r.top + r.height / 2) + "px";
+    }
+  }
   function paintTopSwitch(){
     const host = byId("mtcTopDomainSwitch");
     if(host) host.innerHTML = domainSwitchHtml();
@@ -308,6 +353,10 @@
       });
     }
     paintStreak();
+    setTimeout(maybeAskSupport, 2500);
+    ensureSupportLabel();
+    setInterval(ensureSupportLabel, 700);
+    window.addEventListener("resize", ensureSupportLabel);
     const badge = byId("dailyStreakBadge");
     if(badge) new MutationObserver(paintStreak).observe(badge, {childList:true, subtree:true, characterData:true});
     window.addEventListener("storage", e => { if(e.key === "mtc_daily_streak_v1") paintStreak(); });

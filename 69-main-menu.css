@@ -176,3 +176,19 @@ html body.mtc-menu-ui #mtcDueReviewButton:hover{ transform:none !important; text
 html body.mtc-menu-ui #mtcDueReviewButton .mtc-due-review-badge{ background:none !important; box-shadow:none !important; color:var(--shadow-color) !important;
   min-width:0 !important; padding:0 !important; margin-left:3px; font-size:inherit !important; font-weight:800; border:0 !important; }
 @media (max-width:760px){ html body.mtc-menu-ui #mtcDueReviewButton{ font-size:11px !important; } }
+
+/* « Soutenir le jeu » à côté de la goutte */
+#mtcSupportLabel{ position:fixed; z-index:9050; transform:translateY(-50%); font-family:'Archivo', sans-serif; font-size:10.5px; font-weight:700;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--text-color); text-decoration:none; white-space:nowrap; }
+#mtcSupportLabel:hover{ text-shadow:0 3px 12px var(--shadow-color); }
+body.mtc-menu-open #mtcSupportLabel, body.mtc-menu-loading #mtcSupportLabel{ display:none !important; }
+/* demande de soutien au 30e jour d'une série : petit bandeau, sans bloquer le jeu */
+#mtcSupportAsk{ position:fixed; left:50%; bottom:58px; transform:translateX(-50%); z-index:9400; width:min(520px, calc(100vw - 32px));
+  background:var(--page-bg); color:var(--text-color); border:1px solid var(--text-color); box-shadow:0 8px 26px color-mix(in srgb, var(--shadow-color) 55%, transparent);
+  padding:14px 16px 12px; font-family:'Archivo', sans-serif; font-size:13px; line-height:1.5; animation:mtcMenuIn .25s ease-out both; }
+#mtcSupportAsk p{ margin:0 0 10px; }
+#mtcSupportAsk .mtc-ask-actions{ display:flex; gap:18px; align-items:center; }
+#mtcSupportAsk a, #mtcSupportAsk button{ font-family:'Archivo', sans-serif; font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-color); background:transparent !important; border:0 !important; box-shadow:none !important; padding:2px 0 !important; text-decoration:none; cursor:pointer; }
+#mtcSupportAsk a{ border-bottom:2px solid var(--shadow-color) !important; }
+#mtcSupportAsk a:hover, #mtcSupportAsk button:hover{ transform:none !important; text-shadow:0 3px 12px var(--shadow-color); }
