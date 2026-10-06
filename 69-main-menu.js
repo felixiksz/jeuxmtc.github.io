@@ -168,7 +168,7 @@
       '<div class="mm-head"><button type="button" id="mtcMenuClose">× Fermer</button>' + domainSwitchHtml() + "</div>" +
       '<div class="mm-body"><div class="mm-list">' + list(tab) + "</div>" +
       '<div class="mm-entries">' + ENTRIES.map(([k, label]) =>
-        '<button type="button" class="mm-entry' + (k === tab ? " on" : "") + '" data-tab="' + k + '">' + label + "</button>" +
+        '<button type="button" class="mm-entry' + (k === tab ? " on" : "") + '" data-tab="' + k + '"><span class="mm-lw"><span class="mm-lbl">' + label + '</span><span class="mm-sum">' + current[k].map(it => esc(it[0])).join(" · ") + "</span></span></button>" +
         (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>" +
       '<div class="mm-foot"><span class="mm-version">Connections MTC · v' + MTC_VERSION + "</span>" + thanksHtml() + "</div>";
     menu.setAttribute("data-dom", pharma ? "pharma" : "acu");
@@ -187,6 +187,8 @@
       menu.setAttribute("aria-label", "Menu");
       document.body.appendChild(menu);
       menu.addEventListener("click", onMenuClick);
+      menu.addEventListener("mouseover", onEntryHover);
+      menu.addEventListener("mouseout", e => { if(e.target.closest && e.target.closest(".mm-entry")) clearTimeout(hoverTimer); });
     }
     render();
     menu.classList.add("open");
@@ -195,6 +197,23 @@
   function close(){
     if(menu) menu.classList.remove("open");
     document.body.classList.remove("mtc-menu-open");
+  }
+  // sur ordinateur : passer sur un grand mot affiche sa liste, sans cliquer (court délai pour ignorer un simple passage)
+  let hoverTimer = 0;
+  const canHover = () => window.matchMedia && window.matchMedia("(hover:hover) and (min-width:761px)").matches;
+  function showTab(k){
+    if(!menu || !current[k] || k === tab) return;
+    tab = k;
+    try{ localStorage.setItem(TAB_KEY, tab); }catch(error){}
+    const listEl = menu.querySelector(".mm-list");
+    if(listEl) listEl.innerHTML = current[k].map((it, i) => itemHtml(it, k, i)).join("");
+    menu.querySelectorAll(".mm-entry").forEach(b => b.classList.toggle("on", b.dataset.tab === k));
+  }
+  function onEntryHover(e){
+    const en = e.target.closest && e.target.closest(".mm-entry");
+    if(!en || !canHover() || en.dataset.tab === tab) return;
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => showTab(en.dataset.tab), 110);
   }
   function onMenuClick(e){
     const t = e.target;

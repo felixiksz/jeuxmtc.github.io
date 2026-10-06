@@ -95,6 +95,22 @@ body.mtc-menu-open{ overflow:hidden; }
   transition:color .15s ease, text-shadow .15s ease;
 }
 #mtcMainMenu .mm-entry.on{ color:var(--text-color); }
+/* repère : un filet fin relie la liste au mot actif */
+@media (min-width:761px){
+  #mtcMainMenu .mm-entry{ display:flex !important; align-items:center; justify-content:flex-end; }
+  #mtcMainMenu .mm-entry.on::before{ content:""; flex:1 1 auto; height:1px; margin:0 .35em calc(10.5px * 1.3 + 11px) -40px; background:var(--text-color);
+    transform-origin:right center; animation:mmLineIn .28s ease-out both; }
+}
+/* sous chaque grand mot : ce qu'il contient, en petit (masqué pour le mot actif, dont la liste est affichée) */
+#mtcMainMenu .mm-lw{ display:inline-flex; flex-direction:column; align-items:flex-end; max-width:100%; min-width:0; }
+#mtcMainMenu .mm-sum{ display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-family:'Archivo', sans-serif; font-weight:400; font-size:10.5px; line-height:1.3; letter-spacing:.06em; text-transform:uppercase;
+  margin:1px 0 10px; color:color-mix(in srgb, var(--text-color) 45%, var(--page-bg)); transition:color .15s ease; }
+#mtcMainMenu .mm-entry:hover .mm-sum{ color:var(--text-color); }
+#mtcMainMenu .mm-entry.on .mm-sum{ visibility:hidden; max-width:0; }
+@media (max-width:760px){ #mtcMainMenu .mm-lw{ align-items:flex-start; } #mtcMainMenu .mm-sum{ margin-bottom:6px; } }
+@keyframes mmLineIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+@media (prefers-reduced-motion:reduce){ #mtcMainMenu .mm-entry.on::before{ animation:none; } }
 #mtcMainMenu .mm-entry:hover{ color:var(--text-color); text-shadow:0 4px 22px var(--shadow-color); transform:none !important; }
 #mtcMainMenu .mm-list{ align-self:start; margin-top:14px; }
 #mtcMainMenu .mm-item{
