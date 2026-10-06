@@ -82,6 +82,7 @@ const CORE_ASSETS = [
   "beta-config.js",
   "beta-gate.js",
   "68-contributor-notes.js",
+  "soutiens.js",
   "69-main-menu.js",
   "69-main-menu.css",
   "notes-admin.js",

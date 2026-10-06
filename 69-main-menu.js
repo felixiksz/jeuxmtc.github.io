@@ -15,9 +15,10 @@
   // numéro de version du jeu : majeur.mineur (le premier chiffre change pour une refonte, le second pour des ajouts)
   const MTC_VERSION = "2.0";
   window.MTC_VERSION = MTC_VERSION;
-  // merci aux personnes qui ont soutenu le jeu (prénoms ajoutés à la main)
-  const THANKS = ["Claire"];
+  // soutiens du projet : soutiens.js, modifiable en mode admin (Réglages → Soutiens), publié sur le dépôt
+  const supporters = () => (Array.isArray(window.MTC_SUPPORTERS) ? window.MTC_SUPPORTERS : []).map(s => String(s).trim()).filter(Boolean);
   const thanksHtml = () => {
+    const THANKS = supporters();
     if(!THANKS.length) return "";
     return '<div class="mm-thanks">Projet soutenu par : ' + THANKS.map(esc).join(", ") + ".<br>Merci !</div>";
   };
@@ -61,6 +62,39 @@
     const b = byId("mtcPharmaImportNovelty");
     return b && !b.disabled && b.classList.contains("visible") ? b : null;
   }
+  // publie soutiens.js sur le dépôt avec la clé GitHub de l'admin (la même que pour publier les fiches)
+  async function editSupporters(){
+    const cur = supporters().join(", ");
+    const raw = window.prompt("Prénoms des soutiens, séparés par des virgules (dans l'ordre d'affichage) :", cur);
+    if(raw === null) return;
+    const list = raw.split(",").map(s => s.trim()).filter(Boolean);
+    if(list.join(", ") === cur) return;
+    const TOKEN_KEY = "mtc_admin_publish_token", REPO = "felixiksz/jeuxmtc.github.io", PATH = "soutiens.js";
+    let token = "";
+    try{ token = localStorage.getItem(TOKEN_KEY) || ""; }catch(error){}
+    if(!token){
+      token = (window.prompt("Clé GitHub pour publier (jeton « fine-grained » avec Contents : Read and write sur " + REPO + "). Elle reste seulement sur cet appareil.") || "").trim();
+      if(!token) return;
+      try{ localStorage.setItem(TOKEN_KEY, token); }catch(error){}
+    }
+    const text = "/* Soutiens du projet, affichés en bas du menu (« Projet soutenu par : … Merci ! »).\n" +
+      "   Fichier écrit par le jeu lui-même (mode admin : Menu → Réglages → Soutiens). */\n" +
+      "window.MTC_SUPPORTERS = " + JSON.stringify(list, null, 2) + ";\n";
+    const api = "https://api.github.com/repos/" + REPO + "/contents/" + PATH;
+    const headers = {"Authorization":"Bearer " + token, "Accept":"application/vnd.github+json"};
+    try{
+      const got = await fetch(api + "?ref=main", {headers, cache:"no-store"});
+      if(got.status === 401 || got.status === 403){ try{ localStorage.removeItem(TOKEN_KEY); }catch(error){} throw new Error("clé GitHub refusée (elle a été oubliée : réessaie)"); }
+      const sha = got.ok ? (await got.json()).sha : null;
+      const body = {message:"Soutiens : liste mise à jour", content:btoa(unescape(encodeURIComponent(text))), branch:"main"};
+      if(sha) body.sha = sha;
+      const put = await fetch(api, {method:"PUT", headers:Object.assign({"Content-Type":"application/json"}, headers), body:JSON.stringify(body)});
+      if(!put.ok) throw new Error("écriture impossible (" + put.status + ")");
+      window.MTC_SUPPORTERS = list;
+      render();
+      window.alert("Soutiens publiés : visibles par tout le monde d'ici une à deux minutes.");
+    }catch(error){ window.alert("Publication impossible : " + error.message); }
+  }
   function reminderState(){
     const b = byId("mtcDailyReminderButton");
     return b && b.getAttribute("aria-pressed") === "true" ? "activé" : "désactivé";
@@ -100,6 +134,7 @@
         ["Affichage", "Thèmes de couleurs, son, prononciation.", openSettings],
         ["Aide", "Les tutoriels de chaque écran.", () => setTimeout(() => call("startTour"), 30)],
         admin && byId("mtcGithubSyncButton") && ["Synchronisation", "Tes notes sur plusieurs appareils.", () => clickId("mtcGithubSyncButton")],
+        admin && ["Soutiens", "Les prénoms de « Projet soutenu par » (en bas du menu) : modifier et publier.", editSupporters],
         ["Notes", "Exporter ou importer tes notes et images." + notesStatus(), null, null, [["Exporter", () => call("exportPersonalNotes")], ["Importer", () => call("openImportPersonalNotesDialog")]]],
         pharma && noveltyButton() && ["Fiches pharma complètes", "Nouveauté : ajouter les fiches complètes des substances.", () => noveltyButton().click()],
         ["Corrections", "Les commentaires publics des modules bêta.", () => window.open(DISCUSSIONS_URL, "_blank", "noopener")],
@@ -211,6 +246,7 @@
     box.setAttribute("role", "status");
     box.innerHTML = '<p><b>' + n + " jours de révision d’affilée, bravo !</b> Connections MTC est gratuit et sans publicité. " +
       "S’il t’aide dans tes révisions, un petit soutien le fait vivre.</p>" +
+      '<p class="mtc-ask-note">Pour figurer parmi les soutiens du projet, écris ton prénom dans la note PayPal.</p>' +
       '<div class="mtc-ask-actions">' + (window.mtcSupportAmounts || [3, 5, 10]).concat([0]).map(v =>
         '<a href="' + esc(window.mtcSupportAmountUrl ? window.mtcSupportAmountUrl(v) : supportLink()) + '" target="_blank" rel="noopener noreferrer" class="mtc-ask-go">' + (v ? v + " €" : "Montant libre") + "</a>").join("") +
       '<button type="button" id="mtcSupportAskLater">Plus tard</button></div>';

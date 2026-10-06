@@ -199,3 +199,4 @@ body.mtc-menu-open #mtcSupportLabel, body.mtc-menu-loading #mtcSupportLabel{ dis
 #tourBox.support-coffee-reminder-box{ max-width:min(340px, calc(100vw - 24px)) !important; }
 #tourBox .support-coffee-amounts{ display:flex !important; flex-wrap:wrap !important; gap:6px 16px !important; justify-content:flex-start !important; }
 #tourBox .support-coffee-amounts button{ margin:0 !important; white-space:nowrap; }
+#tourBox .support-coffee-name-note, #mtcSupportAsk .mtc-ask-note{ font-size:11.5px; font-style:italic; opacity:.8; margin:6px 0 8px; }
