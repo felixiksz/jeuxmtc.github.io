@@ -83,9 +83,9 @@
   const links = (b, a) => b === a ? [] : [...B.on].filter(n => TAN_SYSTEMS[n].pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
   const pos = c => {
     const pol = (a, r) => [170 + r * Math.cos(a), 170 + r * Math.sin(a)];
-    if(c === "RM") return pol(-112 * Math.PI / 180, 188);
-    if(c === "DM") return pol(-96 * Math.PI / 180, 188);
-    return pol(-Math.PI / 2 + ORD.indexOf(c) * Math.PI / 6, 125);
+    if(c === "RM") return pol(128 * Math.PI / 180, 188);
+    if(c === "DM") return pol(142 * Math.PI / 180, 188);
+    return pol(-Math.PI / 2 + (ORD.indexOf(c) - ORD.indexOf("C")) * Math.PI / 6, 125);   // C à midi, en haut
   };
   function optimum(){
     for(let k = 1; k <= ALL.length; k++){
@@ -117,9 +117,11 @@
     const chip = c => '<b class="balc" style="color:' + ink(c) + '" title="' + esc(NAMES[c]) + '">' + esc(c) + "</b>";
     let g = '<circle cx="170" cy="170" r="125" fill="none" stroke="currentColor" stroke-opacity=".2"/>';
     const [f, rm, dm, pp] = ["F", "RM", "DM", "P"].map(pos);
-    g += '<path d="M' + f[0] + " " + f[1] + " Q" + (f[0] - 30) + " " + (f[1] - 45) + " " + rm[0] + " " + (rm[1] + 20) + " M" + (rm[0] + 20) + " " + rm[1] + " L" + (dm[0] - 20) + " " + dm[1] +
-      " M" + dm[0] + " " + (dm[1] + 20) + " Q" + (dm[0] + 10) + " " + (pp[1] - 20) + " " + pp[0] + " " + (pp[1] - 20) + '" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-dasharray="3 4"/>';
-    g += '<text x="' + (rm[0] + dm[0]) / 2 + '" y="' + (rm[1] - 30) + '" text-anchor="middle" class="balflow">YÍNG QÌ</text>';
+    const seg = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy) || 1, ux = dx / d * 21, uy = dy / d * 21;
+      return "M" + (a[0] + ux) + " " + (a[1] + uy) + " L" + (b[0] - ux) + " " + (b[1] - uy); };
+    g += '<path d="' + seg(f, rm) + " " + seg(rm, dm) + " " + seg(dm, pp) + '" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-dasharray="3 4"/>';
+    const mid = [(rm[0] + dm[0]) / 2, (rm[1] + dm[1]) / 2], md = Math.hypot(mid[0] - 170, mid[1] - 170) || 1;
+    g += '<text x="' + (mid[0] + (mid[0] - 170) / md * 34) + '" y="' + (mid[1] + (mid[1] - 170) / md * 34 + 3) + '" text-anchor="middle" class="balflow">YÍNG QÌ</text>';
     B.pick.forEach(b => B.aff.forEach(a => {
       const l = links(b, a); if(!l.length) return;
       const [p1, p2] = [pos(b), pos(a)], mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2;
@@ -148,7 +150,7 @@
       '<p class="src">Des canaux sont atteints : clique sur le moins de canaux possible pour les rééquilibrer tous, selon les six systèmes des canaux unis de Dr Tán. Un canal atteint peut en équilibrer un autre. Rèn mài et dū mài ne comptent que pour le système 1.</p>' +
       '<div class="balbar">Systèmes ' + [1, 2, 3, 4, 5].map(n => '<button type="button" class="balsysbtn' + (B.on.has(n) ? " on" : "") + '" data-n="' + n + '" title="' + esc(TAN_SYSTEMS[n].name) + '">' + n + "</button>").join("") +
       '<label><input type="checkbox" id="balHint"' + (B.hint ? " checked" : "") + "> afficher le nombre de canaux équilibrés</label>" +
-      '<span class="balscore">' + B.score + " / " + B.played + "</span></div>" +
+      '<span class="balscore" title="Cas résolus avec le minimum de canaux / cas joués">' + B.score + (B.score > 1 ? " cas parfaits" : " cas parfait") + " sur " + B.played + "</span></div>" +
       '<div class="ballay"><svg class="balclock" viewBox="-40 -50 420 420" role="img" aria-label="Horloge chinoise des douze canaux">' + g + "</svg>" +
       '<div><div class="ballbltop">Canaux atteints</div><p class="balcase">' + B.aff.map(chip).join(" · ") + '</p><ul class="balcov">' + cov + "</ul>" +
       '<div class="balact"><button type="button" class="tool" id="balVal"' + (B.done ? " disabled" : "") + '>Valider</button><button type="button" class="tool" id="balNext">Nouveau cas</button><button type="button" class="tool" id="balClr"' + (B.done ? " disabled" : "") + ">Effacer</button></div>" +
@@ -176,7 +178,7 @@
       B.result = (B.pick.size === k ? '<span class="balok">Parfait : ' + k + (k > 1 ? " canaux" : " canal") + ", c’est le minimum.</span>"
         : "Tout est équilibré avec " + B.pick.size + " canaux ; le minimum est <b>" + k + "</b>.") +
         '<br><span class="balsm">Solutions minimales' + (opt.length > 1 ? " (" + opt.length + ")" : "") + " :</span><br>" +
-        opt.slice(0, 8).map(s => s.map(chip).join(" + ")).join("<br>");
+        opt.slice(0, 8).map(s => s.map(b => chip(b) + ' <span class="balsm">(→ ' + B.aff.filter(x => links(b, x).length).map(x => esc(x) + " syst. " + links(b, x).join(", ")).join(" ; ") + ")</span>").join(" + ")).join("<br>");
       render();
     });
   }

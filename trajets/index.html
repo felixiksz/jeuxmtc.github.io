@@ -1623,7 +1623,7 @@
       ' <span class="rtsm">' + RT_LEVELS[RT.level] + "</span>" +
       '<label><input type="checkbox" id="rtZone"' + (RT.zoneOpt ? " checked" : "") + "> trajet imposé par une zone</label>" +
       '<label><input type="checkbox" id="rtChrono"' + (RT.chrono ? " checked" : "") + "> défi chronométré (5 missions)</label>" +
-      '<span class="rtscore">' + RT_OPT.perfect + " / " + RT_OPT.played + (RT.series ? ' · mission ' + RT.series.n + "/5 · <span id=\"rtClock\"></span>" : "") + "</span></div>" +
+      '<span class="rtscore" title="Trajets faits avec le minimum de correspondances / trajets joués">' + RT_OPT.perfect + (RT_OPT.perfect > 1 ? " trajets parfaits" : " trajet parfait") + " sur " + RT_OPT.played + (RT.series ? ' · mission ' + RT.series.n + "/5 · <span id=\"rtClock\"></span>" : "") + "</span></div>" +
       (RT.start ? '<div class="rtmission">De <b class="rtstart">' + esc(RT.start) + "</b> à <b class=\"rtend\">" + esc(RT.end) + "</b>" + (RT.zone ? " en t’arrêtant dans la zone <b>« " + esc(RT.zone) + " »</b>" : "") + "</div>" : "") +
       (RT.phase === "play" ? '<div class="rtrow">Tu es à <b>' + esc(RT.cur.code) + "</b>, sur la ligne " + chip(RT.cur.line) + " · correspondances : <b>" + RT.transfers + "</b>" +
         (here.length ? ' · <span class="rtsm">changer ici pour :</span> ' + here.map(c => '<button type="button" class="rtchange" data-rtline="' + c + '" style="--c:' + (ELEMENT[c] === "metal" ? "#1d1d1f" : netColor(c)) + '">' + esc(sigle(c)) + "</button>").join("") : "") + "</div>" +
