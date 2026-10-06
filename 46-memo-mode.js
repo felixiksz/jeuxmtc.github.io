@@ -592,6 +592,7 @@
     const score = byId("mtcMemoScore");
     if(score) score.textContent = state.matched.size + "/" + state.visiblePairs.length + " · " + state.attempts + (state.attempts > 1 ? " essais" : " essai");
     if(state.matched.size === state.visiblePairs.length && state.visiblePairs.length){
+      if(typeof window.mtcRecordDailyPlay === "function") window.mtcRecordDailyPlay();
       showMemoBravo();
     }
   }

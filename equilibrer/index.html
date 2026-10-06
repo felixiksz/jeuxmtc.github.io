@@ -44,6 +44,7 @@
 </style>
 <link href="../modules-theme.css?v=20261005-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
+<script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
 <body>
 <header>
@@ -173,6 +174,7 @@
       if(!B.aff.every(a => [...B.pick].some(b => links(b, a).length))){ B.result = '<span class="balno">Il reste des canaux non équilibrés.</span>'; render(); return; }
       const opt = optimum(), k = opt.length ? opt[0].length : 0;
       B.done = true; B.played++;
+      if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
       if(B.pick.size === k) B.score++;
       save();
       B.result = (B.pick.size === k ? '<span class="balok">Parfait : ' + k + (k > 1 ? " canaux" : " canal") + ", c’est le minimum.</span>"

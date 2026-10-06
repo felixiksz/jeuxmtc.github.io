@@ -80,13 +80,23 @@
     }
   }
 
+  // n'importe quel jeu du site compte pour la série (quiz, mémo, modules : voir daily-streak-shared.js)
+  function recordTodaysPlaySilently(){
+    const streak = loadStreak(), today = todayLocalDateString();
+    if(streak.lastPlayedDate === today){ renderBadge(streak); return streak; }
+    const next = {count:streak.lastPlayedDate === yesterdayLocalDateString() ? streak.count + 1 : 1, lastPlayedDate:today};
+    saveStreak(next); renderBadge(next);
+    return next;
+  }
+  window.mtcRecordDailyPlay = recordTodaysPlaySilently;
+
   function wrapRecordStatsGameFinished(){
     const original = window.recordStatsGameFinished;
     if(typeof original !== "function" || original.__dailyStreakWrapped) return;
 
     const wrapped = function(won){
       const result = original.apply(this, arguments);
-      if(won) recordTodaysWin();
+      if(won) recordTodaysWin(); else recordTodaysPlaySilently();
       return result;
     };
     wrapped.__dailyStreakWrapped = true;

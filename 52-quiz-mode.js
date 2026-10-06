@@ -559,6 +559,7 @@
   // difficile ne boucle indéfiniment. "Je maîtrise" fait progresser le
   // niveau et le point n'est pas reproposé cette fois-ci.
   function rateCurrent(rating){
+    if(typeof window.mtcRecordDailyPlay === "function") window.mtcRecordDailyPlay();   // la série compte tous les jeux
     const question = state.questions[state.index];
     if(!question) return;
     const responseMs = question.shownAt ? Math.max(0, Date.now() - question.shownAt) : null;
