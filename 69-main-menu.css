@@ -147,7 +147,8 @@ body.mtc-menu-ui #supportCoffeeButton:not(.support-blooddrop-moving){
 body.mtc-menu-ui .practice-row{ display:flex !important; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px 22px !important; }
 body.mtc-menu-ui .practice-row .mode-switch{ display:none !important; }
 #mtcAutoManual{ font-size:12px; }
-#mtcGameIcons{ display:inline-flex; align-items:center; gap:14px; padding-left:18px; border-left:1px solid color-mix(in srgb, var(--text-color) 25%, transparent); }
+#mtcGameIcons{ display:inline-flex; align-items:center; gap:14px; }
+#mtcAudioModeToggle{ background:transparent !important; box-shadow:none !important; }
 #mtcGameIcons .gameplay-mode-topline:not([hidden]){ display:inline-flex !important; margin:0 !important; padding:0 !important; position:static !important; }
 #mtcGameIcons .gameplay-mode-switch{ display:inline-flex; gap:14px; margin:0 !important; }
 #mtcGameIcons button{ margin:0 !important; padding:4px 2px !important; font-size:17px !important; line-height:1 !important; background:transparent !important; box-shadow:none !important; }
@@ -163,3 +164,8 @@ body.mtc-menu-loading .topbar, body.mtc-menu-loading .bottom-actions, body.mtc-m
 html body.mtc-menu-ui #mtcAutoManual button{ font-size:inherit !important; }
 html body.mtc-menu-ui #mtcAutoManual{ font-size:12px !important; }
 @media (max-width:760px){ html body.mtc-menu-ui #mtcAutoManual{ font-size:11px !important; } }
+
+/* numéro de version : discret, en bas du menu */
+#mtcMainMenu .mm-version{ position:fixed; left:28px; bottom:16px; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--text-color) 45%, var(--page-bg)); }
+@media (max-width:760px){ #mtcMainMenu .mm-version{ position:static; padding:0 16px 24px; } }

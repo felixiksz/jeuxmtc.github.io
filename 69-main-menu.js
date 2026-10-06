@@ -12,6 +12,9 @@
   "use strict";
 
   const TAB_KEY = "mtc_main_menu_tab_v1";
+  // numéro de version du jeu : majeur.mineur (le premier chiffre change pour une refonte, le second pour des ajouts)
+  const MTC_VERSION = "2.0";
+  window.MTC_VERSION = MTC_VERSION;
   const DISCUSSIONS_URL = "https://github.com/felixiksz/jeuxmtc.github.io/discussions";
   const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Mon suivi"], ["reglages", "Réglages"]];
 
@@ -119,7 +122,8 @@
       '<div class="mm-body"><div class="mm-list">' + list(tab) + "</div>" +
       '<div class="mm-entries">' + ENTRIES.map(([k, label]) =>
         '<button type="button" class="mm-entry' + (k === tab ? " on" : "") + '" data-tab="' + k + '">' + label + "</button>" +
-        (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>";
+        (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>" +
+      '<div class="mm-version">Connections MTC · v' + MTC_VERSION + "</div>";
     menu.setAttribute("data-dom", pharma ? "pharma" : "acu");
   }
   function domainSwitchHtml(){
@@ -235,7 +239,9 @@
     }
     let icons = byId("mtcGameIcons");
     if(!icons){ icons = document.createElement("span"); icons.id = "mtcGameIcons"; row.appendChild(icons); }
-    ["mtcAudioModeToggle", "gridLockIndicator"].forEach(id => { const el = byId(id); if(el && el.parentElement !== icons) icons.appendChild(el); });
+    const audio = byId("mtcAudioModeToggle"), lock = byId("gridLockIndicator");
+    if(audio && row.firstChild !== audio) row.insertBefore(audio, row.firstChild);
+    if(lock && lock.parentElement !== icons) icons.appendChild(lock);
     const manual = byId("manualEditButton");
     if(manual && manual.parentElement === row && manual.nextSibling !== icons) row.insertBefore(manual, icons);
   }
@@ -271,7 +277,7 @@
     if(drop){
       document.body.appendChild(drop);
       const mailBox = () => { const m = byId("suggestionMailButton"); const r = m && m.getBoundingClientRect(); return r && r.width ? r : null; };
-      const dropX = () => { const r = mailBox(), w = drop.offsetWidth || 30; return r ? Math.max(6, r.left - w - 12) : Math.max(6, window.innerWidth - w - 54); };
+      const dropX = () => { const r = mailBox(), w = drop.offsetWidth || 30; return r ? Math.max(6, r.left - 27 - w / 2) : Math.max(6, window.innerWidth - 70 - w / 2); };
       const dropGround = () => { const r = mailBox(), h = drop.offsetHeight || 30; return r ? r.top + (r.height - h) / 2 : window.innerHeight - h - 12; };
       const pin = () => { try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){} };
       if(typeof window.panelGroundForSupportBloodDrop === "function" && !window.panelGroundForSupportBloodDrop.mtcPinned){
