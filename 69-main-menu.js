@@ -19,8 +19,7 @@
   const THANKS = ["Claire"];
   const thanksHtml = () => {
     if(!THANKS.length) return "";
-    const names = THANKS.length > 1 ? THANKS.slice(0, -1).join(", ") + " et " + THANKS[THANKS.length - 1] : THANKS[0];
-    return '<div class="mm-thanks">Merci à ' + esc(names) + " pour " + (THANKS.length > 1 ? "leur" : "son") + " soutien.</div>";
+    return '<div class="mm-thanks">Projet soutenu par : ' + THANKS.map(esc).join(", ") + ".<br>Merci !</div>";
   };
   const DISCUSSIONS_URL = "https://github.com/felixiksz/jeuxmtc.github.io/discussions";
   const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Mon suivi"], ["reglages", "Réglages"]];
