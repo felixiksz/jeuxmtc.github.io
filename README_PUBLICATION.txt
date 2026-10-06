@@ -10,5 +10,5 @@ Mes notes — publication
   relancer node tools/formules-publish.js <dossier du dépôt Assistant-MTC>, puis publier formules/formules-data.js.
 
 Contenu : jeu ACU + PHARMA, fiches détaillées, stats locales, modes Révision douce / Examen, tutos,
-grand menu (Jouer, Réviser, Mon suivi, Réglages), modules bêta Trajets et Formules, jeu Équilibrer,
+grand menu (Jouer, Réviser, Suivi, Réglages), modules bêta Trajets et Formules, jeu Équilibrer,
 rappel de soutien avec la goutte de sang.

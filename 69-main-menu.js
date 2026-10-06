@@ -1,7 +1,7 @@
 /* ============================================================
    69-main-menu.js
    Réorganisation de l'écran principal en grand menu (proposition C) :
-   « ≡ Menu » ouvre quatre entrées — Jouer, Réviser, Mon suivi, Réglages —
+   « ≡ Menu » ouvre quatre entrées — Jouer, Réviser, Suivi, Réglages —
    avec les fonctions du jeu en index (nom, description). Chaque ligne
    réutilise les fonctions existantes (panneaux, modules, cartes…) sans
    les modifier. Restent visibles en permanence : la série en bas à
@@ -29,7 +29,7 @@
       "</span></span>Merci !</span>";
   };
   const DISCUSSIONS_URL = "https://github.com/felixiksz/jeuxmtc.github.io/discussions";
-  const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Mon suivi"], ["reglages", "Réglages"]];
+  const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Suivi"], ["reglages", "Réglages"]];
 
   const byId = id => document.getElementById(id);
   const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
@@ -328,9 +328,9 @@
     if(steps.some(s => s && s.selector === "#mtcMenuButton")) return;
     const after = steps.findIndex(s => s && s.selector === ".topbar-row button[onclick*='newGame()']");
     steps.splice(after >= 0 ? after + 1 : 1, 0,
-      {selector:"#mtcMenuButton", title:"Menu", text:"Le menu regroupe tout le reste : Jouer (les jeux), Réviser (mémo, recherche, comparaison, cartes, modules bêta), Mon suivi (statistiques, panier, série et rappel) et Réglages (affichage, aide, export et import des notes, hors connexion)."},
+      {selector:"#mtcMenuButton", title:"Menu", text:"Le menu regroupe tout le reste : Jouer (les jeux), Réviser (mémo, recherche, comparaison, cartes, modules bêta), Suivi (statistiques, panier, série et rappel) et Réglages (affichage, aide, export et import des notes, hors connexion)."},
       {selector:"#mtcTopDomainSwitch", title:"Acu / Pharma", text:"Ici tu peux changer de matière en cours de route."},
-      {selector:"#mtcStreakCorner", title:"Série", text:"Le nombre de jours de jeu d’affilée. Clique sur la série pour ouvrir Mon suivi et activer le rappel quotidien.", position:"aboveBottom"});
+      {selector:"#mtcStreakCorner", title:"Série", text:"Le nombre de jours de jeu d’affilée. Clique sur la série pour ouvrir Suivi et activer le rappel quotidien.", position:"aboveBottom"});
   }
 
   // réglages de la partie sur une ligne : Auto / Manuel (texte, comme Acu / Pharma), Facile–Difficile, puis le son et

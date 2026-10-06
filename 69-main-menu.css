@@ -1,6 +1,6 @@
 /* ============================================================
    69-main-menu.css
-   Grand menu « Jouer / Réviser / Mon suivi / Réglages » (proposition C) :
+   Grand menu « Jouer / Réviser / Suivi / Réglages » (proposition C) :
    l'écran garde la grille ; « ≡ Menu » ouvre un grand menu typographique.
    Grandes lettres en Libre Baskerville, le reste en Archivo. Pas de gris :
    les entrées inactives sont une teinte plus légère de la couleur des
@@ -186,7 +186,7 @@ html body.mtc-menu-ui #mtcAutoManual{ font-size:12px !important; }
 /* numéro de version : discret, en bas du menu */
 #mtcMainMenu .mm-foot{ position:fixed; left:28px; bottom:16px; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 0;
   font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:color-mix(in srgb, var(--text-color) 45%, var(--page-bg)); }
-/* soutiens : en bas à droite, alignés sur le bord droit de Jouer / Réviser / Mon suivi / Réglages */
+/* soutiens : en bas à droite, alignés sur le bord droit de Jouer / Réviser / Suivi / Réglages */
 #mtcMainMenu .mm-thanks{ position:fixed; bottom:16px; right:max(28px, calc((100% - 1100px) / 2 + 28px)); display:inline-flex; align-items:baseline; white-space:nowrap; }
 /* fenêtre des prénoms : défilement continu, bords fondus, pause au survol */
 #mtcMainMenu .mm-ticker{ display:inline-block; width:12em; overflow:hidden; margin:0 .5em; vertical-align:bottom;
