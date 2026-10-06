@@ -15,6 +15,13 @@
   // numéro de version du jeu : majeur.mineur (le premier chiffre change pour une refonte, le second pour des ajouts)
   const MTC_VERSION = "2.0";
   window.MTC_VERSION = MTC_VERSION;
+  // merci aux personnes qui ont soutenu le jeu (prénoms ajoutés à la main)
+  const THANKS = ["Claire"];
+  const thanksHtml = () => {
+    if(!THANKS.length) return "";
+    const names = THANKS.length > 1 ? THANKS.slice(0, -1).join(", ") + " et " + THANKS[THANKS.length - 1] : THANKS[0];
+    return '<div class="mm-thanks">Merci à ' + esc(names) + " pour " + (THANKS.length > 1 ? "leur" : "son") + " soutien.</div>";
+  };
   const DISCUSSIONS_URL = "https://github.com/felixiksz/jeuxmtc.github.io/discussions";
   const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Mon suivi"], ["reglages", "Réglages"]];
 
@@ -123,7 +130,7 @@
       '<div class="mm-entries">' + ENTRIES.map(([k, label]) =>
         '<button type="button" class="mm-entry' + (k === tab ? " on" : "") + '" data-tab="' + k + '">' + label + "</button>" +
         (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>" +
-      '<div class="mm-version">Connections MTC · v' + MTC_VERSION + "</div>";
+      '<div class="mm-foot">' + thanksHtml() + '<div class="mm-version">Connections MTC · v' + MTC_VERSION + "</div></div>";
     menu.setAttribute("data-dom", pharma ? "pharma" : "acu");
   }
   function domainSwitchHtml(){
@@ -227,6 +234,11 @@
       label.target = "_blank"; label.rel = "noopener noreferrer";
       label.addEventListener("click", e => { const d = byId("supportCoffeeButton"); if(d){ e.preventDefault(); d.click(); } });
       document.body.appendChild(label);
+      // la goutte et le texte forment un seul bouton : le survol de l'un éclaire les deux
+      const hover = on => { label.classList.toggle("mtc-support-hover", on); const d = byId("supportCoffeeButton"); if(d) d.classList.toggle("mtc-support-hover", on); };
+      label.addEventListener("mouseenter", () => hover(true));
+      label.addEventListener("mouseleave", () => hover(false));
+      if(drop){ drop.addEventListener("mouseenter", () => hover(true)); drop.addEventListener("mouseleave", () => hover(false)); }
     }
     label.href = supportLink();
     const r = drop && drop.getBoundingClientRect();
