@@ -201,14 +201,10 @@
   .netwrap.dark .schemasvg .sband{ stroke:#2a2f3b; } .netwrap.dark .schemasvg .sbandtxt{ fill:#6f7686; }
   .netwrap.dark .schemasvg .slink-case{ stroke:#171a22; } .netwrap.dark .schemasvg .slink{ stroke:#e8e8ee; }
   .netwrap.dark .schemasvg .sown, .netwrap.dark .schemasvg .sother{ fill:#171a22; stroke:#f2f2f2; }
-  .netwrap.dark .schemasvg .slabel{ fill:#eef0f4; stroke:#171a22; }
-  .netgame{ background:#fffbe9; border:1px solid #eadfb4; border-radius:12px; padding:8px 12px; margin:0 0 10px; font-size:13.5px; display:flex; flex-direction:column; gap:6px; }
-  .netgame .grow{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
-  .netgame select{ font:inherit; padding:3px 6px; border-radius:8px; border:1px solid #ccd; }  .gres{ font-weight:700; margin-left:6px; }  @keyframes ghint{ from{ stroke-opacity:.35; } to{ stroke-opacity:1; } }
+  .netwrap.dark .schemasvg .slabel{ fill:#eef0f4; stroke:#171a22; }  @keyframes ghint{ from{ stroke-opacity:.35; } to{ stroke-opacity:1; } }
   .relay path{ fill:none; stroke:#7d7a70; stroke-width:2.4; stroke-dasharray:7 6; stroke-linecap:round; }  .relay text{ font-size:10px; font-weight:800; fill:#5f5c54; paint-order:stroke; stroke:#fff; stroke-width:3px; }
   .netwrap.dark .relay path{ stroke:#a8a49a; }
-  .netwrap.dark .relay text{ fill:#c9c5bb; stroke:#171a22; }  .itisteps{ font-size:13px; line-height:1.6; }
-  .itileg{ font-size:11.5px; color:#7a6a3a; }  .terminus text{ font-size:11px; font-weight:800; }  body.editing .netstop{ cursor:move; }  .netwrap.dark{ background:#171a22; border-color:#2a2f3b; }
+  .netwrap.dark .relay text{ fill:#c9c5bb; stroke:#171a22; }  .terminus text{ font-size:11px; font-weight:800; }  body.editing .netstop{ cursor:move; }  .netwrap.dark{ background:#171a22; border-color:#2a2f3b; }
   .netwrap.dark .quartier rect{ fill-opacity:.09; stroke:#3a4150; }
   .netwrap.dark .quartier text{ fill:#8c93a3; }
   .netwrap.dark .netstop circle{ fill:#171a22; stroke:#f2f2f2; }
@@ -1178,8 +1174,6 @@
   let NET_HIDDEN = new Set();
   try{ NET_HIDDEN = new Set(JSON.parse(localStorage.getItem(NET_HIDE_KEY) || "[]")); }catch(e){}
   const saveHidden = () => { try{ localStorage.setItem(NET_HIDE_KEY, JSON.stringify([...NET_HIDDEN])); }catch(e){} };
-  // ancien itinéraire sur le plan de ville (retiré) : inactif, gardé en attendant une décision
-  let LAST_LAYOUT = null, ITI = null;
   const zoneQuartier = pid => ZONE_QUARTIER[pid] || ZONE_QUARTIER[pid.split("~")[0]] || null;
   let view = "canal", lastCanal = null;
   function refreshNavHidden(){
@@ -1684,7 +1678,6 @@
     applyTan();
     window.addEventListener("resize", placeHeads);
     placeHeads();
-    bindIti();
     const rsb = document.getElementById("rtStartBtn"); if(rsb) rsb.addEventListener("click", rtStart);
     rtBind();
     if(RT && RT.phase === "play") main.querySelectorAll('.netline[data-code="' + RT.cur.line + '"]').forEach(l => l.classList.add("rt-curline"));
@@ -1700,106 +1693,10 @@
     showSchema();
   }
 
-  const ITI_LEVELS = {1:"1 correspondance", 2:"2 correspondances", 3:"3 correspondances ou plus"};
-  const stLabel = p => (PLACES[p] || {label:p.slice(3)}).label;
-  // réseau des lignes affichées : une étape = un trajet sur une ligne (ou un relais)
-  function itiGraph(){
-    const L = LAST_LAYOUT, lineOf = {}, lineName = {}, at = {};
-    L.lines.forEach(l => {
-      const key = l.code + "|" + l.type + (l.interne ? "|i" : "");
-      lineName[key] = "ligne " + sigle(l.code) + (l.type === "principal" ? (l.interne ? " (branche interne)" : "") : " — " + l.name);
-      l.nodes.forEach(n => { if(n.startsWith("pt:") && L.cell[n]){ (lineOf[key] = lineOf[key] || new Set()).add(n); (at[n] = at[n] || new Set()).add(key); } });
-    });
-    const relay = {};
-    (L.relays || []).forEach(r => { if(at[r.a] && at[r.b]){ (relay[r.a] = relay[r.a] || []).push({to:r.b, name:"relais " + sigle(r.from) + " → " + sigle(r.to)}); (relay[r.b] = relay[r.b] || []).push({to:r.a, name:"relais " + sigle(r.from) + " → " + sigle(r.to)}); } });
-    return {lineOf, lineName, at, relay};
-  }
-  function itiBfs(g, start){
-    const dist = {[start]:0}, par = {}, done = new Set(), queue = [start];
-    for(let qi = 0; qi < queue.length; qi++){
-      const u = queue[qi];
-      const visit = (v, via) => { if(dist[v] === undefined){ dist[v] = dist[u] + 1; par[v] = {u, via}; queue.push(v); } };
-      [...(g.at[u] || [])].forEach(k => { if(done.has(k)) return; done.add(k); g.lineOf[k].forEach(v => visit(v, g.lineName[k])); });
-      (g.relay[u] || []).forEach(r => visit(r.to, r.name));
-    }
-    return {dist, par};
-  }
-  function itiLeg(g, x, y){
-    const k = [...(g.at[x] || [])].find(k => g.lineOf[k].has(y));
-    if(k) return g.lineName[k];
-    const r = (g.relay[x] || []).find(r => r.to === y);
-    return r ? r.name : null;
-  }
-  function itiNew(){
-    const g = itiGraph(), ids = Object.keys(g.at);
-    const want = Number(ITI.level);
-    for(let tries = 0; tries < 60 && ids.length; tries++){
-      const a = ids[Math.floor(Math.random() * ids.length)], {dist, par} = itiBfs(g, a);
-      const cands = Object.keys(dist).filter(b => want >= 3 ? dist[b] >= 4 : dist[b] === want + 1);
-      if(!cands.length) continue;
-      const b = cands[Math.floor(Math.random() * cands.length)];
-      const sol = [b]; while(sol[0] !== a) sol.unshift(par[sol[0]].u);
-      Object.assign(ITI, {phase:"play", a, b, path:[a], best:dist[b], bestPath:sol, sol:null, msg:"", t0:Date.now()});
-      return;
-    }
-    ITI.msg = "Pas d’itinéraire de ce niveau avec les lignes affichées : affiche plus de canaux ou de types.";
-  }
-  function itiClick(pid){
-    const g = itiGraph(), last = ITI.path[ITI.path.length - 1];
-    if(pid === last) return;
-    const i = ITI.path.indexOf(pid);
-    if(i >= 0){ ITI.path = ITI.path.slice(0, i + 1); ITI.msg = ""; showNetwork(); return; }   // revenir à une étape
-    const via = itiLeg(g, last, pid);
-    if(!via){ ITI.msg = "✘ Pas de ligne directe entre " + stLabel(last) + " et " + stLabel(pid) + "."; showNetwork(); return; }
-    ITI.path.push(pid);
-    ITI.msg = "";
-    if(pid === ITI.b){
-      const legs = ITI.path.length - 1;
-      ITI.phase = "done";
-      ITI.msg = legs <= ITI.best ? "Itinéraire optimal : " + (legs - 1) + " correspondance" + (legs > 2 ? "s" : "") + " !"
-        : "Arrivé avec " + (legs - 1) + " correspondances — le meilleur en demande " + (ITI.best - 1) + ".";
-    }
-    showNetwork();
-  }
-  function itiSteps(path){
-    const g = itiGraph();
-    return path.map((p, i) => i ? '<span class="itileg">' + esc(itiLeg(g, path[i - 1], p) || "?") + "</span> → <b>" + esc(stLabel(p)) + "</b>" : "<b>" + esc(stLabel(p)) + "</b>").join(" ");
-  }
-  function itiPanel(){
-    if(!ITI) return "";
-    const lv = '<select data-i="level">' + Object.entries(ITI_LEVELS).map(([k, v]) => '<option value="' + k + '"' + (String(k) === String(ITI.level) ? " selected" : "") + ">" + v + "</option>").join("") + "</select>";
-    let html = '<div class="netgame iti"><div class="grow"><b>Itinéraire</b> ';
-    if(ITI.phase === "setup" || !ITI.a){
-      html += "— va d’une station à une autre avec le moins de changements de ligne possible : clique sur les stations où tu changes de ligne, puis l’arrivée. Les lignes affichées comptent (types et canaux choisis en haut et à gauche), ainsi que les relais entre canaux.</div>" +
-        '<div class="grow">Niveau : ' + lv + ' <button type="button" class="tool" data-i="go">Nouveau trajet</button> <button type="button" class="linkish" data-i="quit">fermer</button>' +
-        (ITI.msg ? ' <span class="gres">' + esc(ITI.msg) + "</span>" : "") + "</div></div>";
-      return html;
-    }
-    html += "de <b>" + esc(stLabel(ITI.a)) + "</b> à <b>" + esc(stLabel(ITI.b)) + "</b> · " + esc(ITI_LEVELS[ITI.level]) + " · " + lv + "</div>" +
-      '<div class="grow itisteps">' + itiSteps(ITI.path) + (ITI.phase === "play" ? ' → <i>clique sur la station suivante</i>' : "") + "</div>" +
-      (ITI.sol ? '<div class="grow itisteps">Meilleur itinéraire : ' + itiSteps(ITI.sol) + "</div>" : "") +
-      '<div class="grow">' + (ITI.phase === "play" ? '<button type="button" class="tool" data-i="undo"' + (ITI.path.length > 1 ? "" : " disabled") + '>Annuler l’étape</button> <button type="button" class="tool" data-i="solve">Solution</button> ' : "") +
-      '<button type="button" class="tool" data-i="go">Nouveau trajet</button> <button type="button" class="linkish" data-i="quit">quitter</button>' +
-      (ITI.msg ? ' <span class="gres">' + esc(ITI.msg) + "</span>" : "") + "</div></div>";
-    return html;
-  }
-  function bindIti(){
-    const btn = document.getElementById("netItiBtn");
-    if(btn) btn.addEventListener("click", () => { ITI = {phase:"setup", level:"1", msg:""}; showNetwork(); });
-    const lv = main.querySelector('.netgame.iti [data-i="level"]');
-    if(lv) lv.addEventListener("change", () => { ITI.level = lv.value; });
-    main.querySelectorAll(".netgame.iti button[data-i]").forEach(b => b.addEventListener("click", () => {
-      const a = b.dataset.i;
-      if(a === "go"){ itiNew(); showNetwork(); }
-      else if(a === "quit"){ ITI = null; showNetwork(); }
-      else if(a === "undo"){ if(ITI.path.length > 1) ITI.path.pop(); ITI.msg = ""; showNetwork(); }
-      else if(a === "solve"){ ITI.sol = ITI.bestPath; ITI.phase = "done"; ITI.msg = "Meilleur : " + (ITI.best - 1) + " correspondance" + (ITI.best > 2 ? "s" : "") + "."; showNetwork(); }
-    }));
-  }
 
   let current = null;
   function show(code, sectionIndex, keepScroll){
-    ITI = null; RT = null;
+    RT = null;
     const canal = data.find(c => c.code === code) || data[0];
     current = canal.code;
     view = "canal";
@@ -2008,7 +1905,7 @@
       // la liste complète des correspondances s'ouvre au double-clic
       if(RT && RT.phase === "play" && node.classList.contains("netstop")){ const lc = event.target.closest && event.target.closest("[data-line]"); rtClick(node.dataset.pid.slice(3), lc ? lc.dataset.line : null); return; }
       if(node.classList.contains("plain")){ openPointFiche(node.dataset.pid.slice(3)); return; }
-      if(node.classList.contains("netstop")){ if(ITI && ITI.phase === "play") itiClick(node.dataset.pid); else openCorr(corrKey(node.dataset.pid)); return; }
+      if(node.classList.contains("netstop")){ openCorr(corrKey(node.dataset.pid)); return; }
       if(node.dataset.cp){ complementClick(node); return; }
       if(node.classList.contains("node")) highlightMention(node);
       else openCorr(node.dataset.pid);
