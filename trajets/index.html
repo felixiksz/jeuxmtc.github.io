@@ -122,13 +122,7 @@
   .crow .where{ flex:none; width:8.5em; font-size:.72rem; font-weight:700; color:#555; background:#f1f1f7; border-radius:6px; padding:1px 6px; line-height:1.25; }
   nav .navrow.muted button{ opacity:.38; background:#eee; text-decoration:line-through; }
   .tgroup{ display:inline-flex; gap:6px; align-items:center; padding:1px 7px; border:1px solid #d7d7e6; border-radius:999px; }
-  .netwrap{ background:#e3e6eb; }   /* hors quartiers : gris bleuté, même luminosité que les quartiers */
-  .qcell{ stroke:none; }
-  .gamebtn{ font-size:13px; margin-left:10px; vertical-align:middle; }
-  .netmode{ display:inline-flex; margin-left:10px; vertical-align:middle; }
-  .netmode .tool{ font-size:13px; border-radius:0; }
-  .netmode .tool:first-child{ border-radius:999px 0 0 999px; } .netmode .tool:last-child{ border-radius:0 999px 999px 0; margin-left:-1px; }
-  .schemawrap{ background:#fff; }
+  .netwrap{ background:#e3e6eb; }   /* hors quartiers : gris bleuté{ stroke:none; }  .schemawrap{ background:#fff; }
   .schemaheads{ position:absolute; left:0; right:0; top:0; height:32px; z-index:1; pointer-events:none; background:linear-gradient(#fff 70%, rgba(255,255,255,0)); }
   .shead{ position:absolute; top:6px; transform:translateX(-50%); font-size:11px; font-weight:800; padding:1px 6px; border-radius:5px; border:1.5px solid; white-space:nowrap; pointer-events:auto; cursor:pointer; transition:opacity .15s; }
   .shead.tan-dim{ opacity:.25; }
@@ -210,66 +204,16 @@
   .netwrap.dark .schemasvg .slabel{ fill:#eef0f4; stroke:#171a22; }
   .netgame{ background:#fffbe9; border:1px solid #eadfb4; border-radius:12px; padding:8px 12px; margin:0 0 10px; font-size:13.5px; display:flex; flex-direction:column; gap:6px; }
   .netgame .grow{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
-  .netgame select{ font:inherit; padding:3px 6px; border-radius:8px; border:1px solid #ccd; }
-  .gchip{ font:inherit; font-size:12px; font-weight:800; min-width:34px; padding:3px 7px; border-radius:6px; border:2px solid var(--c); background:#fff; color:#333; cursor:pointer; }
-  span.gchip, .gchip.on{ background:var(--c); color:#fff; text-shadow:0 0 2px rgba(0,0,0,.45); }
-  .gres{ font-weight:700; margin-left:6px; }
-  .gres .g-ok{ color:#2c9a5c; } .gres .g-near{ color:#c98a10; } .gres .g-bad{ color:#d23a33; }
-  .netstop.g-ok circle{ fill:#3bb273; } .netstop.g-near circle{ fill:#f2b134; } .netstop.g-bad circle{ fill:#e0413a; }
-  .netstop.g-hint circle{ fill:#ffd84d; stroke:#b07a00; }
-  .ghint{ fill:#ffd84d; fill-opacity:.35; stroke:#b07a00; stroke-width:2.5; stroke-dasharray:5 4; pointer-events:none; animation:ghint 1.2s ease-in-out infinite alternate; }
-  @keyframes ghint{ from{ stroke-opacity:.35; } to{ stroke-opacity:1; } }
-  body.netgame-on #typeToggle, body.netgame-on #typeFilter, body.netgame-on #editToggle, body.netgame-on .netlegend .nettools{ display:none; }
-  body.netgame-on .netstop{ cursor:grab; }
-  .relay path{ fill:none; stroke:#7d7a70; stroke-width:2.4; stroke-dasharray:7 6; stroke-linecap:round; }
-  .relay path.relayarrow{ stroke-dasharray:none; stroke-width:2.2; stroke-linejoin:round; }
-  .relay text{ font-size:10px; font-weight:800; fill:#5f5c54; paint-order:stroke; stroke:#fff; stroke-width:3px; }
+  .netgame select{ font:inherit; padding:3px 6px; border-radius:8px; border:1px solid #ccd; }  .gres{ font-weight:700; margin-left:6px; }  @keyframes ghint{ from{ stroke-opacity:.35; } to{ stroke-opacity:1; } }
+  .relay path{ fill:none; stroke:#7d7a70; stroke-width:2.4; stroke-dasharray:7 6; stroke-linecap:round; }  .relay text{ font-size:10px; font-weight:800; fill:#5f5c54; paint-order:stroke; stroke:#fff; stroke-width:3px; }
   .netwrap.dark .relay path{ stroke:#a8a49a; }
-  .netwrap.dark .relay text{ fill:#c9c5bb; stroke:#171a22; }
-  .itipath{ fill:none; stroke:#ffd84d; stroke-width:12; stroke-linecap:round; stroke-linejoin:round; opacity:.75; pointer-events:none; }
-  .itisol{ fill:none; stroke:#2c9a5c; stroke-width:5; stroke-dasharray:10 7; stroke-linecap:round; pointer-events:none; }
-  .itimark circle{ fill:none; stroke-width:4; pointer-events:none; }
-  .itimark text{ font-size:13px; font-weight:900; paint-order:stroke; stroke:#fff; stroke-width:4px; pointer-events:none; }
-  .itistart circle{ stroke:#2c9a5c; } .itistart text{ fill:#2c9a5c; }
-  .itiend circle{ stroke:#d23a33; } .itiend text{ fill:#d23a33; }
-  .itistep{ fill:none; stroke:#b07a00; stroke-width:3; pointer-events:none; }
-  .itisteps{ font-size:13px; line-height:1.6; }
-  .itileg{ font-size:11.5px; color:#7a6a3a; }
-  .facelabel{ font-size:34px; font-weight:800; fill:#b4ab97; letter-spacing:.2em; pointer-events:none; }
-  .casing{ stroke:#ffffff; pointer-events:none; }
-  .netwrap.dark .casing{ stroke:#171a22; }
-  .subq rect{ fill:#ffffff; fill-opacity:.28; stroke:#ffffff; stroke-opacity:.8; stroke-dasharray:6 5; }
-  .subq text{ font-size:11px; font-weight:800; fill:#8f8878; letter-spacing:.06em; text-transform:uppercase; }
-  .rivername{ font-family:"Libre Baskerville", Georgia, serif; font-style:italic; font-size:12px; fill:#2f6b9f; letter-spacing:.12em; paint-order:stroke; stroke:#eaf4fb; stroke-width:3px; pointer-events:none; }
-  .rivername.rm{ fill:#b0527c; stroke:#fbe6ef; }
-  .rivername.big{ font-size:16px; font-weight:700; }
-  .terminus text{ font-size:11px; font-weight:800; }
-  .netstop .cat{ font-size:10px; fill:#1f4e79; }
-  .pier .anchor{ font-size:11px; font-weight:800; fill:#1f4e79; paint-order:stroke; stroke:#fff; stroke-width:3px; }
-  body.editing .netstop{ cursor:move; }
-  .qborder{ stroke:#ffffff; stroke-width:5; stroke-linejoin:round; }
-  .qlabel{ font-size:15px; font-weight:800; fill:#9c9483; letter-spacing:.08em; text-transform:uppercase; pointer-events:none; }
-  .qlabel.downtown{ fill:#b0755c; }
-  .netjoint{ pointer-events:none; }
-  .netjoint text{ font-size:12px; font-weight:800; fill:#5b574f; paint-order:stroke; stroke:#fff; stroke-width:4px; letter-spacing:.05em; text-transform:uppercase; }
-  .netwrap.dark .qcell{ fill-opacity:.12; }
-  .netwrap.dark .qborder{ stroke:#2a2f3b; }
-  .netwrap.dark .qlabel{ fill:#6f7686; }
-  .netwrap.dark .rivername{ stroke:#171a22; fill:#8cc3ec; }
-  .netwrap.dark .netstop .cat{ fill:#9cc9ee; }
-  .netwrap.dark .netjoint circle{ fill:#171a22; }
-  .netwrap.dark .netjoint text{ fill:#cfd3dc; stroke:#171a22; }
-  .netwrap.dark{ background:#171a22; border-color:#2a2f3b; }
+  .netwrap.dark .relay text{ fill:#c9c5bb; stroke:#171a22; }  .itisteps{ font-size:13px; line-height:1.6; }
+  .itileg{ font-size:11.5px; color:#7a6a3a; }  .terminus text{ font-size:11px; font-weight:800; }  body.editing .netstop{ cursor:move; }  .netwrap.dark{ background:#171a22; border-color:#2a2f3b; }
   .netwrap.dark .quartier rect{ fill-opacity:.09; stroke:#3a4150; }
   .netwrap.dark .quartier text{ fill:#8c93a3; }
   .netwrap.dark .netstop circle{ fill:#171a22; stroke:#f2f2f2; }
   .netwrap.dark .netstop text{ fill:#eef0f4; stroke:#171a22; }
-  .netwrap.dark .netstop text.small{ fill:#aab0bd; }
-  .netwrap.dark .netbadge circle{ fill:#171a22; }
-  .netwrap.dark .netbadge text{ fill:#fff; }
-  .netwrap.dark .joint rect{ fill:#fff; fill-opacity:.05; }
-  .netwrap.dark .joint text{ fill:#6f7686; }
-  .netinfo{ margin:0 0 6px; font-size:.85rem; }
+  .netwrap.dark .netstop text.small{ fill:#aab0bd; }  .netinfo{ margin:0 0 6px; font-size:.85rem; }
   .netinfo summary{ cursor:pointer; color:var(--accent); font-weight:700; }
   @media (max-width:760px){
     main{ padding:8px 8px 8px 10px; }
@@ -281,15 +225,11 @@
   .netsvg{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; user-select:none; }
   .netsvg.dragging{ cursor:grabbing; }
   .netzoom{ position:absolute; right:10px; top:10px; z-index:2; display:flex; flex-direction:column; gap:4px; }
-  .netzoom button{ font:inherit; font-weight:800; width:32px; height:32px; border:1px solid #ccd; border-radius:8px; background:#fff; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.08); }
-  .joint text{ font-size:11px; font-weight:800; fill:#9a96a8; letter-spacing:.04em; text-transform:uppercase; }
-  .quartier text{ font-size:15px; font-weight:800; fill:#a39d8c; letter-spacing:.03em; }
+  .netzoom button{ font:inherit; font-weight:800; width:32px; height:32px; border:1px solid #ccd; border-radius:8px; background:#fff; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.08); }  .quartier text{ font-size:15px; font-weight:800; fill:#a39d8c; letter-spacing:.03em; }
   .netstop text.small{ font-size:8px; font-weight:600; fill:#666; }
   .netstop{ cursor:pointer; }
   .netstop text{ font-size:10.5px; font-weight:800; fill:#222; paint-order:stroke; stroke:#fff; stroke-width:3.5px; }
-  .netstop:hover rect, .netstop:hover circle{ stroke:#000; stroke-width:2.6; }
-  .netbadge text{ font-size:8px; font-weight:800; fill:#222; }
-  .netline:hover{ stroke-width:6; }
+  .netstop:hover rect, .netstop:hover circle{ stroke:#000; stroke-width:2.6; }  .netline:hover{ stroke-width:6; }
   .netlegend{ flex-wrap:wrap; margin:0 0 8px; align-items:center; }
   .netlegend svg{ vertical-align:middle; margin-right:4px; }
   .crow small.jh{ font-size:.68rem; color:#8a6d00; background:#fff6d6; border-radius:999px; padding:0 6px; white-space:nowrap; }
@@ -440,11 +380,17 @@
   // ---- corrections faites dans la page (gardées dans ce navigateur, exportables) ----
   const EDIT_KEY = "mtc_trajets_edits_v1";
   const ORIG = JSON.parse(JSON.stringify({data, PLACES}));
-  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}, complements:{}, internes:{}, stationPos:{}, pointZone:{}});
+  const emptyEdits = () => ({paras:{}, notes:{}, branches:{}, places:{}, verified:{}, complements:{}, internes:{}, pointZone:{}});
   let edits = loadEdits();
   let editing = false;
   function loadEdits(){
-    try{ return Object.assign(emptyEdits(), JSON.parse(localStorage.getItem(EDIT_KEY) || "{}")); }catch(e){ return emptyEdits(); }
+    try{
+      const e = Object.assign(emptyEdits(), JSON.parse(localStorage.getItem(EDIT_KEY) || "{}"));
+      // l'ancien plan de ville et son jeu de démêlage ont été retirés : on efface leurs réglages mémorisés
+      if(e.stationPos){ delete e.stationPos; try{ localStorage.setItem(EDIT_KEY, JSON.stringify(e)); }catch(err){} }
+      try{ localStorage.removeItem("mtc_trajets_net_mode"); }catch(err){}
+      return e;
+    }catch(e){ return emptyEdits(); }
   }
   function saveEdits(){
     try{ localStorage.setItem(EDIT_KEY, JSON.stringify(edits)); }catch(e){}
@@ -1045,12 +991,8 @@
       '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="background:#efe9d8;border-radius:4px;width:16px"></i>quartier traversé (zone du corps)</span><span><i style="background:#f6dcd2;border-radius:4px;width:16px"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span><span><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#9aa0c8" stroke-width="2.4" stroke-dasharray="6 4"/></svg>branche interne</span></div></div>';
   }
 
-  // =====================================================================
-  // Réseau global, façon plan de ville : chaque canal régulier est une ligne de
-  // métro (tous ses points), RM et DM un fleuve, les merveilleux vaisseaux des
-  // rivières ; les zones du corps sont des quartiers (centre-ville = organes,
-  // banlieue = extrémités), les articulations de grands carrefours.
-  // =====================================================================
+  // Positions anatomiques des zones du corps : servent à ranger les points de la tête aux pieds
+  // (plan des intersections) et aux correspondances par localisation.
   const NET_POS = {
     // tête
     tete:[600,60], vertex:[600,40], crane:[600,52], parietal:[565,50], cerveau:[610,72], front:[600,96], "angle-frontal":[545,96],
@@ -1148,7 +1090,6 @@
     const ptrs = new Map();
     let dragged = false, last = null, pinch = null;
     svg.addEventListener("pointerdown", e => {
-      if((editing || (GAME && GAME.phase === "play")) && e.target.closest && e.target.closest(".netstop")) return;   // glisser d'une station : voir showNetwork
       ptrs.set(e.pointerId, [e.clientX, e.clientY]);
       dragged = false; last = [e.clientX, e.clientY];
       if(ptrs.size === 2){ const [p1, p2] = [...ptrs.values()]; pinch = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]); }
@@ -1214,48 +1155,9 @@
     talon:"talon", "tendon-calc":"talon", "dos-pied":"pied", tarse:"pied", naviculaire:"pied", metatarse:"pied", plante:"plante",
     hallux:"orteils", orteils:"orteils", "petit-orteil":"orteils"
   };
-  const QUARTIER_LABEL = {sommet:"Sommet de la tête", cerveau:"Cerveau", front:"Front", tempe:"Tempe", yeux:"Yeux", nez:"Nez", oreille:"Oreille", joue:"Joue, pommette", bouche:"Bouche, lèvres", dents:"Dents, gencives", machoire:"Mâchoire", langue:"Langue", occiput:"Occiput", nuque:"Nuque", gorge:"Gorge", cou:"Cou", susclav:"Creux sus-claviculaire", clavicule:"Clavicule", epaule:"Épaule", omoplate:"Omoplate", aisselle:"Aisselle", bras:"Bras", coude:"Coude", avbras:"Avant-bras", poignet:"Poignet", main:"Main", doigts:"Doigts", thorax:"Thorax, poitrine", seins:"Seins", poumon:"Poumon", coeur:"Cœur", ec:"Enveloppe du cœur", cotes:"Côtes, flancs", diaphragme:"Diaphragme", hypocondre:"Hypocondre", oesophage:"Œsophage", foie:"Foie", vb:"Vésicule biliaire", estomac:"Estomac", rate:"Rate, pancréas", dos:"Dos", colonne:"Colonne vertébrale", reins:"Reins", lombes:"Lombes", tf:"Trois foyers", abdomen:"Abdomen", ombilic:"Ombilic", intestins:"Intestins", basventre:"Bas-ventre", vessie:"Vessie", pubis:"Pubis", genitaux:"Organes génitaux", perinee:"Périnée", anus:"Anus", sacrum:"Sacrum", fesse:"Fesse", aine:"Aine", hanche:"Hanche", cuisse:"Cuisse", genou:"Genou", poplite:"Creux poplité", jambe:"Jambe", mollet:"Mollet", malleole:"Malléole", talon:"Talon", pied:"Pied", plante:"Plante du pied", orteils:"Orteils"};
-  const DOWNTOWN = new Set(["coeur", "poumon", "ec", "foie", "vb", "estomac", "rate", "intestins", "reins", "vessie", "tf", "diaphragme", "oesophage"]);
-  const SUBURB = new Set(["main", "doigts", "pied", "plante", "orteils", "talon"]);
-  const QUARTIER_COLORS = ["#f3e9c6", "#dfeccf", "#f5d9df", "#d8e7f1", "#ece0f2", "#f7e2cc", "#d9ecea", "#eeeccd"];
-  // articulations : grands carrefours par lesquels passent toutes les lignes du membre
-  const JOINTS = {epaule:"Épaule", coude:"Coude", poignet:"Poignet", hanche:"Hanche", genou:"Genou", malleole:"Cheville"};
-  const JOINT_ZONES = {epaule:["epaule", "acromion", "delto"], coude:["coude", "pli-coude", "olecrane"], poignet:["poignet", "dos-poignet", "cun-kou", "styloide-rad", "styloide-uln", "pisiforme"],
-    hanche:["hanche", "trochanter", "coxo"], genou:["genou", "poplite"], malleole:["malleole", "malleole-int", "malleole-ext"]};
-  const JOINT_OF = {};
-  Object.entries(JOINT_ZONES).forEach(([j, zs]) => zs.forEach(z => { JOINT_OF[z] = j; }));
-  const ARM = ["P", "GI", "C", "IG", "EC", "TF"], LEG = ["E", "Rt", "V", "Rn", "VB", "F"];
-  const LIMB_JOINTS = {arm:["epaule", "coude", "poignet"], leg:["hanche", "genou", "malleole"]};
-  // tous les points de la ligne externe de chaque canal régulier, dans l'ordre (RM et DM : le fleuve)
-  const MAIN_SEG = (() => {
-    const r = (a, b) => Array.from({length:b - a + 1}, (_, i) => a + i);
-    return {P:[r(1, 11)], GI:[r(1, 20)], E:[r(1, 8), [5].concat(r(9, 45))], Rt:[r(1, 21)], C:[r(1, 9)], IG:[r(1, 19)],
-      V:[r(1, 40), [10].concat(r(41, 54), [40]), [40].concat(r(55, 67))], Rn:[r(1, 27)], EC:[r(1, 9)], TF:[r(1, 23)],
-      VB:[r(1, 44)], F:[r(1, 14)], RM:[r(1, 24)], DM:[r(1, 28)]};
-  })();
-  // catégories de points (canaux réguliers) : cinq points de transport, yuán, luò, xì
-  const POINT_CATS = (() => {
-    const T = {P:[11, 10, 9, 8, 5], GI:[1, 2, 3, 5, 11], E:[45, 44, 43, 41, 36], Rt:[1, 2, 3, 5, 9], C:[9, 8, 7, 4, 3], IG:[1, 2, 3, 5, 8],
-      V:[67, 66, 65, 60, 40], Rn:[1, 2, 3, 7, 10], EC:[9, 8, 7, 5, 3], TF:[1, 2, 3, 6, 10], VB:[44, 43, 41, 38, 34], F:[1, 2, 3, 4, 8]};
-    const NAMES = ["jǐng-puits", "yíng-jaillissement", "shū-rivière", "jīng-fleuve", "hé-réunion"];
-    const Y = {P:9, GI:4, E:42, Rt:3, C:7, IG:4, V:64, Rn:3, EC:7, TF:4, VB:40, F:3};
-    const L = {P:7, GI:6, E:40, Rt:4, C:5, IG:7, V:58, Rn:4, EC:6, TF:5, VB:37, F:5, RM:15, DM:1};
-    const X = {P:6, GI:7, E:34, Rt:8, C:6, IG:6, V:63, Rn:5, EC:4, TF:7, VB:36, F:6};
-    const out = {};
-    const add = (code, n, cat, name) => { const k = "pt:" + code + " " + n; (out[k] = out[k] || []).push({cat, name}); };
-    Object.entries(T).forEach(([code, ns]) => ns.forEach((n, i) => add(code, n, "transport", "point " + NAMES[i])));
-    Object.entries(Y).forEach(([code, n]) => add(code, n, "yuan", "point yuán-source"));
-    Object.entries(L).forEach(([code, n]) => add(code, n, "luo", "point luò-liaison"));
-    add("Rt", 21, "luo", "point du grand luò-liaison");
-    Object.entries(X).forEach(([code, n]) => add(code, n, "xi", "point xì-crevasse"));
-    return out;
-  })();
-  const CAT_GLYPH = {transport:"⛵\uFE0E", yuan:"☀\uFE0E", luo:"⛓\uFE0E", xi:"⛏\uFE0E"};
-  // points d'ouverture des merveilleux vaisseaux : embarcadères des navettes
+  // points d'ouverture des merveilleux vaisseaux
   const OPENING = {CM:"Rt 4", YinW:"EC 6", DM:"IG 3", YangQ:"V 62", RM:"P 7", YinQ:"Rn 6", DaiM:"VB 41", YangW:"TF 5"};
-  // voies : les canaux côte à côte (de droite à gauche du tronc), le fleuve au milieu
-  const LANE = {V:6, VB:5, TF:4, IG:3, GI:2, E:1, RM:0, DM:0, Rt:-1, P:-2, EC:-3, C:-4, F:-5, Rn:-6};
-  // points placés dans un quartier (correspondances par localisation) ; déplaçables en mode édition
+  // points placés dans une zone du corps (correspondances par localisation)
   const DEFAULT_POINT_ZONE = {"pt:RM 2":"pubis", "pt:RM 8":"ombilic"};
   const POINT_ZONE_DATA = window.MTC_TRAJETS_POINT_ZONES || {};
   const LIMB_Q = new Set(["epaule", "aisselle", "bras", "coude", "avbras", "poignet", "main", "doigts", "hanche", "cuisse", "genou", "poplite", "jambe", "mollet", "malleole", "talon", "pied", "plante", "orteils", "aine"]);
@@ -1270,92 +1172,15 @@
   let NET_VB = null;
   const RIVER = new Set(["RM", "DM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"]);
   const NET_COLOR = {terre:"#d9a400", bois:"#2f9a3c", feu:"#e0261b", eau:"#1f5fd6", metal:"#ffffff"};
-  // tracé arrondi (virages en courbe, comme sur un plan d'autoroute)
-  const roundPath = (pts, r) => {
-    if(pts.length < 3) return "M" + pts.map(z => z[0].toFixed(1) + "," + z[1].toFixed(1)).join(" L");
-    let d = "M" + pts[0][0].toFixed(1) + "," + pts[0][1].toFixed(1);
-    for(let i = 1; i < pts.length - 1; i++){
-      const [ax, ay] = pts[i - 1], [bx, by] = pts[i], [cx, cy] = pts[i + 1];
-      const l1 = Math.hypot(bx - ax, by - ay) || 1, l2 = Math.hypot(cx - bx, cy - by) || 1;
-      const rr = Math.min(r, l1 / 2, l2 / 2);
-      const p1 = [bx - (bx - ax) / l1 * rr, by - (by - ay) / l1 * rr], p2 = [bx + (cx - bx) / l2 * rr, by + (cy - by) / l2 * rr];
-      d += " L" + p1[0].toFixed(1) + "," + p1[1].toFixed(1) + " Q" + bx.toFixed(1) + "," + by.toFixed(1) + " " + p2[0].toFixed(1) + "," + p2[1].toFixed(1);
-    }
-    const z = pts[pts.length - 1];
-    return d + " L" + z[0].toFixed(1) + "," + z[1].toFixed(1);
-  };
-  const RIVER_BANK = {RM:"#d77fa4", DM:"#6aa9d6"};
   const RIVER_COLOR = {RM:"#f4b6cf", DM:"#a9d8f5", CM:"#9bcfe0", YangQ:"#7fa6e8", YinQ:"#b49ae6", YangW:"#efb05c", YinW:"#e5949a", DaiM:"#b5d3a8"};
   const netColor = code => NET_COLOR[ELEMENT[code]] || RIVER_COLOR[code] || "#666";
-  const NET_DASH = {luo:"8 5", grand_luo:"8 5", distinct:"2.5 4", tendineux:"12 4 2.5 4"};
   const NET_HIDE_KEY = "mtc_trajets_net_hidden_v1";
   let NET_HIDDEN = new Set();
   try{ NET_HIDDEN = new Set(JSON.parse(localStorage.getItem(NET_HIDE_KEY) || "[]")); }catch(e){}
-  const saveHidden = () => { if(GAME) return; try{ localStorage.setItem(NET_HIDE_KEY, JSON.stringify([...NET_HIDDEN])); }catch(e){} };
-  // jeu de démêlage : les stations de quelques lignes sont mélangées, il faut les remettre à leur place
-  // (la référence est la carte corrigée : positions calculées + stations déplacées à la main)
-  let GAME = null, LAST_LAYOUT = null, ITI = null;
-  // relais d'un canal au suivant dans la circulation du qì nourricier (cours « Documentation - Les canaux
-  // réguliers », Zhōng Lì : connexions biǎo/lǐ, couples yáng à l'œil, trajets internes de la poitrine ; F → P : F 13, foie, poumon)
-  const RELAYS = [
-    {from:"P", to:"GI", path:["pt:P 7", "pt:GI 1"], txt:"de P 7 (avant-bras) à GI 1 (index)"},
-    {from:"GI", to:"E", path:["pt:GI 20", "pt:E 1"], txt:"GI 20, à l’aile du nez, où naît E"},
-    {from:"E", to:"Rt", path:["pt:E 42", "pt:Rt 1"], txt:"de E 42 (dos du pied) à Rt 1 (gros orteil)"},
-    {from:"Rt", to:"C", path:["q:estomac", "q:coeur", "pt:C 1"], txt:"de l’estomac, à travers le diaphragme, au cœur ; C émerge à C 1"},
-    {from:"C", to:"IG", path:["pt:C 9", "pt:IG 1"], txt:"de C 9 à IG 1 (auriculaire)"},
-    {from:"IG", to:"V", path:["pt:IG 18", "pt:V 1"], txt:"de la pommette (IG 18) à V 1 (angle interne de l’œil)"},
-    {from:"V", to:"Rn", path:["pt:V 67", "pt:Rn 1"], txt:"de V 67 (5e orteil) à Rn 1 (plante du pied)"},
-    {from:"Rn", to:"EC", path:["q:poumon", "q:coeur", "pt:EC 1"], txt:"du poumon au cœur, puis dans la poitrine ; EC émerge à EC 1"},
-    {from:"EC", to:"TF", path:["pt:EC 8", "pt:TF 1"], txt:"de EC 8 (paume) à TF 1 (annulaire)"},
-    {from:"TF", to:"VB", path:["pt:TF 23", "pt:VB 1"], txt:"de TF 23 (queue du sourcil) à VB 1 (angle externe de l’œil)"},
-    {from:"VB", to:"F", path:["pt:VB 41", "pt:F 1"], txt:"de VB 41 (dos du pied) à F 1 (gros orteil)"},
-    {from:"F", to:"P", path:["pt:F 13", "q:foie", "q:poumon", "pt:P 1"], txt:"de F 13, par le foie, jusqu’au poumon ; P émerge à P 1"}
-  ];
-  const netInPoly = (pt, poly) => { let ins = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; };
-  const netBasePos = pid => NET_POS[pid] ? NET_POS[pid].slice() : (NET_POS[pid.split("~")[0]] ? NET_POS[pid.split("~")[0]].slice() : null);
+  const saveHidden = () => { try{ localStorage.setItem(NET_HIDE_KEY, JSON.stringify([...NET_HIDDEN])); }catch(e){} };
+  // ancien itinéraire sur le plan de ville (retiré) : inactif, gardé en attendant une décision
+  let LAST_LAYOUT = null, ITI = null;
   const zoneQuartier = pid => ZONE_QUARTIER[pid] || ZONE_QUARTIER[pid.split("~")[0]] || null;
-  const jointOf = pid => JOINT_OF[pid] || JOINT_OF[pid.split("~")[0]] || null;
-  // plan de la ville : la tête et les pieds étirés pour aérer les points, qui y sont serrés
-  // tronc et jambes (x > 450) très élargis : c'est là que passent la plupart des lignes ; bras resserré
-  // abscisses : bras de la face antérieure (x < 450) resserré, tronc et jambes élargis, bras de la face postérieure (x > 1020) resserré
-  // (la tête, y < 250, garde l'échelle du tronc même quand elle s'étale à gauche de x = 450)
-  const netX = (x, y) => (y !== undefined && y < 250 && x < 920) ? 450 * 2.6 + (x - 450) * 7.5
-    : x < 450 ? x * 2.6 : x <= 920 ? 450 * 2.6 + (x - 450) * 7.5 : 450 * 2.6 + 470 * 7.5 + (x - 920) * 2.6;
-  // Planche anatomique à deux faces : à gauche la face antérieure (visage, thorax, abdomen, avant de la jambe, bras des
-  // canaux yīn), à droite la face postérieure (occiput, nuque, dos, lombes, sacrum, arrière de la jambe pour V, bras des
-  // canaux yáng GI, IG, TF). La tête relie les deux faces par le sommet.
-  const BACK_ZONES = new Set(["occiput", "nuque", "trapeze", "omoplate", "supraep", "infraep", "dos", "paravert", "colonne", "vertebres",
-    "lombes", "lombaires", "sacrum", "coccyx", "fesse", "anus", "o-reins"]);
-  const ARM_ZONES = new Set(["epaule", "acromion", "delto", "aisselle", "pli-axill", "membre-sup", "bras", "pli-coude", "coude", "olecrane", "avant-bras",
-    "poignet", "dos-poignet", "cun-kou", "styloide-rad", "styloide-uln", "pisiforme", "paume", "thenar", "main", "dos-main", "metacarpe",
-    "pouce", "index", "medius", "annulaire", "petit-doigt"]);
-  const LEG_ZONES = new Set(["cuisse", "membre-inf", "genou", "poplite", "jambe", "tibia", "fibula", "gastrocnemien", "malleole", "malleole-int",
-    "malleole-ext", "talon", "tendon-calc", "dos-pied", "plante", "tarse", "naviculaire", "metatarse", "hallux", "orteils", "petit-orteil", "hanche", "trochanter", "coxo"]);
-  const YANG_ARM = new Set(["GI", "IG", "TF"]);
-  const BACK_SHIFT = 110, BACK_LEG_SHIFT = 230, ARM_MIRROR = 1392;
-  // quartier « ~p » = copie sur la face postérieure (bras yáng, jambe postérieure)
-  // le pied (dos, plante, métatarse, orteils) n'existe qu'une fois, sur la face antérieure : V y rejoint les autres
-  // canaux de la jambe (V 67 au bout du 5e orteil, à côté de VB 44 et E 45) ; seuls la cuisse, le genou, la jambe,
-  // les malléoles et le talon ont une copie sur la face postérieure, où ne vont que les points de face postérieure
-  // (fiche du point) ; sans face connue (passages des textes), la jambe de V y va
-  const FOOT_ZONES = new Set(["pied", "dos-pied", "plante", "tarse", "naviculaire", "metatarse", "hallux", "orteils", "petit-orteil"]);
-  const legBack = z => LEG_ZONES.has(z) && !FOOT_ZONES.has(z);
-  const backLeg = (z, code, face) => legBack(z) && (face ? face === "postérieur" : code === "V");
-  const sideOf = (z, code, face) => ARM_ZONES.has(z) ? (YANG_ARM.has(code) ? "p" : "a") : legBack(z) ? (backLeg(z, code, face) ? "p" : "a") : BACK_ZONES.has(z) ? "p" : "a";
-  const viewPos = (z, code, face) => {
-    const b = NET_POS[z] || NET_POS[{narine:"nez", rotule:"genou", cheville:"malleole", pied:"dos-pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux"}[z]];
-    if(!b) return null;
-    if(ARM_ZONES.has(z)) return YANG_ARM.has(code) ? [ARM_MIRROR - b[0], b[1]] : b.slice();
-    if(legBack(z)) return backLeg(z, code, face) ? [b[0] + BACK_LEG_SHIFT, b[1]] : b.slice();
-    if(BACK_ZONES.has(z)) return [b[0] + BACK_SHIFT, b[1]];
-    // tête (face antérieure) : zones écartées autour de l'axe du visage, pour aérer les nombreux points
-    if(b[1] < 250) return [600 + (b[0] - 600) * HEAD_SPREAD_X, b[1] * HEAD_SPREAD_Y - (HEAD_SPREAD_Y - 1) * 250];
-    return b.slice();
-  };
-  const HEAD_SPREAD_X = -1.7, HEAD_SPREAD_Y = 1.6;   // négatif : la tête est retournée, oreilles et tempes du côté de la face postérieure
-  const netY = y => y < 260 ? y * 4.6 : 260 * 4.6 + (y - 260) * 2.6;
-  const G = 24;
-
   let view = "canal", lastCanal = null;
   function refreshNavHidden(){
     nav.querySelectorAll(".navrow").forEach(row => {
@@ -1364,39 +1189,15 @@
     });
   }
   function toggleNetCanal(code){
-    if(GAME && GAME.phase !== "setup") return;
     if(NET_HIDDEN.has(code)) NET_HIDDEN.delete(code); else NET_HIDDEN.add(code);
     saveHidden(); showNetwork();
   }
 
-  // Voronoï : cellule d'une graine, bornée par un octogone (quartiers aux formes de ville)
-  function voronoiCell(seeds, i, R){
-    const [sx, sy] = seeds[i];
-    let poly = [];
-    for(let k = 0; k < 8; k++){ const a = Math.PI / 8 + k * Math.PI / 4; poly.push([sx + Math.cos(a) * R, sy + Math.sin(a) * R]); }
-    seeds.forEach((q, j) => {
-      if(j === i || Math.hypot(q[0] - sx, q[1] - sy) > 2 * R) return;
-      const mx = (sx + q[0]) / 2, my = (sy + q[1]) / 2, nx = q[0] - sx, ny = q[1] - sy;
-      const inside = p => (p[0] - mx) * nx + (p[1] - my) * ny <= 0;
-      const out = [];
-      poly.forEach((p, k) => {
-        const n = poly[(k + 1) % poly.length], ip = inside(p), iN = inside(n);
-        if(ip) out.push(p);
-        if(ip !== iN){
-          const d1 = (p[0] - mx) * nx + (p[1] - my) * ny, d2 = (n[0] - mx) * nx + (n[1] - my) * ny, f = d1 / (d1 - d2);
-          out.push([p[0] + (n[0] - p[0]) * f, p[1] + (n[1] - p[1]) * f]);
-        }
-      });
-      poly = out;
-    });
-    return poly;
-  }
 
   // ---- Réseau global, version « schéma » : seulement les points d'intersection (tableau jiāo huì) ----
   // Une colonne verticale par canal (style des plans de trajet seuls), une rangée par point d'intersection, de la tête
   // aux pieds ; un point est une station sur la colonne de chacun de ses canaux, reliées par un trait de correspondance.
   // L'ordre des colonnes rapproche les canaux qui se croisent souvent (correspondances plus courtes).
-  let NET_MODE = "schema";
   // surbrillance des correspondances : merveilleux vaisseaux, vaisseaux luò
   let NET_HL = {mv:false, luo:false, dist:false};
   try{ Object.assign(NET_HL, JSON.parse(localStorage.getItem("mtc_trajets_net_hl") || "{}")); }catch(e){}
@@ -1423,7 +1224,6 @@
   }
   const LUO_POINTS = {"P 7":"GI", "GI 6":"P", "E 40":"Rt", "Rt 4":"E", "C 5":"IG", "IG 7":"C", "V 58":"Rn", "Rn 4":"V", "EC 6":"TF", "TF 5":"EC",
     "VB 37":"F", "F 5":"VB", "RM 15":null, "DM 1":null, "Rt 21":null};
-  try{ NET_MODE = localStorage.getItem("mtc_trajets_net_mode") || "schema"; }catch(e){}
   // les six systèmes des canaux unis (Dr Richard Tán) : canaux qui se rééquilibrent (cours « Les six systèmes des canaux unis »)
   const TAN_SYSTEMS = {
     1:{name:"grands canaux de même nom (tóng míng)", pairs:[["P", "Rt"], ["GI", "E"], ["C", "Rn"], ["IG", "V"], ["EC", "F"], ["TF", "VB"], ["DM", "RM"]]},
@@ -1793,7 +1593,6 @@
     try{ if(localStorage.getItem("mtc_trajets_net_dark") === "1") wrap.classList.add("dark"); }catch(e){}
     wrap.querySelector('[data-z="dark"]').addEventListener("click", () => { wrap.classList.toggle("dark"); try{ localStorage.setItem("mtc_trajets_net_dark", wrap.classList.contains("dark") ? "1" : ""); }catch(e){} });
     main.querySelectorAll("[data-net]").forEach(b => b.addEventListener("click", () => { if(b.dataset.net === "all") NET_HIDDEN.clear(); else data.forEach(c => NET_HIDDEN.add(c.code)); saveHidden(); showNetwork(); }));
-    bindNetMode();
     main.querySelectorAll("[data-hl]").forEach(cb => cb.addEventListener("change", () => {
       NET_HL[cb.dataset.hl] = cb.checked;
       try{ localStorage.setItem("mtc_trajets_net_hl", JSON.stringify(NET_HL)); }catch(e){}
@@ -1885,23 +1684,12 @@
     applyTan();
     window.addEventListener("resize", placeHeads);
     placeHeads();
-    bindGame(); bindIti();
+    bindIti();
     const rsb = document.getElementById("rtStartBtn"); if(rsb) rsb.addEventListener("click", rtStart);
     rtBind();
     if(RT && RT.phase === "play") main.querySelectorAll('.netline[data-code="' + RT.cur.line + '"]').forEach(l => l.classList.add("rt-curline"));
     try{ history.replaceState(null, "", RT ? "#itineraire" : "#reseau"); }catch(e){}
   }
-  function bindNetMode(){
-    main.querySelectorAll("[data-netmode]").forEach(b => b.addEventListener("click", () => {
-      const m = b.dataset.netmode === "ville" ? "ville" : "schema";
-      if(m === NET_MODE) return;
-      NET_MODE = m; NET_VB = null;
-      try{ localStorage.setItem("mtc_trajets_net_mode", m); }catch(e){}
-      showNetwork();
-    }));
-  }
-
-
   function showNetwork(){
     if(view !== "network" && current) lastCanal = current;
     view = "network";
@@ -1909,651 +1697,9 @@
     nav.querySelectorAll("button[data-code]").forEach(b => b.classList.remove("on"));
     document.getElementById("netToggle").classList.add("on");
     refreshNavHidden();
-    // seule la vue « carte de métro » schématique est proposée (plan de ville, Démêler et Itinéraire abandonnés pour l'instant)
-    showSchema(); return;
-    // 1. positions anatomiques : zones fixées à la main, points entre leurs voisins (tous les textes)
-    const pos = {}, raw = [];
-    data.forEach(c => c.sections.forEach(s => (s.branches || []).forEach(b => { const pids = b.places.filter(p => !p.startsWith("c:")); if(pids.length) raw.push(pids); })));
-    raw.forEach(pids => pids.forEach(p => { if(!pos[p]){ const q = netBasePos(p); if(q) pos[p] = q; } }));
-    for(let pass = 0; pass < 6; pass++){
-      raw.forEach(pids => pids.forEach((p, i) => {
-        if(pos[p]) return;
-        let a = i - 1; while(a >= 0 && !pos[pids[a]]) a--;
-        let z = i + 1; while(z < pids.length && !pos[pids[z]]) z++;
-        const A = a >= 0 ? pos[pids[a]] : null, Z = z < pids.length ? pos[pids[z]] : null;
-        if(A && Z){ const f = (i - a) / (z - a); pos[p] = [A[0] + (Z[0] - A[0]) * f, A[1] + (Z[1] - A[1]) * f]; }
-        else if(pass >= 3 && (A || Z)){ const B = A || Z, dd = A ? i - a : i - z; pos[p] = [B[0] + 5 * dd, B[1] + 12 * dd]; }
-      }));
-    }
-    // points de la ligne externe non cités : entre leurs voisins de numérotation
-    const mainNodes = {};
-    Object.entries(MAIN_SEG).forEach(([code, segs]) => { mainNodes[code] = segs.map(seg => seg.map(n => "pt:" + code + " " + n)); });
-    for(let pass = 0; pass < 3; pass++){
-      Object.values(mainNodes).forEach(segs => segs.forEach(seq => {
-        seq.forEach((p, i) => {
-          if(pos[p]) return;
-          let a = i - 1; while(a >= 0 && !pos[seq[a]]) a--;
-          let z = i + 1; while(z < seq.length && !pos[seq[z]]) z++;
-          const A = a >= 0 ? pos[seq[a]] : null, Z = z < seq.length ? pos[seq[z]] : null;
-          if(A && Z){ const f = (i - a) / (z - a); pos[p] = [A[0] + (Z[0] - A[0]) * f, A[1] + (Z[1] - A[1]) * f]; }
-          else if(pass === 2 && (A || Z)){ const B = A || Z, dd = A ? i - a : i - z; pos[p] = [B[0] + 3 * dd, B[1] + 8 * dd]; }
-        });
-      }));
-    }
-    // localisation des fiches : chaque ligne externe avance quartier par quartier, dans l'ordre des points ;
-    // aux membres, la face (interne, antérieure, externe, postérieure) donne la bande du sous-quartier
-    const FACE_OFF = {"interne":-15, "antérieur":-5, "externe":5, "postérieur":15};
-    const manualZone = edits.pointZone || {};
-    const zoneOfPt = p => { const d = POINT_ZONE_DATA[p.slice(3)]; return d ? d.zone : null; };
-    const anchorOf = z => { if(!z) return null; if(NET_POS[z]) return NET_POS[z]; const base = {narine:"nez", rotule:"genou", cheville:"malleole", pied:"dos-pied", femur:"cuisse", coccyx:"sacrum", pupille:"yeux"}[z]; return base ? NET_POS[base] : null; };
-    Object.values(mainNodes).forEach(segs => segs.forEach(seq => {
-      const runs = [];
-      seq.forEach(p => {
-        const z = zoneOfPt(p), A = anchorOf(z);
-        if(!A) return;
-        const d = POINT_ZONE_DATA[p.slice(3)] || {};
-        const arm = A[0] < 450, off = FACE_OFF[d.face] || 0;
-        const Af = arm ? [A[0], A[1] + off] : (A[1] > 640 ? [A[0] + off * 0.6, A[1]] : A);
-        if(runs.length && runs[runs.length - 1].z === z) runs[runs.length - 1].pts.push(p);
-        else runs.push({z, A:Af, pts:[p]});
-      });
-      runs.forEach((r, k) => {
-        const B = runs[k + 1] ? runs[k + 1].A : null;
-        r.pts.forEach((p, j) => {
-          if(manualZone[p]) return;
-          const f = B ? j / r.pts.length : 0;
-          pos[p] = B ? [r.A[0] + (B[0] - r.A[0]) * f * 0.85, r.A[1] + (B[1] - r.A[1]) * f * 0.85] : [r.A[0] + j * 1.5, r.A[1] + j * 5];
-        });
-      });
-    }));
-    Object.keys(JIAOHUI).forEach(k => {
-      const pid = "pt:" + k;
-      if(pos[pid]) return;
-      const m = /^(\S+) (\d+)$/.exec(k);
-      let best = null;
-      Object.keys(pos).forEach(q => { const n = /^pt:(\S+) (\d+)$/.exec(q); if(n && n[1] === m[1] && (!best || Math.abs(n[2] - m[2]) < best[0])) best = [Math.abs(n[2] - m[2]), q]; });
-      if(best) pos[pid] = [pos[best[1]][0] + 4, pos[best[1]][1] + 6];
-    });
-    // quartiers : graine = centre des zones qui le composent
-    const qSeed = {};
-    Object.entries(ZONE_QUARTIER).forEach(([z, q]) => {
-      if(!NET_POS[z]) return;
-      const add = (qid, v) => { (qSeed[qid] = qSeed[qid] || []).push([netX(v[0], v[1]), netY(v[1])]); };
-      if(ARM_ZONES.has(z)){ add(q, viewPos(z, "P")); add(q + "~p", viewPos(z, "GI")); }
-      else if(legBack(z)){ add(q, viewPos(z, "E")); add(q + "~p", viewPos(z, "V")); }
-      else add(q, viewPos(z, ""));
-    });
-    Object.keys(qSeed).forEach(q => { const l = qSeed[q]; qSeed[q] = [l.reduce((s, p) => s + p[0], 0) / l.length, l.reduce((s, p) => s + p[1], 0) / l.length]; });
-    const jointPos = {};
-    Object.keys(JOINTS).forEach(j => {
-      if(!NET_POS[j]) return;
-      const put = (id, v) => { jointPos[id] = [Math.round(netX(v[0]) / G) * G, Math.round(netY(v[1]) / G) * G]; };
-      if(ARM_ZONES.has(j)){ put(j, viewPos(j, "P")); put(j + "~p", viewPos(j, "GI")); }
-      else if(legBack(j)){ put(j, viewPos(j, "E")); put(j + "~p", viewPos(j, "V")); }
-      else put(j, viewPos(j, ""));
-    });
-    // 2. lignes
-    const visible = [];
-    data.forEach(c => c.sections.forEach((s, si) => { if(typeShown(s) && s.branches && s.branches.length && !NET_HIDDEN.has(c.code)) visible.push({c, s, si}); }));
-    const lines = [];
-    const dist = (A, B) => Math.hypot(A[0] - B[0], A[1] - B[1]);
-    const P = n => n.startsWith("j:") ? NET_POS[n.slice(2)] : pos[n];
-    visible.forEach(({c, s}) => {
-      // ligne externe : tous les points du canal (fleuve pour RM et DM)
-      if(s.type === "principal" && mainNodes[c.code] && TYPES_ON.externe !== false){
-        const segs = mainNodes[c.code].map(seq => seq.filter(p => pos[p]).slice());
-        // points d'autres canaux traversés (tableau d'intersection, texte) insérés à leur place
-        const cands = new Set();
-        Object.entries(JIAOHUI).forEach(([k, v]) => { if((v.canaux || []).includes(c.code) && !k.startsWith(c.code + " ")) cands.add("pt:" + k); });
-        s.branches.forEach(b => { if(!b.interne) b.places.forEach(p => { if(p.startsWith("pt:") && !p.startsWith("pt:" + c.code + " ")) cands.add(p); }); });
-        // ordre du texte d'abord : le point d'un autre canal se place juste avant le point du canal qui le suit dans la phrase
-        const placedByText = new Set();
-        s.branches.forEach(b => {
-          if(b.interne) return;
-          b.places.forEach((X, i) => {
-            if(!X.startsWith("pt:") || X.startsWith("pt:" + c.code + " ") || !pos[X] || placedByText.has(X)) return;
-            const after = b.places.slice(i + 1).find(q => q.startsWith("pt:" + c.code + " "));
-            const before = b.places.slice(0, i).reverse().find(q => q.startsWith("pt:" + c.code + " "));
-            for(const seq of segs){
-              if(seq.includes(X)){ placedByText.add(X); return; }
-              if(after && seq.includes(after)){ seq.splice(seq.indexOf(after), 0, X); placedByText.add(X); return; }
-              if(before && seq.includes(before)){ seq.splice(seq.indexOf(before) + 1, 0, X); placedByText.add(X); return; }
-            }
-          });
-        });
-        cands.forEach(X => {
-          if(!pos[X] || placedByText.has(X)) return;
-          let best = null;
-          segs.forEach(seq => {
-            for(let i = 0; i < seq.length - 1; i++){ const cost = dist(P(seq[i]), pos[X]) + dist(pos[X], P(seq[i + 1])) - dist(P(seq[i]), P(seq[i + 1])); if(!best || cost < best[0]) best = [cost, seq, i + 1]; }
-            if(seq.length){
-              const c0 = dist(pos[X], P(seq[0])), c1 = dist(pos[X], P(seq[seq.length - 1]));
-              if(!best || c0 < best[0]) best = [c0, seq, 0];
-              if(!best || c1 < best[0]) best = [c1, seq, seq.length];
-            }
-          });
-          if(best && best[0] < 140) best[1].splice(best[2], 0, X);
-        });
-        segs.forEach(seq => { if(seq.length >= 2) lines.push({c, s, main:true, nodes:seq}); });
-      }
-      // autres trajets : branches internes, annexes, luo, distinct, tendineux, merveilleux vaisseaux
-      s.branches.forEach(b => {
-        if(!branchShown(s, b)) return;
-        const pids = b.places.filter(p => !p.startsWith("c:"));
-        if(s.type === "principal" && mainNodes[c.code] && !b.interne && TYPES_ON.externe !== false &&
-          (pids.filter(p => p.startsWith("pt:" + c.code + " ")).length >= 2 || !b.places.some(p => (p.startsWith("pt:") && !p.startsWith("pt:" + c.code + " ")) || p.startsWith("c:")))) return;
-        const nodes = [];
-        pids.forEach(p => {
-          if(p.startsWith("pt:")){ if(pos[p]) nodes.push(p); return; }
-          const q = zoneQuartier(p);
-          const qq = sideOf(p.split("~")[0], c.code) === "p" && qSeed[q + "~p"] ? q + "~p" : q;
-          if(qq && qSeed[qq]) nodes.push("w:" + qq + "|" + c.code);
-        });
-        const clean = nodes.filter((n, i) => n !== nodes[i - 1]);
-        if(clean.length >= 2) lines.push({c, s, main:false, interne:!!b.interne, nodes:clean});
-      });
-    });
-    // 3. stations : chaque canal suit une courbe continue qui passe, dans l'ordre, par la zone (et la face)
-    //    de ses points d'après leur fiche ; ses stations sont réparties régulièrement sur cette courbe.
-    //    Chaque canal a son couloir (décalage latéral) : les lignes d'une même zone restent côte à côte.
-    const canalsAt = {};
-    const vesselOnly = c => RIVER.has(c) && c !== "RM" && c !== "DM";
-    lines.forEach(l => l.nodes.forEach(n => { if(n.startsWith("pt:")) (canalsAt[n] = canalsAt[n] || new Set()).add(l.c.code); }));
-    const stationsList = Object.keys(canalsAt).sort((a, b) => canalsAt[b].size - canalsAt[a].size);
-    const isStation = n => [...(canalsAt[n] || [])].some(c => !vesselOnly(c));
-    const cell = {}, manual = GAME && (GAME.phase === "play" || GAME.phase === "solved") ? GAME.pos : (edits.stationPos || {});
-    const LANE_X = 20, LANE_Y = 15, MIN_GAP = 24;
-    Object.entries(mainNodes).forEach(([code, segs]) => segs.forEach(seq => {
-      const runs = [];
-      seq.forEach(p => {
-        const d = POINT_ZONE_DATA[p.slice(3)] || {};
-        const z = zoneOfPt(p), A = viewPos(z, code, d.face);
-        if(!A) return;
-        const arm = ARM_ZONES.has(z), off = FACE_OFF[d.face] || 0;
-        const Aa = arm ? [A[0], A[1] + off] : (A[1] > 640 ? [A[0] + off * 0.6, A[1]] : A);
-        const lane = LANE[code] || 0;
-        const S = arm ? [netX(Aa[0], Aa[1]), netY(Aa[1]) + lane * LANE_Y] : [netX(Aa[0], Aa[1]) + lane * LANE_X, netY(Aa[1])];
-        if(runs.length && runs[runs.length - 1].z === z) runs[runs.length - 1].pts.push(p);
-        else runs.push({z, S, pts:[p]});
-      });
-      const K = runs.length;
-      runs.forEach((r, k) => {
-        const n = r.pts.length;
-        const lo = k === 0 ? 0 : k - 0.45, hi = k === K - 1 ? K - 1 : k + 0.45;
-        r.pts.forEach((pt, j) => {
-          if(manual[pt]){ cell[pt] = manual[pt].slice(); return; }
-          if(K === 1){ cell[pt] = [r.S[0], r.S[1] + (j - (n - 1) / 2) * 28]; return; }
-          const u = n === 1 ? Math.min(Math.max(k, lo), hi) : lo + (hi - lo) * j / (n - 1);
-          const i0 = Math.floor(u), i1 = Math.min(K - 1, i0 + 1), f = u - i0, A = runs[i0].S, B = runs[i1].S;
-          cell[pt] = [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f];
-        });
-      });
-    }));
-    // points sans ligne externe affichée (ex. seulement cités par un luo) : position anatomique
-    stationsList.forEach(pt => { if(!cell[pt] && pos[pt]) cell[pt] = manual[pt] ? manual[pt].slice() : [netX(pos[pt][0]), netY(pos[pt][1])]; });
-    // chaque station reste dans le quartier de sa zone (fiche du point) : le couloir de sa ligne ou le passage
-    // d'une face à l'autre ne doit pas la pousser chez le voisin (ex. V 67 dans « Talon » au lieu d'« Orteils »)
-    const qSeedIds = Object.keys(qSeed);
-    const nearestQ = v => { let best = null, bd = Infinity; qSeedIds.forEach(q => { const s = qSeed[q], d = (s[0] - v[0]) ** 2 + (s[1] - v[1]) ** 2; if(d < bd){ bd = d; best = q; } }); return best; };
-    const homeQ = p => {
-      const z = zoneOfPt(p), q = z && ZONE_QUARTIER[z];
-      if(!q) return null;
-      return sideOf(z, p.slice(3).split(" ")[0], (POINT_ZONE_DATA[p.slice(3)] || {}).face) === "p" && qSeed[q + "~p"] ? q + "~p" : (qSeed[q] ? q : null);
-    };
-    const keepHome = () => Object.keys(cell).forEach(p => {
-      if(manual[p] || !p.startsWith("pt:")) return;
-      const q = homeQ(p);
-      if(!q) return;
-      const v = cell[p], s = qSeed[q];
-      for(let k = 0; k < 16 && nearestQ(v) !== q; k++){ v[0] += (s[0] - v[0]) * 0.2; v[1] += (s[1] - v[1]) * 0.2; }
-    });
-    keepHome();
-    // écartement : deux stations différentes ne se superposent jamais (sauf position posée à la main)
-    const ids = Object.keys(cell);
-    for(let it = 0; it < 60; it++){
-      const grid = {}, keyOf = q => Math.floor(q[0] / MIN_GAP) + "," + Math.floor(q[1] / MIN_GAP);
-      ids.forEach(id => { (grid[keyOf(cell[id])] = grid[keyOf(cell[id])] || []).push(id); });
-      let moved = false;
-      ids.forEach((id, ii) => {
-        const [gx, gy] = keyOf(cell[id]).split(",").map(Number);
-        for(let dx = -1; dx <= 1; dx++) for(let dy = -1; dy <= 1; dy++){
-          (grid[(gx + dx) + "," + (gy + dy)] || []).forEach(o => {
-            if(o <= id) return;
-            const A = cell[id], B = cell[o];
-            let vx = B[0] - A[0], vy = B[1] - A[1], d = Math.hypot(vx, vy);
-            if(d >= MIN_GAP) return;
-            if(d < 0.01){ const ang = (ii * 2.399) % (2 * Math.PI); vx = Math.cos(ang); vy = Math.sin(ang); d = 1; }
-            const push = (MIN_GAP - d) / 2 + 0.2, ux = vx / d, uy = vy / d;
-            const fa = manual[id] ? 0 : (manual[o] ? 2 : 1), fb = manual[o] ? 0 : (manual[id] ? 2 : 1);
-            A[0] -= ux * push * fa; A[1] -= uy * push * fa; B[0] += ux * push * fb; B[1] += uy * push * fb;
-            moved = true;
-          });
-        }
-      });
-      if(!moved) break;
-    }
-    keepHome();
-    LAST_LAYOUT = {cell:JSON.parse(JSON.stringify(cell)), lines:lines.map(l => ({code:l.c.code, type:l.s.type, interne:!!l.interne, name:sectionName(l.c, l.s) + (l.interne ? " (branche interne)" : ""), nodes:l.nodes.slice()}))};
-    const nodePos = n => {
-      if(cell[n]) return cell[n];
-      if(n.startsWith("j:")) return jointPos[n.slice(2)];
-      if(n.startsWith("w:")){
-        const [q, code] = n.slice(2).split("|"), k = CANAL_ORDER.indexOf(code);
-        const s0 = qSeed[q];
-        return [Math.round((s0[0] + ((k % 5) - 2) * 14) / 2) * 2, Math.round((s0[1] + ((Math.floor(k / 5) % 4) - 1.5) * 14) / 2) * 2];
-      }
-      return null;
-    };
-    // 4. tracés : droits ou à 45°, lignes côte à côte sur les tronçons partagés
-    const edgeKey = (a, b) => a < b ? a + "§" + b : b + "§" + a;
-    const edges = {};
-    lines.forEach((l, li) => l.nodes.forEach((n, i) => { if(i){ const k = edgeKey(l.nodes[i - 1], n); (edges[k] = edges[k] || []); if(!edges[k].includes(li)) edges[k].push(li); } }));
-    Object.values(edges).forEach(list => list.sort((a, b) => (CANAL_ORDER.indexOf(lines[a].c.code) - CANAL_ORDER.indexOf(lines[b].c.code)) || (TYPE_ORDER.indexOf(lines[a].s.type) - TYPE_ORDER.indexOf(lines[b].s.type))));
-    // un tronçon ne doit jamais passer sur la station d'une autre ligne (sinon on croirait à une correspondance)
-    const stationCells = Object.values(cell);
-    const segDist = (p, a, b) => { const vx = b[0] - a[0], vy = b[1] - a[1], L = vx * vx + vy * vy || 1; const u = Math.max(0, Math.min(1, ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / L)); return Math.hypot(a[0] + u * vx - p[0], a[1] + u * vy - p[1]); };
-    const collides = (pts, ends) => stationCells.some(c => !ends.some(e => e[0] === c[0] && e[1] === c[1]) && pts.slice(1).some((q, i) => segDist(c, pts[i], q) < 7));
-    const routeCache = {};
-    const route = k => {
-      if(routeCache[k]) return routeCache[k];
-      const [a, b] = k.split("§"), A = nodePos(a), B = nodePos(b), [x1, y1] = A, [x2, y2] = B;
-      const dx = x2 - x1, dy = y2 - y1, adx = Math.abs(dx), ady = Math.abs(dy), ends = [A, B];
-      const cands = [];
-      cands.push([[x1, y1], [x2, y2]]);
-      if(adx >= 1 && ady >= 1 && Math.abs(adx - ady) >= 1){
-        const dg = Math.min(adx, ady);
-        const m1 = ady > adx ? [x1, y1 + Math.sign(dy) * (ady - dg)] : [x1 + Math.sign(dx) * (adx - dg), y1];   // droit puis 45°
-        const m2 = ady > adx ? [x2, y2 - Math.sign(dy) * (ady - dg)] : [x2 - Math.sign(dx) * (adx - dg), y2];   // 45° puis droit
-        cands.push([[x1, y1], m1, [x2, y2]], [[x1, y1], m2, [x2, y2]]);
-      }
-      // détours d'une demi-case de part et d'autre
-      const h = G / 2, L = Math.hypot(dx, dy) || 1, nx = -dy / L * h, ny = dx / L * h;
-      [1, -1, 2, -2].forEach(s => cands.push([[x1, y1], [x1 + dx * 0.2 + nx * s, y1 + dy * 0.2 + ny * s], [x1 + dx * 0.8 + nx * s, y1 + dy * 0.8 + ny * s], [x2, y2]]));
-      return (routeCache[k] = cands.find(c => !collides(c, ends)) || cands[0]);
-    };
-    const offsetPath = (pts, o) => {
-      if(!o) return pts;
-      const nrm = [];
-      for(let i = 0; i < pts.length - 1; i++){
-        const ux = pts[i + 1][0] - pts[i][0], uy = pts[i + 1][1] - pts[i][1], L = Math.hypot(ux, uy) || 1;
-        nrm.push([-uy / L, ux / L]);
-      }
-      return pts.map((q, i) => {
-        if(i === 0) return [q[0] + nrm[0][0] * o, q[1] + nrm[0][1] * o];
-        if(i === pts.length - 1) return [q[0] + nrm[i - 1][0] * o, q[1] + nrm[i - 1][1] * o];
-        const n1 = nrm[i - 1], n2 = nrm[i], dot = n1[0] * n2[0] + n1[1] * n2[1], f = o / (1 + dot);
-        return [q[0] + (n1[0] + n2[0]) * f, q[1] + (n1[1] + n2[1]) * f];
-      });
-    };
-    const GAP = 4.2;
-    let rivers = "", svgLines = "", badges = "", riverNames = "", shuttles = "";
-    const riverPts = {};
-    const badgeAt = {};
-    lines.forEach((l, li) => {
-      const code = l.c.code, river = RIVER.has(code), col = netColor(code), metal = ELEMENT[code] === "metal";
-      let d = "";
-      l.nodes.forEach((n, i) => {
-        if(!i) return;
-        const from = l.nodes[i - 1], k = edgeKey(from, n), list = edges[k];
-        const o = river ? 0 : (list.filter(x => !RIVER.has(lines[x].c.code)).indexOf(li) - (list.filter(x => !RIVER.has(lines[x].c.code)).length - 1) / 2) * GAP;
-        let q = offsetPath(route(k), o);
-        if(from > n) q = q.slice().reverse();
-        d += " " + roundPath(q, 16);
-      });
-      if(!d) return;
-      const title = "<title>" + esc(sectionName(l.c, l.s)) + "</title>";
-      if(river){
-        // cours d'eau continu (pour y écrire son nom)
-        const pts = [];
-        l.nodes.forEach((n, i) => { if(!i) return; let q = route(edgeKey(l.nodes[i - 1], n)); if(l.nodes[i - 1] > n) q = q.slice().reverse(); q.forEach((z, j) => { if(!(pts.length && j === 0)) pts.push(z); }); });
-        d = roundPath(pts, 30);
-        const rid = "rv-" + li, nm = esc(l.c.name.replace(/\s*\(.*$/, "").replace(/ — .*/, ""));
-        riverNames += '<path id="' + rid + '" d="' + d + '" fill="none" stroke="none"/>' +
-          [8, 45, 82].map(o => '<text class="rivername' + (code === "RM" ? " big rm" : code === "DM" ? " big" : "") + '" dy="-' + (code === "RM" || code === "DM" ? 11 : 7) + '"><textPath href="#' + rid + '" startOffset="' + o + '%">' + nm + "</textPath></text>").join("");
-        if(code !== "RM" && code !== "DM"){
-          // navette sur le cours d'eau
-          shuttles += '<path d="' + d + '" fill="none" stroke="#1f4e79" stroke-width="1.3" stroke-dasharray="6 5" opacity=".8"/>';
-          riverPts[code] = (riverPts[code] || []).concat(pts);
-        }else riverPts[code] = (riverPts[code] || []).concat(pts);
-      }
-      if(river){
-        // fleuve (RM, DM) et rivières (merveilleux vaisseaux) : berges, eau, reflet
-        const w = code === "RM" || code === "DM" ? 16 : 9;
-        rivers += '<path d="' + d + '" fill="none" stroke="' + (RIVER_BANK[code] || "#5f95c6") + '" stroke-width="' + (w + 3) + '" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>' +
-          '<path class="netline river" data-code="' + code + '" d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round">' + title + "</path>" +
-          '<path d="' + d + '" fill="none" stroke="#dff0fb" stroke-width="1.4" stroke-dasharray="14 18" stroke-linecap="round" opacity=".9"/>';
-      }else{
-        const dash = NET_DASH[l.s.type] ? ' stroke-dasharray="' + NET_DASH[l.s.type] + '"' : "";
-        const wdt = l.interne ? 1.8 : 3.4;
-        // liseré couleur du fond : là où une ligne passe par-dessus une autre sans correspondance, celle du dessous
-        // s'interrompt (effet de pont)
-        svgLines += '<path class="casing" d="' + d + '" fill="none" stroke-width="' + (wdt + (metal ? 4.4 : 2.2)) + '" stroke-linecap="butt" stroke-linejoin="round"/>';
-        if(metal) svgLines += '<path d="' + d + '" fill="none" stroke="#1d1d1f" stroke-width="' + (wdt + 2.2) + '" stroke-linecap="round" stroke-linejoin="round"' + dash + "/>";
-        svgLines += '<path class="netline" data-code="' + code + '" d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + wdt + '" stroke-linecap="round" stroke-linejoin="round"' + dash + (l.interne ? ' opacity=".65"' : "") + ">" + title + "</path>";
-      }
-
-    });
-    Object.entries(MAIN_SEG).forEach(([code, segs]) => {
-      if(!lines.some(l => l.main && l.c.code === code)) return;
-      const nums = segs.flat(), ends = ["pt:" + code + " " + Math.min(...nums), "pt:" + code + " " + Math.max(...nums)];
-      const col = RIVER.has(code) ? "#3f79ad" : netColor(code), metal = ELEMENT[code] === "metal";
-      ends.forEach(e => {
-        const P = cell[e]; if(!P) return;
-        const tag = sigle(code), w = 8 + tag.length * 7.5;
-        badges += '<g class="terminus"><title>Terminus de la ligne ' + esc(tag) + "</title>" +
-          '<rect x="' + (P[0] - w - 10).toFixed(1) + '" y="' + (P[1] - 9) + '" width="' + w.toFixed(1) + '" height="18" rx="4" fill="' + (metal ? "#fff" : col) + '" stroke="' + (metal ? "#1d1d1f" : col) + '" stroke-width="1.6"/>' +
-          '<text x="' + (P[0] - w / 2 - 10).toFixed(1) + '" y="' + (P[1] + 4) + '" text-anchor="middle" fill="' + (metal ? "#1d1d1f" : "#fff") + '">' + esc(tag) + "</text></g>";
-      });
-    });
-    // relais entre canaux : trait neutre en pointillé, flèche dans le sens de la circulation ; aux bras (deux faces
-    // éloignées), une amorce avec renvoi plutôt qu'un trait à travers tout le plan
-    let relaysSvg = "";
-    const relayPos = n => n.startsWith("q:") ? qSeed[n.slice(2)] : cell[n];
-    const mainShown = code => lines.some(l => l.main && l.c.code === code);
-    LAST_LAYOUT.relays = [];
-    RELAYS.forEach(r => {
-      if(!mainShown(r.from) || !mainShown(r.to)) return;
-      const pts = r.path.map(relayPos);
-      if(pts.some(q => !q)) return;
-      const ends = r.path.filter(n => n.startsWith("pt:"));
-      if(ends.length === 2 && r.path[0].startsWith("pt:")) LAST_LAYOUT.relays.push({a:ends[0], b:ends[1], from:r.from, to:r.to});
-      else if(ends.length === 2) LAST_LAYOUT.relays.push({a:ends[0], b:ends[1], from:r.from, to:r.to});
-      const title = "<title>Relais " + esc(sigle(r.from)) + " → " + esc(sigle(r.to)) + " : " + esc(r.txt) + "</title>";
-      const A = pts[0], B = pts[pts.length - 1];
-      const arrow = (P, Q) => { const ang = Math.atan2(Q[1] - P[1], Q[0] - P[0]) * 180 / Math.PI, m = [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2];
-        return '<path class="relayarrow" d="M-6,-5 L5,0 L-6,5" transform="translate(' + m[0].toFixed(1) + "," + m[1].toFixed(1) + ") rotate(" + ang.toFixed(0) + ')"/>'; };
-      if(pts.length === 2 && Math.hypot(B[0] - A[0], B[1] - A[1]) > 900){
-        [[A, "→ " + r.path[1].slice(3), 1], [B, "← " + r.path[0].slice(3), -1]].forEach(([P, lab, dir]) => {
-          const E = [P[0], P[1] + 54];
-          relaysSvg += '<g class="relay">' + title + '<path d="M' + P[0].toFixed(1) + "," + P[1].toFixed(1) + " L" + E[0].toFixed(1) + "," + E[1].toFixed(1) + '"/>' +
-            arrow(dir > 0 ? P : E, dir > 0 ? E : P) +
-            '<text x="' + E[0].toFixed(1) + '" y="' + (E[1] + 13).toFixed(1) + '" text-anchor="middle">relais ' + esc(lab) + "</text></g>";
-        });
-      }else{
-        relaysSvg += '<g class="relay">' + title + '<path d="' + roundPath(pts, 20) + '"/>' + pts.slice(1).map((Q, i) => arrow(pts[i], Q)).join("") + "</g>";
-      }
-    });
-    // itinéraire en cours : trajet du joueur (jaune) et solution (pointillé)
-    let itiSvg = "";
-    if(ITI && ITI.a && cell[ITI.a] && cell[ITI.b]){
-      const poly = (ids, cls) => { const q = ids.map(n => cell[n]).filter(Boolean); return q.length > 1 ? '<path class="' + cls + '" d="M' + q.map(v => v[0].toFixed(1) + "," + v[1].toFixed(1)).join(" L") + '"/>' : ""; };
-      if(ITI.sol) itiSvg += poly(ITI.sol, "itisol");
-      itiSvg += poly(ITI.path, "itipath");
-      [[ITI.a, "Départ", "itistart"], [ITI.b, "Arrivée", "itiend"]].forEach(([n, lab, cls]) => {
-        const [x, y] = cell[n];
-        itiSvg += '<g class="itimark ' + cls + '"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="20"/><text x="' + x.toFixed(1) + '" y="' + (y - 26).toFixed(1) + '" text-anchor="middle">' + lab + "</text></g>";
-      });
-      ITI.path.slice(1, -1).forEach(n => { if(cell[n]){ const [x, y] = cell[n]; itiSvg += '<circle class="itistep" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="13"/>'; } });
-    }
-    // embarcadères : point d'ouverture de chaque merveilleux vaisseau, relié à son cours d'eau
-    let piers = "";
-    Object.entries(OPENING).forEach(([code, pt]) => {
-      const st = cell["pt:" + pt], rp = riverPts[code];
-      if(!st || !rp || !rp.length || !isStation("pt:" + pt)) return;
-      let best = rp[0];
-      rp.forEach(q => { if(Math.hypot(q[0] - st[0], q[1] - st[1]) < Math.hypot(best[0] - st[0], best[1] - st[1])) best = q; });
-      piers += '<g class="pier"><title>Embarcadère : point d’ouverture du ' + esc(sectionName(data.find(c => c.code === code), {type:"vaisseau"})) + "</title>" +
-        (Math.hypot(best[0] - st[0], best[1] - st[1]) < 260 ? '<path d="M' + st[0] + "," + st[1] + " L" + best[0].toFixed(1) + "," + best[1].toFixed(1) + '" stroke="#1f4e79" stroke-width="1.6" stroke-dasharray="3 3" fill="none"/>' : "") +
-        '<text class="anchor" x="' + (st[0] - 16) + '" y="' + (st[1] + 16) + '">⚓\uFE0E ' + esc(sigle(code)) + "</text></g>";
-    });
-    // 5. la ville : quartiers (zones du corps), centre-ville = organes, banlieue = extrémités
-    const qIds = Object.keys(qSeed), seeds = qIds.map(q => qSeed[q]);
-    LAST_LAYOUT.qcells = qIds.map((q, i) => ({q, poly:voronoiCell(seeds, i, 380)}));
-    let city = "";
-    qIds.forEach((q, i) => {
-      const poly = voronoiCell(seeds, i, 380);
-      if(poly.length < 3) return;
-      const qb = q.replace("~p", "");
-      const fill = DOWNTOWN.has(qb) ? "#f1d6c8" : SUBURB.has(qb) ? "#dcebd2" : QUARTIER_COLORS[i % QUARTIER_COLORS.length];
-      const pts = poly.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
-      city += '<polygon class="qcell" points="' + pts + '" fill="' + fill + '"/><polygon points="' + pts + '" fill="url(#streets)"/>' +
-        '<polygon class="qborder" points="' + pts + '" fill="none"/>';
-    });
-    let subq = "";
-    Object.entries(FACE_OFF).forEach(([face, off]) => {
-      const lab = face.charAt(0).toUpperCase() + face.slice(1);
-      const ay = netY(334 + off);
-      [[netX(30), netX(440)], [netX(ARM_MIRROR - 440), netX(ARM_MIRROR - 30)]].forEach(([x0, x1], k) => {
-        subq += '<g class="subq"><rect x="' + x0.toFixed(0) + '" y="' + (ay - 12).toFixed(0) + '" width="' + (x1 - x0).toFixed(0) + '" height="24" rx="12"/><text x="' + (k ? x1 - 8 : x0 + 8).toFixed(0) + '" y="' + (ay + 4).toFixed(0) + '"' + (k ? ' text-anchor="end"' : "") + ">" + lab + "</text></g>";
-      });
-      [0, BACK_LEG_SHIFT].forEach(sh => {
-        const lx = netX(622 + sh + off * 0.6), y0 = netY(700), y1 = netY(1440);
-        subq += '<g class="subq"><rect x="' + (lx - 14).toFixed(0) + '" y="' + y0.toFixed(0) + '" width="28" height="' + (y1 - y0).toFixed(0) + '" rx="14"/><text x="' + lx.toFixed(0) + '" y="' + (y1 + 18).toFixed(0) + '" text-anchor="middle">' + lab + "</text></g>";
-      });
-    });
-    let qLabels = "";
-    [["FACE ANTÉRIEURE", 600], ["FACE POSTÉRIEURE", 600 + BACK_SHIFT + 40]].forEach(([lab, x]) => {
-      qLabels += '<text class="facelabel" x="' + netX(x).toFixed(0) + '" y="' + (Math.min(...Object.values(qSeed).map(s => s[1])) - 260).toFixed(0) + '" text-anchor="middle">' + lab + "</text>";
-    });
-    qIds.forEach(q => { const [x, y] = qSeed[q]; qLabels += '<text class="qlabel' + (DOWNTOWN.has(q) ? " downtown" : "") + '" x="' + x.toFixed(0) + '" y="' + (y - 30).toFixed(0) + '" text-anchor="middle">' + esc(QUARTIER_LABEL[q.replace("~p", "")] || q) + "</text>"; });
-    // 6. articulations (grands carrefours) et stations
-    let joints = "";
-    Object.entries(jointPos).forEach(([j, [x, y]]) => {
-      joints += '<g class="netjoint"><circle cx="' + x + '" cy="' + y + '" r="150" fill="#ffffff" fill-opacity=".22" stroke="#b8b1a0" stroke-width="2" stroke-dasharray="10 8"/>' +
-        '<text x="' + x + '" y="' + (y - 158) + '" text-anchor="middle">' + JOINTS[j.replace("~p", "")] + "</text></g>";
-    });
-    let stations = "";
-    stationsList.forEach(p => {
-      if(!isStation(p)) return;
-      const [x, y] = cell[p], n = [...canalsAt[p]].filter(c => !vesselOnly(c)).length, jh = !!JIAOHUI[p.slice(3)];
-      const cats = POINT_CATS[p] || [];
-      const gcls = GAME && GAME.checked && GAME.checked[p] ? " g-" + GAME.checked[p] : "";
-      const glyphs = [...new Set(cats.map(k => k.cat))].map(k => CAT_GLYPH[k]).join("");
-      const label = (glyphs ? '<tspan class="cat">' + glyphs + " </tspan>" : "") + esc((PLACES[p] || {label:p.slice(3)}).label) +
-        (cats.length ? "<title>" + esc(cats.map(k => k.name).join(", ")) + "</title>" : "");
-      if(n >= 2 || (jh && (JIAOHUI[p.slice(3)].canaux || []).length >= 2)){
-        stations += '<g class="node netstop' + gcls + '" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="' + (6 + Math.min(5, n)) + '" fill="#fff" stroke="#1d1d1f" stroke-width="3"/>' +
-          '<text x="' + (x + 9 + Math.min(5, n)) + '" y="' + (y - 7) + '">' + label + "</text></g>";
-      }else{
-        stations += '<g class="node netstop single' + gcls + '" data-pid="' + esc(p) + '"><circle cx="' + x + '" cy="' + y + '" r="3.6" fill="#fff" stroke="#333" stroke-width="1.6"/>' +
-          '<text class="small" x="' + (x + 6) + '" y="' + (y - 4) + '">' + label + "</text></g>";
-      }
-    });
-    if(GAME && GAME.hint && GAME.ref[GAME.hint]){
-      const [hx, hy] = GAME.ref[GAME.hint];
-      stations += '<circle class="ghint" cx="' + hx.toFixed(1) + '" cy="' + hy.toFixed(1) + '" r="18"/>';
-    }
-    if(GAME) GAME.cross = gameCrossings(LAST_LAYOUT.lines.map(l => l.nodes), cell);
-    const legend = '<div class="legend netlegend">' +
-      '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3.4"/></svg>canal régulier (branches externes)</span>' +
-      '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="1.8" opacity=".65"/></svg>branche interne</span>' +
-      '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="8 5"/></svg>luo</span>' +
-      '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="2.5 4"/></svg>distinct</span>' +
-      '<span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" stroke="#555" stroke-width="3" stroke-dasharray="12 4 2.5 4"/></svg>tendineux</span>' +
-      '<span><svg width="28" height="12"><line x1="0" y1="6" x2="28" y2="6" stroke="#f4b6cf" stroke-width="10"/></svg>fleuve : rèn mài</span>' +
-      '<span><svg width="28" height="12"><line x1="0" y1="6" x2="28" y2="6" stroke="#a9d8f5" stroke-width="10"/></svg>fleuve : dū mài</span>' +
-      '<span><svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#9bcfe0" stroke-width="6"/></svg>rivières : merveilleux vaisseaux</span>' +
-      '<span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="#fff" stroke="#1d1d1f" stroke-width="3"/></svg>carrefour (point d’intersection)</span>' +
-      '<span><svg width="26" height="18"><line x1="13" y1="0" x2="13" y2="18" stroke="#1f5fd6" stroke-width="3"/><line x1="0" y1="9" x2="26" y2="9" stroke="#fff" stroke-width="6"/><line x1="0" y1="9" x2="26" y2="9" stroke="#e0261b" stroke-width="3"/></svg>croisement sans correspondance</span>' +
-      '<span><svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#fff" fill-opacity=".4" stroke="#b8b1a0" stroke-width="1.5" stroke-dasharray="3 2"/></svg>articulation (repère)</span>' +
-      '<span><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" stroke="#7d7a70" stroke-width="2.4" stroke-dasharray="7 6" stroke-linecap="round"/></svg>relais vers le canal suivant (circulation du qì nourricier)</span>' +
-      '<span>⛵\uFE0E point de transport · ☀\uFE0E yuán · ⛓\uFE0E luò · ⛏\uFE0E xì · ⚓\uFE0E embarcadère (point d’ouverture)</span>' +
-      '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
-    const small = window.innerWidth < 760;
-    document.body.classList.toggle("netgame-on", !!GAME && GAME.phase !== "setup");
-    main.innerHTML = '<h2>Réseau global des trajets <span class="netmode"><button type="button" class="tool" data-netmode="schema"' + (GAME || ITI ? " hidden" : "") + '>Schéma</button><button type="button" class="tool on" data-netmode="ville"' + (GAME || ITI ? " hidden" : "") + '>Plan de ville</button></span> <button type="button" class="tool gamebtn" id="netGameBtn"' + (GAME ? " hidden" : "") + '>Démêler</button><button type="button" class="tool gamebtn" id="netItiBtn"' + (GAME || ITI ? " hidden" : "") + '>Itinéraire</button></h2>' + gamePanel() + itiPanel() + (small ? '<details class="netinfo"><summary>Légende et aide</summary>' : "") +
-      '<div class="src">Chaque canal régulier est une ligne dont les stations sont ses points ; RM et DM forment un fleuve, les merveilleux vaisseaux des rivières avec leur navette ; les zones du corps sont des quartiers (centre-ville : organes). Barre de gauche : afficher / masquer un canal. Molette : zoom · glisser : se déplacer · clic : correspondances · en mode ✎ Modifier : glisser une station dans son quartier.</div>' +
-      legend + (small ? "</details>" : "") + '<div class="netwrap"><div class="netzoom"><button type="button" data-z="in" title="Zoomer">+</button><button type="button" data-z="out" title="Dézoomer">−</button><button type="button" data-z="fit" title="Tout voir">⟲</button><button type="button" data-z="dark" title="Fond sombre / plan de ville">◐</button></div>' +
-      '<svg class="netsvg" role="img"><defs><pattern id="streets" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><path d="M0 23 H46 M23 0 V46" stroke="#ffffff" stroke-width="1.3" opacity=".6"/><path d="M0 0 L46 46" stroke="#ffffff" stroke-width=".8" opacity=".35"/></pattern></defs>' +
-      '<g class="city">' + city + subq + qLabels + joints + "</g>" + rivers + shuttles + riverNames + svgLines + relaysSvg + piers + itiSvg + stations + badges + "</svg></div>";
-    const wrap = main.querySelector(".netwrap");
-    try{ if(localStorage.getItem("mtc_trajets_net_dark") === "1") wrap.classList.add("dark"); }catch(e){}
-    wrap.querySelector('[data-z="dark"]').addEventListener("click", () => {
-      wrap.classList.toggle("dark");
-      try{ localStorage.setItem("mtc_trajets_net_dark", wrap.classList.contains("dark") ? "1" : ""); }catch(e){}
-    });
-    main.querySelectorAll("[data-net]").forEach(b => b.addEventListener("click", () => {
-      if(b.dataset.net === "all") NET_HIDDEN.clear(); else data.forEach(c => NET_HIDDEN.add(c.code));
-      saveHidden(); showNetwork();
-    }));
-    const svgEl = main.querySelector(".netsvg");
-    // cadrage donné dans l'adresse (…&vb=x,y,l,h) : utile pour partager une vue
-    const vbq = new URLSearchParams(location.search).get("vb");
-    if(vbq && !NET_VB){ const [x, y, w, h] = vbq.split(",").map(Number); if(w && h) NET_VB = {x, y, w, h}; }
-    initNetZoom(svgEl);
-    bindNetMode();
-    bindGame();
-    bindIti();
-    // mode édition : glisser une station dans un quartier (sa zone de correspondance)
-    const cells = qIds.map((q, i) => ({q, poly:voronoiCell(seeds, i, 380)}));
-    const inPoly = (pt, poly) => { let ins = false; for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const [xi, yi] = poly[i], [xj, yj] = poly[j]; if((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) ins = !ins; } return ins; };
-    let drag = null;
-    svgEl.addEventListener("pointerdown", e => {
-      const st = (editing || (GAME && GAME.phase === "play")) && e.target.closest && e.target.closest(".netstop");
-      if(!st) return;
-      const m = svgEl.getScreenCTM().inverse(), pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(m);
-      drag = {st, pid:st.dataset.pid, x0:pt.x, y0:pt.y, moved:false};
-      try{ svgEl.setPointerCapture(e.pointerId); }catch(err){}
-      e.stopPropagation();
-    }, true);
-    svgEl.addEventListener("pointermove", e => {
-      if(!drag) return;
-      const m = svgEl.getScreenCTM().inverse(), pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(m);
-      const dx = pt.x - drag.x0, dy = pt.y - drag.y0;
-      if(Math.hypot(dx, dy) > 3) drag.moved = true;
-      drag.st.setAttribute("transform", "translate(" + dx + "," + dy + ")");
-      drag.pt = [pt.x, pt.y];
-    });
-    svgEl.addEventListener("pointerup", () => {
-      if(!drag) return;
-      const d = drag; drag = null;
-      if(!d.moved || !d.pt) return;
-      if(GAME && GAME.phase === "play" && !editing){
-        GAME.pos[d.pid] = [d.pt[0], d.pt[1]]; GAME.moves++; GAME.checked = null; GAME.hint = null;
-        showNetwork();
-        return;
-      }
-      const snapped = [Math.round(d.pt[0] / G) * G, Math.round(d.pt[1] / G) * G];
-      const hit = cells.find(c => c.poly.length > 2 && inPoly(d.pt, c.poly));
-      edits.stationPos = edits.stationPos || {}; edits.pointZone = edits.pointZone || {};
-      edits.stationPos[d.pid] = snapped;
-      if(hit) edits.pointZone[d.pid] = hit.q;
-      saveEdits(); showNetwork();
-      svgEl.dispatchEvent(new Event("click"));
-    });
-    try{ history.replaceState(null, "", "#reseau"); }catch(e){}
+    showSchema();
   }
 
-  // ---- jeu de démêlage ----
-  const GAME_LEVELS = {facile:"Facile — par groupes de 3 stations voisines", moyen:"Moyen — par groupes de 6 stations voisines", difficile:"Difficile — chaque ligne entière mélangée"};
-  const gameCanals = () => CANAL_ORDER.filter(code => MAIN_SEG[code] && data.some(c => c.code === code));
-  const shuffle = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-  const randomCanals = n => shuffle(gameCanals().filter(c => c !== "RM" && c !== "DM")).slice(0, n);
-  // croisements : tronçons (entre deux stations) qui se coupent sans extrémité commune
-  function gameCrossings(seqs, P){
-    const segs = [];
-    seqs.forEach(seq => { const pts = seq.filter(n => P[n]); for(let i = 1; i < pts.length; i++) segs.push([pts[i - 1], pts[i]]); });
-    const orient = (a, b, c) => Math.sign((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]));
-    let n = 0;
-    for(let i = 0; i < segs.length; i++) for(let j = i + 1; j < segs.length; j++){
-      const [a, b] = segs[i], [c, d] = segs[j];
-      if(a === c || a === d || b === c || b === d) continue;
-      const A = P[a], B = P[b], C = P[c], D = P[d];
-      if(orient(A, B, C) * orient(A, B, D) < 0 && orient(C, D, A) * orient(C, D, B) < 0) n++;
-    }
-    return n;
-  }
-  function gameQuartier(pt){ const c = GAME.qcells.find(q => q.poly.length > 2 && netInPoly(pt, q.poly)); return c ? c.q : null; }
-  function gameCheck(){
-    const res = {};
-    Object.keys(GAME.ref).forEach(p => {
-      const A = GAME.pos[p], B = GAME.ref[p];
-      if(!A){ res[p] = "ok"; return; }
-      res[p] = Math.hypot(A[0] - B[0], A[1] - B[1]) <= 40 ? "ok" : gameQuartier(A) === gameQuartier(B) ? "near" : "bad";
-    });
-    return res;
-  }
-  function gamePanel(){
-    if(!GAME || GAME.phase === "ref") return "";
-    const chip = code => '<button type="button" class="gchip' + (GAME.codes.includes(code) ? " on" : "") + '" data-gc="' + code + '" style="--c:' + netColor(code) + '">' + esc(sigle(code)) + "</button>";
-    if(GAME.phase === "setup"){
-      return '<div class="netgame"><div class="grow"><b>Démêlage</b> — les stations des lignes choisies sont mélangées : glisse-les jusqu’à leur place sur la carte corrigée (bon quartier, bonne face, bon ordre).</div>' +
-        '<div class="grow">Lignes : ' + gameCanals().map(chip).join("") + ' <button type="button" class="linkish" data-g="rand">au hasard (3)</button></div>' +
-        '<div class="grow">Niveau : <select data-g="level">' + Object.entries(GAME_LEVELS).map(([k, v]) => '<option value="' + k + '"' + (k === GAME.level ? " selected" : "") + ">" + v + "</option>").join("") + "</select> " +
-        '<button type="button" class="tool" data-g="start"' + (GAME.codes.length ? "" : " disabled") + '>Mélanger</button> <button type="button" class="linkish" data-g="quit">fermer</button></div></div>';
-    }
-    const n = Object.keys(GAME.ref).length;
-    let res = "";
-    if(GAME.phase === "solved") res = "Solution affichée : voici la carte corrigée pour ces lignes.";
-    else if(GAME.checked && !GAME.hint){
-      const v = Object.values(GAME.checked), ok = v.filter(x => x === "ok").length, near = v.filter(x => x === "near").length, bad = v.length - ok - near;
-      const score = Math.round((ok * 2 + near) / (2 * n) * 100);
-      res = ok === n ? "Démêlé ! " + GAME.moves + " déplacements, " + Math.round((Date.now() - GAME.t0) / 1000) + " s."
-        : '<span class="g-ok">● ' + ok + " bien placées</span> · " + '<span class="g-near">● ' + near + " bon quartier</span> · " + '<span class="g-bad">● ' + bad + " à déplacer</span> · score " + score + " %";
-    }
-    else if(GAME.hint) res = "Indice : la station en jaune va dans le cercle pointillé.";
-    return '<div class="netgame"><div class="grow"><b>Démêlage</b> ' + GAME.codes.map(code => '<span class="gchip on" style="--c:' + netColor(code) + '">' + esc(sigle(code)) + "</span>").join("") +
-      " · " + esc(GAME_LEVELS[GAME.level].split(" — ")[0]) + " · " + n + " stations · déplacements : " + GAME.moves +
-      " · croisements : <b>" + (GAME.cross == null ? "…" : GAME.cross) + "</b> (carte corrigée : " + GAME.refCross + ")</div>" +
-      '<div class="grow">' + (GAME.phase === "play" ? '<button type="button" class="tool" data-g="check">Vérifier</button> <button type="button" class="tool" data-g="hint">Indice</button> <button type="button" class="tool" data-g="solve">Solution</button> ' : "") +
-      '<button type="button" class="tool" data-g="again">Rejouer</button> <button type="button" class="tool" data-g="setup">Autres lignes</button> <button type="button" class="linkish" data-g="quit">quitter</button>' +
-      (res ? ' <span class="gres">' + res + "</span>" : "") + "</div></div>";
-  }
-  function gameStart(){
-    if(!GAME.saved) GAME.saved = {hidden:new Set(NET_HIDDEN), types:Object.assign({}, TYPES_ON)};
-    // référence : la carte corrigée entière, lignes externes seulement
-    Object.keys(TYPES_ON).forEach(k => { TYPES_ON[k] = k === "externe"; });
-    NET_HIDDEN = new Set();
-    GAME.phase = "ref"; GAME.checked = null; GAME.hint = null;
-    showNetwork();
-    const L = LAST_LAYOUT;
-    const seqs = L.lines.filter(l => GAME.codes.includes(l.code)).map(l => l.nodes.filter(n => n.startsWith("pt:") && L.cell[n]));
-    GAME.ref = {}; GAME.qcells = L.qcells;
-    seqs.forEach(seq => seq.forEach(p => { GAME.ref[p] = L.cell[p].slice(); }));
-    GAME.refCross = gameCrossings(seqs, GAME.ref);
-    // mélange : chaque station prend la place d'une autre station de sa ligne (voisines ou ligne entière)
-    const owner = {}, groups = [];
-    seqs.forEach(seq => {
-      const own = seq.filter(p => !owner[p]); own.forEach(p => { owner[p] = true; });
-      const k = {facile:3, moyen:6}[GAME.level] || own.length;
-      for(let i = 0; i < own.length; i += k) groups.push(own.slice(i, i + k));
-    });
-    const all = groups;
-    GAME.pos = {};
-    all.forEach(g => {
-      let best = null;
-      for(let k = 0; k < 12; k++){ const s = shuffle(g.slice()), fixed = s.filter((p, i) => p === g[i]).length; if(!best || fixed < best[0]) best = [fixed, s]; if(!fixed) break; }
-      g.forEach((p, i) => { const R = GAME.ref[best[1][i]]; GAME.pos[p] = [R[0] + (Math.random() - 0.5) * 40, R[1] + (Math.random() - 0.5) * 40]; });
-    });
-    NET_HIDDEN = new Set(data.map(c => c.code).filter(code => !GAME.codes.includes(code)));
-    GAME.phase = "play"; GAME.moves = 0; GAME.t0 = Date.now();
-    showNetwork();
-  }
-  function gameEnd(){
-    if(GAME && GAME.saved){ NET_HIDDEN = GAME.saved.hidden; Object.assign(TYPES_ON, GAME.saved.types); }
-    GAME = null;
-    document.body.classList.remove("netgame-on");
-  }
-  function bindGame(){
-    const btn = document.getElementById("netGameBtn");
-    if(btn) btn.addEventListener("click", () => { ITI = null; GAME = {phase:"setup", codes:randomCanals(3), level:"moyen"}; showNetwork(); });
-    main.querySelectorAll(".netgame [data-gc]").forEach(b => b.addEventListener("click", () => {
-      if(GAME.phase !== "setup") return;
-      const c = b.dataset.gc, i = GAME.codes.indexOf(c);
-      if(i >= 0) GAME.codes.splice(i, 1); else GAME.codes.push(c);
-      showNetwork();
-    }));
-    const lv = main.querySelector('.netgame [data-g="level"]');
-    if(lv) lv.addEventListener("change", () => { GAME.level = lv.value; });
-    main.querySelectorAll(".netgame button[data-g]").forEach(b => b.addEventListener("click", () => {
-      const a = b.dataset.g;
-      if(a === "rand"){ GAME.codes = randomCanals(3); showNetwork(); }
-      else if(a === "start" || a === "again") gameStart();
-      else if(a === "setup"){ const keep = GAME.saved; if(keep){ NET_HIDDEN = keep.hidden; Object.assign(TYPES_ON, keep.types); } GAME = {phase:"setup", codes:GAME.codes, level:GAME.level}; showNetwork(); }
-      else if(a === "quit"){ gameEnd(); showNetwork(); }
-      else if(a === "check"){ GAME.checked = gameCheck(); GAME.hint = null; showNetwork(); }
-      else if(a === "hint"){
-        const res = gameCheck(), wrong = Object.keys(res).filter(p => res[p] !== "ok");
-        if(!wrong.length){ GAME.checked = res; showNetwork(); return; }
-        wrong.sort((x, y) => Math.hypot(GAME.pos[y][0] - GAME.ref[y][0], GAME.pos[y][1] - GAME.ref[y][1]) - Math.hypot(GAME.pos[x][0] - GAME.ref[x][0], GAME.pos[x][1] - GAME.ref[x][1]));
-        GAME.hint = wrong[0]; GAME.checked = {[wrong[0]]:"hint"};
-        showNetwork();
-      }
-      else if(a === "solve"){ GAME.pos = JSON.parse(JSON.stringify(GAME.ref)); GAME.phase = "solved"; GAME.checked = null; GAME.hint = null; showNetwork(); }
-    }));
-  }
-
-  // ---- jeu de l'itinéraire : aller d'une station à une autre avec le moins de correspondances ----
   const ITI_LEVELS = {1:"1 correspondance", 2:"2 correspondances", 3:"3 correspondances ou plus"};
   const stLabel = p => (PLACES[p] || {label:p.slice(3)}).label;
   // réseau des lignes affichées : une étape = un trajet sur une ligne (ou un relais)
@@ -2653,7 +1799,6 @@
 
   let current = null;
   function show(code, sectionIndex, keepScroll){
-    if(GAME) gameEnd();
     ITI = null; RT = null;
     const canal = data.find(c => c.code === code) || data[0];
     current = canal.code;
@@ -2863,7 +2008,7 @@
       // la liste complète des correspondances s'ouvre au double-clic
       if(RT && RT.phase === "play" && node.classList.contains("netstop")){ const lc = event.target.closest && event.target.closest("[data-line]"); rtClick(node.dataset.pid.slice(3), lc ? lc.dataset.line : null); return; }
       if(node.classList.contains("plain")){ openPointFiche(node.dataset.pid.slice(3)); return; }
-      if(node.classList.contains("netstop")){ if(ITI && ITI.phase === "play") itiClick(node.dataset.pid); else if(!GAME || GAME.phase === "setup") openCorr(corrKey(node.dataset.pid)); return; }
+      if(node.classList.contains("netstop")){ if(ITI && ITI.phase === "play") itiClick(node.dataset.pid); else openCorr(corrKey(node.dataset.pid)); return; }
       if(node.dataset.cp){ complementClick(node); return; }
       if(node.classList.contains("node")) highlightMention(node);
       else openCorr(node.dataset.pid);
