@@ -235,15 +235,16 @@
     const n = streakCount();
     el.innerHTML = "Série " + n + "<small>jour" + (n > 1 ? "s" : "") + "</small>";
   }
-  // soutien : une demande discrète, une seule fois par série, le jour où elle atteint 30 jours
+  // soutien : une demande discrète, une seule fois par série, le jour où elle atteint SUPPORT_ASK_DAYS jours
   // (la série est identifiée par son premier jour, pour ne pas redemander pendant la même série)
+  const SUPPORT_ASK_DAYS = 15;
   const SUPPORT_ASK_KEY = "mtc_support_ask_series_v1";
   function supportLink(){ const d = byId("supportCoffeeButton"); return (d && d.getAttribute("href")) || "https://paypal.me/emesepap1"; }
   function maybeAskSupport(){
     let s;
     try{ s = JSON.parse(localStorage.getItem("mtc_daily_streak_v1") || "{}"); }catch(error){ return; }
     const n = streakCount();
-    if(n < 30 || !s.lastPlayedDate || byId("mtcSupportAsk")) return;
+    if(n < SUPPORT_ASK_DAYS || !s.lastPlayedDate || byId("mtcSupportAsk")) return;
     const start = new Date(s.lastPlayedDate + "T12:00:00"); start.setDate(start.getDate() - (Number(s.count) - 1));
     const seriesId = start.toISOString().slice(0, 10);
     try{ if(localStorage.getItem(SUPPORT_ASK_KEY) === seriesId) return; localStorage.setItem(SUPPORT_ASK_KEY, seriesId); }catch(error){ return; }
