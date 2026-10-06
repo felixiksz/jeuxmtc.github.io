@@ -1595,13 +1595,15 @@
     RT.moves.forEach(m => { if(m.type === "change") s += " → <b>" + esc(m.at) + "</b> → " + rtLine(m.to); });
     return s;
   }
+  const RT_PRAISE = ["Parfait !", "Super !", "Incroyable !", "Bravo !", "Au top !"];
+  const rtPraise = () => RT_PRAISE[Math.floor(Math.random() * RT_PRAISE.length)];
   function rtFinish(gaveUp){
     RT.phase = "done";
     if(!gaveUp && window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
     const perfect = !gaveUp && RT.transfers === RT.opt;
     RT_OPT.played++; if(perfect) RT_OPT.perfect++; rtSave();
     if(RT.series && perfect) RT.series.perfect++;
-    RT.result = (gaveUp ? "Solution :" : perfect ? '<span class="rtok">Parfait : ' + RT.transfers + " correspondance" + (RT.transfers > 1 ? "s" : "") + ", c’est le minimum.</span>"
+    RT.result = (gaveUp ? "Solution :" : perfect ? '<span class="rtok">' + rtPraise() + "</span>"
       : "Arrivée en " + RT.transfers + " correspondance" + (RT.transfers > 1 ? "s" : "") + " ; le minimum est <b>" + RT.opt + "</b>.") +
       (gaveUp ? "" : '<br><span class="rtsm">Ton trajet :</span> ' + rtMyText()) +
       '<br><span class="rtsm">' + (perfect ? "Toutes les correspondances possibles :" : "Le meilleur trajet :") + "</span> " + rtSolText();

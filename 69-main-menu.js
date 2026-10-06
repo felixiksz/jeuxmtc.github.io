@@ -207,8 +207,8 @@
       {selector:"#mtcStreakCorner", title:"Série", text:"Le nombre de jours de jeu d’affilée. Clique sur la série pour ouvrir Mon suivi et activer le rappel quotidien.", position:"aboveBottom"});
   }
 
-  // réglages de la partie sur une ligne : Auto / Manuel (texte, comme Acu / Pharma), Facile–Difficile, puis les icônes
-  // regroupées (révision douce, examen, son, cadenas de la grille)
+  // réglages de la partie sur une ligne : Auto / Manuel (texte, comme Acu / Pharma), Facile–Difficile, puis le son et
+  // le cadenas de la grille ; la colombe et le dinosaure (modes de jeu) restent sous « Astuce »
   function arrangeControls(){
     const row = document.querySelector(".practice-row");
     if(!row) return;
@@ -235,7 +235,7 @@
     }
     let icons = byId("mtcGameIcons");
     if(!icons){ icons = document.createElement("span"); icons.id = "mtcGameIcons"; row.appendChild(icons); }
-    ["gameplayModeTopline", "mtcAudioModeToggle", "gridLockIndicator"].forEach(id => { const el = byId(id); if(el && el.parentElement !== icons) icons.appendChild(el); });
+    ["mtcAudioModeToggle", "gridLockIndicator"].forEach(id => { const el = byId(id); if(el && el.parentElement !== icons) icons.appendChild(el); });
     const manual = byId("manualEditButton");
     if(manual && manual.parentElement === row && manual.nextSibling !== icons) row.insertBefore(manual, icons);
   }
@@ -265,26 +265,32 @@
     // enveloppe : sortie de la barre du bas (dont le cadre décale les éléments « fixes ») pour rester au coin
     const mail = byId("suggestionMailButton");
     if(mail) document.body.appendChild(mail);
-    // goutte de sang : rangée en bas à droite, à gauche de l'enveloppe ; elle y tombe et y rebondit (sans bouger de côté)
+    // goutte de sang : elle tombe et se pose juste à gauche de l'enveloppe, centrée sur sa hauteur
+    // (le jeu la fait tomber jusqu'à un « sol » : ce sol devient la ligne de l'enveloppe, et sa position x est recalée)
     const drop = byId("supportCoffeeButton");
     if(drop){
       document.body.appendChild(drop);
-      const dropX = () => Math.max(6, window.innerWidth - 30 - 54);
-      // l'animation (04-03-core-game.js) recalcule sa position à chaque image : on recale x avant chaque image
+      const mailBox = () => { const m = byId("suggestionMailButton"); const r = m && m.getBoundingClientRect(); return r && r.width ? r : null; };
+      const dropX = () => { const r = mailBox(), w = drop.offsetWidth || 30; return r ? Math.max(6, r.left - w - 12) : Math.max(6, window.innerWidth - w - 54); };
+      const dropGround = () => { const r = mailBox(), h = drop.offsetHeight || 30; return r ? r.top + (r.height - h) / 2 : window.innerHeight - h - 12; };
       const pin = () => { try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){} };
+      if(typeof window.panelGroundForSupportBloodDrop === "function" && !window.panelGroundForSupportBloodDrop.mtcPinned){
+        window.panelGroundForSupportBloodDrop = function(){ return dropGround(); };
+        window.panelGroundForSupportBloodDrop.mtcPinned = true;
+      }
       if(typeof window.stepSupportBloodDropPhysics === "function" && !window.stepSupportBloodDropPhysics.mtcPinned){
         const step = window.stepSupportBloodDropPhysics;
         window.stepSupportBloodDropPhysics = function(){ pin(); return step.apply(this, arguments); };
         window.stepSupportBloodDropPhysics.mtcPinned = true;
       }
       pin();
-      // fenêtre redimensionnée : on replace aussi la goutte tout de suite (sans attendre l'image suivante)
+      // fenêtre redimensionnée : on replace la goutte tout de suite (sans attendre l'image suivante)
       window.addEventListener("resize", () => {
         pin();
         try{
           const s = typeof supportBloodDropState !== "undefined" ? supportBloodDropState : null;
           if(s && drop.classList.contains("support-blooddrop-moving")){
-            s.y = Math.min(s.y, window.innerHeight - (drop.offsetHeight || 30) + 3);
+            s.y = Math.min(s.y, dropGround());
             drop.style.setProperty("transform", "translate3d(" + s.x + "px, " + s.y + "px, 0) rotate(0deg)", "important");
           }
         }catch(error){}
@@ -298,10 +304,9 @@
       .observe(document.documentElement, {attributes:true, attributeFilter:["data-study-domain"]});
     document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")) close(); });
     arrangeControls();
+    const gm = byId("gameplayModeTopline"), ba = document.querySelector(".bottom-actions");
+    if(gm && ba && gm.parentElement !== ba) ba.appendChild(gm);
     document.body.classList.remove("mtc-menu-loading");   // tout est en place : on affiche
-    // les boutons du mode de jeu peuvent être (re)créés plus tard sous la grille : on les ramène dans la ligne des réglages
-    new MutationObserver(() => { const gm = byId("gameplayModeTopline"); if(gm && gm.parentElement && gm.parentElement.id !== "mtcGameIcons") arrangeControls(); })
-      .observe(document.body, {childList:true, subtree:true});
     if(typeof window.startTour === "function"){
       const original = window.startTour;
       window.startTour = function(){ close(); const r = original.apply(this, arguments); patchTour(); return r; };

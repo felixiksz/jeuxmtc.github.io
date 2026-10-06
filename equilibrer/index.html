@@ -78,6 +78,8 @@
   const ORD = ["P", "GI", "E", "Rt", "C", "IG", "V", "Rn", "EC", "TF", "VB", "F"];
   const ALL = ORD.concat(["RM", "DM"]);
   const KEY = "mtc_balance_game_v1";
+  const PRAISE = ["Parfait !", "Super !", "Incroyable !", "Bravo !", "Au top !"];
+  const praise = () => PRAISE[Math.floor(Math.random() * PRAISE.length)];
   const B = {on:new Set([1, 2, 3, 4, 5]), aff:[], pick:new Set(), done:false, hint:false, score:0, played:0, result:""};
   try{ const s = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem("mtc_trajets_balance") || "{}"); if(Array.isArray(s.on) && s.on.length) B.on = new Set(s.on); B.hint = !!s.hint; B.score = s.score || 0; B.played = s.played || 0; }catch(e){}
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({on:[...B.on], hint:B.hint, score:B.score, played:B.played})); }catch(e){} };
@@ -177,10 +179,14 @@
       if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
       if(B.pick.size === k) B.score++;
       save();
-      B.result = (B.pick.size === k ? '<span class="balok">Parfait : ' + k + (k > 1 ? " canaux" : " canal") + ", c’est le minimum.</span>"
-        : "Tout est équilibré avec " + B.pick.size + " canaux ; le minimum est <b>" + k + "</b>.") +
-        '<br><span class="balsm">Solutions minimales' + (opt.length > 1 ? " (" + opt.length + ")" : "") + " :</span><br>" +
-        opt.slice(0, 8).map(s => s.map(b => chip(b) + ' <span class="balsm">(→ ' + B.aff.filter(x => links(b, x).length).map(x => esc(x) + " syst. " + links(b, x).join(", ")).join(" ; ") + ")</span>").join(" + ")).join("<br>");
+      const fmt = s => s.map(b => chip(b) + ' <span class="balsm">(→ ' + B.aff.filter(x => links(b, x).length).map(x => esc(x) + " syst. " + links(b, x).join(", ")).join(" ; ") + ")</span>").join(" + ");
+      const mine = [...B.pick].sort().join("|");
+      const others = opt.filter(s => s.slice().sort().join("|") !== mine);
+      // solution minimale trouvée : juste une félicitation, et les autres solutions s'il y en a
+      B.result = B.pick.size === k
+        ? '<span class="balok">' + praise() + "</span>" + (others.length ? '<br><span class="balsm">Autres solutions possibles :</span><br>' + others.slice(0, 8).map(fmt).join("<br>") : "")
+        : "Tout est équilibré avec " + B.pick.size + " canaux ; le minimum est <b>" + k + "</b>." +
+          '<br><span class="balsm">Solutions minimales' + (opt.length > 1 ? " (" + opt.length + ")" : "") + " :</span><br>" + opt.slice(0, 8).map(fmt).join("<br>");
       render();
     });
   }
