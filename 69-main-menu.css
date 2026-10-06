@@ -192,3 +192,7 @@ body.mtc-menu-open #mtcSupportLabel, body.mtc-menu-loading #mtcSupportLabel{ dis
   color:var(--text-color); background:transparent !important; border:0 !important; box-shadow:none !important; padding:2px 0 !important; text-decoration:none; cursor:pointer; }
 #mtcSupportAsk a{ border-bottom:2px solid var(--shadow-color) !important; }
 #mtcSupportAsk a:hover, #mtcSupportAsk button:hover{ transform:none !important; text-shadow:0 3px 12px var(--shadow-color); }
+/* fenêtre « Me soutenir » : montants sur une ou deux lignes, sans déborder */
+#tourBox.support-coffee-reminder-box{ max-width:min(340px, calc(100vw - 24px)) !important; }
+#tourBox .support-coffee-amounts{ display:flex !important; flex-wrap:wrap !important; gap:6px 16px !important; justify-content:flex-start !important; }
+#tourBox .support-coffee-amounts button{ margin:0 !important; white-space:nowrap; }

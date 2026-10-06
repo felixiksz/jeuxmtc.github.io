@@ -3686,6 +3686,14 @@ const MTC_SUPPORT_COFFEE_RETURN_DELAY_MS =
 const MTC_SUPPORT_COFFEE_INTERVAL_MS =
   7 * 24 * 60 * 60 * 1000;
 
+const SUPPORT_AMOUNTS = [3, 5, 10];
+function supportAmountUrl(amount){
+  const base = (document.getElementById("supportCoffeeButton")?.getAttribute("href") || "https://paypal.me/emesepap1").replace(/\/+$/, "");
+  return amount ? base + "/" + amount + "EUR" : base;
+}
+window.mtcSupportAmounts = SUPPORT_AMOUNTS;
+window.mtcSupportAmountUrl = supportAmountUrl;
+
 const SUPPORT_COFFEE_REMINDER_TITLE =
   "Me soutenir";
 
@@ -3837,8 +3845,9 @@ function showSupportCoffeeReminder(){
     <h3>${SUPPORT_COFFEE_REMINDER_TITLE}</h3>
     ${supportCoffeeMessageHtml(SUPPORT_COFFEE_REMINDER_TEXT)}
 
-    <div class="tour-actions support-coffee-choice-actions">
-      <button type="button" class="support-coffee-reminder-donate">Je donne</button>
+    <div class="tour-actions support-coffee-choice-actions support-coffee-amounts">
+      ${SUPPORT_AMOUNTS.map(a => `<button type="button" class="support-coffee-reminder-donate" data-amount="${a}">${a} €</button>`).join("")}
+      <button type="button" class="support-coffee-reminder-donate" data-amount="">Montant libre</button>
       <button type="button" class="support-coffee-reminder-later">Non, désolé</button>
     </div>
   `;
@@ -3867,13 +3876,13 @@ function showSupportCoffeeReminder(){
     }
   }
 
-  const donateButton =
-    box.querySelector(".support-coffee-reminder-donate");
+  const donateButtons =
+    [...box.querySelectorAll(".support-coffee-reminder-donate")];
 
   const laterButton =
     box.querySelector(".support-coffee-reminder-later");
 
-  [donateButton, laterButton].forEach(button=>{
+  [...donateButtons, laterButton].forEach(button=>{
     if(!button) return;
 
     button.addEventListener("pointerdown", event=>{
@@ -3881,14 +3890,12 @@ function showSupportCoffeeReminder(){
     });
   });
 
-  if(donateButton){
+  donateButtons.forEach(donateButton=>{
     donateButton.addEventListener("click", event=>{
       event.preventDefault();
       event.stopPropagation();
 
-      const supportLink =
-        document.getElementById("supportCoffeeButton")?.getAttribute("href") ||
-        "https://paypal.me/emesepap1";
+      const supportLink = supportAmountUrl(Number(donateButton.dataset.amount) || 0);
 
       markSupportCoffeeClicked();
       closeSupportCoffeeReminder({restoreDrop:true});
@@ -3897,7 +3904,7 @@ function showSupportCoffeeReminder(){
         window.open(supportLink, "_blank", "noopener,noreferrer");
       }catch(error){}
     });
-  }
+  });
 
   if(laterButton){
     laterButton.addEventListener("click", event=>{
@@ -3935,14 +3942,8 @@ function handleSupportCoffeeButtonClick(event, link){
   }
 
   if(hasSupportCoffeeClicked()){
-    const href =
-      link?.getAttribute("href") ||
-      "https://paypal.me/emesepap1";
-
-    try{
-      window.open(href, "_blank", "noopener,noreferrer");
-    }catch(error){}
-
+    // déjà donné une fois : on repropose les montants plutôt que d'ouvrir directement PayPal
+    showSupportCoffeeReminder();
     return false;
   }
 

@@ -205,12 +205,16 @@
     box.setAttribute("role", "status");
     box.innerHTML = '<p><b>' + n + " jours de révision d’affilée, bravo !</b> Connections MTC est gratuit et sans publicité. " +
       "S’il t’aide dans tes révisions, un petit soutien le fait vivre.</p>" +
-      '<div class="mtc-ask-actions"><a href="' + esc(supportLink()) + '" target="_blank" rel="noopener noreferrer" id="mtcSupportAskGo">Soutenir le jeu</a>' +
+      '<div class="mtc-ask-actions">' + (window.mtcSupportAmounts || [3, 5, 10]).concat([0]).map(v =>
+        '<a href="' + esc(window.mtcSupportAmountUrl ? window.mtcSupportAmountUrl(v) : supportLink()) + '" target="_blank" rel="noopener noreferrer" class="mtc-ask-go">' + (v ? v + " €" : "Montant libre") + "</a>").join("") +
       '<button type="button" id="mtcSupportAskLater">Plus tard</button></div>';
     document.body.appendChild(box);
     const close = () => box.remove();
     byId("mtcSupportAskLater").addEventListener("click", close);
-    byId("mtcSupportAskGo").addEventListener("click", () => setTimeout(close, 300));
+    box.querySelectorAll(".mtc-ask-go").forEach(l => l.addEventListener("click", () => {
+      try{ if(typeof markSupportCoffeeClicked === "function") markSupportCoffeeClicked(); }catch(error){}
+      setTimeout(close, 300);
+    }));
   }
   // « Soutenir le jeu » écrit à côté de la goutte (même lien), seulement quand la goutte est visible
   function ensureSupportLabel(){
