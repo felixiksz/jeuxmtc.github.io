@@ -168,9 +168,9 @@
       '<div class="mm-head"><button type="button" id="mtcMenuClose">× Fermer</button>' + domainSwitchHtml() + "</div>" +
       '<div class="mm-body"><div class="mm-list">' + list(tab) + "</div>" +
       '<div class="mm-entries">' + ENTRIES.map(([k, label]) =>
-        '<button type="button" class="mm-entry' + (k === tab ? " on" : "") + '" data-tab="' + k + '"><span class="mm-lw"><span class="mm-lbl">' + label + '</span><span class="mm-sum">' + current[k].map(it => esc(it[0])).join(" · ") + "</span></span></button>" +
+        '<button type="button" class="mm-entry' + (k === tab ? " on" : "") + '" data-tab="' + k + '"><span class="mm-lw"><span class="mm-lbl">' + label + '</span><span class="mm-sum">' + current[k].map(it => esc(it[0])).join('<i class="mm-star">✦</i>') + "</span></span></button>" +
         (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>" +
-      '<div class="mm-foot"><span class="mm-version">Connections MTC · v' + MTC_VERSION + "</span>" + thanksHtml() + "</div>";
+      '<div class="mm-foot"><span class="mm-version">Connections MTC<i class="mm-star">✦</i>v' + MTC_VERSION + "</span>" + thanksHtml() + "</div>";
     menu.setAttribute("data-dom", pharma ? "pharma" : "acu");
   }
   function domainSwitchHtml(){
