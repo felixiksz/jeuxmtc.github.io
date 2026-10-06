@@ -3844,7 +3844,7 @@ function showSupportCoffeeReminder(){
   box.innerHTML = `
     <h3>${SUPPORT_COFFEE_REMINDER_TITLE}</h3>
     ${supportCoffeeMessageHtml(SUPPORT_COFFEE_REMINDER_TEXT)}
-    <p class="support-coffee-name-note">Pour figurer parmi les soutiens du projet, écris ton prénom dans la note PayPal.</p>
+    <p class="support-coffee-name-note">Pour figurer parmi les mécènes du projet, merci d’indiquer ton prénom ou alias dans la note PayPal.</p>
 
     <div class="tour-actions support-coffee-choice-actions support-coffee-amounts">
       ${SUPPORT_AMOUNTS.map(a => `<button type="button" class="support-coffee-reminder-donate" data-amount="${a}">${a} €</button>`).join("")}

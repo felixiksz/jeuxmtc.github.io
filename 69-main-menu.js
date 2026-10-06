@@ -17,10 +17,16 @@
   window.MTC_VERSION = MTC_VERSION;
   // soutiens du projet : soutiens.js, modifiable en mode admin (Réglages → Soutiens), publié sur le dépôt
   const supporters = () => (Array.isArray(window.MTC_SUPPORTERS) ? window.MTC_SUPPORTERS : []).map(s => String(s).trim()).filter(Boolean);
+  // une seule ligne avec la version ; les prénoms défilent dans une petite fenêtre (la liste a vocation à s'allonger)
   const thanksHtml = () => {
     const THANKS = supporters();
     if(!THANKS.length) return "";
-    return '<div class="mm-thanks">Projet soutenu par : ' + THANKS.map(esc).join(", ") + ".<br>Merci !</div>";
+    const names = THANKS.map(esc).join(", ");
+    const dur = Math.max(9, Math.round((names.length * 0.62 + 12) / 1.4));
+    return '<span class="mm-thanks"><span class="mm-sep">·</span>Projet soutenu par :' +
+      '<span class="mm-ticker" style="--tk-dur:' + dur + 's"><span class="mm-ticker-track">' +
+      '<span class="mm-ticker-copy">' + names + '</span><span class="mm-ticker-copy" aria-hidden="true">' + names + "</span>" +
+      "</span></span>Merci !</span>";
   };
   const DISCUSSIONS_URL = "https://github.com/felixiksz/jeuxmtc.github.io/discussions";
   const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Mon suivi"], ["reglages", "Réglages"]];
@@ -164,7 +170,7 @@
       '<div class="mm-entries">' + ENTRIES.map(([k, label]) =>
         '<button type="button" class="mm-entry' + (k === tab ? " on" : "") + '" data-tab="' + k + '">' + label + "</button>" +
         (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>" +
-      '<div class="mm-foot">' + thanksHtml() + '<div class="mm-version">Connections MTC · v' + MTC_VERSION + "</div></div>";
+      '<div class="mm-foot"><span class="mm-version">Connections MTC · v' + MTC_VERSION + "</span>" + thanksHtml() + "</div>";
     menu.setAttribute("data-dom", pharma ? "pharma" : "acu");
   }
   function domainSwitchHtml(){
@@ -246,7 +252,7 @@
     box.setAttribute("role", "status");
     box.innerHTML = '<p><b>' + n + " jours de révision d’affilée, bravo !</b> Connections MTC est gratuit et sans publicité. " +
       "S’il t’aide dans tes révisions, un petit soutien le fait vivre.</p>" +
-      '<p class="mtc-ask-note">Pour figurer parmi les soutiens du projet, écris ton prénom dans la note PayPal.</p>' +
+      '<p class="mtc-ask-note">Pour figurer parmi les mécènes du projet, merci d’indiquer ton prénom ou alias dans la note PayPal.</p>' +
       '<div class="mtc-ask-actions">' + (window.mtcSupportAmounts || [3, 5, 10]).concat([0]).map(v =>
         '<a href="' + esc(window.mtcSupportAmountUrl ? window.mtcSupportAmountUrl(v) : supportLink()) + '" target="_blank" rel="noopener noreferrer" class="mtc-ask-go">' + (v ? v + " €" : "Montant libre") + "</a>").join("") +
       '<button type="button" id="mtcSupportAskLater">Plus tard</button></div>';
