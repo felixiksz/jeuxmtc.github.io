@@ -276,6 +276,9 @@
     const drop = byId("supportCoffeeButton");
     if(drop){
       document.body.appendChild(drop);
+      // quand le jeu « range » la goutte (déjà cliquée, ou fin de l'animation), elle retournait dans l'ancienne barre du bas,
+      // dont le cadre décalait sa position : elle reste désormais dans la page, au coin de l'écran
+      if(typeof window.restoreSupportCoffeeButtonToFooter === "function") window.restoreSupportCoffeeButtonToFooter = el => { if(el) document.body.appendChild(el); };
       const mailBox = () => { const m = byId("suggestionMailButton"); const r = m && m.getBoundingClientRect(); return r && r.width ? r : null; };
       const dropX = () => { const r = mailBox(), w = drop.offsetWidth || 30; return r ? Math.max(6, r.left - 27 - w / 2) : Math.max(6, window.innerWidth - 70 - w / 2); };
       const dropGround = () => { const r = mailBox(), h = drop.offsetHeight || 30; return r ? r.top + (r.height - h) / 2 : window.innerHeight - h - 12; };
