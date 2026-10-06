@@ -50,7 +50,8 @@ window.MTC_FICHE_CORRECTIONS = {
       "contre_indications": "Attention diabète : vigilance avec les molécules hypoglycémiantes."
     },
     "EH1": {
-      "contre_indications": "Attention diabète : décrite comme diminuant l’absorption des hydrates de carbone ; vigilance avec les molécules hypoglycémiantes."
+      "contre_indications": "Attention diabète : décrite comme diminuant l’absorption des hydrates de carbone ; vigilance avec les molécules hypoglycémiantes.",
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
     },
     "PF4": {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
@@ -125,7 +126,37 @@ window.MTC_FICHE_CORRECTIONS = {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
     },
     "TE1": {
-      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
+      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement.\n- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "RQ8": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "CHU5": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "VH6": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "TTD12": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "AS3": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "EH3": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "EH9": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "EH10": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "EH5": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "EH4": {
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
     }
   }
 };

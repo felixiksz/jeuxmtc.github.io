@@ -176,7 +176,7 @@
     const stored = getStoredValue(PRECAUTION_STORAGE_PREFIX, herb.id);
     const published = normalizeMultiline(herb.precaution || herb.precautions || "");
     if(stored === null) return published;
-    const none = value => /^\s*aucune?\s*\.?\s*$/i.test(value || "");
+    const none = value => /^\s*-?\s*aucune?(\s+précaution\s+particulière)?\s*\.?\s*$/i.test(value || "");
     const local = normalizeMultiline(stored);
     if(!published || none(published)) return local;
     if(!local || none(local)) return published;
