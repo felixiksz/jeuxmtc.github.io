@@ -169,3 +169,10 @@ html body.mtc-menu-ui #mtcAutoManual{ font-size:12px !important; }
 #mtcMainMenu .mm-version{ position:fixed; left:28px; bottom:16px; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
   color:color-mix(in srgb, var(--text-color) 45%, var(--page-bg)); }
 @media (max-width:760px){ #mtcMainMenu .mm-version{ position:static; padding:0 16px 24px; } }
+/* « À revoir N » : petit lien texte dans la ligne des réglages, le nombre en couleur d'accent */
+html body.mtc-menu-ui #mtcDueReviewButton{ background:transparent !important; box-shadow:none !important; border:0 !important; padding:4px 2px !important;
+  font-family:'Archivo', sans-serif; font-size:12px !important; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-color); }
+html body.mtc-menu-ui #mtcDueReviewButton:hover{ transform:none !important; text-shadow:0 3px 12px var(--shadow-color); }
+html body.mtc-menu-ui #mtcDueReviewButton .mtc-due-review-badge{ background:none !important; box-shadow:none !important; color:var(--shadow-color) !important;
+  min-width:0 !important; padding:0 !important; margin-left:3px; font-size:inherit !important; font-weight:800; border:0 !important; }
+@media (max-width:760px){ html body.mtc-menu-ui #mtcDueReviewButton{ font-size:11px !important; } }

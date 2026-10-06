@@ -669,18 +669,21 @@
       return;
     }
     if(!btn){
-      const host = document.querySelector(".topbar-row.topbar-main-row .topbar-main-buttons");
+      // rangé dans la ligne des réglages de la partie (avant le cadenas), sinon dans la barre du haut
+      const row = document.querySelector(".practice-row");
+      const host = row || document.querySelector(".topbar-row.topbar-main-row .topbar-main-buttons");
       if(!host) return;
       btn = document.createElement("button");
       btn.type = "button";
       btn.id = "mtcDueReviewButton";
       btn.title = "Réviser les points à revoir (répétition espacée)";
-      btn.innerHTML = '<span aria-hidden="true">🔁</span> <span>Réviser</span> <span class="mtc-due-review-badge" id="mtcDueReviewBadge"></span>';
+      btn.innerHTML = '<span>À revoir</span> <span class="mtc-due-review-badge" id="mtcDueReviewBadge"></span>';
       btn.addEventListener("click", event => {
         event.preventDefault();
         startDueReviewQuiz();
       });
-      host.appendChild(btn);
+      const icons = byId("mtcGameIcons");
+      if(row && icons && icons.parentElement === row) row.insertBefore(btn, icons); else host.appendChild(btn);
     }
     // textContent= remplace toujours le noeud texte, même avec une valeur
     // identique : sans ce garde, la MutationObserver du module (childList,

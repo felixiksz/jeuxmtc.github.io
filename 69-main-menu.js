@@ -242,6 +242,8 @@
     const audio = byId("mtcAudioModeToggle"), lock = byId("gridLockIndicator");
     if(audio && row.firstChild !== audio) row.insertBefore(audio, row.firstChild);
     if(lock && lock.parentElement !== icons) icons.appendChild(lock);
+    const due = byId("mtcDueReviewButton");   // « À revoir N » (52-quiz-mode) : juste avant le cadenas
+    if(due && due.nextSibling !== icons) row.insertBefore(due, icons);
     const manual = byId("manualEditButton");
     if(manual && manual.parentElement === row && manual.nextSibling !== icons) row.insertBefore(manual, icons);
   }
