@@ -171,10 +171,19 @@
     return stored !== null ? stored : (herb.formules || herb.formulas || "");
   }
 
+  // précaution : celle de la fiche (importée ou notée) puis celle des corrections publiées ; « Aucune. » s'efface devant l'autre
   function getHerbPrecaution(herb){
     const stored = getStoredValue(PRECAUTION_STORAGE_PREFIX, herb.id);
-    return stored !== null ? stored : (herb.precaution || herb.precautions || "");
+    const published = normalizeMultiline(herb.precaution || herb.precautions || "");
+    if(stored === null) return published;
+    const none = value => /^\s*aucune?\s*\.?\s*$/i.test(value || "");
+    const local = normalizeMultiline(stored);
+    if(!published || none(published)) return local;
+    if(!local || none(local)) return published;
+    const merged = mergeStaticAndLocal(local, published);
+    return merged === local + "\n\n" + published ? local + "\n" + published : merged;
   }
+  window.mtcHerbPrecaution = herb => herb ? getHerbPrecaution(herb) : "";
 
   function getHerbSynonymes(herb){
     const stored = getStoredValue(SYNONYMES_STORAGE_PREFIX, herb.id);

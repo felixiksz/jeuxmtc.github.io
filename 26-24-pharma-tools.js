@@ -192,6 +192,7 @@
 
   function getHerbSearchPrecautions(herb){
     if(!herb) return "";
+    if(typeof window.mtcHerbPrecaution === "function") return window.mtcHerbPrecaution(herb);
     const stored = getStoredText(PRECAUTION_STORAGE_PREFIX, herb.id);
     // La recherche par champ doit correspondre au champ visible : si une donnée locale/importée existe,
     // on ne recherche pas en plus dans l’ancienne valeur statique cachée.

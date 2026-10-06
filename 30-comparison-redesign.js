@@ -415,6 +415,7 @@
 
   function herbPrecaution(herb){
     if(!herb) return "";
+    if(typeof window.mtcHerbPrecaution === "function") return text(window.mtcHerbPrecaution(herb));
     return text(localStorageValue(PHARMA_PRECAUTION_PREFIX, herb.id, herb.precaution || herb.precautions || ""));
   }
 
