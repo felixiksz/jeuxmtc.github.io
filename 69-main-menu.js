@@ -330,7 +330,7 @@
     steps.splice(after >= 0 ? after + 1 : 1, 0,
       {selector:"#mtcMenuButton", title:"Menu", text:"Le menu regroupe tout le reste : Jouer (les jeux), Réviser (mémo, recherche, comparaison, cartes, modules bêta), Suivi (statistiques, panier, série et rappel) et Réglages (affichage, aide, export et import des notes, hors connexion)."},
       {selector:"#mtcTopDomainSwitch", title:"Acu / Pharma", text:"Ici tu peux changer de matière en cours de route."},
-      {selector:"#mtcStreakCorner", title:"Série", text:"Le nombre de jours de jeu d’affilée. Clique sur la série pour ouvrir Suivi et activer le rappel quotidien.", position:"aboveBottom"});
+      {selector:"#mtcStreakCorner", title:"Série", text:"Le nombre de jours de jeu d’affilée. Clique sur la série pour ouvrir le Suivi et activer le rappel quotidien.", position:"aboveBottom"});
   }
 
   // réglages de la partie sur une ligne : Auto / Manuel (texte, comme Acu / Pharma), Facile–Difficile, puis le son et
