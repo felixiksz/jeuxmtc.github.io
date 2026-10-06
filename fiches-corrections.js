@@ -157,6 +157,9 @@ window.MTC_FICHE_CORRECTIONS = {
     },
     "EH4": {
       "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+    },
+    "CHU3": {
+      "precaution": "- Allergie à la pénicilline : attention."
     }
   }
 };
