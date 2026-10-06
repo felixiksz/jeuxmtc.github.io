@@ -198,12 +198,46 @@
     try{ steps = tourSteps; }catch(error){ return; }
     if(!Array.isArray(steps)) return;
     for(let i = steps.length - 1; i >= 0; i--) if(steps[i] && MOVED.includes(steps[i].selector)) steps.splice(i, 1);
+    steps.forEach(s => { if(s && s.selector === ".practice-row .mode-switch") s.selector = "#mtcAutoManual"; });
     if(steps.some(s => s && s.selector === "#mtcMenuButton")) return;
     const after = steps.findIndex(s => s && s.selector === ".topbar-row button[onclick*='newGame()']");
     steps.splice(after >= 0 ? after + 1 : 1, 0,
       {selector:"#mtcMenuButton", title:"Menu", text:"Le menu regroupe tout le reste : Jouer (les jeux), Réviser (mémo, recherche, comparaison, cartes, modules bêta), Mon suivi (statistiques, panier, série et rappel) et Réglages (affichage, aide, export et import des notes, hors connexion)."},
       {selector:"#mtcTopDomainSwitch", title:"Acu / Pharma", text:"Ici tu peux changer de matière en cours de route."},
       {selector:"#mtcStreakCorner", title:"Série", text:"Le nombre de jours de jeu d’affilée. Clique sur la série pour ouvrir Mon suivi et activer le rappel quotidien.", position:"aboveBottom"});
+  }
+
+  // réglages de la partie sur une ligne : Auto / Manuel (texte, comme Acu / Pharma), Facile–Difficile, puis les icônes
+  // regroupées (révision douce, examen, son, cadenas de la grille)
+  function arrangeControls(){
+    const row = document.querySelector(".practice-row");
+    if(!row) return;
+    const cb = byId("modeToggle");
+    if(cb && !byId("mtcAutoManual")){
+      const sw = document.createElement("span");
+      sw.id = "mtcAutoManual";
+      sw.className = "mtc-domain-switch";
+      sw.innerHTML = '<button type="button" data-am="auto">Auto</button>/<button type="button" data-am="manual">Manuel</button>';
+      row.insertBefore(sw, row.querySelector(".mode-switch") || row.firstChild);
+      const paint = () => {
+        sw.querySelector('[data-am="auto"]').classList.toggle("on", !cb.checked);
+        sw.querySelector('[data-am="manual"]').classList.toggle("on", cb.checked);
+      };
+      sw.addEventListener("click", e => {
+        const b = e.target.closest("[data-am]");
+        if(!b) return;
+        const want = b.dataset.am === "manual";
+        if(cb.checked !== want){ cb.checked = want; cb.dispatchEvent(new Event("change", {bubbles:true})); }
+        paint();
+      });
+      cb.addEventListener("change", paint);
+      paint();
+    }
+    let icons = byId("mtcGameIcons");
+    if(!icons){ icons = document.createElement("span"); icons.id = "mtcGameIcons"; row.appendChild(icons); }
+    ["gameplayModeTopline", "mtcAudioModeToggle", "gridLockIndicator"].forEach(id => { const el = byId(id); if(el && el.parentElement !== icons) icons.appendChild(el); });
+    const manual = byId("manualEditButton");
+    if(manual && manual.parentElement === row && manual.nextSibling !== icons) row.insertBefore(manual, icons);
   }
 
   function boot(){
@@ -263,6 +297,11 @@
     new MutationObserver(() => { paintTopSwitch(); if(menu && menu.classList.contains("open")) render(); })
       .observe(document.documentElement, {attributes:true, attributeFilter:["data-study-domain"]});
     document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")) close(); });
+    arrangeControls();
+    document.body.classList.remove("mtc-menu-loading");   // tout est en place : on affiche
+    // les boutons du mode de jeu peuvent être (re)créés plus tard sous la grille : on les ramène dans la ligne des réglages
+    new MutationObserver(() => { const gm = byId("gameplayModeTopline"); if(gm && gm.parentElement && gm.parentElement.id !== "mtcGameIcons") arrangeControls(); })
+      .observe(document.body, {childList:true, subtree:true});
     if(typeof window.startTour === "function"){
       const original = window.startTour;
       window.startTour = function(){ close(); const r = original.apply(this, arguments); patchTour(); return r; };
