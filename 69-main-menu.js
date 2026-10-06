@@ -17,13 +17,13 @@
   window.MTC_VERSION = MTC_VERSION;
   // soutiens du projet : soutiens.js, modifiable en mode admin (Réglages → Soutiens), publié sur le dépôt
   const supporters = () => (Array.isArray(window.MTC_SUPPORTERS) ? window.MTC_SUPPORTERS : []).map(s => String(s).trim()).filter(Boolean);
-  // une seule ligne avec la version ; les prénoms défilent dans une petite fenêtre (la liste a vocation à s'allonger)
+  // en bas à droite du menu ; les prénoms défilent dans une petite fenêtre (la liste a vocation à s'allonger)
   const thanksHtml = () => {
     const THANKS = supporters();
     if(!THANKS.length) return "";
     const names = THANKS.map(esc).join(", ");
     const dur = Math.max(9, Math.round((names.length * 0.62 + 12) / 1.4));
-    return '<span class="mm-thanks"><span class="mm-sep">·</span>Projet soutenu par :' +
+    return '<span class="mm-thanks">Projet soutenu par :' +
       '<span class="mm-ticker" style="--tk-dur:' + dur + 's"><span class="mm-ticker-track">' +
       '<span class="mm-ticker-copy">' + names + '</span><span class="mm-ticker-copy" aria-hidden="true">' + names + "</span>" +
       "</span></span>Merci !</span>";

@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "v2.0-20261006";
+const MTC_OFFLINE_VERSION = "v2.0-20261006-fonts";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -85,6 +85,19 @@ const CORE_ASSETS = [
   "soutiens.js",
   "69-main-menu.js",
   "69-main-menu.css",
+  "fonts/archivo-300-800-normal-latin-ext.woff2",
+  "fonts/archivo-300-800-normal-latin.woff2",
+  "fonts/fonts.css",
+  "fonts/libre-baskerville-400-700-normal-latin-ext.woff2",
+  "fonts/libre-baskerville-400-700-normal-latin.woff2",
+  "fonts/libre-baskerville-400-italic-latin-ext.woff2",
+  "fonts/libre-baskerville-400-italic-latin.woff2",
+  "fonts/tomorrow-300-normal-latin-ext.woff2",
+  "fonts/tomorrow-300-normal-latin.woff2",
+  "fonts/tomorrow-400-normal-latin-ext.woff2",
+  "fonts/tomorrow-400-normal-latin.woff2",
+  "fonts/tomorrow-500-normal-latin-ext.woff2",
+  "fonts/tomorrow-500-normal-latin.woff2",
   "notes-admin.js",
   "fiches-corrections.js",
   "Import_tableau pharma_pro(1).json",

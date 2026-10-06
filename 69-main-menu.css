@@ -168,8 +168,8 @@ html body.mtc-menu-ui #mtcAutoManual{ font-size:12px !important; }
 /* numéro de version : discret, en bas du menu */
 #mtcMainMenu .mm-foot{ position:fixed; left:28px; bottom:16px; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 0;
   font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:color-mix(in srgb, var(--text-color) 45%, var(--page-bg)); }
-#mtcMainMenu .mm-thanks{ display:inline-flex; align-items:baseline; white-space:nowrap; }
-#mtcMainMenu .mm-sep{ margin:0 .6em; }
+/* soutiens : en bas à droite, alignés sur le bord droit de Jouer / Réviser / Mon suivi / Réglages */
+#mtcMainMenu .mm-thanks{ position:fixed; bottom:16px; right:max(28px, calc((100% - 1100px) / 2 + 28px)); display:inline-flex; align-items:baseline; white-space:nowrap; }
 /* fenêtre des prénoms : défilement continu, bords fondus, pause au survol */
 #mtcMainMenu .mm-ticker{ display:inline-block; width:12em; overflow:hidden; margin:0 .5em; vertical-align:bottom;
   -webkit-mask-image:linear-gradient(90deg, transparent, #000 1.2em, #000 calc(100% - 1.2em), transparent);
@@ -183,7 +183,7 @@ html body.mtc-menu-ui #mtcAutoManual{ font-size:12px !important; }
   #mtcMainMenu .mm-ticker-copy{ padding-right:0; }
   #mtcMainMenu .mm-ticker-copy + .mm-ticker-copy{ display:none; }
 }
-@media (max-width:760px){ #mtcMainMenu .mm-foot{ position:static; padding:0 16px 24px; } #mtcMainMenu .mm-ticker{ width:9em; } }
+@media (max-width:760px){ #mtcMainMenu .mm-foot{ position:static; padding:0 16px 24px; flex-direction:column; gap:6px; } #mtcMainMenu .mm-thanks{ position:static; } #mtcMainMenu .mm-ticker{ width:9em; } }
 /* « À revoir N » : petit lien texte dans la ligne des réglages, le nombre en couleur d'accent */
 html body.mtc-menu-ui #mtcDueReviewButton{ background:transparent !important; box-shadow:none !important; border:0 !important; padding:4px 2px !important;
   font-family:'Archivo', sans-serif; font-size:12px !important; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-color); }

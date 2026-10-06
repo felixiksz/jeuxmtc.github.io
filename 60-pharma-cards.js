@@ -1433,8 +1433,7 @@
   ].join("\n");
 
   const FONT_LINKS =
-    '<link rel="preconnect" href="https://fonts.googleapis.com">' +
-    '<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">';
+    '<link href="' + new URL("fonts/fonts.css?v=20261006-a", document.baseURI).href + '" rel="stylesheet">';
 
   function buildDocument(pagesHtml, opts){
     const margin = Number(opts.margin) || DEFAULT_OPTIONS.margin;
