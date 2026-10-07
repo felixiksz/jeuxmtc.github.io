@@ -1,0 +1,40 @@
+# Partage des notes des joueur·euses : une discussion dans la catégorie « Contributions »
+# (bouton « Partager mes notes » du jeu) est lue, vérifiée et ajoutée à contributions.json.
+name: Contributions de notes
+
+on:
+  discussion:
+    types: [created, edited]
+  discussion_comment:
+    types: [created, edited]
+
+permissions:
+  contents: write
+  discussions: read
+
+concurrency:
+  group: contributions
+  cancel-in-progress: false
+
+jobs:
+  contributions:
+    if: github.event.discussion.category.slug == 'contributions'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Lire et ajouter les notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCUSSION_ID: ${{ github.event.discussion.node_id }}
+        run: node tools/contributions-action.js
+      - name: Publier
+        run: |
+          if git diff --quiet -- contributions.json; then echo "Rien de nouveau."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add contributions.json
+          git commit -m "Contributions : notes partagées mises à jour"
+          for i in 1 2 3; do git pull --rebase && git push && break; sleep 5; done

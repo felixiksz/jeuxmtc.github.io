@@ -36,6 +36,13 @@
     loading = new Promise(res => { const s = document.createElement("script"); s.src = "notes-admin.js?v=20261007-b"; s.onload = s.onerror = () => res(); document.head.appendChild(s); })
       .then(() => { mergeIntoAdmin(); refresh(); });
   }
+  let loadingContrib = null;
+  function loadContrib(){
+    if(window.MTC_CONTRIBUTIONS || loadingContrib) return;
+    loadingContrib = fetch("contributions.json?t=" + Date.now(), {cache:"no-store"})
+      .then(r => r.ok ? r.json() : {authors:{}}).catch(() => ({authors:{}}))
+      .then(j => { window.MTC_CONTRIBUTIONS = j && j.authors ? j : {authors:{}}; refresh(); });
+  }
   function refresh(){
     try{ if(window.refreshCurrentPointPanel) window.refreshCurrentPointPanel(); }catch(e){}
     try{ if(window.refreshCurrentPharmaHerbPanel) window.refreshCurrentPharmaHerbPanel(); }catch(e){}
@@ -85,7 +92,7 @@
     veil.className = "mtc-contrib-veil";
     veil.innerHTML = '<div class="mtc-contrib-box" role="dialog" aria-modal="true" aria-labelledby="mtcContribTitle">' +
       '<h2 id="mtcContribTitle">Contribuer au jeu</h2>' +
-      "<p>En contribuant aux fiches des points et des substances, et aux modules bêta (Trajets, Formules), tu accèdes aux <b>notes partagées</b> : elles apparaissent en couleur directement dans les champs des fiches, signées de leur auteur·ice.</p>" +
+      "<p>En contribuant aux fiches des points et des substances, et aux modules bêta (Trajets, Formules), tu accèdes aux <b>notes partagées</b> : elles apparaissent en couleur directement dans les champs des fiches, signées de leur auteur·ice. Tu peux partager les tiennes en un clic : Menu → Réglages → Notes → Partager.</p>" +
       '<label><input type="checkbox" class="c1"><span>Je participe à la vérification et à l’amélioration des fiches et des modules (corrections, vérifications, notes).</span></label>' +
       '<label><input type="checkbox" class="c2"><span>Mes notes seront signées de <b>mon nom de profil GitHub</b>, pour qu’on puisse me contacter en cas d’incompréhension. Pas encore de profil ? <a href="https://github.com/signup" target="_blank" rel="noopener">Créer un profil GitHub</a>.</span></label>' +
       '<label><input type="checkbox" class="c3"><span>J’utilise les notes des autres pour mon apprentissage et je ne les diffuse pas en dehors du jeu.</span></label>' +
@@ -115,17 +122,29 @@
   // notes partagées dans le champ d'origine de la fiche, dans la couleur de l'autrice
   const authorName = () => (window.MTC_SHARED_NOTES && window.MTC_SHARED_NOTES.author) || "emesepap, admin";
   // (les associations des substances viennent du cours : pas des notes de l'autrice, donc pas en couleur)
-  const PHARMA_FIELDS = {esprits:"esprit", notes:"notes", formules:"formules", vs:"vs", syntheses:"synthese", precautions:"precaution",
+  const PHARMA_FIELDS = {esprits:"esprit", notes:"notes", associations:"associations", formules:"formules", vs:"vs", syntheses:"synthese", precautions:"precaution",
     ingredients:"ingredients", recherches_modernes:"recherches_modernes", indications:"indications", contre_indications:"contre_indications", preparations:"preparation", synonymes:"synonymes"};
   const POINT_KEYS = {notes:"mtc_point_note_", associations:"mtc_point_associations_", esprits:"mtc_point_esprit_", vs:"mtc_point_vs_", precautions:"mtc_point_precaution_"};
   const POINT_FIELDS = {notes:"Notes", associations:"Associations", esprits:"Esprit", vs:"VS", precautions:"Précaution"};
   const flat = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
-  function sharedFor(domain, id){
-    // l'admin : ses notes sont versées dans ses propres champs (mergeIntoAdmin), donc rien en couleur pour elle
-    if(!enabled() || !id || isAdmin() || !isContributor()) return null;
-    loadNotes();
+  // qui a des notes sur cette fiche : l'admin (sauf pour elle-même : ses notes sont dans ses champs, mergeIntoAdmin)
+  // puis chaque contributeur·ice qui a partagé ses notes (contributions.json), chacun·e dans sa couleur
+  function sourcesFor(domain, id){
+    const list = [];
+    if(!enabled() || !id || !(isContributor() || isAdmin())) return list;
+    loadNotes(); loadContrib();
     const S = window.MTC_SHARED_NOTES;
-    return (S && S[domain] && S[domain][id]) || null;
+    if(!isAdmin() && S && S[domain] && S[domain][id]){
+      const fields = Object.assign({}, S[domain][id]);
+      if(domain === "pharma") delete fields.associations;   // associations des substances : viennent du cours
+      list.push({name:authorName().split(",")[0], color:authorColor(authorName()), fields});
+    }
+    const C = window.MTC_CONTRIBUTIONS;
+    Object.entries((C && C.authors) || {}).forEach(([login, a]) => {
+      const fields = a && a[domain] && a[domain][id];
+      if(fields) list.push({name:login, color:authorColor(login), fields});
+    });
+    return list;
   }
   // seulement les lignes que la personne n'a pas déjà dans le champ (ni répétées dans la note elle-même)
   function freshPart(text, already){
@@ -138,9 +157,15 @@
       return true;
     }).join("\n")).filter(Boolean).join("\n\n");
   }
-  function sharedHtml(text){
-    const author = authorName(), name = author.split(",")[0];
-    return '<div class="mtc-shared-in" style="--a:' + authorColor(author) + '" title="Note partagée de ' + esc(name) + '"><p class="txt">' + esc(text) + '</p><span class="by">— ' + esc(name) + "</span></div>";
+  function sharedHtml(text, src){
+    return '<div class="mtc-shared-in" data-by="' + esc(src.name) + '" style="--a:' + src.color + '" title="Note partagée de ' + esc(src.name) + '"><p class="txt">' + esc(text) + '</p><span class="by">— ' + esc(src.name) + "</span></div>";
+  }
+  // à la suite du champ, ou de la dernière note partagée déjà affichée dans ce champ
+  function placeShared(sec, box, html){
+    const prev = [...sec.querySelectorAll(".mtc-shared-in")].pop();
+    if(prev) insertInBox(prev, html);
+    else if(box) insertInBox(box, html);
+    else sec.insertAdjacentHTML("beforeend", html);
   }
   function insertInBox(box, html){
     box.insertAdjacentHTML("afterend", html);
@@ -155,18 +180,16 @@
     box.style.borderBottomLeftRadius = box.style.borderBottomRightRadius = "0";
   }
   function decoratePharma(container, id){
-    const mine = sharedFor("pharma", id);
-    if(!container || !mine) return;
+    const sources = sourcesFor("pharma", id);
+    if(!container || !sources.length) return;
     style();
-    Object.entries(PHARMA_FIELDS).forEach(([k, field]) => {
+    sources.forEach(src => Object.entries(PHARMA_FIELDS).forEach(([k, field]) => {
       const sec = container.querySelector(".pharma-editable-" + field);
-      if(!mine[k] || !sec || sec.querySelector(".mtc-shared-in")) return;
+      if(!src.fields[k] || !sec || sec.querySelector('.mtc-shared-in[data-by="' + CSS.escape(src.name) + '"]')) return;
       const ta = sec.querySelector("textarea");
-      const text = freshPart(mine[k], (ta ? ta.value : "") + "\n" + sec.textContent);
-      if(!text) return;
-      if(ta) insertInBox(ta, sharedHtml(text));
-      else sec.insertAdjacentHTML("beforeend", sharedHtml(text));
-    });
+      const text = freshPart(src.fields[k], (ta ? ta.value : "") + "\n" + sec.textContent);
+      if(text) placeShared(sec, ta, sharedHtml(text, src));
+    }));
   }
   function decoratePoint(){
     const content = document.getElementById("pointPanelContent");
@@ -174,27 +197,25 @@
     try{ id = currentPointPanelPoint; }catch(e){}
     // le même panneau sert aux substances : seulement pour une fiche de point
     if(!content || document.documentElement.getAttribute("data-study-domain") === "pharmacology" || content.querySelector(".pharma-herb-header")) return;
-    const mine = sharedFor("points", id);
-    if(!mine) return;
+    const sources = sourcesFor("points", id);
+    if(!sources.length) return;
     style();
-    const sections = [...content.querySelectorAll("details.point-info-section")];
-    Object.entries(POINT_FIELDS).forEach(([k, label]) => {
-      if(!mine[k]) return;
+    sources.forEach(src => Object.entries(POINT_FIELDS).forEach(([k, label]) => {
+      if(!src.fields[k]) return;
+      const sections = [...content.querySelectorAll("details.point-info-section")];
       let sec = sections.find(d => { const s = d.querySelector("summary"); return s && s.textContent.replace("✎", "").trim().toLowerCase().startsWith(label.toLowerCase()); });
-      if(sec && sec.querySelector(".mtc-shared-in")) return;
+      if(sec && sec.querySelector('.mtc-shared-in[data-by="' + CSS.escape(src.name) + '"]')) return;
       const ta = sec && sec.querySelector("textarea");
       let stored = "";
       try{ stored = localStorage.getItem(POINT_KEYS[k] + id) || ""; }catch(e){}
-      const text = freshPart(mine[k], [stored, ta ? ta.value : "", sec ? sec.textContent : ""].join("\n"));
+      const text = freshPart(src.fields[k], [stored, ta ? ta.value : "", sec ? sec.textContent : ""].join("\n"));
       if(!text) return;
       if(!sec){
         content.insertAdjacentHTML("beforeend", '<details class="point-info-section" open><summary>' + esc(label === "VS" ? "VS." : label) + "</summary></details>");
         sec = content.lastElementChild;
       }
-      const box = sec.querySelector(".acu-comparison-editable") || sec.querySelector(".point-note-display");
-      if(box) insertInBox(box, sharedHtml(text));
-      else sec.insertAdjacentHTML("beforeend", sharedHtml(text));
-    });
+      placeShared(sec, sec.querySelector(".acu-comparison-editable") || sec.querySelector(".point-note-display"), sharedHtml(text, src));
+    }));
   }
   function watchPointPanel(){
     const content = document.getElementById("pointPanelContent");
@@ -279,7 +300,81 @@
     }catch(e){}
     if(changed) refresh();
   }
-  if((isContributor() || isAdmin()) && enabled()) loadNotes();
+  const DISCUSSION_NEW = "https://github.com/felixiksz/jeuxmtc.github.io/discussions/new?category=contributions";
+  const PUBLIC_FIELD = {precautions:"precaution", indications:"indications", contre_indications:"contre_indications", preparations:"preparation"};
+  function collectMyNotes(){
+    const out = {points:{}, pharma:{}};
+    let n = 0;
+    const points = window.POINT_DETAILS || (typeof POINT_DETAILS !== "undefined" ? POINT_DETAILS : {});
+    const herbs = {}; (window.PHARMA_HERBS || []).forEach(h => { if(h && h.id) herbs[h.id] = h; });
+    ["points", "pharma"].forEach(domain => Object.entries(ADMIN_FIELDS[domain]).forEach(([k, [prefix, field]]) => {
+      for(let i = 0; i < localStorage.length; i++){
+        const key = localStorage.key(i);
+        if(!key || !key.startsWith(prefix)) continue;
+        const id = key.slice(prefix.length);
+        const rec = domain === "points" ? points[id] : herbs[id];
+        if(!rec) continue;
+        const published = String(rec[field || PUBLIC_FIELD[k]] || "");
+        const mine = freshPart(localStorage.getItem(key) || "", published);
+        if(!mine || flat(mine).length < 3) continue;
+        (out[domain][id] = out[domain][id] || {})[k] = mine;
+        n++;
+      }
+    }));
+    return {notes:out, count:n};
+  }
+  function shareParts(notes){
+    const entries = [];
+    ["points", "pharma"].forEach(d => Object.entries(notes[d]).forEach(([id, f]) => entries.push([d, id, f])));
+    const parts = [];
+    let cur = {mtc_notes:1, points:{}, pharma:{}}, size = 0;
+    entries.forEach(([d, id, f]) => {
+      const s = JSON.stringify(f).length + id.length + 10;
+      if(size + s > 55000 && size){ parts.push(cur); cur = {mtc_notes:1, points:{}, pharma:{}}; size = 0; }
+      cur[d][id] = f; size += s;
+    });
+    parts.push(cur);
+    return parts.map((p, i) => "Notes partagées depuis Connections MTC" + (parts.length > 1 ? " (partie " + (i + 1) + "/" + parts.length + ")" : "") +
+      " : ne pas modifier le bloc ci-dessous.\n\n```json\n" + JSON.stringify(p) + "\n```\n");
+  }
+  async function copy(text){
+    try{ await navigator.clipboard.writeText(text); return true; }catch(e){}
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    let ok = false; try{ ok = document.execCommand("copy"); }catch(e){} ta.remove(); return ok;
+  }
+  async function shareNotes(){
+    style();
+    if(!isContributor() && !isAdmin()){ join(); return; }
+    const {notes, count} = collectMyNotes();
+    if(!count){ window.alert("Aucune note perso à partager : tes notes ne diffèrent pas du contenu du jeu."); return; }
+    const parts = shareParts(notes);
+    const title = encodeURIComponent("Mes notes");
+    let url = DISCUSSION_NEW + "&title=" + title;
+    const direct = parts.length === 1 && parts[0].length < 5500;
+    if(direct) url += "&body=" + encodeURIComponent(parts[0]);
+    else await copy(parts[0]);
+    window.open(url, "_blank", "noopener");
+    const veil = document.createElement("div");
+    veil.className = "mtc-contrib-veil";
+    veil.innerHTML = '<div class="mtc-contrib-box" role="dialog" aria-modal="true"><h2>Partager mes notes</h2>' +
+      "<p>" + count + " note" + (count > 1 ? "s" : "") + " perso à partager (seulement ce qui diffère du contenu du jeu).</p>" +
+      (direct ? "<p>Sur la page GitHub qui vient de s’ouvrir, tes notes sont déjà dans le message : clique sur <b>« Start discussion »</b>.</p>"
+        : "<p>Sur la page GitHub qui vient de s’ouvrir : clique dans le message, colle (<b>Ctrl+V</b>, ou appui long puis « Coller »), puis clique sur <b>« Start discussion »</b>.</p>" +
+          (parts.length > 1 ? "<p>Tes notes sont en " + parts.length + " parties : publie la partie 1 comme ci-dessus, puis colle chaque partie suivante en commentaire de la même discussion.</p><p class=\"row\">" +
+            parts.map((_, i) => '<button type="button" data-part="' + i + '">Copier la partie ' + (i + 1) + "</button>").join(" ") + "</p>" : "")) +
+      "<p><small>Elles apparaîtront d’ici une à deux minutes chez les contributeur·ices, dans ta couleur, signées de ton nom GitHub. Pour les mettre à jour plus tard, partage à nouveau : les nouvelles remplacent les anciennes.</small></p>" +
+      '<div class="btns"><button type="button" class="go" data-close>J’ai compris</button></div></div>';
+    document.body.appendChild(veil);
+    veil.addEventListener("click", async e => {
+      const b = e.target.closest("button");
+      if(!b) return;
+      if(b.hasAttribute("data-close")) veil.remove();
+      else if(b.dataset.part){ const ok = await copy(parts[+b.dataset.part]); b.textContent = ok ? "Partie " + (+b.dataset.part + 1) + " copiée" : "Copie impossible"; }
+    });
+  }
+  window.mtcShareNotes = shareNotes;
+
+  if((isContributor() || isAdmin()) && enabled()){ loadNotes(); loadContrib(); }
   if(window.MTC_SHARED_NOTES) mergeIntoAdmin();
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", watchPointPanel); else watchPointPanel();
 })();
