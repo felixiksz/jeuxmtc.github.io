@@ -41,7 +41,7 @@ h2{ font-family:"Libre Baskerville", Georgia, serif; font-weight:700; }
 h3{ color:var(--accent); }
 section{ border-top-color:var(--hair); }
 .linkish{ color:var(--accent); }
-details{ color:color-mix(in srgb, var(--text-color) 82%, var(--page-bg)); }
+details{ color:var(--text-color); }   /* notes : couleur du texte du thème (noir sur fond clair, clair sur fond sombre) */
 .hz, .fr, .subfr, .cname small, .crow .where{ color:var(--muted); }
 .el-none{ color:var(--text-color); }
 
