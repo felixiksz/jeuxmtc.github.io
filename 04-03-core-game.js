@@ -3756,8 +3756,17 @@ function registerSupportCoffeeVisit(){
 }
 
 function hasSupportCoffeeClicked(){
+  if(window.mtcSupportDropDemo) return false;   // ?goutte : démonstration de l'animation, sans rien enregistrer
   return localStorage.getItem(MTC_SUPPORT_COFFEE_CLICKED_KEY) === "1";
 }
+/* Adresse de test « …/index.html?goutte » : la goutte s'anime tout de suite, même après un don,
+   pour voir l'animation (rien n'est enregistré). */
+try{
+  if(new URLSearchParams(location.search).has("goutte")){
+    window.mtcSupportDropDemo = true;
+    window.addEventListener("load", () => setTimeout(() => { if(typeof showSupportBloodDrop === "function") showSupportBloodDrop(); }, 1500));
+  }
+}catch(error){}
 
 function isSupportCoffeeReminderEligible(){
 
