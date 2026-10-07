@@ -115,7 +115,7 @@ const POINT_DETAILS = {
     "correspondances": "🖇️ rèn mài",
     "actions": "➢ Disperse le vent, diffuse librement le qì du poumon et chasse les facteurs pathogènes \n➢ Régule le rèn mài",
     "indications": "• Troubles du poumon : toux, vide de qì, manque de souffle, asthme \n• Troubles de la tête, nuque et des cinq sens : migraine, raideur du cou, déviation de la bouche et des yeux, maux de dents, maux de gorge, sinusite\n• Chaleur dans les paumes, déficience motrice des membres supérieurs, handicap du poignet \n• Épilepsie causée par la frayeur, hématurie, chaleur urinaire, énurésie, phallodynie, urticaire, \n• Maladie de Takayasu",
-    "notes": "Traite plutot le vent\n\nEn tant que point luò-liaison, permet de mobiliser les\nvaisseaux luò-liaison afin dexpulser les pervers.",
+    "notes": "En tant que point luò-liaison, permet de mobiliser les\nvaisseaux luò-liaison afin dexpulser les pervers.",
     "associations": "",
     "canal": "P",
     "_source_sheet": "P",

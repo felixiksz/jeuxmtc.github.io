@@ -467,7 +467,7 @@
       "Affermir le Jing",
       "Diminuer les urines"
     ],
-    "esprit": "urine, sperme, vision",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "A",
@@ -527,7 +527,7 @@
       "Enrichir le coeur",
       "Calmer le Shen"
     ],
-    "esprit": "shen, pompe cardiaque, diarree",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "A",
@@ -696,7 +696,7 @@
       "Produire les liquides",
       "Rassembler et collecter par l'astringence"
     ],
-    "esprit": "diabete, toxine alcool, hepatite, double vide rn et P, transpi spontanée, insomnie",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "A",
@@ -726,7 +726,7 @@
       "Eclaircir les yeux",
       "Arrêter les démangeaisons"
     ],
-    "esprit": "Vent (plénitude, stagnation, chaleur)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AF",
@@ -758,7 +758,7 @@
       "Equilibrer la dyspnée",
       "Faire s'écouler l'urine"
     ],
-    "esprit": "Vent (clarifie la chaleur)\nRamollissement des masses et obstructions",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AF",
@@ -786,7 +786,7 @@
       "Eteindre le Vent",
       "Apaiser la frayeur"
     ],
-    "esprit": "Vent (chaleur plénitude ou vide)\nMaux de tête avec hypertension (montée du yang du foie, feu\ndu foie)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -819,7 +819,7 @@
       "Disperser la nouure",
       "Resserrer et faire l'astringence"
     ],
-    "esprit": "Apaisement (vent, yáng du foie, shén)\nFuite des liquides physiologiques par vide de rein\nNodules, masses\nHyperacidité gastrique",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -849,7 +849,7 @@
       "Neutraliser la toxine",
       "Arrêter la douleur"
     ],
-    "esprit": "Vent (toutes causes sauf vide de sang)\nObstructions bi (vent humidité)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -878,7 +878,7 @@
       "Cacher le Yang",
       "Eclaircir les yeux"
     ],
-    "esprit": "Hyperactivité du yang du foie\nYeux (chaleur plénitude ou vide)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -908,7 +908,7 @@
       "Désobstruer les liaisons",
       "Cacher le Yang"
     ],
-    "esprit": "Vent et montée de yang du foie (par nutrition et relâchement)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -938,7 +938,7 @@
       "Neutraliser la toxine",
       "Arrêter la douleur"
     ],
-    "esprit": "Cas graves et symptômes tenaces\nVent (toutes causes sauf vide de sang)\nObstructions bi (vent humidité)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -967,7 +967,7 @@
       "Calmer le Shen",
       "Arrêter le Sang"
     ],
-    "esprit": "Montée du yang du foie\nChaleur (cœur et foie)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -1001,7 +1001,7 @@
       "Chasser les taies",
       "Régénérer les tissus"
     ],
-    "esprit": "Chaleur (cœur et foie)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AF",
@@ -1032,7 +1032,7 @@
       "Ouvrir l'Estomac",
       "Dissiper les aliments"
     ],
-    "esprit": "Humidité dans le foyer central (mobilisation du qi)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AH",
@@ -1059,7 +1059,7 @@
       "Libérer la surpression",
       "Expurger le putride"
     ],
-    "esprit": "Humidité (assèchement)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AH",
@@ -1088,7 +1088,7 @@
       "Assécher l'Humidité",
       "Expulser le Froid"
     ],
-    "esprit": "Froid humidité (foyer central)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AH",
@@ -1116,7 +1116,7 @@
       "Expulser la Canicule",
       "Libérer la Surface"
     ],
-    "esprit": "Humidité (foyer central)\nVomissements\n(Canicule)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AH",
@@ -1143,7 +1143,7 @@
       "Faire descendre le Qi",
       "Dissiper les mucosités"
     ],
-    "esprit": "Humidité et stagnations (poumon, système digestif)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AH",
@@ -1173,7 +1173,7 @@
       "Mettre en ordre le Qi",
       "Calmer le fœtus"
     ],
-    "esprit": "Humidité (foyer central)\nMenace de fausse couche (stagnation de qi)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AH",
@@ -1202,7 +1202,7 @@
       "Arrêter la douleur",
       "Calmer le fœtus"
     ],
-    "esprit": "Saignements par froid-vide\nFroid vide du foyer inférieur (avec ou sans humidité)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1230,7 +1230,7 @@
       "Réduire le gonflement",
       "Engendrer les tissus"
     ],
-    "esprit": "Saignements par chaleur plénitude ou vide (poumon, estomac)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1260,7 +1260,7 @@
       "Favoriser les urines",
       "Dégager la strangurie"
     ],
-    "esprit": "Saignements par chaleur, lésion des liquides",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1291,7 +1291,7 @@
       "Disperser la tuméfaction",
       "Disperser la toxine"
     ],
-    "esprit": "Saignements par chaleur",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1321,7 +1321,7 @@
       "Disperser la tuméfaction",
       "Disperser la toxine"
     ],
-    "esprit": "Saignements par chaleur (foyer inférieur)\nBrûlures",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1347,7 +1347,7 @@
       "Arrêter le saignement",
       "Disperser la Stase"
     ],
-    "esprit": "Saignements (remède d’appoint)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1376,7 +1376,7 @@
       "Arrêter la douleur",
       "Tiédir le centre"
     ],
-    "esprit": "Saignements par froid-vide\nDouleur abdominale, diarrhée par froid-vide",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AS",
@@ -1403,7 +1403,7 @@
       "Activer le Sang",
       "Réduire la Stase"
     ],
-    "esprit": "Saignements par stase de sang",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "AS",
@@ -1431,7 +1431,7 @@
       "Disperser la Stase",
       "Activer le Sang"
     ],
-    "esprit": "Saignements par chaleur et stase de sang",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1460,7 +1460,7 @@
       "Disperser la Stase",
       "Activer le Sang"
     ],
-    "esprit": "Saignements avec stase de sang\nBlessures traumatiques avec stase de sang",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1491,7 +1491,7 @@
       "Arrêter la dysenterie",
       "Tuer les parasites"
     ],
-    "esprit": "Saignements (tous types de tableaux pathologiques)\nDysenterie, diarrhée chroniques",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1521,7 +1521,7 @@
       "Disperser la Stase",
       "Dissiper l'abcès"
     ],
-    "esprit": "Saignements par chaleur\nInflammations cutanées par chaleur toxique",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "AS",
@@ -1549,7 +1549,7 @@
       "Calmer l'Esprit/le Shen",
       "Nourrir le Cœur"
     ],
-    "esprit": "VIDE — nourrir coeur, calmer shen: insomnie, memoire\nsursauts, palpitations, transpirations nocturnes — constipation secheresse vide sang yin\nsheng: constipation secheresse\nshuang (dégraissée): coeur vide yin sang\nattention selles molles, abondances mucosités",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CE",
@@ -1576,7 +1576,7 @@
       "Activer le Sang",
       "Réduire le gonflement"
     ],
-    "esprit": "SURPRESSION — stagnation foie (colere, insomnie, depression) -\nblessures gonflements stase de sang — abcés (+poumon) inflammations cutanées int et ext",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CE",
@@ -1603,7 +1603,7 @@
       "Nourrir le Foie",
       "Retenir la transpiration"
     ],
-    "esprit": "VIDE — Esprit (nourrir foie, calmer coeur), transpiration\npar déficience\nsheng: coeur foie esprit sang yin\nchao huang: transpiration vide yin qi",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CE",
@@ -1631,7 +1631,7 @@
       "Dissiper la tuméfaction",
       "Chasser les mucosités"
     ],
-    "esprit": "MUCOSITES — calmer esprit, favoriser intellect, chasser\nmucosités (toux, manies), abcés furoncles\ngan cao zhi yuan zhi: shen vide coeur sang, mucosités orifices, dysharmonie rein coeur\nmi zhi yuan zhi: Poumon calmer toux mucosités",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CE",
@@ -1659,7 +1659,7 @@
       "Faire s'écouler l'eau",
       "Désobstruer les selles"
     ],
-    "esprit": "Clarifie la chaleur (foie et gros intestin)\nTroubles oculaires (foie)\nConstipation (gros intestin)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CF",
@@ -1687,7 +1687,7 @@
       "Eliminer la dysphorie",
       "Arrêter les vomissements"
     ],
-    "esprit": "Clarifie la chaleur (couche du qi, poumon, estomac, vessie)\nEngendre les liquides",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CF",
@@ -1718,7 +1718,7 @@
       "Rassembler et produire les chairs (en externe)",
       "Engendrer les muscles et refermer les plaies \n(calciné en externe)"
     ],
-    "esprit": "Clarifie la chaleur (couche du qi, poumon, estomac)\nPurge le feu (poumon, estomac)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CF",
@@ -1750,7 +1750,7 @@
       "Dissiper la tuméfaction",
       "Expulser le pus"
     ],
-    "esprit": "Clarifie la chaleur (couche du qi, poumon, estomac)\nEngendre les liquides\nArrête la soif",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CF",
@@ -1776,7 +1776,7 @@
       "Clarifier le Foie",
       "Disperser le surpression et la nouure"
     ],
-    "esprit": "Tête, yeux (feu du foie)\nCou (feu du foie et mucosités)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CF",
@@ -1805,7 +1805,7 @@
       "Humecter la sécheresse",
       "Nourrir le Yin"
     ],
-    "esprit": "Clarifie la chaleur (couche du qi, poumon, estomac, reins)\nEngendre les liquides\nHumidifie les intestins",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CF",
@@ -1837,7 +1837,7 @@
       "Neutraliser la toxicité",
       "Rafraîchir le Sang"
     ],
-    "esprit": "Clarifie la chaleur (couche du qi)\nClarifie la chaleur/feu (cœur, foie, estomac)\nJaunisse (chaleur humidité VB)\nSyndrome lin (chaleur humidité vessie)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CF",
@@ -1865,7 +1865,7 @@
       "Purger le feu",
       "Neutraliser la toxicité"
     ],
-    "esprit": "Clarifie la chaleur, assèche l'humidité (surtout foyer inférieur)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CHU",
@@ -1893,7 +1893,7 @@
       "Neutraliser la toxicité",
       "Tuer les parasites"
     ],
-    "esprit": "Clarifie la chaleur, assèche l'humidité (action générale et plus\nparticulièrement système digestif)\nClarifie le feu (cœur, foie)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CHU",
@@ -1923,7 +1923,7 @@
       "Rafraichir le sang et arrêter les saignements",
       "Calmer le fœtus"
     ],
-    "esprit": "Clarifie la chaleur, assèche l'humidité (action générale et plus\nparticulièrement foyer supérieur)\nSyndrome Shaoyang avec alternance fièvre/frissons",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CHU",
@@ -1951,7 +1951,7 @@
       "Tuer les parasites",
       "Faire s’écouler les urines"
     ],
-    "esprit": "Clarifie la chaleur, assèche l'humidité (action générale\npuissante)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CHU",
@@ -1978,7 +1978,7 @@
       "Purger le feu du foie et de la vésicule biliaire",
       "Éliminer l’humidité chaleur du foyer inférieur"
     ],
-    "esprit": "Clarifie la chaleur, assèche l'humidité (Foie, VB)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CHU",
@@ -2007,7 +2007,7 @@
       "Arrêter la douleur",
       "Réduire le gonflement"
     ],
-    "esprit": "Chaleur du sang avec stase de sang\nYeux rouges",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CS",
@@ -2035,7 +2035,7 @@
       "Disperser la Stase",
       "Activer le Sang"
     ],
-    "esprit": "Chaleur du sang avec stase de sang\nChaleur vide",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CS",
@@ -2064,7 +2064,7 @@
       "Engendrer les liquides",
       "Tonifier le Sang"
     ],
-    "esprit": "Chaleur (plénitude, vide, sang)\nNutrition (yin, liquides, sang)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CS",
@@ -2095,7 +2095,7 @@
       "Purger le Feu",
       "Eliminer la dysphorie"
     ],
-    "esprit": "Gorge (chaleur toxique et masse douloureuse)\nChaleur vide (poumon, estomac, reins)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CS",
@@ -2122,7 +2122,7 @@
       "Activer le Sang",
       "Neutraliser la toxine"
     ],
-    "esprit": "Dermatoses (chaleur du sang)\nBrûlures",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CS",
@@ -2152,7 +2152,7 @@
       "Expulser le Vent",
       "Assécher l'Humidité"
     ],
-    "esprit": "Stases de sang en général\nCéphalées, cerveau (stase de sang)\nObstructions bì (vent froid humidité)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2185,7 +2185,7 @@
       "Calmer le Shen",
       "Eliminer la dysphorie"
     ],
-    "esprit": "Stases de sang (chaleur)\nCœur-esprit (chaleur)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2214,7 +2214,7 @@
       "Casser le Sang",
       "Réduire la masse"
     ],
-    "esprit": "Masses abdominales\nDésordres gynécologiques et digestifs (stagnation de qi, stase\nde sang)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2242,7 +2242,7 @@
       "Expulser la Stase",
       "Débloquer les règles"
     ],
-    "esprit": "Stases de sang en général\nDésordres gynécologiques (stase de sang)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2272,7 +2272,7 @@
       "Détendre les tendons",
       "Activer les liaisons"
     ],
-    "esprit": "Stase de sang avec vide de sang",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2300,7 +2300,7 @@
       "Casser le Sang",
       "Désobstruer les canaux"
     ],
-    "esprit": "Stases de sang dans tout le tronc\nEpaule, bras (obstruction bi par froid humidité)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2330,7 +2330,7 @@
       "Réduire le gonflement",
       "Régénérer les tissus"
     ],
-    "esprit": "Stases de sang (traumatismes, régénération tissulaire)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2363,7 +2363,7 @@
       "Dégager la strangurie",
       "Faire descendre le Feu et le Sang"
     ],
-    "esprit": "Douleurs dans le bas du corps (stases de sang, vide du foie et\ndes reins)\nHémorragies dans le haut du corps (chaleur)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2393,7 +2393,7 @@
       "Régénérer les tissus",
       "Neutraliser la toxine"
     ],
-    "esprit": "Stases de sang (douleurs, traumatismes, régénération tissulaire)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2421,7 +2421,7 @@
       "Casser le Sang",
       "Dissiper l'accumulation"
     ],
-    "esprit": "Système digestif (stagnation de qi et/ou d’aliments, stase de, sang)\nUtérus (stagnation de qi, stase de sang)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2450,7 +2450,7 @@
       "Humecter les Intestins",
       "Désobstruer les selles"
     ],
-    "esprit": "Stases de sang\nPoumon et gros intestin\nConstipation (vide de sang)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2478,7 +2478,7 @@
       "Mobiliser le Qi",
       "Expulser la Stase"
     ],
-    "esprit": "Douleurs (stase de sang)\nPuissant antalgique",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2507,7 +2507,7 @@
       "Réduire le gonflement",
       "Favoriser les urines"
     ],
-    "esprit": "Stases de sang, gynécologie, œdèmes avec chaleur",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2538,7 +2538,7 @@
       "Libérer la surpression",
       "Favoriser la VB et faire reculer le jaune"
     ],
-    "esprit": "Douleur RTL, gynécologie (stagnation de qi et stase de sang\navec chaleur)\nHémorragies (chaleur avec ou sans stase)\nIctère yang (humidité chaleur F/VB)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CSS",
@@ -2566,7 +2566,7 @@
       "Rafraîchir le Sang",
       "Arrêter la dysenterie"
     ],
-    "esprit": "Diarrhée, dysenterie, troubles cutanés (humidité\nchaleur/chaleur toxique)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CT",
@@ -2594,7 +2594,7 @@
       "Rafraîchir le Sang",
       "Assouplir la gorge"
     ],
-    "esprit": "Gorge, tête, visage (chaleur toxique)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CT",
@@ -2622,7 +2622,7 @@
       "Disperser le Vent Chaleur",
       "Libérer la Canicule"
     ],
-    "esprit": "Maladies de la chaleur (tous les stades)\nPeau, gorge, gros intestin (chaleur toxique)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CT",
@@ -2652,7 +2652,7 @@
       "Dissiper le gonflement",
       "Disperser la nouure"
     ],
-    "esprit": "Nodules, masses, tumeurs, abcès (chaleur toxique)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CT",
@@ -2680,7 +2680,7 @@
       "Disperser la nouure",
       "Favoriser les urines"
     ],
-    "esprit": "Inflammations cutanées, abcès internes et externes (chaleur\ntoxine)\nIctère, troubles urinaires (humidité chaleur)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CT",
@@ -2708,7 +2708,7 @@
       "Disperser le Sang",
       "Dissiper les mucosités"
     ],
-    "esprit": "Gorge, poumon (chaleur toxine avec mucosités)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CT",
@@ -2738,7 +2738,7 @@
       "Dégager la strangurie",
       "Expulser le pus"
     ],
-    "esprit": "Abcès du poumon\nSécrétions du foyer inférieur (chaleur (humidité) toxique)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CT",
@@ -2767,7 +2767,7 @@
       "Dissiper le gonflement",
       "Disperser la nouure"
     ],
-    "esprit": "Affections cutanées (chaleur toxine dans la couche du sang)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CT",
@@ -2795,7 +2795,7 @@
       "Rafraîchir le Sang",
       "Faire reculer l'évapration des os"
     ],
-    "esprit": "Chaleur (vide de yin)\nSaignements (chaleur du sang)\nToux (chaleur du poumon)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "CV",
@@ -2823,7 +2823,7 @@
       "Libérer la canicule",
       "Stopper le paludisme"
     ],
-    "esprit": "Paludisme avec alternance fièvre/frissons\nCanicule\nJaunisse (humidité chaleur F/VB ou Rt/E)\nLésion des liquides (chaleur)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "CV",
@@ -2854,7 +2854,7 @@
       "Clarifier le Poumon",
       "Transformer l'Humidité"
     ],
-    "esprit": "Clarifie la chaleur, fait s'écouler l’humidité (vessie, GI, poumon, yeux)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "EH",
@@ -2884,7 +2884,7 @@
       "Réduire la tuméfaction",
       "Neutraliser la toxicité"
     ],
-    "esprit": "Humidité peau (œdème, jaunisse, abcès, furoncles)\nAbcès intestinal",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "EH",
@@ -2914,7 +2914,7 @@
       "Tranquiliser le cœur",
       "Calmer le Shen"
     ],
-    "esprit": "Humidité dans tout le corps (et/ou mucosités)\nRate, Esprit",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "EH",
@@ -2944,7 +2944,7 @@
       "Rassembler l'Humidité",
       "Refermer la plaie"
     ],
-    "esprit": "Humidité chaleur (urines, selles, peau)\nCanicule (pervers humidité chaleur)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "EH",
@@ -2972,7 +2972,7 @@
       "Désobstruer les vaisseaux sanguins",
       "Favoriser les vaisseaux sanguins"
     ],
-    "esprit": "Humidité chaleur de la vessie (par feu du cœur)\nHypogalactie",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "EH",
@@ -3001,7 +3001,7 @@
       "Désobstruer le Qi",
       "Favoriser la lactation"
     ],
-    "esprit": "Humidité chaleur de la vessie\nAgalactie, hypogalactie",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "EH",
@@ -3028,7 +3028,7 @@
       "Renforcer la Rate",
       "Tonifier le Poumon"
     ],
-    "esprit": "Humidité (interne ou externe)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "EH",
@@ -3055,7 +3055,7 @@
       "Favoriser la Vésicule Biliaire",
       "Faire reculer le jaune"
     ],
-    "esprit": "Ictère yang",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "EH",
@@ -3082,7 +3082,7 @@
       "Exsuder l'Hulidité",
       "Purger la Chaleur"
     ],
-    "esprit": "Humidité chaleur du FI",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "EH",
@@ -3108,7 +3108,7 @@
       "Exsuder l'Hulidité",
       "Faire s'écouler l'urine"
     ],
-    "esprit": "Humidité dans tout le corps",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "EH",
@@ -3275,7 +3275,7 @@
       "Dégager la strangurie",
       "Activer la circulation du Sang"
     ],
-    "esprit": "Constipation (vide de sang/liquide)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "LD",
@@ -3302,7 +3302,7 @@
       "Faire s'écouler l'eau",
       "Faire descendre le Qi"
     ],
-    "esprit": "Constipation (vide de sang/liquide, plénitude)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "LD",
@@ -3333,7 +3333,7 @@
       "Eclaircir la vue",
       "Equilibrer la dyspnée"
     ],
-    "esprit": "cacher yang foie coeur, instabilité coeur, epilespsie, syndrome maniaco depressif, vertiges yang\nfoie, acouphenes, surdité, vision faible par vide foie rein, dyspnée reins\nsheng: coeur foie psy, vertiges, insomnies....\ncu cui (vinaigre): reins: asthme na qi, oreilles, vertiges, vision par vide yin foie rein",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "LE",
@@ -3366,7 +3366,7 @@
       "Régénérer les tissus",
       "Refermer les plaies"
     ],
-    "esprit": "- Calmer esprit, frayeur, cacher yang foie (epilepsie, psychose, vertiges...)\n- Retient transpi, affermit jing, incontinence\n- Demangeaisons, eczema, referme plaies\nAttention H/C, pervers plenitude\nsheng: esprit foie\nduan: astringent urines transpi selles leucorrhées sperme plaies",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "LE",
@@ -3395,7 +3395,7 @@
       "Clarifier le Cœur",
       "Calmer le Shen"
     ],
-    "esprit": "Tonifie le Yin du Poumon et favorise les liquides — Nourrit le Yin de l'Estomac, clarifie la chaleur du coeur, calme le shen",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "NY",
@@ -3424,7 +3424,7 @@
       "Soutenir l'Estomac",
       "Produire les liquides"
     ],
-    "esprit": "Nourrit le Yin de l'Estomac",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "NY",
@@ -3454,7 +3454,7 @@
       "Ramollir les indurations",
       "Disperser la nouure"
     ],
-    "esprit": "Nourrit le Yin et ancre le Yang — Clarifie la chaleur vide, ramolli le dur et les nodules",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "NY",
@@ -3484,7 +3484,7 @@
       "Enrichir le Jing",
       "Eclaircir les yeux"
     ],
-    "esprit": "Tonifie le Yin du Foie et des Reins — Nourrit le Foie, benefique pour les yeux",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "NY",
@@ -3516,7 +3516,7 @@
       "Affermir les menstruations",
       "Arrêter le Sang"
     ],
-    "esprit": "Nourrit le Yin des Reins pour solidifier les os, arrête le saignement",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "NY",
@@ -3545,7 +3545,7 @@
       "Tonifier la Rate",
       "Soutenir le jing"
     ],
-    "esprit": "Tonifie la Rate, accroit le Jing",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "NY",
@@ -3575,7 +3575,7 @@
       "Soutenir l'Estomac",
       "Produire les liquides"
     ],
-    "esprit": "Nourrit le Yin du Cour et de l'Estomac",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "NY",
@@ -3604,7 +3604,7 @@
       "Soutenir l'Estomac",
       "Produire les liquides"
     ],
-    "esprit": "Nourrit le Yin de l'Estomac",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "NY",
@@ -3634,7 +3634,7 @@
       "Noircir les cheveux",
       "Eclaircir les yeux"
     ],
-    "esprit": "Clarifie la chaleur, éclaircit les yeux",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "NY",
@@ -3662,7 +3662,7 @@
       "Produire les liquides",
       "Arrêter la soif"
     ],
-    "esprit": "Nourrit le Yin du Poumon et de l'Estomac, arrête la soif",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "NY",
@@ -3691,7 +3691,7 @@
       "Eclaircir les yeux",
       "Enlever les taies de l'œil"
     ],
-    "esprit": "Perte de connaissance (obstruction de chaleur)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "OO",
@@ -3722,7 +3722,7 @@
       "Disperser la stase",
       "Déclencher l'accouchement"
     ],
-    "esprit": "Obstructions",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "OO",
@@ -3753,7 +3753,7 @@
       "Mettre en ordre le Qi",
       "Disperser le vent"
     ],
-    "esprit": "Obstructions par mucosités humidité (shén, orifices du cœur\ncentre, articulations)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "OO",
@@ -3782,7 +3782,7 @@
       "Faire circuler l'eau",
       "Tuer les parasites"
     ],
-    "esprit": "Amas de type froid plénitude",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PE",
@@ -3808,7 +3808,7 @@
       "Casser les accumulations",
       "Désobstruer les selles et les urines"
     ],
-    "esprit": "Œdème et mucosités-yīn (foyers supérieur et médian)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PE",
@@ -3835,7 +3835,7 @@
       "Réduire le gonflement",
       "Disperser la nouure"
     ],
-    "esprit": "Œdème et mucosités-yīn (foyer supérieur avec action plus\nmodérée que gān suì)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PE",
@@ -3864,7 +3864,7 @@
       "Tuer les parasites",
       "Soigner les ulcérations"
     ],
-    "esprit": "Œdème et mucosités-yīn (foyer supérieur avec action plus\nmodérée que gān suì et jīng dà jǐ)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PE",
@@ -3895,7 +3895,7 @@
       "Libérer la surpression du Foie",
       "Expurger le putride"
     ],
-    "esprit": "Vent chaleur externe\nTête, gorge, peau (vent chaleur externe, chaleur interne)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PF",
@@ -3924,7 +3924,7 @@
       "Harmoniser et libérer l'interne et la surface",
       "Faire reculer la fièvre"
     ],
-    "esprit": "Syndrome shào yáng\nStagnation du qì du foie\nAffaissement du qì de la rate",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PF",
@@ -3956,7 +3956,7 @@
       "Apaiser les spasmes et convulsions",
       "Aider à déclencher l'accouchement"
     ],
-    "esprit": "Vent, spasmes, démangeaisons",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PF",
@@ -3985,7 +3985,7 @@
       "Eliminer la dysphorie",
       "Arrêter la soif"
     ],
-    "esprit": "Nuque, épaule, trapèzes (atteinte externe avec ou sans chaleur\ninterne)\nDiarrhée, soif (chaleur, vide de qi)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PF",
@@ -4015,7 +4015,7 @@
       "Calmer leYang du Foie",
       "Clarifier le Feu du Foie"
     ],
-    "esprit": "Yeux rouges et douloureux",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PF",
@@ -4044,7 +4044,7 @@
       "Neutraliser la toxicité",
       "Diffuser et disperser le Vent-Chaleur"
     ],
-    "esprit": "Gorge (très) douloureuse (avec ou sans gonflement)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PF",
@@ -4074,7 +4074,7 @@
       "Humidifier la sécheresse",
       "Rafraîchir le Sang"
     ],
-    "esprit": "Toux (chaleur du poumon)\nTroubles oculaires, céphalées, vertiges (chaleur du foie, vent\nchaleur externe)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PF",
@@ -4102,7 +4102,7 @@
       "Clarifier la Chaleur",
       "Libérer la surface"
     ],
-    "esprit": "Chaleur toxine (vent chaleur externe, yáng míng)\nStade initial des maladies éruptives\nEffondrement du qì de la rate",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PF",
@@ -4132,7 +4132,7 @@
       "Dissiper la tuméfaction",
       "Enlever le pus"
     ],
-    "esprit": "Maux de tête, de dents (vent froid externe)\nLeucorrhées",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4159,7 +4159,7 @@
       "Transformer / Eliminer / \nAssécher l'Humidité",
       "Arrêter la douleur"
     ],
-    "esprit": "Congestion nasale (vent froid externe ou autre)\nDouleurs (vent froid humidité)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4188,7 +4188,7 @@
       "Arrêter les spasmes",
       "Arrêter la diarrhée"
     ],
-    "esprit": "Vent en surface",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4216,7 +4216,7 @@
       "Dégager le Yang",
       "Transformer le Qi"
     ],
-    "esprit": "Libère la surface (surface vide)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PT",
@@ -4246,7 +4246,7 @@
       "Arrêter les saignements",
       "Arrêter les démangeaisons"
     ],
-    "esprit": "Surface avec démangeaisons (vent, vent froid ou vent chaleur\nexterne)\nArrête les saignements",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4274,7 +4274,7 @@
       "Libérer la surface",
       "Induire la transpiration"
     ],
-    "esprit": "Libère la surface (surface plénitude)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PT",
@@ -4303,7 +4303,7 @@
       "Arrêter la douleur",
       "Libérer la surface"
     ],
-    "esprit": "Douleurs de type vent-froid-humidité (tropisme plus marqué\npour le haut du corps)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4330,7 +4330,7 @@
       "Arrêter les vomissements",
       "Transformer les mucosités"
     ],
-    "esprit": "Libère la surface (vent/vent-froid externe)\nPanacée pour les vomissements",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PT",
@@ -4363,7 +4363,7 @@
       "Tiédir le Poumon",
       "Traiter les inflammations buccales (bains de bouche)"
     ],
-    "esprit": "Douleur (tête, articulations), Nez",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PT",
@@ -4394,7 +4394,7 @@
       "Régulariser / \nHarmoniser le centre",
       "Chasser la Canicule"
     ],
-    "esprit": "Vent froid en surface et canicule interne",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4420,7 +4420,7 @@
       "Désobstruer les orifices du nez",
       "Disperser / Chasser le Vent"
     ],
-    "esprit": "Congestion nasale (vent froid externe ou autre)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4447,7 +4447,7 @@
       "Mobiliser le Qi",
       "Harmoniser l'Estomac"
     ],
-    "esprit": "Vend froid externe\nVend froid externe avec stagnation de qì (poitrine, système\ndigestif)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PT",
@@ -4503,7 +4503,7 @@
       "Briser l'accumulation et la stagnation",
       "Faire circuler la stase de Sang"
     ],
-    "esprit": "Purgatif général de la chaleur",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PUF",
@@ -4531,7 +4531,7 @@
       "Désobstruer les selles",
       "Arrêter les saignements"
     ],
-    "esprit": "Constipation (chaleur)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "PUF",
@@ -4558,7 +4558,7 @@
       "Humidifier la Sécheresse",
       "Ramollir le dur"
     ],
-    "esprit": "Constipation (chaleur sécheresse)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "PUF",
@@ -4586,7 +4586,7 @@
       "Assécher l'Humidité",
       "Transformer les mucosités"
     ],
-    "esprit": "Stagnation de qi, inversion par stagnation de qi, humidité (Rt, P)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "RQ",
@@ -4613,7 +4613,7 @@
       "Arrêter la douleur",
       "Expulser et tuer les parasites"
     ],
-    "esprit": "Troubles shan, digestifs par stagnation de qi dans le système\ndu foie (organe + canal) avec chaleur",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "RQ",
@@ -4640,7 +4640,7 @@
       "Transformer les mucosités",
       "Détendre le Foie"
     ],
-    "esprit": "Stagnation de qi (foie, rate)\nToux (mucosités humidité)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "RQ",
@@ -4667,7 +4667,7 @@
       "Mobiliser le Qi",
       "Arrêter la douleur"
     ],
-    "esprit": "Stagnation du qi dans le système digestif et intestinal (Rt, E, GI\nF, VB)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "RQ",
@@ -4693,7 +4693,7 @@
       "Faire descendre le QI",
       "Arrêter le hoquet"
     ],
-    "esprit": "Hoquet",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "RQ",
@@ -4722,7 +4722,7 @@
       "Libérer la surpression",
       "Régulariser les règles"
     ],
-    "esprit": "Syndrome de surpression et stagnation de qi du foie\nTroubles gynécologiques, digestifs par stagnation du qi du foie",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "RQ",
@@ -4752,7 +4752,7 @@
       "Détendre la poitrine",
       "Conduire la stagnation"
     ],
-    "esprit": "Stagnation du qi (obstruction thoracique (xiong bi), système\ndigestif) avec froid",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "RQ",
@@ -4780,7 +4780,7 @@
       "Transformer les mucosités",
       "Eliminer l'amas"
     ],
-    "esprit": "Stagnation de qi (foyer central et inférieur) avec chaleur\nCasse le qi et les masses",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "RQ",
@@ -4809,7 +4809,7 @@
       "Harmoniser le Centre",
       "Calmer le fœtus"
     ],
-    "esprit": "humidité + vide de rate\nmenace d'avortement, leicorhée, sialorhée\nTypologie Bai Zhu: teint pâle\njaunâtre, terne +\npoches sous les yeux surtout les mtains",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TE",
@@ -4839,7 +4839,7 @@
       "Harmoniser Ying Qi et Wei Qi",
       "Neutraliser la toxine des médicaments"
     ],
-    "esprit": "harmonisation\nvide de qi et de sang\nying<3wei\nTypologie Da Zao: anorexie",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TE",
@@ -4868,7 +4868,7 @@
       "Enrichir le Sang",
       "Soutenir le Poumon"
     ],
-    "esprit": "vide de qi et du sang\ntai yin\nplutot vide de yin\nginseng des pauvres\ntypologie : essoufflement\nballonnement, peu d’appétit\nfatigue, conjonctives pâles\nlangue pâle, fine, indentée",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TE",
@@ -4896,7 +4896,7 @@
       "Arrêter la douleur",
       "Neutraliser la toxine"
     ],
-    "esprit": "Amène les liquides + douceur\nneutralise toxines",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TE",
@@ -4924,7 +4924,7 @@
       "Neutraliser la toxine",
       "Relâcher la tension"
     ],
-    "esprit": "harmonise ttlmonde\ntoxine\ngorge\ncoeur\nspasme",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TE",
@@ -4957,7 +4957,7 @@
       "Expulser le pus",
       "Refermer les plaies et régénérer les tissus"
     ],
-    "esprit": "transpiration par vide de Qi\ncicatrisation de la peau\neffondrements, surface vide\nTypologie Huáng qí :\n-transpiration ++, jaunâtre, odorante, collante (transpire en\nmangeant) -vide de Qi, teint pâle, jaunâtre, fatigue\n-Gan mao fréquent avec crainte du vent, regard terne\n-tendance obésité comme ballon, corps lourd\n-musculature molle, relâchement musculaire\n-œdème, godet, rétention d’eau, abdomen gonflé, nombril profond\n-tendance à l’ulcère + affections cutanées chroniques qui\ns’enfoncent",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TE",
@@ -4985,7 +4985,7 @@
       "Soutenir le Sang",
       "Calmer le Cœur et le Shen"
     ],
-    "esprit": "seul qui nourrit tai yin — shao yin, shen\nanti-tumoral\n- Action de tonification sur les\nTrois Foyers (donc sur le corps)\n+ stimule l’acquis et l’inné",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TE",
@@ -5016,7 +5016,7 @@
       "Tonifier fortement le Yuan Qi",
       "Renforcer l'intellect"
     ],
-    "esprit": "Maître absolu de la tonification du Qi\népuisement du Qi et des liquides\nyuan qi, shen",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TE",
@@ -5046,7 +5046,7 @@
       "Soutenir les Reins",
       "Réfréner le Jing"
     ],
-    "esprit": "vide yin\nvide Rn\ndiabete",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TE",
@@ -5073,7 +5073,7 @@
       "Engendrer les liquides",
       "Humidifier le Poumon"
     ],
-    "esprit": "fievre de l'aprem\npervers qui reste coincé\nconvalescence",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TE",
@@ -5102,7 +5102,7 @@
       "Soutenir le Yin du Poumon",
       "Clarifier le Feu vide"
     ],
-    "esprit": "vide de qi avec chaleur\nsecheresse P",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TE",
@@ -5132,7 +5132,7 @@
       "Eliminer l'Humidité",
       "Arrêter la douleur"
     ],
-    "esprit": "Revenir yang ++, Collapsus yang, vide yang, froid humidité, obstruction bi",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TI",
@@ -5162,7 +5162,7 @@
       "Expulser les mucosités",
       "Désobstruer les vaisseaux"
     ],
-    "esprit": "Revenir Yang +, Froid rate estomac, epuisement yang, froid liquides poumon\nREVENIR YANG: FZ + GJ se potentialisent SI NI TANG",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TI",
@@ -5191,7 +5191,7 @@
       "Chasser le Vent",
       "Mobiliser le Qi"
     ],
-    "esprit": "Froid douleur estomac (Main sur le ventre), vomissements",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TI",
@@ -5218,7 +5218,7 @@
       "Abaisser le Qi",
       "Neutraliser la toxicité"
     ],
-    "esprit": "Rechauffe estomac, stimule appetit, douleurs, vomissements, diarrhées — epilepsie mucosités, BI\nen externe",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TI",
@@ -5247,7 +5247,7 @@
       "Tuer les parasites",
       "Neutraliser les toxines des poissons"
     ],
-    "esprit": "Froid humidité estomac, vomissements, diarrhées parasites, eczema prurit genitaux (ext)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TI",
@@ -5280,7 +5280,7 @@
       "Désobstruer les vaisseaux",
       "Désobstruer les vaisseaux sanguins"
     ],
-    "esprit": "Vides de yang, douleurs froid partout, congestion duê au froid avec stase sang et/ou mucosités\nyang flottant Ramene feu à sa source (coeur reins), syndromes vide qi et sang, uterus (chong mai\nren mai prennent leur source dans ming men)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TI",
@@ -5312,7 +5312,7 @@
       "Arrêter la diarrhée",
       "Arrêter les vomissements"
     ],
-    "esprit": "Douleurs froid (y compris foie), vomissements froid (dysharmonie F/E)), diarrhée froid humidité\neczema ulceres exsudation",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TI",
@@ -5339,7 +5339,7 @@
       "Harmoniser l'Estomac",
       "Mettre en ordre le QI"
     ],
-    "esprit": "Mini Wu Zhu Yu\nHernie, orchidoptose, douleurs froid/ stag qi foie (yan zhi), dysménorrhées, froid et stagnation\ncentre",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TI",
@@ -5368,7 +5368,7 @@
       "Retenir le Yin",
       "Rassembler la transpiration"
     ],
-    "esprit": "Sang (vide, stase, chaleur)\nHyperactivité du yang du foie avec vide de yin du foie",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TS",
@@ -5398,7 +5398,7 @@
       "Humidifier les intestins",
       "Désobstruer les selles"
     ],
-    "esprit": "Vide de sang avec ou sans stase",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "TS",
@@ -5427,7 +5427,7 @@
       "Arrêter les saignements",
       "Calmer le fœtus"
     ],
-    "esprit": "Vide de sang/yin\nHémorragies (chaleur vide)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TS",
@@ -5454,7 +5454,7 @@
       "Tonifier le Foie",
       "Soutenir les Reins"
     ],
-    "esprit": "Syndromes de vide de sang du foie et du jing des reins",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TS",
@@ -5482,7 +5482,7 @@
       "Soutenir la Rate",
       "Calmer le Shen"
     ],
-    "esprit": "Syndromes de vide de qi de la rate et de sang du cœur",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TS",
@@ -5509,7 +5509,7 @@
       "Soutenir le jing",
       "Remplir les moelles"
     ],
-    "esprit": "Sang, yin, jing (nutrition)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TS",
@@ -5536,7 +5536,7 @@
       "Ramollir et disperser les indurations.",
       "Réduire le gonflement et arrêter la douleur en usage externe."
     ],
-    "esprit": "Mucosités humidité\nNausées et vomissements (mucosités)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5569,7 +5569,7 @@
       "Humidifier le poumon et arrêter la toux.",
       "Disperser les nodosités et réduire le gonflement."
     ],
-    "esprit": "Toux sèche (vide de yin du poumon)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5602,7 +5602,7 @@
       "Détendre la poitrine et dissiper les nodosités.",
       "Humidifier les intestins et débloquer les selles."
     ],
-    "esprit": "Poumon (chaleur vide ou plénitude)\nConstipation\nObstruction de la poitrine (Xiong Bi)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5636,7 +5636,7 @@
       "Assouplir la gorge et favoriser la voix.",
       "Expulser le pus."
     ],
-    "esprit": "Poumon, gorge, toux",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5669,7 +5669,7 @@
       "Mettre en ordre le qì, disperser les indurations et dissiper la tuméfaction.",
       "Désobstruer les liaisons et arrêter la douleur."
     ],
-    "esprit": "Toux par mucosités froides\nObstructions bi (vent froid humidité avec mucosités)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5701,7 +5701,7 @@
       "Arrêter la toux et calmer la dyspnée.",
       "Humidifier les intestins et débloquer les selles."
     ],
-    "esprit": "Toux\nConstipation (sécheresse)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5733,7 +5733,7 @@
       "Transformer les mucosités et ramollir les indurations.",
       "Favoriser l’écoulement de l’eau et dissiper l’œdème."
     ],
-    "esprit": "Masses (indurations, nodosités)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5766,7 +5766,7 @@
       "Assouplir la gorge et ouvrir la voix.",
       "Humidifier les intestins et débloquer les selles."
     ],
-    "esprit": "Douleur de la gorge, enrouement (chaleur plénitude ou vide)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5798,7 +5798,7 @@
       "Expulser le vent et arrêter les spasmes.",
       "Disperser la nouure et réduire le gonflement."
     ],
-    "esprit": "Toux (mucosités froid et/ou humidité)\nMucosités vent\nAssèche l’humidité, transforme les mucosités, expulse le vent, arrête les spasmes.\nForme crue : vent / mucosités vent / convulsions.\nPréparé bái fán + shēng jiāng : humidité et mucosités.\nPréparé avec bile : mucosités chaleur.",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5862,7 +5862,7 @@
       "Clarifier le cœur et apaiser la frayeur.",
       "Éteindre le vent et calmer les convulsions."
     ],
-    "esprit": "Obstruction des orifices du cœur (mucosités chaleur)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5896,7 +5896,7 @@
       "Ramollir le dur.",
       "Mobiliser l’eau."
     ],
-    "esprit": "Poumon (mucosités avec douleur du thorax)\nSystème digestif (mucosités avec inversion du qi de l'estomac)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5928,7 +5928,7 @@
       "Clarifier la chaleur et transformer les mucosités.",
       "Disperser les nodosités et réduire le gonflement."
     ],
-    "esprit": "Mucosités chaleur (poumon, nodules)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5961,7 +5961,7 @@
       "Clarifier le cœur et ouvrir les orifices.",
       "Arrêter les convulsions et apaiser la frayeur."
     ],
-    "esprit": "Psy, système nerveux (mucosités chaleur sur cœur/estomac)",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -5995,7 +5995,7 @@
       "Harmoniser l’estomac et arrêter les vomissements.",
       "Rafraîchir le sang et arrêter le sang."
     ],
-    "esprit": "Système digestif, vésicule biliaire (mucosités chaleur)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "INDEX PAR CLASSES",
@@ -6032,7 +6032,7 @@
       "Arrêter la toux",
       "Transormer les mucsités"
     ],
-    "esprit": "Toux par vide (na qi) et ou avec mucosités, impuissance, ejaculation precoce par vide rein\naffaiblissemnt maladie chronique, ming men",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6059,7 +6059,7 @@
       "Renforcer les tendons et les os",
       "Calmer le fœtus"
     ],
-    "esprit": "deficience foie rein (douleur lombaires genoux, manque de force)(+ext), menace avortement\nHTA vide rein pertes",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6087,7 +6087,7 @@
       "Tiédir le Poumon",
       "Humidifier les intestins"
     ],
-    "esprit": "Faiblesse douleur partie inf, impuissances emissions involontaires, enuresie, toux par na qi\nconstipation vide sang liquides",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6118,7 +6118,7 @@
       "Harmoniser Chong Mai et Ren Mai",
       "Déloger l'abcès et les toxines"
     ],
-    "esprit": "Vide yang rein, foie, qi ,sang: fractures (+ext), croissance, reproduction, vide ren mai dai mai\nchong mai menorragie, metrorragie, leucorrhées, ulcerations inflammations cutanées qui ne\nguerissent pas",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6146,7 +6146,7 @@
       "Désobstruer les selles",
       "Humidifier la Sécheresse"
     ],
-    "esprit": "Vide yang reins, jing, sang, membres inf lombes, constipation secheresse gi (produit humide)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6178,7 +6178,7 @@
       "Eclaircir les yeux",
       "Arrêter la diarrhée"
     ],
-    "esprit": "Impuissance, enuresie, pertes, reproduction....Douleurs lombaires genoux, Vision, menace\navortement, meno metrorragies par vide rein foie ren mai, diarrhées, diabete vide yin, vitiligo",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6207,7 +6207,7 @@
       "Harmoniser les vaisseaux sanguins",
       "Arrêter les métrorragies"
     ],
-    "esprit": "Tendons, os, coups, blessures, menace avortement, pertes urines sperme",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6236,7 +6236,7 @@
       "Tiédir la Rate",
       "Affermir le Qi"
     ],
-    "esprit": "Pertes urine, sperme, emissions nocturnes, salivation excessive, diarrhée",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6263,7 +6263,7 @@
       "Eliminer l'Humidité",
       "Expulser le Vent"
     ],
-    "esprit": "Tiede, piquant, doux foie, reins\nVide yang rein, BI vide froid humidité (branche+racine)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "TY",
@@ -6318,7 +6318,7 @@
       "Disperser le Froid",
       "Arrêter la douleur d'obstruction"
     ],
-    "esprit": "Obstructions bi (aigus ou chroniques) par vent froid humidité",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "VH",
@@ -6346,7 +6346,7 @@
       "Harmoniser l'Estomac",
       "Détendre les tendons"
     ],
-    "esprit": "Humidité (obstructions bi, foyer médian) accompagnée de\ncontractures et spasmes des tendons",
+    "esprit": "",
     "prioritaire": true,
     "source": {
       "workbookSheet": "VH",
@@ -6376,7 +6376,7 @@
       "Clarifier la Chaleur",
       "Faire s'écouler l'urine"
     ],
-    "esprit": "Obstructions bi par vent humidité\nIctère yang",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "VH",
@@ -6408,7 +6408,7 @@
       "Enrichir le Sang",
       "Calmer le foeuts"
     ],
-    "esprit": "Obstructions bi par vent humidité sur terrain de vide",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "VH",
@@ -6435,7 +6435,7 @@
       "Favoriser la fluidité des articulations",
       "Mobiliser l'eau et le qi"
     ],
-    "esprit": "Obstructions bi par vent humidité (plus particulièrement les\nmembres supérieurs)",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "VH",
@@ -6464,7 +6464,7 @@
       "Activer le Sang",
       "Chasser la Stase"
     ],
-    "esprit": "Humidité, articulations",
+    "esprit": "",
     "prioritaire": false,
     "source": {
       "workbookSheet": "VH",

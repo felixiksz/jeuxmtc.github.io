@@ -2,7 +2,7 @@
    Généré depuis un export du jeu ; ne pas modifier à la main. */
 window.MTC_SHARED_NOTES = {
  "author": "emesepap, admin",
- "exportedAt": "2026-10-07T12:00:00.000Z",
+ "exportedAt": "2026-10-07T15:00:00.000Z",
  "points": {
   "DM1": {
    "notes": "Da Bao Bao Mai Dai Mai : réception de la charge de stase de Sang par le Bao Mai, troisième temps du relais (après VB-22, RM-15 ± DM-9), avant drainage final par VB-26+VB-41. (Sterman)"
@@ -198,7 +198,8 @@ window.MTC_SHARED_NOTES = {
    "associations": "E36+ GI11 : troubles digestifs: renforceet regule fonctions de yang ming (malnutrition).Restaure tranformation du qi si yang ming re réagit plus aux traitement d'acu. DI chroniqe sur tajet genou coude jambe epaule\n\nE36+Rt 3 :stimule yang Rt, renforce le centre. Vide chronique s'aggravant en def yang( colite chronique, gastrite chronique, certaines anémie et syndrome deCrohn)\n\nE 36 + GI 11 : renforce et régule fonction du Yang Ming surtout si malnutrition par absorption insuffisante\nE 36 + GI 11 : « épuisement » du Yang Ming suite à TTT long et inefficace ou maladie chronique avec non-réaction du canal\nE 36 + GI 11 : paralysie faciale de type Yang Ming\nE 36 + GI 11 : douleur chronique sur trajet du canal (genou, coude, épaule, jambe entière)\nE 36 + GI 11 — Circuits : Yang Ming/Tai Yin, Yang Ming/Jue Yin, Yang Ming/Rn-EC\n\nE 36 + RM 11 : réchauffe et renforce Rt et Esto\nE 36 + RM 11 : vide Rt et Esto (douleurs abdo, diarrhées, petit appétit, transpi spontanées et/ou fatigue)\nE 36 + RM 11 : + GI 10 = les 3 li\nE 36 + RM 11 : + RM 12 : léger effet de drainage pour faciliter élimination stase nourriture, humidité et/ou glaires\nE 36 + RM 11 — Circuits : Yang Ming/Tai Yin, Yang Ming/Jue Yin, Yang Ming/Rn-EC, Terre/Feu ministre\n\nE 36 + RM 12 : régule Rt et Esto\nE 36 + RM 12 : tonification douce\nE 36 + RM 12 : plénitude avec transformation du qi incorrect\nE 36 + RM 12 — Circuits : Yang Ming/Tai Yin, Yang Ming/Jue Yin, Yang Ming/Rn-EC, Terre/Feu ministre"
   },
   "P7": {
-   "associations": "P7+GI4+DM14 : Disperse Vent Froid, libere la surface, diffuse le P.EN DISPERSION. GRANDE PRESCRIPTION CLASSIQUE\nP7+GI4+GI11 : Disperse Vent chaleur, diffuse le P\nP7+GI4 : Disperse vent, Ciblent tête, nuque+face et bouche\nP7+Rn6 : Pt cles Ren Mai ,Yin Qiao Mai : tt gorge, poitrine, inflamation chronique gorge def yin\nP7+Rt4 : Pt clés Ren Mai , Chong Mai, Régule règles, ménorragie, absences règle, règles\ndouloureuses\nP7+ E36: Toux et asthme chronique avec mucosités-Humidité par vide de Rt\n\nP 7 + V10: équilibre poumon\nP 7 + VB 41: association pour un drainage en douceur du dai mai — le Ren mai (P-7) soutient la contenance et l'amour de soi ; préférable si les ressources du patient sont limitées ou l'histoire est traumatique. (Farrell)\n\nModèle Luo Émotionnel à trois niveaux : P 7 + F 5 pour le niveau Wei/Humeur (sentiment bloqué sans cible identifiée).(Sterman)\n\nP 7 + Rn 6 : troubles de la gorge (maux) intenses\nP 7 + Rn 6 : nourrit liquides de la gorge et des voies aériennes sup\nP 7 + Rn 6 : tb urinaires avec mict° difficile\nP 7 + Rn 6 : œdèmes de type P-Rn\nP 7 + Rn 6 — Circuits : Métal/Eau\n\nP 7 + Rt 4 : régulation des règles avec temps irrégulier entre les cycles\nP 7 + Rt 4 : moins efficace pour ménorragies, absence de règles ou règles douloureuses\nP 7 + Rt 4 — Circuits : Tai Yin/Tai Yang, Tai Yin/Yang Ming, Tai Yang/qi, Shao Yang/Rt-C, Métal/Eau, Terre/Feu ministre, Tai Yin/F-IG\n\n(ren mai + du mai)\nP 7 + IG 3 : céphalée occipitale obtenue après la pratique de Qi Gong (exercice de l'orbite microcosmique)\nP 7 + IG 3 : blocages de la circulation sur l'axe RM-DM (céphalées, maux de dos, douleur abdo basse et fixe)\nP 7 + IG 3 — Circuits : Tai Yin/Tai Yang, Tai Yang/qi, Métal/Eau, Feu/Bois, Tai Yin/F-IG\n\nP 7 + V10: équilibre poumon\nP 7 + VB 41: association pour un drainage en douceur du dai mai — le Ren mai (P-7) soutient la contenance et l'amour de soi ; préférable si les ressources du patient sont limitées ou l'histoire est traumatique. (Farrell)\n\nModèle Luo Émotionnel à trois niveaux : P 7 + F 5 pour le niveau Wei/Humeur (sentiment bloqué sans cible identifiée).(Sterman)"
+   "associations": "P7+GI4+DM14 : Disperse Vent Froid, libere la surface, diffuse le P.EN DISPERSION. GRANDE PRESCRIPTION CLASSIQUE\nP7+GI4+GI11 : Disperse Vent chaleur, diffuse le P\nP7+GI4 : Disperse vent, Ciblent tête, nuque+face et bouche\nP7+Rn6 : Pt cles Ren Mai ,Yin Qiao Mai : tt gorge, poitrine, inflamation chronique gorge def yin\nP7+Rt4 : Pt clés Ren Mai , Chong Mai, Régule règles, ménorragie, absences règle, règles\ndouloureuses\nP7+ E36: Toux et asthme chronique avec mucosités-Humidité par vide de Rt\n\nP 7 + V10: équilibre poumon\nP 7 + VB 41: association pour un drainage en douceur du dai mai — le Ren mai (P-7) soutient la contenance et l'amour de soi ; préférable si les ressources du patient sont limitées ou l'histoire est traumatique. (Farrell)\n\nModèle Luo Émotionnel à trois niveaux : P 7 + F 5 pour le niveau Wei/Humeur (sentiment bloqué sans cible identifiée).(Sterman)\n\nP 7 + Rn 6 : troubles de la gorge (maux) intenses\nP 7 + Rn 6 : nourrit liquides de la gorge et des voies aériennes sup\nP 7 + Rn 6 : tb urinaires avec mict° difficile\nP 7 + Rn 6 : œdèmes de type P-Rn\nP 7 + Rn 6 — Circuits : Métal/Eau\n\nP 7 + Rt 4 : régulation des règles avec temps irrégulier entre les cycles\nP 7 + Rt 4 : moins efficace pour ménorragies, absence de règles ou règles douloureuses\nP 7 + Rt 4 — Circuits : Tai Yin/Tai Yang, Tai Yin/Yang Ming, Tai Yang/qi, Shao Yang/Rt-C, Métal/Eau, Terre/Feu ministre, Tai Yin/F-IG\n\n(ren mai + du mai)\nP 7 + IG 3 : céphalée occipitale obtenue après la pratique de Qi Gong (exercice de l'orbite microcosmique)\nP 7 + IG 3 : blocages de la circulation sur l'axe RM-DM (céphalées, maux de dos, douleur abdo basse et fixe)\nP 7 + IG 3 — Circuits : Tai Yin/Tai Yang, Tai Yang/qi, Métal/Eau, Feu/Bois, Tai Yin/F-IG\n\nP 7 + V10: équilibre poumon\nP 7 + VB 41: association pour un drainage en douceur du dai mai — le Ren mai (P-7) soutient la contenance et l'amour de soi ; préférable si les ressources du patient sont limitées ou l'histoire est traumatique. (Farrell)\n\nModèle Luo Émotionnel à trois niveaux : P 7 + F 5 pour le niveau Wei/Humeur (sentiment bloqué sans cible identifiée).(Sterman)",
+   "notes": "Traite plutot le vent"
   },
   "EC7": {
    "associations": "EC 7 + F 2 : élimine la chaleur et transforme les stagnat° de Qi et/ou sang (blocage qi dans F-stagnat°sg dans EC)\nEC 7 + F 2 : point fils draine canal mère\nEC 7 + F 2 : règles irrégulières et syndrome pré-menstruel avec irritabilité, agitation +/- autres signes de chaleur\nEC 7 + F 2 : vent pathogène externe bloqué dans le luo\nEC 7 + F 2 : chaleur du Jue Yin (insomnies, céphalées vasculaires, sd de la ménopause, règles irrégulières, tb du déficit de l'attention TDA chez l'enfant)\nEC 7 + F 2 : troubles émotionnels provoqués par stress excessif chez patient jeune = svt chaleur dans Jue Yin (tb émotionnels type plénitude)\nEC 7 + F 2 — Circuits : Jue Yin/Shao Yang, Jue Yin/Yang Ming, Jue Yin/GI-Rn\n\nEC 7 + P 5 : élimine et draine chaleur statique sur EC, P et esto\nEC 7 + P 5 : sècheresse gorge, bouche, nez\nEC 7 + P 5 : perte voix\nEC 7 + P 5 : douleur poitrine avec gout amer dans la bouche\nEC 7 + P 5 : langue rouge, ulcérat° buccales ou nasales\nEC 7 + P 5 : constipat° et/ou urines foncées\nEC 7 + P 5 : toux avec expectorat° glaires purulentes\nEC 7 + P 5 : chaleur statique sur esto due invasion chaleur externe sur réchauffeur sup (nausées, vomissements)\nEC 7 + P 5 : autres types invasion externes emprisonnées dans Yang Ming - Jue Yin\nEC 7 + P 5 — Circuits : Jue Yin/Shao Yang, Jue Yin/Yang Ming, Tai Yang/qi, Métal/Eau, Terre/Feu ministre"
@@ -563,182 +564,182 @@ window.MTC_SHARED_NOTES = {
  },
  "pharma": {
   "A9": {
-   "esprits": "diabete, toxine d'alcool, hepatite, \n\ntoux par double vide rn et P, \ndiarrhée chronique par vide de la Rt\ntranspi spontanée, \ninsomnie\npompe cardiaque",
+   "esprits": "diabete, toxine alcool, hepatite, double vide rn et P, transpi spontanée, insomnie\n\ndiabete, toxine d'alcool, hepatite, \n\ntoux par double vide rn et P, \ndiarrhée chronique par vide de la Rt\npompe cardiaque",
    "notes": "baisser les taux de transaminases élevées (hépatite)"
   },
   "VH3": {
-   "esprits": "OK chaleur vide",
+   "esprits": "Obstructions bi par vent humidité\nIctère yang\n\nOK chaleur vide",
    "formules": "DU HUO JI SHENG TANG : Rhumatismes et douleurs récentes ou chroniques (tableau vide) ostheo-articulaires, y compris tableau auto-immune :\n\n+Wu Jia Pi = ton qi et sang F et Rn"
   },
   "PT10": {
-   "esprits": "Vent-froid pendant la canicule..\n\"la ma huang de l'été\"\n\nOedemes\n\nLibere biao, harmonise le centre et transforme l'humidité"
+   "esprits": "Vent froid en surface et canicule interne\n\nVent-froid pendant la canicule..\n\"la ma huang de l'été\"\n\nOedemes\n\nLibere biao, harmonise le centre et transforme l'humidité"
   },
   "CSS4": {
-   "esprits": "Stases de sang en général, \n\nDésordres gynécologiques (stase de sang)\n\nStase poitrine (sang, mucosités)",
+   "esprits": "Stases de sang en général\nDésordres gynécologiques (stase de sang)\n\nStase poitrine (sang, mucosités)",
    "notes": "Tao Ren+Hong Hua: action générale sur les doueleurs par stase de sang",
    "associations": "HONG HUA   +   TAO REN = Association clé pour la stase de sang"
   },
   "CHU1": {
-   "esprits": "Chaleur humidité, (surtout foyer inférieur), Gynéco, Pieds et genoux gonflés, \nInflammations cutanées"
+   "esprits": "Clarifie la chaleur, assèche l'humidité (surtout foyer inférieur)\n\nChaleur humidité, (surtout foyer inférieur), Gynéco, Pieds et genoux gonflés, \nInflammations cutanées"
   },
   "PF1": {
-   "esprits": "Vent chaleur externe, \nTête, yeux, gorge, peau (vent chaleur externe, chaleur interne)\n\nDémangeaisons par vent chaleur",
+   "esprits": "Vent chaleur externe\nTête, gorge, peau (vent chaleur externe, chaleur interne)\n\nTête, yeux, gorge, peau (vent chaleur externe, chaleur interne)\n\nDémangeaisons par vent chaleur",
    "notes": "Initie la lactogenese, YIN QIAO SAN\nXIAO YAO SAN: dys. F -Rt avec vide de sang ou pas, Avec Chai Hu+Bai Shao Yao = libérer la stag.qi du foie\n\nSANG JU YIN: Vent-chaleur externe avec plus de toux"
   },
   "CS4": {
-   "esprits": "Gorge (chaleur toxique et masse douloureuse), \n\nDermato (éruptions, inflammations, abcès toxiques)\n\nChaleur vide (poumon, estomac, reins)\n\nMucosités"
+   "esprits": "Gorge (chaleur toxique et masse douloureuse)\nChaleur vide (poumon, estomac, reins)\n\nDermato (éruptions, inflammations, abcès toxiques)\n\nMucosités"
   },
   "CSS2": {
-   "esprits": "Cœur\n\nShen\n\nStase de sang par chaleur \n\nChaleur du foie se propagant au cœur"
+   "esprits": "Stases de sang (chaleur)\nCœur-esprit (chaleur)\n\nShen\n\nStase de sang par chaleur \n\nChaleur du foie se propagant au cœur"
   },
   "CS3": {
-   "esprits": "Chaleur (plénitude, vide, sang), \nNutrition (yin, liquides, sang)\nNE TRAITE PAS LA STASE\n\nAgitation mentale"
+   "esprits": "Chaleur (plénitude, vide, sang)\nNutrition (yin, liquides, sang)\n\nNE TRAITE PAS LA STASE\n\nAgitation mentale"
   },
   "CF2": {
-   "esprits": "Dysphorie par consomption des liquides, Clarifie la chaleur (couche du qi, poumon, estomac, vessie),, \n\nEngendre les liquides\n\nDiurétique \n\nSyndromes lin",
+   "esprits": "Clarifie la chaleur (couche du qi, poumon, estomac, vessie)\nEngendre les liquides\n\nDysphorie par consomption des liquides, Clarifie la chaleur (couche du qi, poumon, estomac, vessie),, \n\nDiurétique \n\nSyndromes lin",
    "notes": "Yin qiao san : début des attaques de chaleur"
   },
   "CT1": {
-   "esprits": "Chaleur Yang Ming"
+   "esprits": "Diarrhée, dysenterie, troubles cutanés (humidité\nchaleur/chaleur toxique)\n\nChaleur Yang Ming"
   },
   "PF5": {
-   "esprits": "Maux-de-tetes (F)\n\nPas très puissant pour libérer surface",
+   "esprits": "Yeux rouges et douloureux\n\nMaux-de-tetes (F)\n\nPas très puissant pour libérer surface",
    "notes": "En externe mélangé avec sérum phy \n\nSANG JU YIN: Vent-chaleur externe avec plus de toux"
   },
   "AF8": {
-   "esprits": "Cas graves et symptômes tenaces \nVent du foie (toutes causes sauf vide de sang)\nObstructions bi (vent humidité)\nOpisthotonos"
+   "esprits": "Cas graves et symptômes tenaces\nVent (toutes causes sauf vide de sang)\nObstructions bi (vent humidité)\n\nVent du foie (toutes causes sauf vide de sang)\nOpisthotonos"
   },
   "LD1": {
-   "esprits": "Constipation (vide de sang/yin)"
+   "esprits": "Constipation (vide de sang/liquide)\n\nConstipation (vide de sang/yin)"
   },
   "FD5": {
    "esprits": "Excés alimentaire (notamment minéraux, métaux)\n\nAméliore l'assimilation des aliments\n\nAide á digerer si VB retirée"
   },
   "VH5": {
-   "esprits": "Obstructions bi par vent humidité (surtout membres supérieurs)\n\noedemes (général ou membres sup.)",
+   "esprits": "Obstructions bi par vent humidité (plus particulièrement les\nmembres supérieurs)\n\nObstructions bi par vent humidité (surtout membres supérieurs)\n\noedemes (général ou membres sup.)",
    "associations": "SANG ZHI + Fu Ling + Zhu Ling = reduit l'oedeme par la diuerese",
    "vs": "SANG ZHI vs Mu Gua \nmembres sup vs membres inf"
   },
   "CHU4": {
-   "esprits": "Clarifie la chaleur, assèche l'humidité (action générale, puissante)\n\nJaunisse, gynéco, GI\n\nDermato",
+   "esprits": "Clarifie la chaleur, assèche l'humidité (action générale\npuissante)\n\nJaunisse, gynéco, GI\n\nDermato",
    "notes": "KU SHEN DI HUANG WAN: hémorroïdes qui saignent avec chaleur \n\nKU SHEN WAN: Inflammation cutanée: évacuer la chaleur par l'axe P-GI / YANG MING \n\nKU SHEN TANG: herpes génital \n\nXIAO FENG SAN: Démangeaisons cutanées"
   },
   "AS10": {
-   "esprits": "hémostatique"
+   "esprits": "Saignements avec stase de sang\nBlessures traumatiques avec stase de sang\n\nhémostatique"
   },
   "CT4": {
-   "esprits": "Diurétique\nFeu du cœur qui se transmet à l'IG (infection urinaire)",
+   "esprits": "Nodules, masses, tumeurs, abcès (chaleur toxique)\n\nDiurétique\nFeu du cœur qui se transmet à l'IG (infection urinaire)",
    "notes": "Yin qiao san: formule fondamentale pour traiter vent-chaleur externe \n\nDao chi san: infection urinaire, feu du cœur qui se transmet à l'Ig\n\nLong dan xie gan tang : infection urinaire par feu du foie qui se transmet à la vessie"
   },
   "AF2": {
-   "esprits": "Chaleur et nouure dans la vessie"
+   "esprits": "Vent (clarifie la chaleur)\nRamollissement des masses et obstructions\n\nChaleur et nouure dans la vessie"
   },
   "CV2": {
-   "esprits": "maladies infectueux (palud, covid)\n\nconsomption des liquides par attaque chaleur externe, \n\nUrticaire, eczéma (en externe), \n\nPaludisme avec alternance fièvre/frissons, \n\nCanicule, \n\nJaunisse (humidité chaleur F/VB ou Rt/E)",
+   "esprits": "Paludisme avec alternance fièvre/frissons\nCanicule\nJaunisse (humidité chaleur F/VB ou Rt/E)\nLésion des liquides (chaleur)\n\nmaladies infectueux (palud, covid)\n\nconsomption des liquides par attaque chaleur externe, \n\nUrticaire, eczéma (en externe), ",
    "notes": "Ttment COVID\nprix Nobel Malaria"
   },
   "CF4": {
-   "esprits": "Clarifie la chaleur (couche du qi, poumon, yang ming, \n\nEngendre les liquides, \n\n!! Arrête la soif\n\nDiabète",
+   "esprits": "Clarifie la chaleur (couche du qi, poumon, estomac)\nEngendre les liquides\nArrête la soif\n\nClarifie la chaleur (couche du qi, poumon, yang ming, \n\nDiabète",
    "notes": "Interdit femme enceinte"
   },
   "CF3": {
-   "esprits": "chaleur couche du qi, poumon, yang ming\n\nPurge le feu\n\nSi présence de sueurs abondantes \n\nCalme la dysphorie",
+   "esprits": "Clarifie la chaleur (couche du qi, poumon, estomac)\nPurge le feu (poumon, estomac)\n\nchaleur couche du qi, poumon, yang ming\n\nSi présence de sueurs abondantes \n\nCalme la dysphorie",
    "notes": "Hypoglycémiant \nDouleur dentaire, saignement des gencives par feu esto\n\nEczéma, brûlures \n\nZHU YE SHI GAO YANG : nourrir le yin et clarifier la chaleur pour éliminer la dysphorie par consomption des liquides",
    "associations": "- Syndrome de chaleur plénitude dans la couche du qì au couleur d’une maladie de la chaleur tiédeur: Shi Gao + Zhi Mu (pour clarifier la chaleur plénitude dans la couche du qì.)\n\n- Attaque de canicule qui , par sa chaleur intensive , consume les qì et les liquides: Shí gāo + rén shēn (pour nourrir le yīn , tonifier le qì tout en clarifiant la chaleur.)\n- Apparition de macules et papules , fièvre élevée persistante par obstruction de chaleur toxine , chaleur en excès dans les couches du qì et du sang: Shí gāo + XUAN SHEN + MU DAN PI + zhī zǐ (pour purger la chaleur , éliminer la toxine et rafraichir le sang.)\n- Dernier stade des maladies de la tiédeur , avec fièvre traînante , agitation anxieuse , bouche sèche , langue rouge , peu d’enduit lingual: Shí gāo + zhú yè + mài dōng (pour purger la chaleur , calmer la dysphorie et engendrer les liquides.)\n- Toux et dyspnée par l’accumulation de chaleur sur le poumon: Shí gāo + MA HUANG + xìng rén (pour purger puissamment le feu et disperser le qì du poumon , afin d’arrêter la toux et la dyspnée.)\n- Toux due aux mucosités chaleur: Shí gāo + GAN CAO + zhú lì (pour résoudre les mucosités clarifier le poumon et arrêter la toux.)\n- Maux de dents (surtout quand ils s'étendent à la tête) , saignement et douleur aux gencives , douleur au visage , mauvaise haleine par feu de l’estomac et toxine: Shí gāo + HUANG LIAN + shēng má (pour clarifier l’estomac et arrêter le saignement.)\n- Douleur et de distension à la tête: Shí gāo + CHUAN XIONG + bái zhǐ (pour clarifier la chaleur et arrêter la douleur.)\n- Douleur de la gorge: Shí gāo + NIU BANG ZI + bò hé (pour clarifier la chaleur et favoriser la gorge.)\n- Soif par montée du feu et vide de yīn: Shí gāo + SHU DI HUANG + MAI DONG + NIU XI + zhī mǔ (pour purger le feu , engendrer les liquides et arrêter la soif.)\n- Ulcération chronique: Shí gāo + shēng yào (pour éliminer la toxine , assécher l’humidité et améliorer la cicatrisation des tissus.)\n- Ezéma qui suinte abondamment: Shí gāo + HUANG BAI + kū fán ((pour éliminer la toxine , assécher l’humidité et améliorer la cicatrisation des tissus.)\n- Brulure: Shí gāo + qīng dài + HUANG BAI\n\n- Syndrome de chaleur plénitude dans la couche du qì au couleur d’une maladie de la chaleur tiédeur: Shi Gao + Zhi Mu (pour clarifier la chaleur plénitude dans la couche du qì.)\n\n- Attaque de canicule qui , par sa chaleur intensive , consume les qì et les liquides: Shí gāo + rén shēn (pour nourrir le yīn , tonifier le qì tout en clarifiant la chaleur.)\n- Apparition de macules et papules , fièvre élevée persistante par obstruction de chaleur toxine , chaleur en excès dans les couches du qì et du sang: Shí gāo + XUAN SHEN + MU DAN PI + zhī zǐ (pour purger la chaleur , éliminer la toxine et rafraichir le sang.)\n- Dernier stade des maladies de la tiédeur , avec fièvre traînante , agitation anxieuse , bouche sèche , langue rouge , peu d’enduit lingual: Shí gāo + zhú yè + mài dōng (pour purger la chaleur , calmer la dysphorie et engendrer les liquides.)\n- Toux et dyspnée par l’accumulation de chaleur sur le poumon: Shí gāo + MA HUANG + xìng rén (pour purger puissamment le feu et disperser le qì du poumon , afin d’arrêter la toux et la dyspnée.)\n- Toux due aux mucosités chaleur: Shí gāo + GAN CAO + zhú lì (pour résoudre les mucosités clarifier le poumon et arrêter la toux.)\n- Maux de dents (surtout quand ils s'étendent à la tête) , saignement et douleur aux gencives , douleur au visage , mauvaise haleine par feu de l’estomac et toxine: Shí gāo + HUANG LIAN + shēng má (pour clarifier l’estomac et arrêter le saignement.)\n- Douleur et de distension à la tête: Shí gāo + CHUAN XIONG + bái zhǐ (pour clarifier la chaleur et arrêter la douleur.)\n- Douleur de la gorge: Shí gāo + NIU BANG ZI + bò hé (pour clarifier la chaleur et favoriser la gorge.)\n- Soif par montée du feu et vide de yīn: Shí gāo + SHU DI HUANG + MAI DONG + NIU XI + zhī mǔ (pour purger le feu , engendrer les liquides et arrêter la soif.)\n- Ulcération chronique: Shí gāo + shēng yào (pour éliminer la toxine , assécher l’humidité et améliorer la cicatrisation des tissus.)\n- Ezéma qui suinte abondamment: Shí gāo + HUANG BAI + kū fán ((pour éliminer la toxine , assécher l’humidité et améliorer la cicatrisation des tissus.)\n- Brulure: Shí gāo + qīng dài + HUANG BAI"
   },
   "PT2": {
-   "esprits": "Congestion nasale (vent froid externe ou autre)\n\nDouleurs (vent froid humidité)\nRhinite chronique / allergique",
+   "esprits": "Congestion nasale (vent froid externe ou autre)\nDouleurs (vent froid humidité)\n\nRhinite chronique / allergique",
    "notes": "L'amer fait sombrer l'humidité\nTUE AUSSI LES PARASITES"
   },
   "VH1": {
-   "esprits": "surtout foyer inf., \n\nDentalgie (vent ou chaleur)\n\nrejet de stérilet et autres blessures par du métal\n\nLombalgie",
+   "esprits": "Obstructions bi (aigus ou chroniques) par vent froid humidité\n\nsurtout foyer inf., \n\nDentalgie (vent ou chaleur)\n\nrejet de stérilet et autres blessures par du métal\n\nLombalgie",
    "notes": "Attaque de froid du Shao yin",
    "associations": "DU HUO       +       BAI ZHU       +             =       douleur dentaire \nDU HUO       +       QIANG HUO       =      vent-froid-humidite, douleurs généralisés",
    "formules": "DU HUO JI SHENG TANG : Rhumatismes et douleurs récentes ou chroniques (tableau vide) ostheo-articulaires, y compris tableau auto-immune :\n\n+Wu Jia Pi = ton qi et sang F et Rn\n\nQIANG HUO SHENG SHI TANG = douleurs corporels généralisés",
    "vs": "DU HUO   vs   QIANG HUO  \nbas du corps   vs   haut du corps"
   },
   "PF7": {
-   "esprits": "Toux (chaleur du poumon), \n\nLésion du P par le tabac \n\nTroubles oculaires, céphalées, vertiges (chaleur du foie, vent, chaleur externe)\n\nChaleur dans le sang",
+   "esprits": "Toux (chaleur du poumon)\nTroubles oculaires, céphalées, vertiges (chaleur du foie, vent\nchaleur externe)\n\nLésion du P par le tabac \n\nChaleur dans le sang",
    "notes": "SANG JU YIN: Vent-chaleur externe avec plus de toux \n\nHypoglycémiant"
   },
   "PT9": {
-   "esprits": "Douleur (tête, articulations), \nNez\nOUVRE FORT LES ORIFICES",
+   "esprits": "Douleur (tête, articulations), Nez\n\nOUVRE FORT LES ORIFICES",
    "formules": "MA HUANG FU ZI XI XIN TANG = combo pour restaurer le yáng et la conscience, et pour aller en prison ... GRAND froid avec tout qui se bloque, personne affaiblie, a la limite de la mort."
   },
   "A8": {
    "esprits": "Palpitations,\n\ninsomnie,\nanxiété,\ndysharmonie Rn-C\nparasites intestinales"
   },
   "CSS12": {
-   "esprits": "Douleurs (stase de sang), \n\nPuissant antalgique quelque soit la cause \n\nThorax/ abdomen \n\nTranquillisant"
+   "esprits": "Douleurs (stase de sang)\nPuissant antalgique\n\nPuissant antalgique quelque soit la cause \n\nThorax/ abdomen \n\nTranquillisant"
   },
   "AS9": {
-   "esprits": "Troubles gynéco"
+   "esprits": "Saignements par chaleur et stase de sang\n\nTroubles gynéco"
   },
   "AF7": {
-   "esprits": "Engourdissement \nAvc, etc"
+   "esprits": "Vent et montée de yang du foie (par nutrition et relâchement)\n\nEngourdissement \nAvc, etc"
   },
   "A4": {
    "esprits": "fuites par vide des reins: \nleucorrhees, urines fréquentes, incontinence, diarrhée chronique, diarrhée"
   },
   "CSS5": {
-   "esprits": "Troubles gynéco \nPar stase de sang et/ou vide de sang"
+   "esprits": "Stase de sang avec vide de sang\n\nTroubles gynéco \nPar stase de sang et/ou vide de sang"
   },
   "AS11": {
-   "esprits": "Saignements (passe partout)\n\nDysenterie, diarrhée chroniques"
+   "esprits": "Saignements (tous types de tableaux pathologiques)\nDysenterie, diarrhée chroniques\n\nSaignements (passe partout)"
   },
   "AF10": {
-   "esprits": "Agitation shen\nInsomnie \nTroubles oculaires par chaleur"
+   "esprits": "Chaleur (cœur et foie)\n\nAgitation shen\nInsomnie \nTroubles oculaires par chaleur"
   },
   "AS4": {
-   "esprits": "chaleur-mucosités au poumon",
+   "esprits": "Saignements par chaleur\n\nchaleur-mucosités au poumon",
    "notes": "Peut etre rajouté dans une formule si saignement par chaleur"
   },
   "PT3": {
-   "esprits": "vent-humidité\n\nbouclier contre les attaques externes\n\nVent sur la surface (prurites)\n\nSpasmes, diarrhées",
+   "esprits": "Vent en surface\n\nvent-humidité\n\nbouclier contre les attaques externes\n\nVent sur la surface (prurites)\n\nSpasmes, diarrhées",
    "formules": "YU PING FENG SAN=vide de la surface, allergies\n\n QIANG HUO SHENG SHI TANG = sensation de lourdeur avec douleur des articulations, lombalgies, attaque de surface"
   },
   "CT2": {
-   "esprits": "Tout chaleur toxique int/ext\nGorge, tête, visage, dents \n\nVs grippe ou autre virus épidémie grippale"
+   "esprits": "Gorge, tête, visage (chaleur toxique)\n\nTout chaleur toxique int/ext\nGorge, tête, visage, dents \n\nVs grippe ou autre virus épidémie grippale"
   },
   "AS3": {
-   "esprits": "Saignements par chaleur des 3 foyers,  \nlésion des liquides\n\nchaleur dans le sang"
+   "esprits": "Saignements par chaleur, lésion des liquides\n\nSaignements par chaleur des 3 foyers,  \n\nchaleur dans le sang"
   },
   "PT1": {
-   "esprits": "- Maux de tête, \n- Dentalgie (vent froid externe) \ndouleurs et vent externe: sous forme sheng pour les douleurs,\nsauté au jaune: axe assécher l'humidité\n- Leucorrhées (sauté au jaune)",
+   "esprits": "Maux de tête, de dents (vent froid externe)\nLeucorrhées\n\n- Dentalgie (vent froid externe) \ndouleurs et vent externe: sous forme sheng pour les douleurs,\nsauté au jaune: axe assécher l'humidité\n- Leucorrhées (sauté au jaune)",
    "formules": "BAI DU SAN,\nCANG ER ZI SAN",
    "syntheses": "➢ Si il n’y avait que 3 idées à retenir pour l’application clinique de bái zhǐ ce serait:\nDouleurs, notamment de la tête, de l’arcade sourcilière et des dents. Abcès purulents, en application externe. Leucorrhées.\nEn surface\nBái zhǐ n’est pas un bon produit en tant que tel pour libérer la surface dans la mesure où selon certains ouvrages il n’est même pas considéré comme un produit piquant. Par contre, à partir du moment où cette attaque de vent froid en surface provoque des douleurs aiguës dans le corps en général, mais en particulier au niveau de la tête, de l’arcade sourcilière ou bien des dents, bái zhǐ devient un remède incontournable.\nD’autre part, bái zhǐ directement en application externe est un excellent produit pour traiter les abcès purulents. Pour ces deux indications, c’est sous la forme crue qu’il faudra utiliser ce remède.\nEn interne\nBái zhǐ a une bonne capacité d’assèchement de l’humidité et en particulier quand le symptôme principal est la présence de leucorrhées abondantes. Bien entendu, si ces leucorrhées sont de type chaleur humidité ou froid humidité, il faudra combiner bái zhǐ avec d’autres Pour cette indication c’est la forme sautée au jaune de bái zhǐ qu’il faudra utiliser."
   },
   "CF7": {
-   "esprits": "Clarifie la chaleur / feu (couche du qi, cœur, foie, estomac), \n\nJaunisse (chaleur humidité VB), \n\nSyndrome lin (chaleur humidité vessie)\n\nYeux\nFievre eleve, agitation",
+   "esprits": "Clarifie la chaleur (couche du qi)\nClarifie la chaleur/feu (cœur, foie, estomac)\nJaunisse (chaleur humidité VB)\nSyndrome lin (chaleur humidité vessie)\n\nClarifie la chaleur / feu (couche du qi, cœur, foie, estomac), \n\nYeux\nFievre eleve, agitation",
    "notes": "Hemorraghie nimporte ou SHI HUI SAN\n\nHUANG LIAN JIE DU TANG> clarifie la chaleur partout / hemorragies, feu du C, agitation, insomnie, hum/chal F/VB, etc"
   },
   "LD2": {
-   "esprits": "Constipation TOUS TABLEAUX"
+   "esprits": "Constipation (vide de sang/liquide, plénitude)\n\nConstipation TOUS TABLEAUX"
   },
   "CF6": {
-   "esprits": "Clarifie la chaleur PLEN/VIDE (couche du qi, poumon, esto, reins), \n\nEngendre les liquides, \n\nHumidifie les intestins\n\nToux sèche, dyspnée vide de yin\n\nConstipation vide de yin",
+   "esprits": "Clarifie la chaleur (couche du qi, poumon, estomac, reins)\nEngendre les liquides\nHumidifie les intestins\n\nClarifie la chaleur PLEN/VIDE (couche du qi, poumon, esto, reins), \n\nToux sèche, dyspnée vide de yin\n\nConstipation vide de yin",
    "notes": "Xiao ke par vide de yin: YU YE TANG"
   },
   "A7": {
    "esprits": "Tonique du yin et du yáng a la fois\n\nSaignement par RM et Chong Mai non affermies"
   },
   "CHU3": {
-   "esprits": "Chaleur humidité (action générale et plus, particulièrement foyer supérieur),\n\nSyndrome Shaoyang avec alternance fièvre/frissons, \n\nCanicule, \n\nMenace d'avortement\n\nSaignement par chaleur",
+   "esprits": "Clarifie la chaleur, assèche l'humidité (action générale et plus\nparticulièrement foyer supérieur)\nSyndrome Shaoyang avec alternance fièvre/frissons\n\nChaleur humidité (action générale et plus, particulièrement foyer supérieur),\n\nCanicule, \n\nMenace d'avortement\n\nSaignement par chaleur",
    "notes": "Contient berberine-->diabète, HUANG QIN TANG:, chaleur humidité, notamment maladies auto-immunes ou inflammation avec chaleur humidité.\n\nXIAO CHAI HU TANG \n\nAN TAI YIN: agitation du foetus et menace d'avortement par chaleur"
   },
   "FD4": {
    "esprits": "Excés alimentaire (notamment gras et viande),\ndysenterie,\n\ndouleur abdominale par diarrhée,\nexpulse le ténia\ndouleurs de regles par stase de sang"
   },
   "PF2": {
-   "esprits": "Syndrome shào yáng, \n\nStagnation du qì du foie, \n\nAffaissement du qì de la rate",
+   "esprits": "Syndrome shào yáng\nStagnation du qì du foie\nAffaissement du qì de la rate",
    "notes": "Harmonise biao - li, CHAI HU SHU GAN SAN: Stag qui du Foie (avec SPM)\n\nBU ZHONG YI QI TANG : Affaissement du centre",
    "formules": "- Chái Gé Jiě Jī Tāng = Fièvre dans un syndrome externe.\n\n- Xiǎo Chái Hú Tāng = Syndrome shào yáng dû à une invasion externe de froid qui se manifeste par une alternance de frissons et de fièvre, plénitude et de malaise dans la poitrine, goût amer dans la bouche, gorge sèche et vertige.\n\n- Chái Hú Shū Gān Sàn = Douleur à la poitrine et aux hypochondres.\n\n- Xiāo Yáo Sàn = Règles irrégulières accompagnées d’une alternance de frissons et de fièvre, distension des seins ou plénitude à la poitrine dues à une stagnation du qì du foie ou de déficience de sang.\n\n- Fù Yuán Huó Xiě Tāng = Douleur de la poitrine due à un traumatisme.\n\n- Bǔ Zhōng Yì Qì Tāng = Effondrement du qì du centre qui se manifeste par un prolapsus anal, gastroptose, hystéroptose ou épuisement général. (chai hu en petite dose pour avoir juste sa fonction ascendente)\n\n- Chái Gé Jiě Jī Tāng = Fièvre dans un syndrome externe.\n\n- Xiǎo Chái Hú Tāng = Syndrome shào yáng dû à une invasion externe de froid qui se manifeste par une alternance de frissons et de fièvre, plénitude et de malaise dans la poitrine, goût amer dans la bouche, gorge sèche et vertige.\n\n- Chái Hú Shū Gān Sàn = Douleur à la poitrine et aux hypochondres.\n\n- Xiāo Yáo Sàn = Règles irrégulières accompagnées d’une alternance de frissons et de fièvre, distension des seins ou plénitude à la poitrine dues à une stagnation du qì du foie ou de déficience de sang.\n\n- Fù Yuán Huó Xiě Tāng = Douleur de la poitrine due à un traumatisme.\n\n- Bǔ Zhōng Yì Qì Tāng = Effondrement du qì du centre qui se manifeste par un prolapsus anal, gastroptose, hystéroptose ou épuisement général. (chai hu en petite dose pour avoir juste sa fonction ascendente)"
   },
   "CHU5": {
-   "esprits": "Yeux, dents, OGE, gorge"
+   "esprits": "Clarifie la chaleur, assèche l'humidité (Foie, VB)\n\nYeux, dents, OGE, gorge"
   },
   "PF4": {
-   "esprits": "Courbatures: Nuque, épaule, trapèzes (atteinte externe avec ou sans chaleur, interne), - Libère couche musculaire, \n\nDiarrhée, soif (chaleur, vide de qi)",
+   "esprits": "Nuque, épaule, trapèzes (atteinte externe avec ou sans chaleur\ninterne)\nDiarrhée, soif (chaleur, vide de qi)\n\nCourbatures: Nuque, épaule, trapèzes (atteinte externe avec ou sans chaleur, interne), - Libère couche musculaire, ",
    "notes": "GUI ZHI JIA GE GEN TANG : Courbatures par synd. Ext."
   },
   "FD3": {
@@ -750,52 +751,52 @@ window.MTC_SHARED_NOTES = {
    "notes": "a haute dose toxique (psychotrope)"
   },
   "CSS14": {
-   "esprits": "Douleur RTL, \n\ngynécologie (stagnation de qi et stase de sang, avec chaleur), \n\nHémorragies (chaleur avec ou sans stase), \n\nIctère yang (humidité chaleur F/VB)\n\nChaleur du cœur qui agite \n\nChaleur couche du sang \n\nStase+surpr.qi.F"
+   "esprits": "Douleur RTL, gynécologie (stagnation de qi et stase de sang\navec chaleur)\nHémorragies (chaleur avec ou sans stase)\nIctère yang (humidité chaleur F/VB)\n\nChaleur du cœur qui agite \n\nChaleur couche du sang \n\nStase+surpr.qi.F"
   },
   "AF5": {
-   "esprits": "Migraines et céphalées chroniques"
+   "esprits": "Vent (toutes causes sauf vide de sang)\nObstructions bi (vent humidité)\n\nMigraines et céphalées chroniques"
   },
   "CSS1": {
-   "esprits": "très utilisé pour faire circuler le sang et éliminer les stases, remède clé des céphalées et du cerveau (séquelles d’AVC, hémiplégie, engourdissement), syndromes d’obstruction avec douleurs articulaires.\nGynéco\nDermato",
+   "esprits": "Stases de sang en général\nCéphalées, cerveau (stase de sang)\nObstructions bì (vent froid humidité)\n\ntrès utilisé pour faire circuler le sang et éliminer les stases, remède clé des céphalées et du cerveau (séquelles d’AVC, hémiplégie, engourdissement), syndromes d’obstruction avec douleurs articulaires.\nGynéco\nDermato",
    "notes": "CX + Dang Gui = nourrir et activer le sang\n\nSI WU TANG : Nourrir le sang\n\nSI JUN ZI TANG : Ton ° de la Rt\n\nBA ZHEN TANG : Ton° qi et nourrir le sang"
   },
   "PT12": {
-   "esprits": "Vend froid externe\navec ou sans stagnation de qì (poitrine, système digestif)\n\nNausée pendant la grossesse",
+   "esprits": "Vend froid externe\nVend froid externe avec stagnation de qì (poitrine, système\ndigestif)\n\navec ou sans stagnation de qì (poitrine, système digestif)\n\nNausée pendant la grossesse",
    "associations": "ZI SU YE    +    SHENG JIANG    =    Intoxication par poissons et fruits de mer",
    "syntheses": "Zǐ sū yè libère la surface d’une attaque de vent froid externe. Dans ce cadre, on utilisera zǐ sū yè de préférence à un autre remède quand les symptômes marquants sont:\n- la toux: dans ce cas, on pense à l’association avec xìng rén;\n- une sensation d’oppression marquée à la poitrine et/ou une atteinte du système digestif avec sensation d’oppression et de plénitude épigastrique, nausées, vomissements: dans ce cas, penser à la combinaison avec xiāng fù.\nZǐ sū yè s’utilise aussi dans des syndromes uniquement internes de stagnation de qì qui touchent le système digestif avec sensation de plénitude de la poitrine et de l’épigastre, nausées, vomissements. Dans ce cas, il sera encore plus pertinent d’utiliser zǐ sū gěng.\n- Cette stagnation de qì peut survenir seule ou être provoquée par le froid et/ou l’humidité:\ndans ce cas, il faut penser à l’association avec jú pí, bàn xià, huò xiāng.\n- Cette stagnation de qì peut être provoquée par l’humidité chaleur: dans ce cas, il faut penser à l’association avec huáng lián."
   },
   "CSS8": {
-   "esprits": "Conduit la chaleur vers le bas du corps \n\nDouleurs dans le bas du corps (stases de sang, vide du foie et, des reins), \n\nDouleurs gynéco, post-partum \n\nHémorragies dans le haut du corps (chaleur)"
+   "esprits": "Douleurs dans le bas du corps (stases de sang, vide du foie et\ndes reins)\nHémorragies dans le haut du corps (chaleur)\n\nConduit la chaleur vers le bas du corps \n\nDouleurs gynéco, post-partum "
   },
   "CSS11": {
-   "esprits": "Stases de sang, Poumon et gros intestin, Constipation (vide de sang), Abcès pulmonaire / intestinale \nchaleur+stase",
+   "esprits": "Stases de sang\nPoumon et gros intestin\nConstipation (vide de sang)\n\nStases de sang, Poumon et gros intestin, Constipation (vide de sang), Abcès pulmonaire / intestinale \nchaleur+stase",
    "notes": "TAO HONG SI WU TANG : pb de règles par vide et/ou stase de sang"
   },
   "CS2": {
-   "esprits": "Tous tableaux de chaleur vide ou plénitude avec ou sans stase \nLésions cutanées par chaleur dans le sang! Abcès ext ou int \nMénopause"
+   "esprits": "Chaleur du sang avec stase de sang\nChaleur vide\n\nTous tableaux de chaleur vide ou plénitude avec ou sans stase \nLésions cutanées par chaleur dans le sang! Abcès ext ou int \nMénopause"
   },
   "AS12": {
-   "esprits": "Saignements par chaleur\nInflammations, gonflement cutanées par chaleur toxique"
+   "esprits": "Saignements par chaleur\nInflammations cutanées par chaleur toxique\n\nInflammations, gonflement cutanées par chaleur toxique"
   },
   "AS1": {
-   "esprits": "= armoise moxa\nSaignements par vide de yáng de la Rt\n\nFroid vide du foyer inférieur (avec ou sans humidité)\ndouleur par froid\nfait aussi circuler"
+   "esprits": "Saignements par froid-vide\nFroid vide du foyer inférieur (avec ou sans humidité)\n\n= armoise moxa\nSaignements par vide de yáng de la Rt\n\ndouleur par froid\nfait aussi circuler"
   },
   "CF5": {
-   "esprits": "CLARIFIE LE FEU DU FOIE\n\nTête, yeux (feu du foie), \n\nCou (feu du foie et mucosités)\n\nNodules, grosseurs, ganglions, goitre",
+   "esprits": "Tête, yeux (feu du foie)\nCou (feu du foie et mucosités)\n\nCLARIFIE LE FEU DU FOIE\n\nNodules, grosseurs, ganglions, goitre",
    "notes": "XIAO KU CAO SAN TAN: feu du foie sur terrain de vide de sang du foie"
   },
   "A3": {
-   "esprits": "shen, pompe cardiaque, \n\nastringence des intestins: diarrhee!",
+   "esprits": "shen, pompe cardiaque, diarree\n\nastringence des intestins: diarrhee!",
    "notes": "leucorrhée, spermatorrhée par vide Rt et Rn"
   },
   "CT8": {
-   "esprits": "Affections cutanées \nchaleur toxine dans la couche du sang"
+   "esprits": "Affections cutanées (chaleur toxine dans la couche du sang)"
   },
   "AF6": {
-   "esprits": "Vertige, éblouissement\nFièvre en marées"
+   "esprits": "Hyperactivité du yang du foie\nYeux (chaleur plénitude ou vide)\n\nVertige, éblouissement\nFièvre en marées"
   },
   "CV1": {
-   "esprits": "Chaleur vide de yin et de sang, \n\nSaignement par chaleur danse sang,\n\nRéaction allergique dermato\n\nValorisation des os \n\nChaleur dans le sang \n\nFièvre nocturne et fraîcheur du mâtin\n\nVide de yin par malnutrition de l'enfant",
+   "esprits": "Chaleur (vide de yin)\nSaignements (chaleur du sang)\nToux (chaleur du poumon)\n\nChaleur vide de yin et de sang, \n\nSaignement par chaleur danse sang,\n\nRéaction allergique dermato\n\nValorisation des os \n\nChaleur dans le sang \n\nFièvre nocturne et fraîcheur du mâtin\n\nVide de yin par malnutrition de l'enfant",
    "notes": "Souvent associé à mu dan pi pour la chaleur vide",
    "formules": "QING GU SAN: chaleur des os\nXIE BAI SAN: secheresse poumon\nJIA WEI XIE BAI SAN: toux par vide de yin du P"
   },
@@ -804,73 +805,73 @@ window.MTC_SHARED_NOTES = {
    "notes": "Les poules picorent tout, mangent tout, digérent tout... meme les cailloux :D"
   },
   "TTD4": {
-   "esprits": "POUMON, gorge, toux\nDiffuse le qi du poumon"
+   "esprits": "Poumon, gorge, toux\n\nDiffuse le qi du poumon"
   },
   "CSS7": {
-   "esprits": "Abcès cutanée douloureux"
+   "esprits": "Stases de sang (traumatismes, régénération tissulaire)\n\nAbcès cutanée douloureux"
   },
   "PT11": {
-   "esprits": "Débouche le nez\n\nDouleurs dentaires\n\nMaux de tete"
+   "esprits": "Congestion nasale (vent froid externe ou autre)\n\nDébouche le nez\n\nDouleurs dentaires\n\nMaux de tete"
   },
   "CHU2": {
-   "esprits": "Chaleur humidité (action générale et plus, particulièrement système digestif), \n\n!! Clarifie le feu (cœur, esto, foie)\n\nDrainer la voie du feu pour qu'il puisse rejoindre l'eau",
+   "esprits": "Clarifie la chaleur, assèche l'humidité (action générale et plus\nparticulièrement système digestif)\nClarifie le feu (cœur, foie)\n\nChaleur humidité (action générale et plus, particulièrement système digestif), \n\n!! Clarifie le feu (cœur, esto, foie)\n\nDrainer la voie du feu pour qu'il puisse rejoindre l'eau",
    "notes": "Contient berberine-->diabète"
   },
   "V1": {
    "esprits": "éliminer des produits toxiques ou aliments qui stagnent ou un excés de médicaments ingérés par exemples"
   },
   "VH6": {
-   "esprits": ", muscles\n\nTon qi et sang du F et Rn\n\nOedemes (en asso): rechauffe les reins et evacue les oedeme par diurese",
+   "esprits": "Humidité, articulations\n\n, muscles\n\nTon qi et sang du F et Rn\n\nOedemes (en asso): rechauffe les reins et evacue les oedeme par diurese",
    "notes": "Peut etre preparé en vin médicinal pour renforcer les os",
    "associations": "WU JIA PI  +  DU ZHONG  =  lombaires\n\nWU JIA PI  +  NIU XI  =  genou\n\nWU JIA PI  +  CANG ZHU  =  assechent l'Humidite"
   },
   "CSS13": {
-   "esprits": "Stases de sang avec chaleur\n\nDouleur post-partum, gynéco, œdèmes \n\nDiurétique"
+   "esprits": "Stases de sang, gynécologie, œdèmes avec chaleur\n\nStases de sang avec chaleur\n\nDouleur post-partum, gynéco, œdèmes \n\nDiurétique"
   },
   "AS8": {
-   "esprits": "(passe-partout)",
+   "esprits": "Saignements par stase de sang\n\n(passe-partout)",
    "notes": "ATTENTION si decoction en cocotte, mettre dans un gaze"
   },
   "AS7": {
-   "esprits": "Saignements par vide yáng de la Rt\n\nDouleur abdominale, diarrhée par \nfroid-vide (foyer inférieur)",
+   "esprits": "Saignements par froid-vide\nDouleur abdominale, diarrhée par froid-vide\n\nSaignements par vide yáng de la Rt\n\nfroid-vide (foyer inférieur)",
    "notes": "En prévention, ou pour perte de sang par froid vide post-partum"
   },
   "AF9": {
-   "esprits": "Shen \nArrête le sang \nVision floue \nUlcération/acidité gastrique"
+   "esprits": "Montée du yang du foie\nChaleur (cœur et foie)\n\nShen \nArrête le sang \nVision floue \nUlcération/acidité gastrique"
   },
   "A6": {
    "esprits": "impuissance, émissions nocturnes par vide des reins"
   },
   "TTD1": {
-   "esprits": "Mucosités humidité\n\nNausées et vomissements (mucosités)\n\n!!Psychose par mucosités qui obstruent les orifices"
+   "esprits": "Mucosités humidité\nNausées et vomissements (mucosités)\n\n!!Psychose par mucosités qui obstruent les orifices"
   },
   "CT5": {
-   "esprits": "Inflammations cutanées, abcès internes et externes (chaleur toxine)\nIctère, troubles urinaires (humidité chaleur)\nSeins"
+   "esprits": "Inflammations cutanées, abcès internes et externes (chaleur\ntoxine)\nIctère, troubles urinaires (humidité chaleur)\n\nSeins"
   },
   "PF8": {
-   "esprits": "Chaleur toxine (vent chaleur externe, yáng míng), \n\nStade initial des éruptions \n\nEffondrement du qì de la rate",
+   "esprits": "Chaleur toxine (vent chaleur externe, yáng míng)\nStade initial des maladies éruptives\nEffondrement du qì de la rate\n\nStade initial des éruptions ",
    "notes": "SHENG MA GE GEN TANG : Éruptions cutanées par vent-chaleur (poumon -yang mint)\n\nBU ZHONG YI QI TANG"
   },
   "PUF1": {
-   "esprits": "Humecte le sang sec et envoie la stase vers le bas\nChassee vieux pour faire venir le nouveau",
+   "esprits": "Purgatif général de la chaleur\n\nHumecte le sang sec et envoie la stase vers le bas\nChassee vieux pour faire venir le nouveau",
    "notes": "POUR ACNÉS (transcription d'une écriture á la main)\nLUO CHUANG CHA SI (?)\nLiu Huang 5g ? Pu huang?\nKu Fan 10g\nDa Huang 5g\nHuang Lian 3g\nHuang Bai 3g\n\nEn poudre fine tamisée + 70ml d'eau bouillie froide-->pate\nAppliquer sur la zone concernée le soin. Cure de 30j max l'hiver et 10j max l'été. (pose toute la nuit)",
    "formules": "- Pour acnés: Decoction de DIAN DAO SAN pour « nettoyer » la peau ( DA HUANG 10 g + LIU HUANG10g)\n\n- DA CHENG QI TANG: Formule purgative puissante ponctuelle pour accumulation de chaleur dans organes yang ming \n\n- BA ZHENG SAN: phase aiguë des troubles urinaires accumulation de chaleur humidité Vessie"
   },
   "EH4": {
-   "esprits": "Humidité chaleur (urines, selles, peau)\n\nCanicule (pervers humidité chaleur)\n\ncystite lame de rasoire"
+   "esprits": "Humidité chaleur (urines, selles, peau)\nCanicule (pervers humidité chaleur)\n\ncystite lame de rasoire"
   },
   "PT8": {
-   "esprits": "Libère la surface (vent/vent-froid externe)\nmucosités\nfait descendre le qi ni (vomissements)\ntoxicité",
+   "esprits": "Libère la surface (vent/vent-froid externe)\nPanacée pour les vomissements\n\nmucosités\nfait descendre le qi ni (vomissements)\ntoxicité",
    "vs": "SHENG JIANG   vs   GAN JIANG \nfrais  vs   séché"
   },
   "TTD6": {
-   "esprits": "Fait descendre le métal"
+   "esprits": "Toux\nConstipation (sécheresse)\n\nFait descendre le métal"
   },
   "CS5": {
-   "esprits": "Dermatoses (chaleur du sang),\n\nBrûlures"
+   "esprits": "Dermatoses (chaleur du sang)\nBrûlures"
   },
   "VH2": {
-   "esprits": "Nourrit le foie\n\nHumidité (obstructions bi, foyer médian) , contractures et spasmes des tendons\n\noedeme et lourdeur des membres inférieurs",
+   "esprits": "Humidité (obstructions bi, foyer médian) accompagnée de\ncontractures et spasmes des tendons\n\nNourrit le foie\n\nHumidité (obstructions bi, foyer médian) , contractures et spasmes des tendons\n\noedeme et lourdeur des membres inférieurs",
    "notes": "Stagnation alimentaire",
    "vs": "MU GUA vs vs Sang Zhi \nmembres inf vs membres sup"
   },
@@ -879,40 +880,40 @@ window.MTC_SHARED_NOTES = {
    "associations": "ZI SU GENG + Sha Ren + Guang Huo Xiang = Vomissement pendant la grossesse"
   },
   "PT7": {
-   "esprits": "Douleurs de type vent-froid-humidité (tropisme plus marqué pour le haut du corps)\n\nTraite pas l'interne",
+   "esprits": "Douleurs de type vent-froid-humidité (tropisme plus marqué\npour le haut du corps)\n\nTraite pas l'interne",
    "associations": "- Attaque de la surface par le vent froid et chaleur interne avec fièvre , frissons , absence de transpiration , céphalées , raideur de la nuque , douleurs des membres , soif , goût amer dans la bouche: Qiāng huó + FANG FENG + CHUAN XIONG\n\n- Attaque de la surface par le vent humidité avec douleur des épaules et du dos , difficulté à tourner la tête , céphalée , sensation de lourdeur du corps , douleur lombaire , pouls flottant: Qiāng huó + DU HUO + gǎo běn + FANG FENG\n\n- Syndrome d’obstruction par vent froid humidité: Qiāng huó + DANG GUI\n\n- Céphalées de type tài yáng par invasion de vent froid humidité: Qiāng huó + CHUAN XIONG + BAI ZHI + gǎo běn\n\n- Céphalées par invasion de de vent chaleur: Qiāng huó + BAI ZHI + jīng jiè suì"
   },
   "CSS6": {
-   "esprits": "Stases de sang dans tout le tronc,\nEpaule, bras \n(obstruction bi par froid humidité)"
+   "esprits": "Stases de sang dans tout le tronc\nEpaule, bras (obstruction bi par froid humidité)"
   },
   "AF4": {
-   "esprits": "Hyperactivité du yang du foie \nPalpitations \nMasses, nodules"
+   "esprits": "Apaisement (vent, yáng du foie, shén)\nFuite des liquides physiologiques par vide de rein\nNodules, masses\nHyperacidité gastrique\n\nHyperactivité du yang du foie \nPalpitations \nMasses, nodules"
   },
   "CF1": {
-   "esprits": "Clarifie la chaleur (foie et gros intestin),\nTroubles oculaires (foie),\nConstipation (gros intestin)\n\nHTA avec hypercholestérolémie"
+   "esprits": "Clarifie la chaleur (foie et gros intestin)\nTroubles oculaires (foie)\nConstipation (gros intestin)\n\nHTA avec hypercholestérolémie"
   },
   "AS5": {
-   "esprits": ", eczema, abcés, chaleur toxine",
+   "esprits": "Saignements par chaleur (foyer inférieur)\nBrûlures\n\n, eczema, abcés, chaleur toxine",
    "notes": "hémorrhoides, selles avec du sang, problémes utérins"
   },
   "TE1": {
-   "esprits": "humidité + vide de rate\nmenace d'avortement, leucorrhée, sialorrhée\nTypologie Bai Zhu: teint pâle\njaunâtre, terne +\npoches sous les yeux surtout les matins"
+   "esprits": "humidité + vide de rate\nmenace d'avortement, leicorhée, sialorhée\nTypologie Bai Zhu: teint pâle\njaunâtre, terne +\npoches sous les yeux surtout les mtains\n\nmenace d'avortement, leucorrhée, sialorrhée\npoches sous les yeux surtout les matins"
   },
   "PT6": {
-   "esprits": ",\nSUDORIFIQUE\nDiffuse et fait descendre le qi du poumon\n\nToux",
+   "esprits": "Libère la surface (surface plénitude)\n\nSUDORIFIQUE\nDiffuse et fait descendre le qi du poumon\n\nToux",
    "notes": "Difficile á remplacer. Seule elle pousse pas vers l'extérieur, elle va juste ouvrir. \n\nMa huang ouvre les pores mais a besoin de Gui zhi pour enduire la sudorification. \n\nSouvent marqué indisponible, il faut demander.",
    "vs": "MA HUANG  vs  GUI ZHI\nouvre FORT les pores  vs  pousse vers l'exterieur"
   },
   "PT4": {
-   "esprits": "Cible l'utérus et la prostate\nStase de sang et froid gynécologique (fibromes, endometriose, caillots)",
+   "esprits": "Libère la surface (surface vide)\n\nCible l'utérus et la prostate\nStase de sang et froid gynécologique (fibromes, endometriose, caillots)",
    "notes": "Ma huang ouvre les pores mais a besoin de Gui zhi pour enduire la sudorification.",
    "vs": "GUI ZHI     vs     MA HUANG \npousse vers l'exterieur     vs    ouvrir FORT les pores"
   },
   "RQ6": {
-   "esprits": "COTES, HYPOCONDRES"
+   "esprits": "Syndrome de surpression et stagnation de qi du foie\nTroubles gynécologiques, digestifs par stagnation du qi du foie\n\nCOTES, HYPOCONDRES"
   },
   "AF1": {
-   "esprits": "Yeux (chaleur, distention, les yeux qui tirent), larmoiement \nDermatoses vent/chaleur",
+   "esprits": "Vent (plénitude, stagnation, chaleur)\n\nYeux (chaleur, distention, les yeux qui tirent), larmoiement \nDermatoses vent/chaleur",
    "notes": "Testostérone-like\nPour la chaleur associer à une sm froide"
   },
   "FD2": {
@@ -920,52 +921,341 @@ window.MTC_SHARED_NOTES = {
    "formules": "BAO HE WAN = repas de noel..."
   },
   "CSS3": {
-   "esprits": "DRASTIQUE \n\nMasses abdominales, \n\nDésordres gynécologiques et digestifs \n\n(stagnation de qi, stase, de sang)",
+   "esprits": "Masses abdominales\nDésordres gynécologiques et digestifs (stagnation de qi, stase\nde sang)\n\nDRASTIQUE ",
    "notes": "Si vide de la Rt associer aux toniques de la Rt (eg Bai Zhu+fu ling, xiao yao san)"
   },
   "CSS10": {
-   "esprits": "Système digestif (stagnation de qi et/ou d’aliments, stase de sang), \n\nUtérus (stagnation de qi, stase de sang)"
+   "esprits": "Système digestif (stagnation de qi et/ou d’aliments, stase de, sang)\nUtérus (stagnation de qi, stase de sang)"
   },
   "VH4": {
-   "esprits": "lombes et genoux\n\nsoutient la grossesse (limite les fausses couches)\n\nhypertension par vide F et Rn",
+   "esprits": "Obstructions bi par vent humidité sur terrain de vide\n\nlombes et genoux\n\nsoutient la grossesse (limite les fausses couches)\n\nhypertension par vide F et Rn",
    "formules": "DU HUO JI SHENG TANG : Rhumatismes et douleurs récentes ou chroniques (tableau vide) ostheo-articulaires, y compris tableau auto-immune :\n\n+Wu Jia Pi = ton qi et sang F et Rn\n\nTIAN MA GOU TENG YIN = hypertension par vide Rn et F"
   },
   "CS1": {
-   "notes": "Chi shao+bai shao=nourrir et activer le sang tout en le clarifiant pour éviter la stase"
+   "notes": "Chi shao+bai shao=nourrir et activer le sang tout en le clarifiant pour éviter la stase",
+   "esprits": "Chaleur du sang avec stase de sang\nYeux rouges"
   },
   "TE8": {
    "notes": "substitué par Dang Shen\n\nJing fang: perte d'appétit+epigastre tendu+perte de poids",
-   "formules": "SHEN FU TANG = Collapsus du yáng\n\nXIAO CHAI HU TANG"
+   "formules": "SHEN FU TANG = Collapsus du yáng\n\nXIAO CHAI HU TANG",
+   "esprits": "Maître absolu de la tonification du Qi\népuisement du Qi et des liquides\nyuan qi, shen"
   },
   "PUF3": {
-   "notes": "TIAO WEI CHENG QI TANG: Formule purgative Mang xiao+ da huang  (sans plénitude abdominale)"
+   "notes": "TIAO WEI CHENG QI TANG: Formule purgative Mang xiao+ da huang  (sans plénitude abdominale)",
+   "esprits": "Constipation (chaleur sécheresse)"
   },
   "A1": {
    "notes": "Nourrit et contient les liquides du foie pour améliorer la vision",
-   "formules": "WU ZI YANG ZONG TANG: infertilité / sterilité par vide des reins, émissions nocturnes"
+   "formules": "WU ZI YANG ZONG TANG: infertilité / sterilité par vide des reins, émissions nocturnes",
+   "esprits": "urine, sperme, vision"
   },
   "CT3": {
-   "notes": "En infusion pour prévenir les maladies de la chaleur en été"
+   "notes": "En infusion pour prévenir les maladies de la chaleur en été",
+   "esprits": "Maladies de la chaleur (tous les stades)\nPeau, gorge, gros intestin (chaleur toxique)"
   },
   "A2": {
    "notes": "antalgique\n\nmoderer l'acidité gastrique\n\nexterne: eczema, ulcérations chronique (asseche l'Humidité)",
    "formules": "BAI ZHI SAN: leucorrhées, émissions nocturnes, éjaculation précoce par vide des Reins ou manque de maintien de Dai Mai"
   },
   "PF6": {
-   "notes": "YIN QIAO SAN: syndromes externes de vent-chaleur"
+   "notes": "YIN QIAO SAN: syndromes externes de vent-chaleur",
+   "esprits": "Gorge (très) douloureuse (avec ou sans gonflement)"
   },
   "PUF2": {
-   "notes": "Moins drastique que da huang \n\nEn prévention pour les personnes à tendance constipation (personnes âgées notamment)"
+   "notes": "Moins drastique que da huang \n\nEn prévention pour les personnes à tendance constipation (personnes âgées notamment)",
+   "esprits": "Constipation (chaleur)"
   },
   "TI2": {
-   "associations": "GAN JIANG + Fu Zi = souvent utilisés ensemble"
+   "associations": "GAN JIANG + Fu Zi = souvent utilisés ensemble",
+   "esprits": "Revenir Yang +, Froid rate estomac, epuisement yang, froid liquides poumon\nREVENIR YANG: FZ + GJ se potentialisent SI NI TANG"
   },
   "TI1": {
-   "associations": "FU ZI + Gan Jiang =souvent utilisés ensemble"
+   "associations": "FU ZI + Gan Jiang =souvent utilisés ensemble",
+   "esprits": "Revenir yang ++, Collapsus yang, vide yang, froid humidité, obstruction bi"
   },
   "TE6": {
    "associations": "HUANG QI + Ren Shen = tonifier le yang de la rate",
-   "formules": "BU ZHONG YI QI TANG = manque de maintien de la rate, affaissement du qi de la rate, saignements par vide de yáng de la rate"
+   "formules": "BU ZHONG YI QI TANG = manque de maintien de la rate, affaissement du qi de la rate, saignements par vide de yáng de la rate",
+   "esprits": "transpiration par vide de Qi\ncicatrisation de la peau\neffondrements, surface vide\nTypologie Huáng qí :\n-transpiration ++, jaunâtre, odorante, collante (transpire en\nmangeant) -vide de Qi, teint pâle, jaunâtre, fatigue\n-Gan mao fréquent avec crainte du vent, regard terne\n-tendance obésité comme ballon, corps lourd\n-musculature molle, relâchement musculaire\n-œdème, godet, rétention d’eau, abdomen gonflé, nombril profond\n-tendance à l’ulcère + affections cutanées chroniques qui\ns’enfoncent"
+  },
+  "AF3": {
+   "esprits": "Vent (chaleur plénitude ou vide)\nMaux de tête avec hypertension (montée du yang du foie, feu\ndu foie)"
+  },
+  "AH1": {
+   "esprits": "Humidité dans le foyer central (mobilisation du qi)"
+  },
+  "AH2": {
+   "esprits": "Humidité (assèchement)"
+  },
+  "AH3": {
+   "esprits": "Froid humidité (foyer central)"
+  },
+  "AH4": {
+   "esprits": "Humidité (foyer central)\nVomissements\n(Canicule)"
+  },
+  "AH5": {
+   "esprits": "Humidité et stagnations (poumon, système digestif)"
+  },
+  "AH6": {
+   "esprits": "Humidité (foyer central)\nMenace de fausse couche (stagnation de qi)"
+  },
+  "AS2": {
+   "esprits": "Saignements par chaleur plénitude ou vide (poumon, estomac)"
+  },
+  "AS6": {
+   "esprits": "Saignements (remède d’appoint)"
+  },
+  "CE1": {
+   "esprits": "VIDE — nourrir coeur, calmer shen: insomnie, memoire\nsursauts, palpitations, transpirations nocturnes — constipation secheresse vide sang yin\nsheng: constipation secheresse\nshuang (dégraissée): coeur vide yin sang\nattention selles molles, abondances mucosités"
+  },
+  "CE2": {
+   "esprits": "SURPRESSION — stagnation foie (colere, insomnie, depression) -\nblessures gonflements stase de sang — abcés (+poumon) inflammations cutanées int et ext"
+  },
+  "CE3": {
+   "esprits": "VIDE — Esprit (nourrir foie, calmer coeur), transpiration\npar déficience\nsheng: coeur foie esprit sang yin\nchao huang: transpiration vide yin qi"
+  },
+  "CE4": {
+   "esprits": "MUCOSITES — calmer esprit, favoriser intellect, chasser\nmucosités (toux, manies), abcés furoncles\ngan cao zhi yuan zhi: shen vide coeur sang, mucosités orifices, dysharmonie rein coeur\nmi zhi yuan zhi: Poumon calmer toux mucosités"
+  },
+  "CSS9": {
+   "esprits": "Stases de sang (douleurs, traumatismes, régénération tissulaire)"
+  },
+  "CT6": {
+   "esprits": "Gorge, poumon (chaleur toxine avec mucosités)"
+  },
+  "CT7": {
+   "esprits": "Abcès du poumon\nSécrétions du foyer inférieur (chaleur (humidité) toxique)"
+  },
+  "EH1": {
+   "esprits": "Clarifie la chaleur, fait s'écouler l’humidité (vessie, GI, poumon, yeux)"
+  },
+  "EH2": {
+   "esprits": "Humidité peau (œdème, jaunisse, abcès, furoncles)\nAbcès intestinal"
+  },
+  "EH3": {
+   "esprits": "Humidité dans tout le corps (et/ou mucosités)\nRate, Esprit"
+  },
+  "EH5": {
+   "esprits": "Humidité chaleur de la vessie (par feu du cœur)\nHypogalactie"
+  },
+  "EH6": {
+   "esprits": "Humidité chaleur de la vessie\nAgalactie, hypogalactie"
+  },
+  "EH7": {
+   "esprits": "Humidité (interne ou externe)"
+  },
+  "EH8": {
+   "esprits": "Ictère yang"
+  },
+  "EH9": {
+   "esprits": "Humidité chaleur du FI"
+  },
+  "EH10": {
+   "esprits": "Humidité dans tout le corps"
+  },
+  "LE1": {
+   "esprits": "cacher yang foie coeur, instabilité coeur, epilespsie, syndrome maniaco depressif, vertiges yang\nfoie, acouphenes, surdité, vision faible par vide foie rein, dyspnée reins\nsheng: coeur foie psy, vertiges, insomnies....\ncu cui (vinaigre): reins: asthme na qi, oreilles, vertiges, vision par vide yin foie rein"
+  },
+  "LE2": {
+   "esprits": "- Calmer esprit, frayeur, cacher yang foie (epilepsie, psychose, vertiges...)\n- Retient transpi, affermit jing, incontinence\n- Demangeaisons, eczema, referme plaies\nAttention H/C, pervers plenitude\nsheng: esprit foie\nduan: astringent urines transpi selles leucorrhées sperme plaies"
+  },
+  "NY1": {
+   "esprits": "Tonifie le Yin du Poumon et favorise les liquides — Nourrit le Yin de l'Estomac, clarifie la chaleur du coeur, calme le shen"
+  },
+  "NY2": {
+   "esprits": "Nourrit le Yin de l'Estomac"
+  },
+  "NY3": {
+   "esprits": "Nourrit le Yin et ancre le Yang — Clarifie la chaleur vide, ramolli le dur et les nodules"
+  },
+  "NY4": {
+   "esprits": "Tonifie le Yin du Foie et des Reins — Nourrit le Foie, benefique pour les yeux"
+  },
+  "NY5": {
+   "esprits": "Nourrit le Yin des Reins pour solidifier les os, arrête le saignement"
+  },
+  "NY6": {
+   "esprits": "Tonifie la Rate, accroit le Jing"
+  },
+  "NY7": {
+   "esprits": "Nourrit le Yin du Cour et de l'Estomac"
+  },
+  "NY8": {
+   "esprits": "Nourrit le Yin de l'Estomac"
+  },
+  "NY9": {
+   "esprits": "Clarifie la chaleur, éclaircit les yeux"
+  },
+  "NY10": {
+   "esprits": "Nourrit le Yin du Poumon et de l'Estomac, arrête la soif"
+  },
+  "OO1": {
+   "esprits": "Perte de connaissance (obstruction de chaleur)"
+  },
+  "OO2": {
+   "esprits": "Obstructions"
+  },
+  "OO3": {
+   "esprits": "Obstructions par mucosités humidité (shén, orifices du cœur\ncentre, articulations)"
+  },
+  "PE1": {
+   "esprits": "Amas de type froid plénitude"
+  },
+  "PE2": {
+   "esprits": "Œdème et mucosités-yīn (foyers supérieur et médian)"
+  },
+  "PE3": {
+   "esprits": "Œdème et mucosités-yīn (foyer supérieur avec action plus\nmodérée que gān suì)"
+  },
+  "PE4": {
+   "esprits": "Œdème et mucosités-yīn (foyer supérieur avec action plus\nmodérée que gān suì et jīng dà jǐ)"
+  },
+  "PF3": {
+   "esprits": "Vent, spasmes, démangeaisons"
+  },
+  "PT5": {
+   "esprits": "Surface avec démangeaisons (vent, vent froid ou vent chaleur\nexterne)\nArrête les saignements"
+  },
+  "RQ1": {
+   "esprits": "Stagnation de qi, inversion par stagnation de qi, humidité (Rt, P)"
+  },
+  "RQ2": {
+   "esprits": "Troubles shan, digestifs par stagnation de qi dans le système\ndu foie (organe + canal) avec chaleur"
+  },
+  "RQ3": {
+   "esprits": "Stagnation de qi (foie, rate)\nToux (mucosités humidité)"
+  },
+  "RQ4": {
+   "esprits": "Stagnation du qi dans le système digestif et intestinal (Rt, E, GI\nF, VB)"
+  },
+  "RQ5": {
+   "esprits": "Hoquet"
+  },
+  "RQ7": {
+   "esprits": "Stagnation du qi (obstruction thoracique (xiong bi), système\ndigestif) avec froid"
+  },
+  "RQ8": {
+   "esprits": "Stagnation de qi (foyer central et inférieur) avec chaleur\nCasse le qi et les masses"
+  },
+  "TE2": {
+   "esprits": "harmonisation\nvide de qi et de sang\nying<3wei\nTypologie Da Zao: anorexie"
+  },
+  "TE3": {
+   "esprits": "vide de qi et du sang\ntai yin\nplutot vide de yin\nginseng des pauvres\ntypologie : essoufflement\nballonnement, peu d’appétit\nfatigue, conjonctives pâles\nlangue pâle, fine, indentée"
+  },
+  "TE4": {
+   "esprits": "Amène les liquides + douceur\nneutralise toxines"
+  },
+  "TE5": {
+   "esprits": "harmonise ttlmonde\ntoxine\ngorge\ncoeur\nspasme"
+  },
+  "TE7": {
+   "esprits": "seul qui nourrit tai yin — shao yin, shen\nanti-tumoral\n- Action de tonification sur les\nTrois Foyers (donc sur le corps)\n+ stimule l’acquis et l’inné"
+  },
+  "TE9": {
+   "esprits": "vide yin\nvide Rn\ndiabete"
+  },
+  "TE10": {
+   "esprits": "fievre de l'aprem\npervers qui reste coincé\nconvalescence"
+  },
+  "TE11": {
+   "esprits": "vide de qi avec chaleur\nsecheresse P"
+  },
+  "TI3": {
+   "esprits": "Froid douleur estomac (Main sur le ventre), vomissements"
+  },
+  "TI4": {
+   "esprits": "Rechauffe estomac, stimule appetit, douleurs, vomissements, diarrhées — epilepsie mucosités, BI\nen externe"
+  },
+  "TI5": {
+   "esprits": "Froid humidité estomac, vomissements, diarrhées parasites, eczema prurit genitaux (ext)"
+  },
+  "TI6": {
+   "esprits": "Vides de yang, douleurs froid partout, congestion duê au froid avec stase sang et/ou mucosités\nyang flottant Ramene feu à sa source (coeur reins), syndromes vide qi et sang, uterus (chong mai\nren mai prennent leur source dans ming men)"
+  },
+  "TI7": {
+   "esprits": "Douleurs froid (y compris foie), vomissements froid (dysharmonie F/E)), diarrhée froid humidité\neczema ulceres exsudation"
+  },
+  "TI8": {
+   "esprits": "Mini Wu Zhu Yu\nHernie, orchidoptose, douleurs froid/ stag qi foie (yan zhi), dysménorrhées, froid et stagnation\ncentre"
+  },
+  "TS1": {
+   "esprits": "Sang (vide, stase, chaleur)\nHyperactivité du yang du foie avec vide de yin du foie"
+  },
+  "TS2": {
+   "esprits": "Vide de sang avec ou sans stase"
+  },
+  "TS3": {
+   "esprits": "Vide de sang/yin\nHémorragies (chaleur vide)"
+  },
+  "TS4": {
+   "esprits": "Syndromes de vide de sang du foie et du jing des reins"
+  },
+  "TS5": {
+   "esprits": "Syndromes de vide de qi de la rate et de sang du cœur"
+  },
+  "TS6": {
+   "esprits": "Sang, yin, jing (nutrition)"
+  },
+  "TTD2": {
+   "esprits": "Toux sèche (vide de yin du poumon)"
+  },
+  "TTD3": {
+   "esprits": "Poumon (chaleur vide ou plénitude)\nConstipation\nObstruction de la poitrine (Xiong Bi)"
+  },
+  "TTD5": {
+   "esprits": "Toux par mucosités froides\nObstructions bi (vent froid humidité avec mucosités)"
+  },
+  "TTD7": {
+   "esprits": "Masses (indurations, nodosités)"
+  },
+  "TTD8": {
+   "esprits": "Douleur de la gorge, enrouement (chaleur plénitude ou vide)"
+  },
+  "TTD9": {
+   "esprits": "Toux (mucosités froid et/ou humidité)\nMucosités vent\nAssèche l’humidité, transforme les mucosités, expulse le vent, arrête les spasmes.\nForme crue : vent / mucosités vent / convulsions.\nPréparé bái fán + shēng jiāng : humidité et mucosités.\nPréparé avec bile : mucosités chaleur."
+  },
+  "TTD11": {
+   "esprits": "Obstruction des orifices du cœur (mucosités chaleur)"
+  },
+  "TTD12": {
+   "esprits": "Poumon (mucosités avec douleur du thorax)\nSystème digestif (mucosités avec inversion du qi de l'estomac)"
+  },
+  "TTD13": {
+   "esprits": "Mucosités chaleur (poumon, nodules)"
+  },
+  "TTD14": {
+   "esprits": "Psy, système nerveux (mucosités chaleur sur cœur/estomac)"
+  },
+  "TTD15": {
+   "esprits": "Système digestif, vésicule biliaire (mucosités chaleur)"
+  },
+  "TY1": {
+   "esprits": "Toux par vide (na qi) et ou avec mucosités, impuissance, ejaculation precoce par vide rein\naffaiblissemnt maladie chronique, ming men"
+  },
+  "TY2": {
+   "esprits": "deficience foie rein (douleur lombaires genoux, manque de force)(+ext), menace avortement\nHTA vide rein pertes"
+  },
+  "TY3": {
+   "esprits": "Faiblesse douleur partie inf, impuissances emissions involontaires, enuresie, toux par na qi\nconstipation vide sang liquides"
+  },
+  "TY4": {
+   "esprits": "Vide yang rein, foie, qi ,sang: fractures (+ext), croissance, reproduction, vide ren mai dai mai\nchong mai menorragie, metrorragie, leucorrhées, ulcerations inflammations cutanées qui ne\nguerissent pas"
+  },
+  "TY5": {
+   "esprits": "Vide yang reins, jing, sang, membres inf lombes, constipation secheresse gi (produit humide)"
+  },
+  "TY6": {
+   "esprits": "Impuissance, enuresie, pertes, reproduction....Douleurs lombaires genoux, Vision, menace\navortement, meno metrorragies par vide rein foie ren mai, diarrhées, diabete vide yin, vitiligo"
+  },
+  "TY7": {
+   "esprits": "Tendons, os, coups, blessures, menace avortement, pertes urines sperme"
+  },
+  "TY8": {
+   "esprits": "Pertes urine, sperme, emissions nocturnes, salivation excessive, diarrhée"
+  },
+  "TY9": {
+   "esprits": "Tiede, piquant, doux foie, reins\nVide yang rein, BI vide froid humidité (branche+racine)"
   }
  }
 };

@@ -33,7 +33,7 @@
   let loading = null;
   function loadNotes(){
     if(window.MTC_SHARED_NOTES || loading) return;
-    loading = new Promise(res => { const s = document.createElement("script"); s.src = "notes-admin.js?v=20261007"; s.onload = s.onerror = () => res(); document.head.appendChild(s); })
+    loading = new Promise(res => { const s = document.createElement("script"); s.src = "notes-admin.js?v=20261007-b"; s.onload = s.onerror = () => res(); document.head.appendChild(s); })
       .then(() => { mergeIntoAdmin(); refresh(); });
   }
   function refresh(){
