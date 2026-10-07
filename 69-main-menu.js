@@ -35,8 +35,9 @@
       while(avoid.has(i)) i = (i + 1) % COLORS.length;
       pick.push(i);
     });
-    const names = THANKS.map((n, k) => '<span style="color:' + COLORS[pick[k]] + '">' + esc(n) + "</span>").join(", ");
-    const dur = Math.max(9, Math.round((THANKS.join(", ").length * 0.62 + 12) / 1.4));
+    // pas de virgule : un blanc d'environ une seconde de défilement entre deux prénoms
+    const names = THANKS.map((n, k) => '<span style="color:' + COLORS[pick[k]] + '">' + esc(n) + "</span>").join('<span class="mm-gap" aria-hidden="true"></span>');
+    const dur = Math.max(9, Math.round((THANKS.join("").length * 0.62 + (THANKS.length - 1) * 1.6 + 12) / 1.4));
     return '<span class="mm-thanks">Projet soutenu par :' +
       '<span class="mm-ticker" style="--tk-dur:' + dur + 's"><span class="mm-ticker-track">' +
       '<span class="mm-ticker-copy">' + names + '</span><span class="mm-ticker-copy" aria-hidden="true">' + names + "</span>" +
