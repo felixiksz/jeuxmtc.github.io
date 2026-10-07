@@ -118,8 +118,9 @@
   const authorName = () => (window.MTC_SHARED_NOTES && window.MTC_SHARED_NOTES.author) || "emesepap, admin";
   const PHARMA_FIELDS = {esprits:"esprit", notes:"notes", associations:"associations", formules:"formules", vs:"vs", syntheses:"synthese", precautions:"precaution",
     ingredients:"ingredients", recherches_modernes:"recherches_modernes", indications:"indications", contre_indications:"contre_indications", preparations:"preparation", synonymes:"synonymes"};
+  const POINT_KEYS = {notes:"mtc_point_note_", associations:"mtc_point_associations_", esprits:"mtc_point_esprit_", vs:"mtc_point_vs_", precautions:"mtc_point_precaution_"};
   const POINT_FIELDS = {notes:"Notes", associations:"Associations", esprits:"Esprit", vs:"VS", precautions:"Précaution"};
-  const flat = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[«»"’'.,;:!?()\-–—]/g, " ").replace(/\s+/g, " ").trim();
+  const flat = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   function sharedFor(domain, id){
     // l'admin aussi (ses notes d'un autre appareil) ; ce qu'elle a déjà dans le champ n'est pas répété (freshPart)
     if(!enabled() || !id || !(isContributor() || isAdmin())) return null;
@@ -133,7 +134,7 @@
     return String(text || "").split(/\n\s*\n/).map(par => par.split("\n").filter(line => {
       const f = flat(line);
       if(!f) return false;
-      if(seen.has(f) || (f.length > 3 && have.includes(f))) return false;
+      if(seen.has(f) || (f.length > 2 && have.includes(f))) return false;
       seen.add(f);
       return true;
     }).join("\n")).filter(Boolean).join("\n\n");
@@ -150,7 +151,7 @@
       const sec = container.querySelector(".pharma-editable-" + field);
       if(!mine[k] || !sec || sec.querySelector(".mtc-shared-in")) return;
       const ta = sec.querySelector("textarea");
-      const text = freshPart(mine[k], ta ? ta.value : sec.textContent);
+      const text = freshPart(mine[k], (ta ? ta.value : "") + "\n" + sec.textContent);
       if(!text) return;
       const title = sec.querySelector(".pharma-editable-title");
       if(title) title.insertAdjacentHTML("afterend", sharedHtml(text));
@@ -172,7 +173,9 @@
       let sec = sections.find(d => { const s = d.querySelector("summary"); return s && s.textContent.replace("✎", "").trim().toLowerCase().startsWith(label.toLowerCase()); });
       if(sec && sec.querySelector(".mtc-shared-in")) return;
       const ta = sec && sec.querySelector("textarea");
-      const text = freshPart(mine[k], sec ? (ta ? ta.value : sec.textContent) : "");
+      let stored = "";
+      try{ stored = localStorage.getItem(POINT_KEYS[k] + id) || ""; }catch(e){}
+      const text = freshPart(mine[k], [stored, ta ? ta.value : "", sec ? sec.textContent : ""].join("\n"));
       if(!text) return;
       if(!sec){
         content.insertAdjacentHTML("beforeend", '<details class="point-info-section" open><summary>' + esc(label === "VS" ? "VS." : label) + "</summary></details>");
