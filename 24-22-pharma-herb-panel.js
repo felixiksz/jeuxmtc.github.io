@@ -227,7 +227,10 @@
     const localKey = normalize(localText);
     if(staticKey === localKey || staticKey.includes(localKey)) return staticText;
     if(localKey.includes(staticKey)) return localText;
-    return `${staticText}\n\n${localText}`;
+    const flatLine = value => normalize(value).replace(/[^a-z0-9]+/g, "");
+    const haveLocal = flatLine(localText);
+    const missing = staticText.split("\n").filter(line => { const k = flatLine(line); return k && !haveLocal.includes(k); }).join("\n").trim();
+    return missing ? `${missing}\n\n${localText}` : localText;
   }
 
   function getMergedStoredOrStatic(prefix, herb, staticValue){

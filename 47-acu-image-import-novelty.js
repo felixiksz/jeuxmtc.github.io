@@ -221,7 +221,7 @@
       });
       document.body.appendChild(button);
     }
-    if(button.dataset.loading !== "1") button.classList.toggle("visible", isPharma() && !hasImported());
+    button.classList.remove("visible");   // fiches complètes intégrées au jeu (22-21-pharma-fiches-completes.js)
   }
   function init(){
     wrapPointOpeners();
