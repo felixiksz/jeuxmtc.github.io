@@ -18,25 +18,55 @@
   // soutiens du projet : soutiens.js, modifiable en mode admin (Réglages → Soutiens), publié sur le dépôt
   const supporters = () => (Array.isArray(window.MTC_SUPPORTERS) ? window.MTC_SUPPORTERS : []).map(s => String(s).trim()).filter(Boolean);
   // en bas à droite du menu ; les prénoms défilent dans une petite fenêtre (la liste a vocation à s'allonger)
+  const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const lum = rgb => { const c = rgb.map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+  const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+  const hueSat = ([r, g, b]) => {
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn, l = (mx + mn) / 2;
+    const s = d ? d / (1 - Math.abs(2 * l - 1)) : 0;
+    let hh = 0;
+    if(d) hh = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return [(hh * 60 + 360) % 360, s];
+  };
+  function themeBackground(){
+    const el = document.getElementById("mtcMainMenu") || document.body;
+    const m = getComputedStyle(el).backgroundColor.match(/\d+(\.\d+)?/g);
+    return m && m.length >= 3 ? m.slice(0, 3).map(Number) : [250, 250, 248];
+  }
+  // couleur lisible sur le fond : null si sa teinte est trop proche d'un fond coloré (sauf force), sinon éclaircie ou foncée
+  function readable(rgb, bg, force){
+    const [hc] = hueSat(rgb), [hb, sb] = hueSat(bg);
+    const dh = Math.min(Math.abs(hc - hb), 360 - Math.abs(hc - hb));
+    if(!force && sb > .2 && dh < 32) return null;
+    const toward = lum(bg) < .3 ? 255 : 0;
+    let c = rgb.slice();
+    for(let k = 0; k < 10 && contrast(c, bg) < 3.2; k++) c = c.map(v => Math.round(v + (toward - v) * .15));
+    return "rgb(" + c.join(",") + ")";
+  }
   const thanksHtml = () => {
     const THANKS = supporters();
     if(!THANKS.length) return "";
-    // chaque prénom reçoit automatiquement sa couleur vive, tirée de son nom (toujours la même), jamais celle de son voisin
-    // (ni du premier pour le dernier, puisque la liste défile en boucle)
-    const COLORS = ["#d33a2c", "#2e9a4a", "#2b5fd9", "#d9a400", "#8a3fd1", "#e6731a", "#139e9a"];
+    // chaque prénom reçoit automatiquement sa couleur vive, tirée de son nom, jamais celle de son voisin (ni du premier
+    // pour le dernier, puisque la liste défile en boucle), jamais rouge à côté de bleu (le drapeau français) ;
+    // les couleurs s'adaptent au thème : celles trop proches du fond sont écartées, les autres éclaircies ou foncées pour rester lisibles
+    const PALETTE = [["rouge", "#d33a2c"], ["vert", "#2e9a4a"], ["bleu", "#2b5fd9"], ["jaune", "#d9a400"], ["violet", "#8a3fd1"], ["orange", "#e6731a"], ["turquoise", "#139e9a"]];
+    const bg = themeBackground();
+    let COLORS = PALETTE.map(([name, hex]) => [name, readable(hexRgb(hex), bg)]).filter(c => c[1]);
+    if(COLORS.length < 4) COLORS = PALETTE.map(([name, hex]) => [name, readable(hexRgb(hex), bg, true)]);
+    const flag = (a, b) => a && b && ((a === "rouge" && b === "bleu") || (a === "bleu" && b === "rouge"));
     const pick = [];
     THANKS.forEach((n, k) => {
       let h = 0;
       for(const ch of n.toLowerCase()) h = (h * 31 + ch.codePointAt(0)) >>> 0;
       let i = h % COLORS.length;
-      // jamais la couleur d'un voisin, ni rouge à côté de bleu (le drapeau français)
-      const near = [pick[k - 1], k === THANKS.length - 1 && k > 1 ? pick[0] : undefined].filter(x => x !== undefined);
-      const avoid = new Set(near.concat(near.map(x => x === 0 ? 2 : x === 2 ? 0 : x)));
-      while(avoid.has(i)) i = (i + 1) % COLORS.length;
+      const near = [pick[k - 1], k === THANKS.length - 1 && k > 1 ? pick[0] : undefined].filter(x => x !== undefined).map(x => COLORS[x][0]);
+      for(let tries = 0; tries < COLORS.length && near.some(nm => nm === COLORS[i][0] || flag(nm, COLORS[i][0])); tries++) i = (i + 1) % COLORS.length;
       pick.push(i);
     });
+    const colorOf = k => COLORS[pick[k]][1];
     // pas de virgule : un blanc d'environ une seconde de défilement entre deux prénoms
-    const names = THANKS.map((n, k) => '<span style="color:' + COLORS[pick[k]] + '">' + esc(n) + "</span>").join('<span class="mm-gap" aria-hidden="true"></span>');
+    const names = THANKS.map((n, k) => '<span style="color:' + colorOf(k) + '">' + esc(n) + "</span>").join('<span class="mm-gap" aria-hidden="true"></span>');
     const dur = Math.max(9, Math.round((THANKS.join("").length * 0.62 + (THANKS.length - 1) * 1.6 + 12) / 1.4));
     return '<span class="mm-thanks">Projet soutenu par :' +
       '<span class="mm-ticker" style="--tk-dur:' + dur + 's"><span class="mm-ticker-track">' +
