@@ -263,7 +263,7 @@
       title:"Après la partie",
       text:pharma
         ? "Une fois la grille terminée, deux boutons apparaissent sous la grille : le Mémo, pour revoir les SM de la grille en un coup d'œil, et le Quiz, pour vérifier ce que tu as retenu."
-        : "Une fois la grille terminée, deux boutons apparaissent sous la grille : le Mémo, pour revoir les points de la grille en un coup d'œil, et le Quiz, pour vérifier ce que tu as retenu. Les points que tu connais mal reviennent ensuite d'eux-mêmes grâce au bouton 🔁 Réviser, en haut (répétition espacée).",
+        : "Une fois la grille terminée, deux boutons apparaissent sous la grille : le Mémo, pour revoir les points de la grille en un coup d'œil, et le Quiz, pour vérifier ce que tu as retenu. Les points que tu connais mal reviennent ensuite d'eux-mêmes grâce à « À revoir », en haut : le nombre indique combien de points sont à revoir aujourd’hui (répétition espacée).",
       position:"aboveBottom"
     }, 0);
 

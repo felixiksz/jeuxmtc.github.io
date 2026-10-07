@@ -318,7 +318,7 @@
   // la visite guidée : les boutons regroupés dans le menu sont remplacés par une étape « Menu »
   const MOVED = ["#mtcDailyReminderButton", ".topbar-row button[onclick*='toggleSettings()']", "#statsButton", "#advancedSearchButton",
     "#reviewBasketButton", "#comparisonButton", "#studyDomainSelect", "#fullscreenToggleButton", "#pharmaCardsButton",
-    "#exportNotesButton", "#importNotesButton", "#mtcOfflineButton", "#cheatsheetButton"];
+    "#exportNotesButton", "#importNotesButton", "#mtcOfflineButton", "#cheatsheetButton", "[data-import-history-toggle]"];
   function patchTour(){
     let steps;
     try{ steps = tourSteps; }catch(error){ return; }

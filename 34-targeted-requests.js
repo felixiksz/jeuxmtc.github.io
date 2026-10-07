@@ -226,6 +226,7 @@
     const key = "mtc_progress_hint_import_history_v2";
     const target = document.querySelector("[data-import-history-toggle]");
     if(!target || localStorage.getItem(key) === "1") return;
+    if(!target.getClientRects().length) return;   // pastilles masquées (grand menu) : pas de bulle dans le vide
     try{ localStorage.setItem(key, "1"); }catch(error){}
     if(typeof window.showProgressHintSoon === "function"){
       window.showProgressHintSoon(
