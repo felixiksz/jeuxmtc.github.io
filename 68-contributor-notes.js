@@ -58,8 +58,9 @@
 .mtc-contrib .note{ border-left:4px solid var(--a); background:color-mix(in srgb, var(--a) 9%, transparent); border-radius:0 8px 8px 0; padding:4px 10px 6px; margin:6px 0; }
 .mtc-contrib .note h5{ margin:2px 0; color:var(--a); opacity:1; }
 .mtc-contrib .row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
-.mtc-contrib .row button{ font:inherit; font-size:.85em; font-weight:700; border:1px solid currentColor; background:transparent; color:inherit; border-radius:999px; padding:3px 11px; cursor:pointer; }
-.mtc-contrib .row .quit{ border:0; text-decoration:underline; font-weight:400; opacity:.6; padding:0; }
+.mtc-contrib .row button{ font:inherit !important; font-size:.85em !important; font-weight:700 !important; text-transform:none !important; letter-spacing:0 !important; border:0 !important; background:transparent !important; box-shadow:none !important; color:inherit; padding:0 !important; margin:0 !important; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.mtc-contrib .row button:hover{ transform:none !important; text-shadow:0 3px 12px var(--shadow-color, rgba(0,0,0,.2)); }
+.mtc-contrib .row .quit{ font-weight:400 !important; opacity:.6; }
 .mtc-shared-in{ color:var(--a); margin:4px 0 8px; text-align:left; }
 .mtc-shared-in .txt{ white-space:pre-line; margin:0; line-height:1.5; }
 .mtc-shared-in .by{ display:block; font-size:.78em; font-style:italic; opacity:.85; margin-top:2px; }
@@ -104,11 +105,11 @@
   function block(domain, id, label){
     if(!enabled() || !id) return "";
     style();
-    if(!isContributor()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes partagées">Contribuer</button></div>';
+    if(!isContributor() && !isAdmin()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes partagées">Contribuer</button></div>';
     loadNotes();
     const author = authorName(), col = authorColor(author);
     return '<div class="mtc-contrib"><div class="row">' +
-      (isAdmin() ? "" : '<span class="by-legend" style="--a:' + col + '">● en couleur : notes de ' + esc(author.split(",")[0]) + "</span>") +
+      ('<span class="by-legend" style="--a:' + col + '">● en couleur : notes de ' + esc(author.split(",")[0]) + "</span>") +
       '<button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">Notes signées des contributeur·ices</button>' +
       '<button type="button" class="quit" data-contrib="quit">ne plus contribuer</button></div></div>';
   }
@@ -120,16 +121,22 @@
   const POINT_FIELDS = {notes:"Notes", associations:"Associations", esprits:"Esprit", vs:"VS", precautions:"Précaution"};
   const flat = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[«»"’'.,;:!?()\-–—]/g, " ").replace(/\s+/g, " ").trim();
   function sharedFor(domain, id){
-    // l'admin voit déjà ses notes dans ses propres champs : pas de doublon
-    if(!enabled() || !isContributor() || isAdmin() || !id) return null;
+    // l'admin aussi (ses notes d'un autre appareil) ; ce qu'elle a déjà dans le champ n'est pas répété (freshPart)
+    if(!enabled() || !id || !(isContributor() || isAdmin())) return null;
     loadNotes();
     const S = window.MTC_SHARED_NOTES;
     return (S && S[domain] && S[domain][id]) || null;
   }
-  // seulement les paragraphes que la personne n'a pas déjà dans le champ
+  // seulement les lignes que la personne n'a pas déjà dans le champ (ni répétées dans la note elle-même)
   function freshPart(text, already){
-    const have = flat(already);
-    return String(text || "").split(/\n\s*\n/).map(s => s.trim()).filter(s => s && !have.includes(flat(s))).join("\n\n");
+    const have = flat(already), seen = new Set();
+    return String(text || "").split(/\n\s*\n/).map(par => par.split("\n").filter(line => {
+      const f = flat(line);
+      if(!f) return false;
+      if(seen.has(f) || (f.length > 3 && have.includes(f))) return false;
+      seen.add(f);
+      return true;
+    }).join("\n")).filter(Boolean).join("\n\n");
   }
   function sharedHtml(text){
     const author = authorName(), name = author.split(",")[0];

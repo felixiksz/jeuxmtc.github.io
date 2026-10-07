@@ -46,7 +46,7 @@
 .mtc-beta-box button:disabled{ opacity:.4; cursor:default; }
 .mtc-beta-box small{ color:#666; }
 body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-beta-player #editToggle, body.mtc-beta-player .navrow input, body.mtc-beta-player .check-legend{ display:none !important; }
-.mtc-corr-panel{ position:fixed; top:0; right:0; bottom:0; width:min(440px, 100vw); z-index:900; background:#fff; color:#111; box-shadow:-8px 0 30px rgba(0,0,0,.18); display:flex; flex-direction:column; font:14px/1.5 "Archivo", system-ui, sans-serif; transform:translateX(105%); transition:transform .2s ease; }
+.mtc-corr-panel{ position:fixed; top:0; right:0; bottom:0; width:min(440px, 100vw); z-index:9950; background:#fff; color:#111; box-shadow:-8px 0 30px rgba(0,0,0,.18); display:flex; flex-direction:column; font:14px/1.5 "Archivo", system-ui, sans-serif; transform:translateX(105%); transition:transform .2s ease; }
 .mtc-corr-panel.open{ transform:none; }
 .mtc-corr-panel header{ position:static; margin:0; display:flex; align-items:center; gap:8px; padding:12px 14px; border-bottom:1px solid #eee; }
 .mtc-corr-panel header b{ flex:1; }
