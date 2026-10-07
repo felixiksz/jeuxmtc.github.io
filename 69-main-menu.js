@@ -318,6 +318,26 @@
   const MOVED = ["#mtcDailyReminderButton", ".topbar-row button[onclick*='toggleSettings()']", "#statsButton", "#advancedSearchButton",
     "#reviewBasketButton", "#comparisonButton", "#studyDomainSelect", "#fullscreenToggleButton", "#pharmaCardsButton",
     "#exportNotesButton", "#importNotesButton", "#mtcOfflineButton", "#cheatsheetButton", "[data-import-history-toggle]"];
+  // recherche : le curseur se place tout de suite dans la barre de recherche à l'ouverture du panneau
+  function watchSearchFocus(){
+    const panel = byId("advancedSearchPanel");
+    if(!panel || panel.dataset.mtcFocusWatch) return;
+    panel.dataset.mtcFocusWatch = "1";
+    let wasOpen = panel.classList.contains("open"), until = 0;
+    // le contenu du panneau est (re)dessiné juste après l'ouverture : on remet le curseur tant que la personne n'a rien touché
+    const focusInput = () => {
+      if(!panel.classList.contains("open") || Date.now() > until || panel.contains(document.activeElement)) return;
+      const input = [...panel.querySelectorAll('input[type="search"], input[type="text"], input:not([type])')].find(i => i.offsetParent !== null);
+      if(input){ try{ input.focus({preventScroll:true}); }catch(e){} }
+    };
+    new MutationObserver(() => {
+      const open = panel.classList.contains("open");
+      if(open && !wasOpen){ until = Date.now() + 1500; [60, 250, 600, 1200].forEach(ms => setTimeout(focusInput, ms)); }
+      wasOpen = open;
+    }).observe(panel, {attributes:true, attributeFilter:["class"]});
+    new MutationObserver(() => setTimeout(focusInput, 0)).observe(panel, {childList:true, subtree:true});
+    panel.addEventListener("pointerdown", () => { until = 0; });
+  }
   function patchTour(){
     let steps;
     try{ steps = tourSteps; }catch(error){ return; }
@@ -440,6 +460,7 @@
       .observe(document.documentElement, {attributes:true, attributeFilter:["data-study-domain"]});
     document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")) close(); });
     arrangeControls();
+    watchSearchFocus();
     const gm = byId("gameplayModeTopline"), ba = document.querySelector(".bottom-actions");
     if(gm && ba && gm.parentElement !== ba) ba.appendChild(gm);
     document.body.classList.remove("mtc-menu-loading");   // tout est en place : on affiche
