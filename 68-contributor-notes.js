@@ -34,7 +34,7 @@
   function loadNotes(){
     if(window.MTC_SHARED_NOTES || loading) return;
     loading = new Promise(res => { const s = document.createElement("script"); s.src = "notes-admin.js?v=20261002"; s.onload = s.onerror = () => res(); document.head.appendChild(s); })
-      .then(refresh);
+      .then(() => { mergeIntoAdmin(); refresh(); });
   }
   function refresh(){
     try{ if(window.refreshCurrentPointPanel) window.refreshCurrentPointPanel(); }catch(e){}
@@ -114,14 +114,15 @@
 
   // notes partagées dans le champ d'origine de la fiche, dans la couleur de l'autrice
   const authorName = () => (window.MTC_SHARED_NOTES && window.MTC_SHARED_NOTES.author) || "emesepap, admin";
-  const PHARMA_FIELDS = {esprits:"esprit", notes:"notes", associations:"associations", formules:"formules", vs:"vs", syntheses:"synthese", precautions:"precaution",
+  // (les associations des substances viennent du cours : pas des notes de l'autrice, donc pas en couleur)
+  const PHARMA_FIELDS = {esprits:"esprit", notes:"notes", formules:"formules", vs:"vs", syntheses:"synthese", precautions:"precaution",
     ingredients:"ingredients", recherches_modernes:"recherches_modernes", indications:"indications", contre_indications:"contre_indications", preparations:"preparation", synonymes:"synonymes"};
   const POINT_KEYS = {notes:"mtc_point_note_", associations:"mtc_point_associations_", esprits:"mtc_point_esprit_", vs:"mtc_point_vs_", precautions:"mtc_point_precaution_"};
   const POINT_FIELDS = {notes:"Notes", associations:"Associations", esprits:"Esprit", vs:"VS", precautions:"Précaution"};
   const flat = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   function sharedFor(domain, id){
-    // l'admin aussi (ses notes d'un autre appareil) ; ce qu'elle a déjà dans le champ n'est pas répété (freshPart)
-    if(!enabled() || !id || !(isContributor() || isAdmin())) return null;
+    // l'admin : ses notes sont versées dans ses propres champs (mergeIntoAdmin), donc rien en couleur pour elle
+    if(!enabled() || !id || isAdmin() || !isContributor()) return null;
     loadNotes();
     const S = window.MTC_SHARED_NOTES;
     return (S && S[domain] && S[domain][id]) || null;
@@ -232,6 +233,53 @@
       window.mtcOpenCorrections("Notes — " + kind + " " + b.dataset.id, b.dataset.label, "notes");
     }
   }, true);
-  if(isContributor() && enabled()) loadNotes();
+  // ADMIN : toutes les notes partagées sont les siennes. Une fois par version de notes-admin.js, les lignes qui
+  // manquent dans ce navigateur sont ajoutées à ses propres champs (modifiables, sans couleur). Sauvegarde des
+  // valeurs d'avant dans mtc_shared_merge_backup_v1.
+  const MERGED_KEY = "mtc_shared_merged_v1";
+  const ADMIN_FIELDS = {
+    points:{notes:["mtc_point_note_", "notes"], associations:["mtc_point_associations_", "associations"], vs:["mtc_point_vs_", "vs"],
+      esprits:["mtc_point_esprit_", "esprit"], precautions:["mtc_point_precaution_", "precaution"]},
+    pharma:{esprits:["mtc_pharma_herb_esprit_", "esprit"], notes:["mtc_pharma_herb_notes_", "notes"], associations:["mtc_pharma_herb_associations_", "associations"],
+      formules:["mtc_pharma_herb_formules_", "formules"], vs:["mtc_pharma_herb_vs_", "vs"], syntheses:["mtc_pharma_herb_synthese_", "synthese"],
+      synonymes:["mtc_pharma_herb_synonymes_", "synonymes"], ingredients:["mtc_pharma_herb_ingredients_", "ingredients"],
+      recherches_modernes:["mtc_pharma_herb_recherches_modernes_", "recherches_modernes"],
+      // champs où le jeu ajoute déjà le texte de la fiche à la note : la note seule suffit
+      precautions:["mtc_pharma_herb_precaution_", null], indications:["mtc_pharma_herb_indications_", null],
+      contre_indications:["mtc_pharma_herb_contre_indications_", null], preparations:["mtc_pharma_herb_preparation_", null]}
+  };
+  function mergeIntoAdmin(){
+    const S = window.MTC_SHARED_NOTES;
+    if(!isAdmin() || !S) return;
+    const version = S.exportedAt || "1";
+    try{ if(localStorage.getItem(MERGED_KEY) === version) return; }catch(e){ return; }
+    const record = (domain, id) => domain === "points"
+      ? ((window.POINT_DETAILS || (typeof POINT_DETAILS !== "undefined" ? POINT_DETAILS : {}))[id] || {})
+      : ((window.PHARMA_HERBS || []).find(h => h && h.id === id) || {});
+    let backup = {};
+    try{ backup = JSON.parse(localStorage.getItem("mtc_shared_merge_backup_v1") || "{}"); }catch(e){}
+    let changed = 0;
+    ["points", "pharma"].forEach(domain => Object.entries(S[domain] || {}).forEach(([id, fields]) => {
+      Object.entries(fields).forEach(([k, text]) => {
+        const map = ADMIN_FIELDS[domain][k];
+        if(!map) return;
+        const key = map[0] + id;
+        const stored = localStorage.getItem(key);
+        const base = stored !== null ? stored : (map[1] ? String(record(domain, id)[map[1]] || "") : "");
+        const missing = freshPart(text, base);
+        if(!missing) return;
+        if(!(key in backup)) backup[key] = stored;
+        localStorage.setItem(key, base.trim() ? base.replace(/\s+$/, "") + "\n\n" + missing : missing);
+        changed++;
+      });
+    }));
+    try{
+      localStorage.setItem("mtc_shared_merge_backup_v1", JSON.stringify(backup));
+      localStorage.setItem(MERGED_KEY, version);
+    }catch(e){}
+    if(changed) refresh();
+  }
+  if((isContributor() || isAdmin()) && enabled()) loadNotes();
+  if(window.MTC_SHARED_NOTES) mergeIntoAdmin();
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", watchPointPanel); else watchPointPanel();
 })();
