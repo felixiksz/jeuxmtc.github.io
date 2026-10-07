@@ -448,7 +448,9 @@
   function applyEdits(){
     data.forEach((c, ci) => c.sections.forEach((s, si) => {
       const o = ORIG.data[ci].sections[si];
-      s.paragraphs = o.paragraphs.map((p, pi) => edits.paras[c.code + "|" + si + "|" + pi] ?? p);
+      // **mots** = repères anatomiques en gras : s.rich pour l'affichage, s.paragraphs (sans les **) pour les calculs
+      s.rich = o.paragraphs.map((p, pi) => edits.paras[c.code + "|" + si + "|" + pi] ?? p);
+      s.paragraphs = s.rich.map(p => p.replace(/\*\*/g, ""));
       s.notes = o.notes.map((n, ni) => ({...n, text:edits.notes[c.code + "|" + si + "|" + ni] ?? n.text}));
       const eb = edits.branches[c.code + "|" + si];
       s.branches = eb ? eb.map((places, bi) => ({...(o.branches[bi] || {}), places:places.slice()}))
@@ -469,6 +471,7 @@
   // texte d'un paragraphe modifié : les appels de note redeviennent [[nN]]
   function serializeEditable(el){
     const clone = el.cloneNode(true);
+    clone.querySelectorAll("b, strong").forEach(b => b.replaceWith("**" + b.textContent + "**"));
     clone.querySelectorAll("sup").forEach(sup => sup.replaceWith("[[n" + sup.textContent.trim() + "]]"));
     return clone.textContent.replace(/\s+/g, " ").trim();
   }
@@ -498,7 +501,7 @@
     addPlace(pid, {label:L, group:"ajoutés"});
     return pid;
   }
-  const withRefs = (text, key) => esc(text).replace(/\[\[n(\d+)\]\]/g, (m, n) => '<sup><a href="#' + key + '-n' + n + '">' + n + "</a></sup>");
+  const withRefs = (text, key) => esc(text).replace(/\*\*([^*]+?)\*\*/g, "<b>$1</b>").replace(/\[\[n(\d+)\]\]/g, (m, n) => '<sup><a href="#' + key + '-n' + n + '">' + n + "</a></sup>");
 
   // Noms des canaux pour les listes de correspondances
   const CANAL = {
@@ -1726,7 +1729,7 @@
             s.paragraphs.map((p, pi) => {
               const k = canal.code + "|" + si + "|" + pi, bullet = /^- /.test(p);
               return "<p" + (bullet ? ' class="li' : ' class="') + (k in edits.paras ? " edited" : "") + '" data-para="' + esc(k) + '"' +
-                (bullet ? ' data-bullet="1"' : "") + ce + ">" + withRefs(bullet ? p.slice(2) : p, key) + "</p>";
+                (bullet ? ' data-bullet="1"' : "") + ce + ">" + withRefs(bullet ? (s.rich || s.paragraphs)[pi].slice(2) : (s.rich || s.paragraphs)[pi], key) + "</p>";
             }).join("") +
             (s.notes.length ? "<details" + (editing ? " open" : "") + "><summary>Notes (" + s.notes.length + ")</summary><ol>" +
               s.notes.map((n, ni) => {

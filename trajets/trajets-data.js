@@ -737,10 +737,10 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Le canal du shǒu tài yīn (canal P) naît au foyer central[[n1]], dans l'interne, dans la région de l'estomac, il descend joindre le gros intestin[[n2]], fait demi-tour et revient pour parcourir les bouches de l’estomac[[n3]], il traverse le diaphragme et établit une relation de dépendance avec le poumon.",
-     "- Depuis le système pulmonaire, qui comprend la trachée, la gorge, le larynx et le cavum[[n4]], il part horizontalement en direction de l’aisselle, pour émerger au point P 1 (zhōng fǔ). Il remonte au creux du triangle delto-pectoral au point P 2 (yún mén).",
-     "Il descend ensuite le long du bord antérieur (radial) de la face médiale du bras, latéralement aux canaux du shǒu shào yīn (canal C) et du shǒu jué yīn (canal EC), puis il atteint le pli du coude au niveau du P 5 (chǐ zé). Du pli du coude, il longe la face radiale de la face antérieure de l'avant-bras, pénètre dans cùn kǒu[[n5]], se dirige vers le pouce puis longe le bord radial de l'éminence thénar en passant par P 10 (yú jì). Il se termine au bord radial de l'extrémité du pouce, à l'angle unguéal radial du pouce à P 11 (shào shāng).",
-     "- Une branche annexe part de P 7 (lìe qūe), au-dessus de l'apophyse styloïde du radius, elle circule sur la face palmaire de la main, et va jusqu'au bord radial de l'extrémité de l'index où elle relie le shǒu yáng míng (canal GI)[[n6]]."
+     "- Le canal du shǒu tài yīn (canal P) naît au **foyer central**[[n1]], dans l'interne, dans la **région de l'estomac**, il descend joindre le **gros intestin**[[n2]], fait demi-tour et revient pour parcourir les **bouches de l’estomac**[[n3]], il traverse le **diaphragme** et établit une relation de dépendance avec le **poumon**.",
+     "- Depuis le système pulmonaire, qui comprend la **trachée**, la **gorge**, le **larynx** et le **cavum**[[n4]], il part horizontalement en direction de l’**aisselle**, pour émerger au point P 1 (zhōng fǔ). Il remonte au **creux du triangle delto-pectoral** au point P 2 (yún mén).",
+     "Il descend ensuite le long du **bord antérieur (radial) de la face médiale du bras**, latéralement aux canaux du shǒu shào yīn (canal C) et du shǒu jué yīn (canal EC), puis il atteint le **pli du coude** au niveau du P 5 (chǐ zé). Du **pli du coude**, il longe la **face radiale de la face antérieure de l'avant-bras**, pénètre dans **cùn kǒu**[[n5]], se dirige vers le **pouce** puis longe le **bord radial de l'éminence thénar** en passant par P 10 (yú jì). Il se termine au **bord radial de l'extrémité du pouce**, à l'**angle unguéal radial du pouce** à P 11 (shào shāng).",
+     "- Une branche annexe part de P 7 (lìe qūe), au-dessus de l'**apophyse styloïde du radius**, elle circule sur la **face palmaire de la main**, et va jusqu'au **bord radial de l'extrémité de l'index** où elle relie le shǒu yáng míng (canal GI)[[n6]]."
     ],
     "notes": [
      {
@@ -845,10 +845,10 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Le shǒu tài yīn jīng bié (canal distinct P) se sépare du canal principal environ 3 cùn sous l'aisselle, dans la région du P 3 (tiān fǔ)[[n7]].",
-     "- Il pénètre dans la poitrine au point VB 22 (yuān yè), devant le shǒu shào yīn (canal C), il gagne le poumon et y pénètre.",
-     "Une branche descend joindre le gros intestin et s’y disperser.",
-     "Une branche monte pour sortir au creux sus-claviculaire, suivre la gorge[[n8]] et s’unir à nouveau au shǒu yáng míng (canal GI) à la superficie[[n9]]."
+     "- Le shǒu tài yīn jīng bié (canal distinct P) se sépare du canal principal environ 3 cùn sous l'**aisselle**, dans la région du P 3 (tiān fǔ)[[n7]].",
+     "- Il pénètre dans la **poitrine** au point VB 22 (yuān yè), devant le shǒu shào yīn (canal C), il gagne le **poumon** et y pénètre.",
+     "Une branche descend joindre le **gros intestin** et s’y disperser.",
+     "Une branche monte pour sortir au **creux sus-claviculaire**, suivre la **gorge**[[n8]] et s’unir à nouveau au shǒu yáng míng (canal GI) à la superficie[[n9]]."
     ],
     "notes": [
      {
@@ -934,8 +934,8 @@ window.MTC_TRAJETS = [
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
      "- Le shǒu tài yīn luò mài (vaisseau liaison P) naît au niveau du point P 7 (lìe qūe)[[n10]].",
-     "- Le vaisseau liaison commence dans le plan de séparation des chairs, proximal par rapport au poignet, d'où une branche part vers l'extérieur pour rejoindre le canal principal du shǒu yáng míng (canal GI)[[n11]] dans la région de GI 4 (hé gǔ).",
-     "Une branche circule parallèlement au canal principal du shǒu tài yīn (canal P), entre tout droit dans la paume et se disperse dans l’éminence thénar."
+     "- Le vaisseau liaison commence dans le plan de séparation des chairs, **proximal par rapport au poignet**, d'où une branche part vers l'extérieur pour rejoindre le canal principal du shǒu yáng míng (canal GI)[[n11]] dans la région de GI 4 (hé gǔ).",
+     "Une branche circule parallèlement au canal principal du shǒu tài yīn (canal P), entre tout droit dans la **paume** et se disperse dans l’**éminence thénar**."
     ],
     "notes": [
      {
@@ -1004,9 +1004,9 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Le shǒu tài yīn jīng jīn (canal tendineux P) commence sur le pouce[[n12]], et monte pour se nouer derrière l’éminence thénar. Il passe sur le bord ulnaire de la styloïde radiale et traverse cùn kǒu[[n13]]. Il monte longer l’avant-bras et se nouer au milieu du coude, il monte sur la face antérieure du bras, entre sous les aisselles, puis sort au creux sus-claviculaire et se noue au-devant de la partie supérieure de l’articulation de l’épaule dans la région de GI 15 (jiān yú).",
-     "- Une branche monte se nouer dans le creux sus-claviculaire.",
-     "- Une autre branche descend se nouer dans le thorax, parcourt le diaphragme et converge dans la région des côtes flottantes[[n14]]."
+     "- Le shǒu tài yīn jīng jīn (canal tendineux P) commence sur le **pouce**[[n12]], et monte pour se nouer derrière l’**éminence thénar**. Il passe sur le **bord ulnaire de la styloïde radiale** et traverse **cùn kǒu**[[n13]]. Il monte longer l’**avant-bras** et se nouer au **milieu du coude**, il monte sur la **face antérieure du bras**, entre sous les **aisselles**, puis sort au **creux sus-claviculaire** et se noue au-devant de la **partie supérieure de l’articulation de l’épaule** dans la région de GI 15 (jiān yú).",
+     "- Une branche monte se nouer dans le **creux sus-claviculaire**.",
+     "- Une autre branche descend se nouer dans le **thorax**, parcourt le **diaphragme** et converge dans la **région des côtes flottantes**[[n14]]."
     ],
     "notes": [
      {
@@ -1940,9 +1940,9 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Le zù tài yīn (canal Rt) débute au bord interne de l'extrémité de l’hallux (gros orteil) au point Rt 1 (yǐn bái)[[n1]], il monte en longeant le bord interne de l’hallux (gros orteil) en circulant à la limite entre chair rouge et chair blanche, puis il traverse le bord interne du 1er métatarsien. Il continue à monter et traverse la face antérieure de la malléole interne, puis la face interne de la jambe en longeant la face postéro-interne du tibia, 3 cùn au-dessus de la pointe de la malléole interne, il croise le zù jué yīn (canal F) et le zú shào yīn (canal Rn) au point Rt 6 (sān yīn jiāo)[[n2]]. Il passe en avant du zù jué yīn (canal F) environ 8 cùn au-dessus de la pointe de la malléole interne[[n3]], passe par le bord interne du genou, puis longe le bord antéro-interne de la cuisse. Il monte sur l'abdomen se connecter au rèn mài aux points, RM 3 (zhōng jí), RM 4 (guān yuán)[[n4]], passe à 4 cùn à l'extérieur de la ligne médiane antérieure[[n5]] avant de se connecter à nouveau au rèn mài au point RM 10 (xià wǎn)[[n6]], puis se lier à la rate[[n7]] (et au pancréas), puis à l'estomac. De l’estomac, émerge le trajet externe et croise le zù shào yáng (canal VB) à VB 24 (rì yuè)[[n8]] puis le zù jué yīn (canal F) à F 14 (qī mén)[[n9]]. Il monte en longeant la partie externe de la poitrine, 6 cùn à l'extérieur de la ligne médiane antérieure, puis il se lie au shǒu tài yīn (canal P) au point P 1 (zhōng fǔ)[[n10]], pour redescendre en bas de l'aisselle et se terminer au point Rt 21 (dà bāo).",
-     "- De l’estomac, une branche monte traverser le diaphragme, se connecte à nouveau au rèn mài au point RM 17 (dàn zhōng)[[n11]] puis longe l'œsophage avant de se lier à la racine de la langue et se disperser en dessous[[n12]].",
-     "- Une autre branche se détache de l'estomac avant de traverser le diaphragme et de se jeter à l'intérieur du coeur pour se lier au shǒu shào yīn (canal C)[[n13]]."
+     "- Le zù tài yīn (canal Rt) débute au **bord interne de l'extrémité de l’hallux (gros orteil)** au point Rt 1 (yǐn bái)[[n1]], il monte en longeant le **bord interne de l’hallux (gros orteil)** en circulant à la **limite entre chair rouge et chair blanche**, puis il traverse le **bord interne du 1er métatarsien**. Il continue à monter et traverse la **face antérieure de la malléole interne**, puis la **face interne de la jambe** en longeant la **face postéro-interne du tibia**, 3 cùn au-dessus de la **pointe de la malléole interne**, il croise le zù jué yīn (canal F) et le zú shào yīn (canal Rn) au point Rt 6 (sān yīn jiāo)[[n2]]. Il passe en avant du zù jué yīn (canal F) environ 8 cùn au-dessus de la **pointe de la malléole interne**[[n3]], passe par le **bord interne du genou**, puis longe le **bord antéro-interne de la cuisse**. Il monte sur l'**abdomen** se connecter au rèn mài aux points, RM 3 (zhōng jí), RM 4 (guān yuán)[[n4]], passe à 4 cùn à l'extérieur de la **ligne médiane antérieure**[[n5]] avant de se connecter à nouveau au rèn mài au point RM 10 (xià wǎn)[[n6]], puis se lier à la **rate**[[n7]] (et au **pancréas**), puis à l'**estomac**. De l’**estomac**, émerge le trajet externe et croise le zù shào yáng (canal VB) à VB 24 (rì yuè)[[n8]] puis le zù jué yīn (canal F) à F 14 (qī mén)[[n9]]. Il monte en longeant la **partie externe de la poitrine**, 6 cùn à l'extérieur de la **ligne médiane antérieure**, puis il se lie au shǒu tài yīn (canal P) au point P 1 (zhōng fǔ)[[n10]], pour redescendre en **bas de l'aisselle** et se terminer au point Rt 21 (dà bāo).",
+     "- De l’**estomac**, une branche monte traverser le **diaphragme**, se connecte à nouveau au rèn mài au point RM 17 (dàn zhōng)[[n11]] puis longe l'**œsophage** avant de se lier à la **racine de la langue** et se disperser en dessous[[n12]].",
+     "- Une autre branche se détache de l'**estomac** avant de traverser le **diaphragme** et de se jeter à l'intérieur du **coeur** pour se lier au shǒu shào yīn (canal C)[[n13]]."
     ],
     "notes": [
      {
@@ -2096,8 +2096,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Le canal distinct de la rate se détache du canal principal au niveau du bord antérieur de la face interne du haut de la cuisse[[n14]], puis pénètre profondément dans l'abdomen, monte en suivant le canal distinct de l'estomac.",
-     "Il se lie à l'estomac, puis à la rate et au cœur dans la profondeur de l'organisme. Il monte à la surface au niveau de la tête et se relie au canal distinct de l'estomac[[n15]]. Il se relie avec la gorge et débouche au niveau de la racine de la langue[[n16]]."
+     "- Le canal distinct de la rate se détache du canal principal au niveau du **bord antérieur de la face interne du haut de la cuisse**[[n14]], puis pénètre profondément dans l'**abdomen**, monte en suivant le canal distinct de l'estomac.",
+     "Il se lie à l'**estomac**, puis à la **rate** et au **cœur** dans la profondeur de l'organisme. Il monte à la surface au niveau de la **tête** et se relie au canal distinct de l'estomac[[n15]]. Il se relie avec la **gorge** et débouche au niveau de la **racine de la langue**[[n16]]."
     ],
     "notes": [
      {
@@ -2157,8 +2157,8 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Le vaisseau luo-liaison de la rate nait au niveau du point Rt 4 (gōng sūn)[[n17]], 1 cùn en arrière de l'articulation métatarso-phalangienne, d'où une branche part vers l'extérieur pour se lier au zú yáng míng.",
-     "- Une autre branche monte en suivant le canal principal de la rate, pénètre dans l'abdomen et se lie aux intestins et à l'estomac."
+     "- Le vaisseau luo-liaison de la rate nait au niveau du point Rt 4 (gōng sūn)[[n17]], 1 cùn en arrière de l'**articulation métatarso-phalangienne**, d'où une branche part vers l'extérieur pour se lier au zú yáng míng.",
+     "- Une autre branche monte en suivant le canal principal de la rate, pénètre dans l'**abdomen** et se lie aux **intestins** et à l'**estomac**."
     ],
     "notes": [
      {
@@ -2225,7 +2225,7 @@ window.MTC_TRAJETS = [
     "type": "grand_luo",
     "title": "Trajet du grand vaisseau liaison",
     "paragraphs": [
-     "- Le vaisseau luo-liaison de la rate naît à Rt 21 (dà bāo)[[n18]]. II débute à 3 cùn au-dessus de VB 22 (yuān yè)[[n19]] et se ramifie sur tout Ie thorax et I'hypocondre[[n20]]."
+     "- Le vaisseau luo-liaison de la rate naît à Rt 21 (dà bāo)[[n18]]. II débute à 3 cùn au-dessus de VB 22 (yuān yè)[[n19]] et se ramifie sur tout Ie **thorax** et I'**hypocondre**[[n20]]."
     ],
     "notes": [
      {
@@ -2276,8 +2276,8 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Le canal tendineux de la rate nait à l'extrémité interne de l’hallux (gros orteil)[[n21]], monte et se lie à la malléole interne, puis continue à monter le long du tibia pour se connecter au bord interne du tibia. Il monte à nouveau au niveau de la face interne de la cuisse, et se lie à la partie antérieure du haut de la cuisse. Il se réunit aux organes génitaux externes[[n22]], puis monte au-dessus du pubis[[n23]], sur l'abdomen et se connecte avec l'ombilic, d'où il pénètre dans la cavité abdominale pour se connecter aux côtes et se disperser dans la cavité thoracique.",
-     "- Une branche interne part de l’abdomen se relier à la colonne vertébrale."
+     "- Le canal tendineux de la rate nait à l'**extrémité interne de l’hallux (gros orteil)**[[n21]], monte et se lie à la **malléole interne**, puis continue à monter le long du **tibia** pour se connecter au **bord interne du tibia**. Il monte à nouveau au niveau de la **face interne de la cuisse**, et se lie à la **partie antérieure du haut de la cuisse**. Il se réunit aux **organes génitaux externes**[[n22]], puis monte au-dessus du **pubis**[[n23]], sur l'**abdomen** et se connecte avec l'**ombilic**, d'où il pénètre dans la **cavité abdominale** pour se connecter aux **côtes** et se disperser dans la **cavité thoracique**.",
+     "- Une branche interne part de l’**abdomen** se relier à la **colonne vertébrale**."
     ],
     "notes": [
      {
