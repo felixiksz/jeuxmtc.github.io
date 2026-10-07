@@ -13,7 +13,7 @@
 
   const TAB_KEY = "mtc_main_menu_tab_v1";
   // numéro de version du jeu : majeur.mineur (le premier chiffre change pour une refonte, le second pour des ajouts)
-  const MTC_VERSION = "2.0";
+  const MTC_VERSION = "2.1";
   window.MTC_VERSION = MTC_VERSION;
   // soutiens du projet : soutiens.js, modifiable en mode admin (Réglages → Soutiens), publié sur le dépôt
   const supporters = () => (Array.isArray(window.MTC_SUPPORTERS) ? window.MTC_SUPPORTERS : []).map(s => String(s).trim()).filter(Boolean);
@@ -21,8 +21,16 @@
   const thanksHtml = () => {
     const THANKS = supporters();
     if(!THANKS.length) return "";
-    const names = THANKS.map(esc).join(", ");
-    const dur = Math.max(9, Math.round((names.length * 0.62 + 12) / 1.4));
+    // chaque prénom dans une couleur vive tirée au hasard (jamais deux voisins de la même couleur)
+    const COLORS = ["#d33a2c", "#2e9a4a", "#2b5fd9", "#d9a400", "#8a3fd1", "#e6731a", "#139e9a"];
+    let last = -1;
+    const names = THANKS.map(n => {
+      let i = Math.floor(Math.random() * COLORS.length);
+      if(i === last) i = (i + 1 + Math.floor(Math.random() * (COLORS.length - 1))) % COLORS.length;
+      last = i;
+      return '<span style="color:' + COLORS[i] + '">' + esc(n) + "</span>";
+    }).join(", ");
+    const dur = Math.max(9, Math.round((THANKS.join(", ").length * 0.62 + 12) / 1.4));
     return '<span class="mm-thanks">Projet soutenu par :' +
       '<span class="mm-ticker" style="--tk-dur:' + dur + 's"><span class="mm-ticker-track">' +
       '<span class="mm-ticker-copy">' + names + '</span><span class="mm-ticker-copy" aria-hidden="true">' + names + "</span>" +
