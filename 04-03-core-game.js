@@ -3704,7 +3704,6 @@ let supportBloodDropState = null;
 let supportBloodDropFrame = null;
 
 function markSupportCoffeeClicked(){
-  window.mtcSupportDropKeepAlive = false;
   try{ localStorage.setItem(
     MTC_SUPPORT_COFFEE_CLICKED_KEY,
     "1"
@@ -3867,10 +3866,10 @@ function showSupportCoffeeReminder(){
 
     if(restoreDrop){
       hideSupportBloodDrop();
-    }else if(typeof showSupportBloodDrop === "function"){
+    }else if(typeof showSupportBloodDrop === "function" && !hasSupportCoffeeClicked()){
       /* Après “Non, désolé”, la goutte reste animée (tombe et continue
-         à interagir avec les panneaux du bas), même après un don passé. */
-      window.mtcSupportDropKeepAlive = true;
+         à interagir avec les panneaux du bas), sauf si la personne a déjà contribué. */
+      try{ localStorage.setItem(MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY, "1"); }catch(error){}
       showSupportBloodDrop();
     }
   }
@@ -4166,7 +4165,7 @@ function hideSupportBloodDrop(){
 
 function showSupportBloodDrop(){
 
-  if(hasSupportCoffeeClicked() && !window.mtcSupportDropKeepAlive){
+  if(hasSupportCoffeeClicked()){
     hideSupportBloodDrop();
     return;
   }
@@ -4256,7 +4255,7 @@ function stepSupportBloodDropPhysics(time){
     !drop ||
     !drop.classList.contains("support-blooddrop-moving") ||
     !supportBloodDropState ||
-    (hasSupportCoffeeClicked() && !window.mtcSupportDropKeepAlive)
+    hasSupportCoffeeClicked()
   ){
     hideSupportBloodDrop();
     return;
