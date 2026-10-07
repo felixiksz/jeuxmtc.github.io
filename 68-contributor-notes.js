@@ -3,7 +3,9 @@
    Mode contributeur (modules bêta Trajets / Formules) : une personne
    qui accepte de contribuer accède, dans les fiches des points et des
    substances, aux notes partagées :
-   - les notes perso de l'admin (notes-admin.js, signées « emesepap, admin ») ;
+   - les notes perso de l'admin (notes-admin.js), intégrées directement dans le champ
+     d'origine de la fiche, dans la couleur de l'autrice et signées de son nom
+     (pas pour l'admin elle-même, ni ce que la personne a déjà dans ses propres notes) ;
    - un fil « Notes des contributeur·ices » par fiche (giscus), où chaque note
      est signée du nom de profil GitHub de son auteur, pour pouvoir le
      contacter en cas d'incompréhension.
@@ -58,7 +60,11 @@
 .mtc-contrib .row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
 .mtc-contrib .row button{ font:inherit; font-size:.85em; font-weight:700; border:1px solid currentColor; background:transparent; color:inherit; border-radius:999px; padding:3px 11px; cursor:pointer; }
 .mtc-contrib .row .quit{ border:0; text-decoration:underline; font-weight:400; opacity:.6; padding:0; }
-.mtc-contrib-veil{ position:fixed; inset:0; z-index:1200; background:rgba(20,18,40,.55); display:flex; align-items:center; justify-content:center; padding:16px; }
+.mtc-shared-in{ color:var(--a); margin:4px 0 8px; text-align:left; }
+.mtc-shared-in .txt{ white-space:pre-line; margin:0; line-height:1.5; }
+.mtc-shared-in .by{ display:block; font-size:.78em; font-style:italic; opacity:.85; margin-top:2px; }
+.mtc-contrib .by-legend{ font-size:.82em; color:var(--a); margin-right:4px; }
+.mtc-contrib-veil{ position:fixed; inset:0; z-index:12000; background:rgba(20,18,40,.55); display:flex; align-items:center; justify-content:center; padding:16px; }
 .mtc-contrib-box{ background:#fff; color:#111; max-width:540px; width:100%; border-radius:16px; padding:20px 22px; box-shadow:0 12px 40px rgba(0,0,0,.25); font:15px/1.55 "Archivo", system-ui, sans-serif; text-align:left; }
 .mtc-contrib-box h2{ margin:0 0 6px; font-size:1.2rem; }
 .mtc-contrib-box label{ display:flex; gap:9px; align-items:flex-start; margin:8px 0; cursor:pointer; }
@@ -77,9 +83,9 @@
     const veil = document.createElement("div");
     veil.className = "mtc-contrib-veil";
     veil.innerHTML = '<div class="mtc-contrib-box" role="dialog" aria-modal="true" aria-labelledby="mtcContribTitle">' +
-      '<h2 id="mtcContribTitle">Contribuer aux modules bêta</h2>' +
-      "<p>En contribuant à Trajets et Formules, tu accèdes aux <b>notes des autres contributeur·ices</b> dans les fiches des points et des substances.</p>" +
-      '<label><input type="checkbox" class="c1"><span>Je participe à la vérification et à l’amélioration des modules (corrections, vérifications, notes).</span></label>' +
+      '<h2 id="mtcContribTitle">Contribuer au jeu</h2>' +
+      "<p>En contribuant aux fiches des points et des substances, et aux modules bêta (Trajets, Formules), tu accèdes aux <b>notes partagées</b> : elles apparaissent en couleur directement dans les champs des fiches, signées de leur auteur·ice.</p>" +
+      '<label><input type="checkbox" class="c1"><span>Je participe à la vérification et à l’amélioration des fiches et des modules (corrections, vérifications, notes).</span></label>' +
       '<label><input type="checkbox" class="c2"><span>Mes notes seront signées de <b>mon nom de profil GitHub</b>, pour qu’on puisse me contacter en cas d’incompréhension. Pas encore de profil ? <a href="https://github.com/signup" target="_blank" rel="noopener">Créer un profil GitHub</a>.</span></label>' +
       '<label><input type="checkbox" class="c3"><span>J’utilise les notes des autres pour mon apprentissage et je ne les diffuse pas en dehors du jeu.</span></label>' +
       '<div class="btns"><button type="button" class="no">Annuler</button><button type="button" class="go" disabled>Je contribue</button></div></div>';
@@ -94,21 +100,87 @@
     });
   }
 
+  // sous l'en-tête : la légende de la couleur, le fil des notes signées et « ne plus contribuer » (les notes sont dans les champs)
   function block(domain, id, label){
     if(!enabled() || !id) return "";
     style();
-    if(!isContributor()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes des autres contributeur·ices">Contribuer — notes des contributeurs</button></div>';
+    if(!isContributor()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes partagées">Contribuer</button></div>';
     loadNotes();
-    const shared = window.MTC_SHARED_NOTES, mine = shared && shared[domain] && shared[domain][id];
-    const fields = mine ? Object.entries(mine) : [];
-    const labels = LABELS[domain] || {};
-    const author = (shared && shared.author) || "emesepap, admin", col = authorColor(author);
-    return '<div class="mtc-contrib"><details' + (fields.length ? " open" : "") + "><summary>Notes des contributeur·ices" + (fields.length ? " (" + fields.length + ")" : "") + "</summary>" +
-      (fields.length ? '<p class="legend"><span class="dot" style="--a:' + col + '"></span>' + esc(author) + "</p>" +
-        fields.map(([k, v]) => '<div class="note" style="--a:' + col + '" title="' + esc(author) + '"><h5>' + esc(labels[k] || k) + '</h5><p class="txt">' + esc(v) + "</p></div>").join("")
-        : (shared ? "<p class=\"txt\">Pas encore de note partagée sur cette fiche.</p>" : "<p class=\"txt\">Chargement…</p>")) +
-      '<div class="row"><button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">Notes signées des contributeur·ices</button>' +
-      '<button type="button" class="quit" data-contrib="quit">ne plus contribuer</button></div></details></div>';
+    const author = authorName(), col = authorColor(author);
+    return '<div class="mtc-contrib"><div class="row">' +
+      (isAdmin() ? "" : '<span class="by-legend" style="--a:' + col + '">● en couleur : notes de ' + esc(author.split(",")[0]) + "</span>") +
+      '<button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">Notes signées des contributeur·ices</button>' +
+      '<button type="button" class="quit" data-contrib="quit">ne plus contribuer</button></div></div>';
+  }
+
+  // notes partagées dans le champ d'origine de la fiche, dans la couleur de l'autrice
+  const authorName = () => (window.MTC_SHARED_NOTES && window.MTC_SHARED_NOTES.author) || "emesepap, admin";
+  const PHARMA_FIELDS = {esprits:"esprit", notes:"notes", associations:"associations", formules:"formules", vs:"vs", syntheses:"synthese", precautions:"precaution",
+    ingredients:"ingredients", recherches_modernes:"recherches_modernes", indications:"indications", contre_indications:"contre_indications", preparations:"preparation", synonymes:"synonymes"};
+  const POINT_FIELDS = {notes:"Notes", associations:"Associations", esprits:"Esprit", vs:"VS", precautions:"Précaution"};
+  const flat = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[«»"’'.,;:!?()\-–—]/g, " ").replace(/\s+/g, " ").trim();
+  function sharedFor(domain, id){
+    // l'admin voit déjà ses notes dans ses propres champs : pas de doublon
+    if(!enabled() || !isContributor() || isAdmin() || !id) return null;
+    loadNotes();
+    const S = window.MTC_SHARED_NOTES;
+    return (S && S[domain] && S[domain][id]) || null;
+  }
+  // seulement les paragraphes que la personne n'a pas déjà dans le champ
+  function freshPart(text, already){
+    const have = flat(already);
+    return String(text || "").split(/\n\s*\n/).map(s => s.trim()).filter(s => s && !have.includes(flat(s))).join("\n\n");
+  }
+  function sharedHtml(text){
+    const author = authorName(), name = author.split(",")[0];
+    return '<div class="mtc-shared-in" style="--a:' + authorColor(author) + '" title="Note partagée de ' + esc(name) + '"><p class="txt">' + esc(text) + '</p><span class="by">— ' + esc(name) + "</span></div>";
+  }
+  function decoratePharma(container, id){
+    const mine = sharedFor("pharma", id);
+    if(!container || !mine) return;
+    style();
+    Object.entries(PHARMA_FIELDS).forEach(([k, field]) => {
+      const sec = container.querySelector(".pharma-editable-" + field);
+      if(!mine[k] || !sec || sec.querySelector(".mtc-shared-in")) return;
+      const ta = sec.querySelector("textarea");
+      const text = freshPart(mine[k], ta ? ta.value : sec.textContent);
+      if(!text) return;
+      const title = sec.querySelector(".pharma-editable-title");
+      if(title) title.insertAdjacentHTML("afterend", sharedHtml(text));
+      else sec.insertAdjacentHTML("afterbegin", sharedHtml(text));
+    });
+  }
+  function decoratePoint(){
+    const content = document.getElementById("pointPanelContent");
+    let id = null;
+    try{ id = currentPointPanelPoint; }catch(e){}
+    // le même panneau sert aux substances : seulement pour une fiche de point
+    if(!content || document.documentElement.getAttribute("data-study-domain") === "pharmacology" || content.querySelector(".pharma-herb-header")) return;
+    const mine = sharedFor("points", id);
+    if(!mine) return;
+    style();
+    const sections = [...content.querySelectorAll("details.point-info-section")];
+    Object.entries(POINT_FIELDS).forEach(([k, label]) => {
+      if(!mine[k]) return;
+      let sec = sections.find(d => { const s = d.querySelector("summary"); return s && s.textContent.replace("✎", "").trim().toLowerCase().startsWith(label.toLowerCase()); });
+      if(sec && sec.querySelector(".mtc-shared-in")) return;
+      const ta = sec && sec.querySelector("textarea");
+      const text = freshPart(mine[k], sec ? (ta ? ta.value : sec.textContent) : "");
+      if(!text) return;
+      if(!sec){
+        content.insertAdjacentHTML("beforeend", '<details class="point-info-section" open><summary>' + esc(label === "VS" ? "VS." : label) + "</summary></details>");
+        sec = content.lastElementChild;
+      }
+      const display = sec.querySelector(".point-note-display");
+      if(display) display.insertAdjacentHTML("afterend", sharedHtml(text));
+      else sec.insertAdjacentHTML("beforeend", sharedHtml(text));
+    });
+  }
+  function watchPointPanel(){
+    const content = document.getElementById("pointPanelContent");
+    if(!content || content.dataset.mtcSharedWatch) return;
+    content.dataset.mtcSharedWatch = "1";
+    new MutationObserver(decoratePoint).observe(content, {childList:true});
   }
 
   // points : à la suite de l'éditeur admin de la fiche (05-04-final-corrections.js appelle ce crochet)
@@ -126,6 +198,7 @@
     const anchor = container.querySelector(".mtc-fiche-admin") || container.querySelector(".pharma-herb-header");
     const herb = (window.PHARMA_HERBS || []).find(h => h && h.id === id);
     if(anchor) anchor.insertAdjacentHTML("afterend", block(domain, id, herb ? (herb.pinyin || id) : id));
+    if(domain === "pharma") decoratePharma(container, id);
   };
 
   document.addEventListener("click", e => {
@@ -141,4 +214,5 @@
     }
   }, true);
   if(isContributor() && enabled()) loadNotes();
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", watchPointPanel); else watchPointPanel();
 })();
