@@ -354,6 +354,26 @@
       label.style.top = (r.top + r.height / 2) + "px";
     }
   }
+  // goutte au repos : elle se pose sur le haut d'un panneau ouvert en bas (recherche, panier, A|B, stats), comme en mouvement
+  const BOTTOM_PANELS = ".stats-panel, .advanced-search-panel, .review-basket-panel, .comparison-panel";
+  function floatRestingDrop(){
+    const d = byId("supportCoffeeButton");
+    if(!d || d.classList.contains("support-blooddrop-moving")) return;
+    let ground = Infinity;
+    document.querySelectorAll(BOTTOM_PANELS).forEach(p => {
+      if(!p.classList.contains("open")) return;
+      const r = p.getBoundingClientRect();
+      if(r.top > 0 && r.top < window.innerHeight && r.height > 40) ground = Math.min(ground, r.top);
+    });
+    if(ground === Infinity) d.style.removeProperty("bottom");
+    else d.style.setProperty("bottom", Math.round(window.innerHeight - ground + 2) + "px", "important");
+    ensureSupportLabel();
+  }
+  function watchBottomPanels(){
+    const again = () => { floatRestingDrop(); [120, 450, 900].forEach(ms => setTimeout(floatRestingDrop, ms)); };
+    document.querySelectorAll(BOTTOM_PANELS).forEach(p => new MutationObserver(again).observe(p, {attributes:true, attributeFilter:["class"]}));
+    window.addEventListener("resize", floatRestingDrop);
+  }
   function paintTopSwitch(){
     const host = byId("mtcTopDomainSwitch");
     if(host) host.innerHTML = domainSwitchHtml();
@@ -522,6 +542,7 @@
     document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")) close(); });
     arrangeControls();
     watchSearchFocus();
+    watchBottomPanels();
     bottomIcons();
     const gm = byId("gameplayModeTopline"), ba = document.querySelector(".bottom-actions");
     if(gm && ba && gm.parentElement !== ba) ba.appendChild(gm);
