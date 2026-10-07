@@ -364,6 +364,22 @@
     "#reviewBasketButton", "#comparisonButton", "#studyDomainSelect", "#fullscreenToggleButton", "#pharmaCardsButton",
     "#exportNotesButton", "#importNotesButton", "#mtcOfflineButton", "#cheatsheetButton", "[data-import-history-toggle]"];
   // recherche : le curseur se place tout de suite dans la barre de recherche à l'ouverture du panneau
+  // recherche, panier, A|B en icônes, en bas au centre (ils ouvrent les panneaux habituels)
+  function bottomIcons(){
+    if(byId("mtcBottomIcons")) return;
+    const svg = d => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>";
+    const ICONS = [
+      ["advancedSearchButton", "Recherche", svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>')],
+      ["reviewBasketButton", "Panier", svg('<path d="M3.5 9h17l-1.8 10.2a1.5 1.5 0 0 1-1.5 1.3H6.8a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M8 9l3-5.5M16 9l-3-5.5"/>')],
+      ["comparisonButton", "Comparer A | B", svg('<rect x="3" y="5" width="7.5" height="14" rx="1.5"/><rect x="13.5" y="5" width="7.5" height="14" rx="1.5"/>')]
+    ];
+    const box = document.createElement("nav");
+    box.id = "mtcBottomIcons";
+    box.setAttribute("aria-label", "Outils de révision");
+    box.innerHTML = ICONS.map(([id, label, icon]) => '<button type="button" data-for="' + id + '" title="' + label + '" aria-label="' + label + '">' + icon + "</button>").join("");
+    box.addEventListener("click", e => { const b = e.target.closest("[data-for]"); if(b) clickId(b.dataset.for); });
+    document.body.appendChild(box);
+  }
   function watchSearchFocus(){
     const panel = byId("advancedSearchPanel");
     if(!panel || panel.dataset.mtcFocusWatch) return;
@@ -506,6 +522,7 @@
     document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")) close(); });
     arrangeControls();
     watchSearchFocus();
+    bottomIcons();
     const gm = byId("gameplayModeTopline"), ba = document.querySelector(".bottom-actions");
     if(gm && ba && gm.parentElement !== ba) ba.appendChild(gm);
     document.body.classList.remove("mtc-menu-loading");   // tout est en place : on affiche

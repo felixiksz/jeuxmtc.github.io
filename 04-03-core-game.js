@@ -3704,6 +3704,7 @@ let supportBloodDropState = null;
 let supportBloodDropFrame = null;
 
 function markSupportCoffeeClicked(){
+  window.mtcSupportDropKeepAlive = false;
   try{ localStorage.setItem(
     MTC_SUPPORT_COFFEE_CLICKED_KEY,
     "1"
@@ -3866,13 +3867,10 @@ function showSupportCoffeeReminder(){
 
     if(restoreDrop){
       hideSupportBloodDrop();
-    }else if(
-      typeof showSupportBloodDrop === "function" &&
-      !hasSupportCoffeeClicked() &&
-      localStorage.getItem(MTC_SUPPORT_COFFEE_RETURN_ELIGIBLE_KEY) === "1"
-    ){
-      /* Après “Non, désolé”, la goutte reste tombée et continue
-         à interagir avec les panneaux du bas. */
+    }else if(typeof showSupportBloodDrop === "function"){
+      /* Après “Non, désolé”, la goutte reste animée (tombe et continue
+         à interagir avec les panneaux du bas), même après un don passé. */
+      window.mtcSupportDropKeepAlive = true;
       showSupportBloodDrop();
     }
   }
@@ -4168,7 +4166,7 @@ function hideSupportBloodDrop(){
 
 function showSupportBloodDrop(){
 
-  if(hasSupportCoffeeClicked()){
+  if(hasSupportCoffeeClicked() && !window.mtcSupportDropKeepAlive){
     hideSupportBloodDrop();
     return;
   }
@@ -4258,7 +4256,7 @@ function stepSupportBloodDropPhysics(time){
     !drop ||
     !drop.classList.contains("support-blooddrop-moving") ||
     !supportBloodDropState ||
-    hasSupportCoffeeClicked()
+    (hasSupportCoffeeClicked() && !window.mtcSupportDropKeepAlive)
   ){
     hideSupportBloodDrop();
     return;

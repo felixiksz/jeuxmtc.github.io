@@ -18,6 +18,7 @@ body.mtc-menu-ui #mtcAdminFormules,
 body.mtc-menu-ui #fullscreenToggleButton,
 body.mtc-menu-ui .study-domain-topline,
 body.mtc-menu-ui #dailyStreakBadge,
+body.mtc-menu-ui #footerMainTools,
 body.mtc-menu-ui #exportNotesButton,
 body.mtc-menu-ui #importNotesButton,
 body.mtc-menu-ui #pharmaCardsButton,
@@ -54,7 +55,7 @@ body.mtc-menu-ui .topbar-main-buttons{ order:0; }
 
 /* éléments permanents : série en bas à gauche, enveloppe en bas à droite, sans fond */
 #mtcStreakCorner{
-  position:fixed; left:16px; bottom:18px; z-index:9050;
+  position:fixed; left:16px; bottom:20px; z-index:9050;
   background:transparent !important; border:0 !important; box-shadow:none !important; padding:2px 0 !important;
   color:var(--text-color); font-family:'Archivo', sans-serif; font-size:11px; font-weight:700;
   text-transform:uppercase; letter-spacing:.07em; cursor:pointer;
@@ -62,10 +63,22 @@ body.mtc-menu-ui .topbar-main-buttons{ order:0; }
 #mtcStreakCorner small{ font-size:inherit; font-weight:400; margin-left:3px; }
 #mtcStreakCorner:hover{ transform:none !important; text-shadow:0 3px 12px var(--shadow-color); }
 body.mtc-menu-ui #suggestionMailButton{
-  position:fixed !important; right:16px !important; bottom:14px !important; top:auto !important; left:auto !important;
+  position:fixed !important; right:16px !important; bottom:13px !important; top:auto !important; left:auto !important;
   margin:0 !important; transform:none !important; z-index:9050;
   background:transparent !important; box-shadow:none !important; border:0 !important;
 }
+
+/* recherche, panier, A|B : trois icônes discrètes en bas au centre, sur la ligne de la série et de l'enveloppe */
+#mtcBottomIcons{ position:fixed; left:50%; bottom:14px; height:28px; transform:translateX(-50%); z-index:9050; display:none; align-items:center; gap:22px; }
+body.mtc-menu-ui #mtcBottomIcons{ display:flex; }
+body.mtc-menu-open #mtcBottomIcons, body.mtc-menu-loading #mtcBottomIcons{ display:none; }
+#mtcBottomIcons button{ display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0 !important; margin:0 !important;
+  background:transparent !important; border:0 !important; box-shadow:none !important; color:var(--text-color); cursor:pointer; }
+#mtcBottomIcons svg{ width:17px; height:17px; }
+#mtcBottomIcons button:hover{ transform:none !important; filter:drop-shadow(0 2px 6px var(--shadow-color)); }
+@media (max-width:760px){ #mtcBottomIcons{ gap:12px; } #mtcBottomIcons svg{ width:16px; height:16px; } }
+/* téléphone : pas la place pour « Soutenir le jeu » à côté des icônes ; la goutte reste */
+@media (max-width:560px){ #mtcSupportLabel{ display:none !important; } }
 
 /* le grand menu */
 #mtcMainMenu{
@@ -142,7 +155,7 @@ body.mtc-menu-open{ overflow:hidden; }
   #mtcMainMenu .mm-list{ display:none; }
   #mtcMainMenu .mm-phone-list{ display:block; margin:8px 0 18px; }
   #mtcMainMenu .mm-item{ grid-template-columns:1fr; gap:3px; padding:9px 0 !important; }
-  #mtcStreakCorner{ left:12px; bottom:18px; }
+  #mtcStreakCorner{ left:12px; bottom:20px; }
   body.mtc-menu-ui #suggestionMailButton{ right:12px !important; }
 }
 
@@ -159,7 +172,7 @@ html body.mtc-menu-ui .bottom-actions{
 }
 /* goutte de sang au repos : en bas à droite, à gauche de l'enveloppe (en mouvement, sa position est calculée par le jeu) */
 body.mtc-menu-ui #supportCoffeeButton:not(.support-blooddrop-moving){
-  position:fixed !important; right:54px !important; bottom:12px !important; left:auto !important; top:auto !important; transform:none !important;
+  position:fixed !important; right:54px !important; bottom:13px !important; left:auto !important; top:auto !important; transform:none !important;
 }
 
 /* ligne des réglages de la partie : Auto / Manuel · Facile–Difficile · icônes */
@@ -228,3 +241,14 @@ body.mtc-menu-open #mtcSupportLabel, body.mtc-menu-loading #mtcSupportLabel{ dis
 #tourBox .support-coffee-amounts{ display:flex !important; flex-wrap:wrap !important; gap:6px 16px !important; justify-content:flex-start !important; }
 #tourBox .support-coffee-amounts button{ margin:0 !important; white-space:nowrap; }
 #tourBox .support-coffee-name-note, #mtcSupportAsk .mtc-ask-note{ font-size:11.5px; font-style:italic; opacity:.8; margin:6px 0 8px; }
+
+/* Mémo (aide-mémoire) sur ordinateur : la barre de fermeture « < » ne doit pas repousser le contenu en bas du panneau
+   (elle s'étirait sur toute la hauteur dans le flux) : bande collée à droite, hors du flux */
+@media (min-width:700px) and (pointer:fine){
+  html body .cheatsheet-panel.open .cheatsheet-toggle{
+    position:sticky !important; top:0 !important; float:right !important;
+    height:calc(100vh - 60px) !important; margin:0 -8px calc(60px - 100vh) 0 !important;
+  }
+}
+/* titre du Mémo pharma (« Substances médicinales majeures ») : tient dans la largeur du panneau */
+html body #cheatsheetPanelContent .point-code{ display:block; max-width:100%; font-size:clamp(24px, 2.3vw, 32px) !important; letter-spacing:.02em !important; overflow-wrap:break-word; }
