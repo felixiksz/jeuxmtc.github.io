@@ -358,29 +358,8 @@
       label.style.top = (m.top + m.height / 2) + "px";
     }
   }
-  // goutte au repos : elle se pose sur le haut d'un panneau ouvert en bas (recherche, panier, A|B, stats), comme en mouvement
+  // panneaux du bas (la goutte animée s'y pose et rebondit ; la goutte au repos, elle, reste à sa place)
   const BOTTOM_PANELS = ".stats-panel, .advanced-search-panel, .review-basket-panel, .comparison-panel";
-  function floatRestingDrop(){
-    const d = byId("supportCoffeeButton");
-    if(!d || d.classList.contains("support-blooddrop-moving")) return;
-    let ground = Infinity;
-    document.querySelectorAll(BOTTOM_PANELS).forEach(p => {
-      if(!p.classList.contains("open")) return;
-      const r = p.getBoundingClientRect();
-      if(r.top > 0 && r.top < window.innerHeight && r.height > 40) ground = Math.min(ground, r.top);
-    });
-    if(ground === Infinity) d.style.removeProperty("bottom");
-    else d.style.setProperty("bottom", Math.round(window.innerHeight - ground + 2) + "px", "important");
-    ensureSupportLabel();
-  }
-  function watchBottomPanels(){
-    // pendant l'ouverture ou la fermeture d'un panneau, la goutte suit son bord à chaque image (elle ne passe jamais dessous)
-    let until = 0, running = false;
-    const follow = () => { floatRestingDrop(); if(performance.now() < until) requestAnimationFrame(follow); else { running = false; floatRestingDrop(); } };
-    const again = () => { until = performance.now() + 1400; if(!running){ running = true; requestAnimationFrame(follow); } setTimeout(floatRestingDrop, 1500); };
-    document.querySelectorAll(BOTTOM_PANELS).forEach(p => new MutationObserver(again).observe(p, {attributes:true, attributeFilter:["class"]}));
-    window.addEventListener("resize", floatRestingDrop);
-  }
   function paintTopSwitch(){
     const host = byId("mtcTopDomainSwitch");
     if(host) host.innerHTML = domainSwitchHtml();
@@ -558,7 +537,6 @@
     document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")) close(); });
     arrangeControls();
     watchSearchFocus();
-    watchBottomPanels();
     bottomIcons();
     const gm = byId("gameplayModeTopline"), ba = document.querySelector(".bottom-actions");
     if(gm && ba && gm.parentElement !== ba) ba.appendChild(gm);
