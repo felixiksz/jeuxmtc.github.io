@@ -120,7 +120,8 @@
   .crow .where{ flex:none; width:8.5em; font-size:.72rem; font-weight:700; color:#555; background:#f1f1f7; border-radius:6px; padding:1px 6px; line-height:1.25; }
   nav .navrow.muted button{ opacity:.38; background:#eee; text-decoration:line-through; }
   .tgroup{ display:inline-flex; gap:6px; align-items:center; padding:1px 7px; border:1px solid #d7d7e6; border-radius:999px; }
-  .netwrap{ background:#e3e6eb; }   /* hors quartiers : gris bleuté{ stroke:none; }  .schemawrap{ background:#fff; }
+  .netwrap{ background:#e3e6eb; }   /* hors quartiers : gris bleuté, même luminosité que les quartiers */
+  .schemawrap{ background:#fff; }
   .schemaheads{ position:absolute; left:0; right:0; top:0; height:32px; z-index:1; pointer-events:none; background:linear-gradient(#fff 70%, rgba(255,255,255,0)); }
   .shead{ position:absolute; top:6px; transform:translateX(-50%); font-size:11px; font-weight:800; padding:1px 6px; border-radius:5px; border:1.5px solid; white-space:nowrap; pointer-events:auto; cursor:pointer; transition:opacity .15s; }
   .shead.tan-dim{ opacity:.25; }
@@ -214,6 +215,12 @@
     main h2{ font-size:1rem; margin:2px 0 4px; }
     .netwrap{ height:calc(100vh - 120px) !important; }
     .netzoom button{ width:38px; height:38px; }
+    /* itinéraire sur téléphone : toute la largeur pour le plan (sans la colonne des canaux), en-tête non collant */
+    body.rt-on nav{ display:none; }
+    body.rt-on header, body.rt-on main{ margin-left:0; }
+    body.rt-on header{ position:static; }
+    .rtbar{ font-size:.82rem; }
+    .rthelp{ font-size:.78rem; }
   }
   .netwrap{ position:relative; border:1px solid #e6e6f3; border-radius:12px; background:#e3e6eb; height:calc(100vh - 200px); min-height:420px; overflow:hidden; }
   .netsvg{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; user-select:none; }
@@ -1461,6 +1468,7 @@
   }
 
   function showSchema(){
+    document.body.classList.toggle("rt-on", !!RT);
     const codes = new Set(data.map(c => c.code));
     const visible = c => codes.has(c) && (RT ? RT.level >= 2 || !MV6.has(c) : !NET_HIDDEN.has(c));
     const byCode = {};
@@ -1694,6 +1702,7 @@
 
   let current = null;
   function show(code, sectionIndex, keepScroll){
+    document.body.classList.remove("rt-on");
     RT = null;
     const canal = data.find(c => c.code === code) || data[0];
     current = canal.code;
