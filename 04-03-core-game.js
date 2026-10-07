@@ -4301,18 +4301,28 @@ function stepSupportBloodDropPhysics(time){
     state.vx = 0;
   }
 
-  if(state.y >= groundY){
-    const impact =
-      Math.max(
-        Math.abs(state.vy),
-        panelMovedUp ? 2.4 : 0
-      );
+  /* Plafond : propulsée trop haut, elle rebondit contre le haut de l'écran. */
+  if(state.y < 6){
+    state.y = 6;
+    if(state.vy < 0) state.vy = -state.vy * .42;
+  }
+
+  if(state.y >= groundY && panelMovedUp && state.vy >= 0){
+    /* Le panneau monte sous la goutte : elle est propulsée vers le haut
+       (plus fort si le panneau monte vite), puis retombe sur lui. */
+    const push = state.y - groundY;
+    state.y = groundY;
+    state.vy = -Math.min(13, 5 + push * .35);
+    state.vx = 0;
+  }else if(state.y >= groundY){
+    const impact = Math.abs(state.vy);
 
     state.y = groundY;
 
-    if(impact > .82){
+    if(impact > .6){
+      /* Petit rebond à chaque contact avec le sol (bas de l'écran ou panneau). */
       state.vy =
-        -impact * .32;
+        -impact * .42;
 
       /* Pas de déplacement latéral aléatoire : la goutte rebondit seulement. */
       state.vx = 0;

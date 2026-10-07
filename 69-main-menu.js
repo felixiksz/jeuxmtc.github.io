@@ -347,11 +347,15 @@
     }
     label.href = supportLink();
     const r = drop && drop.getBoundingClientRect();
-    const shown = !!(r && r.width && getComputedStyle(drop).display !== "none" && getComputedStyle(drop).visibility !== "hidden");
+    const mail = byId("suggestionMailButton"), m = mail && mail.getBoundingClientRect();
+    const panelOpen = [...document.querySelectorAll(BOTTOM_PANELS)].some(p => p.classList.contains("open"));
+    const shown = !!(r && r.width && m && m.width && !panelOpen && getComputedStyle(drop).display !== "none" && getComputedStyle(drop).visibility !== "hidden");
     label.style.display = shown ? "" : "none";
     if(shown){
-      label.style.right = Math.max(8, window.innerWidth - r.left + 6) + "px";
-      label.style.top = (r.top + r.height / 2) + "px";
+      // place de repos de la goutte : à gauche de l'enveloppe (la goutte peut bouger, le texte reste)
+      const restLeft = m.left - 27 - (drop.offsetWidth || 28) / 2;
+      label.style.right = Math.max(8, window.innerWidth - restLeft + 6) + "px";
+      label.style.top = (m.top + m.height / 2) + "px";
     }
   }
   // goutte au repos : elle se pose sur le haut d'un panneau ouvert en bas (recherche, panier, A|B, stats), comme en mouvement
@@ -505,7 +509,16 @@
       if(typeof window.restoreSupportCoffeeButtonToFooter === "function") window.restoreSupportCoffeeButtonToFooter = el => { if(el) document.body.appendChild(el); };
       const mailBox = () => { const m = byId("suggestionMailButton"); const r = m && m.getBoundingClientRect(); return r && r.width ? r : null; };
       const dropX = () => { const r = mailBox(), w = drop.offsetWidth || 30; return r ? Math.max(6, r.left - 27 - w / 2) : Math.max(6, window.innerWidth - 70 - w / 2); };
-      const dropGround = () => { const r = mailBox(), h = drop.offsetHeight || 30; return r ? r.top + (r.height - h) / 2 : window.innerHeight - h - 12; };
+      const dropGround = () => {
+        const r = mailBox(), h = drop.offsetHeight || 30;
+        let g = r ? r.top + (r.height - h) / 2 : window.innerHeight - h - 12;
+        document.querySelectorAll(BOTTOM_PANELS).forEach(p => {
+          if(!p.classList.contains("open")) return;
+          const pr = p.getBoundingClientRect();
+          if(pr.top > 0 && pr.top < window.innerHeight && pr.height > 40) g = Math.min(g, pr.top - h + 2);
+        });
+        return g;
+      };
       const pin = () => { try{ if(typeof supportBloodDropState !== "undefined" && supportBloodDropState) supportBloodDropState.x = dropX(); }catch(error){} };
       if(typeof window.panelGroundForSupportBloodDrop === "function" && !window.panelGroundForSupportBloodDrop.mtcPinned){
         window.panelGroundForSupportBloodDrop = function(){ return dropGround(); };
