@@ -29,7 +29,9 @@
       let h = 0;
       for(const ch of n.toLowerCase()) h = (h * 31 + ch.codePointAt(0)) >>> 0;
       let i = h % COLORS.length;
-      const avoid = new Set([pick[k - 1], k === THANKS.length - 1 && k > 1 ? pick[0] : undefined]);
+      // jamais la couleur d'un voisin, ni rouge à côté de bleu (le drapeau français)
+      const near = [pick[k - 1], k === THANKS.length - 1 && k > 1 ? pick[0] : undefined].filter(x => x !== undefined);
+      const avoid = new Set(near.concat(near.map(x => x === 0 ? 2 : x === 2 ? 0 : x)));
       while(avoid.has(i)) i = (i + 1) % COLORS.length;
       pick.push(i);
     });
