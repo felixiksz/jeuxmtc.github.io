@@ -156,10 +156,17 @@
     return stored !== null ? stored : "";
   }
 
+  // associations : celles de la fiche (importée ou notée), puis les lignes publiées qui n'y sont pas encore
   function getHerbAssociations(herb){
     const stored = getStoredValue(ASSOCIATIONS_STORAGE_PREFIX, herb.id);
-    return stored !== null ? stored : (herb.associations || herb.association || "");
+    const published = normalizeMultiline(herb.associations || herb.association || "");
+    if(stored === null || !published) return stored !== null ? stored : published;
+    const flatLine = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+    const have = flatLine(stored);
+    const extra = published.split("\n").filter(line => { const k = flatLine(line); return !k || !have.includes(k); }).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    return extra ? normalizeMultiline(stored) + "\n\n" + extra : stored;
   }
+  window.mtcHerbAssociations = herb => herb ? getHerbAssociations(herb) : "";
 
   function getHerbVs(herb){
     const stored = getStoredValue(VS_STORAGE_PREFIX, herb.id);

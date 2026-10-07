@@ -105,7 +105,7 @@
   function block(domain, id, label){
     if(!enabled() || !id) return "";
     style();
-    if(!isContributor() && !isAdmin()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes partagées">Contribuer</button></div>';
+    if(!isContributor() && !isAdmin()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes partagées">Contribuer et afficher les contributions</button></div>';
     loadNotes();
     return '<div class="mtc-contrib"><div class="row">' +
       '<button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">Notes signées des contributeur·ices</button>' +

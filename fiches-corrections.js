@@ -75,7 +75,8 @@ window.MTC_FICHE_CORRECTIONS = {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
     },
     "VH1": {
-      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
+      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement.",
+      "associations": "DU HUO + BAI ZHU + = douleur dentaire\nDU HUO + QIANG HUO = vent-froid-humidite, douleurs généralisés"
     },
     "VH4": {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
@@ -90,7 +91,8 @@ window.MTC_FICHE_CORRECTIONS = {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
     },
     "CSS4": {
-      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
+      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement.",
+      "associations": "HONG HUA + TAO REN = Association clé pour la stase de sang"
     },
     "CSS10": {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
@@ -117,7 +119,8 @@ window.MTC_FICHE_CORRECTIONS = {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
     },
     "TI2": {
-      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
+      "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement.",
+      "associations": "GAN JIANG + Fu Zi = souvent utilisés ensemble"
     },
     "PT8": {
       "precaution": "- Anticoagulants, anti-agrégants plaquettaires (et AINS) : vigilance ; probablement baisser la posologie initiale, et prévenir læ patient·e d’arrêter au moindre saignement."
@@ -135,7 +138,8 @@ window.MTC_FICHE_CORRECTIONS = {
       "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
     },
     "VH6": {
-      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
+      "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau).",
+      "associations": "WU JIA PI + DU ZHONG = lombaires\n\nWU JIA PI + NIU XI = genou\n\nWU JIA PI + CANG ZHU = assechent l'Humidite"
     },
     "TTD12": {
       "precaution": "- Diurétiques : vigilance (action sur le métabolisme de l’eau)."
@@ -160,6 +164,21 @@ window.MTC_FICHE_CORRECTIONS = {
     },
     "CHU3": {
       "precaution": "- Allergie à la pénicilline : attention."
+    },
+    "VH5": {
+      "associations": "SANG ZHI + Fu Ling + Zhu Ling = reduit l'oedeme par la diuerese"
+    },
+    "PT12": {
+      "associations": "ZI SU YE + SHENG JIANG = Intoxication par poissons et fruits de mer"
+    },
+    "PT13": {
+      "associations": "ZI SU GENG + Sha Ren + Guang Huo Xiang = Vomissement pendant la grossesse"
+    },
+    "TI1": {
+      "associations": "FU ZI + Gan Jiang =souvent utilisés ensemble"
+    },
+    "TE6": {
+      "associations": "HUANG QI + Ren Shen = tonifier le yang de la rate"
     }
   }
 };

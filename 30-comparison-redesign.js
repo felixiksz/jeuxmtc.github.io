@@ -400,6 +400,7 @@
 
   function herbAssociations(herb){
     if(!herb) return "";
+    if(typeof window.mtcHerbAssociations === "function") return text(window.mtcHerbAssociations(herb));
     return text(localStorageValue(PHARMA_ASSOC_PREFIX, herb.id, herb.associations || herb.association || ""));
   }
 
