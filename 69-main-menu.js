@@ -374,7 +374,10 @@
     ensureSupportLabel();
   }
   function watchBottomPanels(){
-    const again = () => { floatRestingDrop(); [120, 450, 900].forEach(ms => setTimeout(floatRestingDrop, ms)); };
+    // pendant l'ouverture ou la fermeture d'un panneau, la goutte suit son bord à chaque image (elle ne passe jamais dessous)
+    let until = 0, running = false;
+    const follow = () => { floatRestingDrop(); if(performance.now() < until) requestAnimationFrame(follow); else { running = false; floatRestingDrop(); } };
+    const again = () => { until = performance.now() + 1400; if(!running){ running = true; requestAnimationFrame(follow); } setTimeout(floatRestingDrop, 1500); };
     document.querySelectorAll(BOTTOM_PANELS).forEach(p => new MutationObserver(again).observe(p, {attributes:true, attributeFilter:["class"]}));
     window.addEventListener("resize", floatRestingDrop);
   }

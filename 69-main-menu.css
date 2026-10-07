@@ -254,3 +254,5 @@ body.mtc-menu-open #mtcSupportLabel, body.mtc-menu-loading #mtcSupportLabel{ dis
 html body #cheatsheetPanelContent .point-code{ display:block; max-width:100%; font-size:clamp(24px, 2.3vw, 32px) !important; letter-spacing:.02em !important; overflow-wrap:break-word; }
 /* goutte de sang : même taille que les icônes du bas (aussi en mouvement : le jeu reprend cette taille) */
 html body.mtc-menu-ui #supportCoffeeButton:not(.support-blooddrop-moving){ font-size:15px !important; }
+/* la goutte passe toujours devant les panneaux du bas (recherche, panier, A|B, stats), au repos comme en mouvement */
+html body #supportCoffeeButton, html body #supportCoffeeButton.support-blooddrop-moving{ z-index:9700 !important; }

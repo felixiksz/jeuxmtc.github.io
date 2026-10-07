@@ -4304,7 +4304,7 @@ function stepSupportBloodDropPhysics(time){
   /* Plafond : propulsée trop haut, elle rebondit contre le haut de l'écran. */
   if(state.y < 6){
     state.y = 6;
-    if(state.vy < 0) state.vy = -state.vy * .42;
+    if(state.vy < 0){ state.squash = Math.min(.3, -state.vy * .04); state.vy = -state.vy * .42; }
   }
 
   if(state.y >= groundY && panelMovedUp && state.vy >= 0){
@@ -4314,15 +4314,18 @@ function stepSupportBloodDropPhysics(time){
     state.y = groundY;
     state.vy = -Math.min(13, 5 + push * .35);
     state.vx = 0;
+    state.squash = .38;
   }else if(state.y >= groundY){
     const impact = Math.abs(state.vy);
 
     state.y = groundY;
 
     if(impact > .6){
-      /* Petit rebond à chaque contact avec le sol (bas de l'écran ou panneau). */
+      /* Petit rebond à chaque contact avec le sol (bas de l'écran ou panneau),
+         avec un écrasement « dessin animé » au moment du choc. */
+      state.squash = Math.min(.42, impact * .06);
       state.vy =
-        -impact * .42;
+        -impact * .45;
 
       /* Pas de déplacement latéral aléatoire : la goutte rebondit seulement. */
       state.vx = 0;
@@ -4349,6 +4352,24 @@ function stepSupportBloodDropPhysics(time){
 
   /* Pas de rotation finale ni de roulade : uniquement chute + rebond vertical. */
   state.angle = 0;
+
+  /* Principes du dessin animé : étirée quand elle va vite, écrasée au contact,
+     puis elle reprend sa forme (l'écrasement se résorbe en quelques images). */
+  state.squash = (state.squash || 0) * Math.pow(.78, dt);
+  if(state.squash < .01) state.squash = 0;
+  const airborne = state.y < groundY - 1;
+  const stretch = airborne ? Math.min(.28, Math.abs(state.vy) * .03) : 0;
+  const scaleY = 1 + stretch - state.squash;
+  const scaleX = 1 - stretch * .45 + state.squash * .9;
+  const core = drop.querySelector(".support-blooddrop-core");
+  if(core){
+    if(stretch || state.squash){
+      core.style.transformOrigin = "50% 100%";
+      core.style.transform = `scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+    }else if(core.style.transform){
+      core.style.removeProperty("transform");
+    }
+  }
 
   drop.style.setProperty(
     "--support-blooddrop-angle",
