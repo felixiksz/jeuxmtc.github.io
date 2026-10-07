@@ -11,13 +11,13 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal",
     "paragraphs": [
-     "- Le trajet principal naît en dessous du point RM 3 (zhōng jí)[[n1]] (repère 1), et émerge au RM 1 (huì yīn), point jiāo huì-intersection avec les canaux du chōng mài et du dū mài[[n2]], situé au centre du périnée, entre les deux orifices yīn[[n3]]. Il longe la ligne médiane antérieure traversant la profondeur de l’abdomen[[n4]], passant par les points RM 2 (qū gǔ), où il rencontre le zù jué yīn (canal F)[[n5]], une nouvelle fois aux RM 3 (zhōng jí) et RM 4 (guān yuán), où il rencontre également les zú shào yīn (canal Rn) et zù tài yīn (canal Rt)[[n6]]. Il traverse RM 5 (shí mén), puis RM 6 (qì hǎi), et RM 7 (yīn jiāo), point jiāo huì-intersection où il rencontre à nouveau le chōng mài et le zú shào yīn (canal Rn)[[n7]]. Le trajet du rèn mài continue son ascension en passant par RM 8 (shén què), le centre de l’ombilic, puis RM 9 (shuǐ fēn), pour rencontre le zù tài yīn (canal Rt) au point RM 10 (xià wǎn)[[n8]] et les shǒu tài yáng (canal IG), shǒu shǎo yáng (canal TF) et zú yáng míng (canal E) au point RM 12 (zhōng wǎn)[[n9]], puis à nouveau les shǒu tài yáng (canal IG) et zú yáng míng (canal E) au point RM 13 (shàng wǎn).",
-     "Il pénètre ensuite la poitrine au point RM 16 (zhōng tíng), passant par RM 17 (dàn zhōng)[[n10]], lieu de rencontre avec le zù tài yīn (canal Rt), zú shào yīn (canal Rn), shǒu tài yáng (canal IG) et shǒu shǎo yáng (canal TF)[[n11]], avant d’aboutir au point RM 22 (tiān tū), où il rencontre le yīn wéi mài[[n12]].",
-     "Il monte encore pour s’écouler dans la gorge[[n13]] au point RM 23 (lián quán), où il rencontre à nouveau le yīn wéi mài[[n14]].",
-     "Enfin, son trajet monte à la mâchoire, où il termine à RM 24 (chéng jiāng) dans le sillon mento-labial et où il croise les zú yáng míng (canal E), shǒu yáng míng (canal GI) et dū mài[[n15]].",
-     "Il contourne ensuite les lèvres, croise DM 28 (yín jiāo) et se connecte au zú yáng míng (canal E)[[n16]] et au dū mài[[n17]], au-dessous du frein de la lèvre supérieure, et, DM 26 (rén zhōng), où il rencontre à nouveau le zú yáng míng (canal E), mais également le shǒu yáng míng (canal GI)[[n18]].",
-     "De DM 26 (rén zhōng), deux branches traversent le visage et pénètrent les régions sous-orbitaires[[n19]], pour se connecter à nouveau au zú yáng míng (canal E), ainsi qu’avec le yáng qiāo mài, au point E 1 (chéng qì)[[n20]].",
-     "- Une branche vertébrale naît à l’intérieur de l’abdomen inférieur[[n21]] (repère 2) et monte sur la face postérieure du corps pour circuler dans la colonne vertébrale[[n22]]."
+     "- Le trajet principal naît en dessous du point RM 3 (zhōng jí)[[n1]] (repère 1), et émerge au RM 1 (huì yīn), point jiāo huì-intersection avec les canaux du chōng mài et du dū mài[[n2]], situé au **centre du périnée**, entre les **deux orifices yīn**[[n3]]. Il longe la **ligne médiane antérieure** traversant la **profondeur de l’abdomen**[[n4]], passant par les points RM 2 (qū gǔ), où il rencontre le zù jué yīn (canal F)[[n5]], une nouvelle fois aux RM 3 (zhōng jí) et RM 4 (guān yuán), où il rencontre également les zú shào yīn (canal Rn) et zù tài yīn (canal Rt)[[n6]]. Il traverse RM 5 (shí mén), puis RM 6 (qì hǎi), et RM 7 (yīn jiāo), point jiāo huì-intersection où il rencontre à nouveau le chōng mài et le zú shào yīn (canal Rn)[[n7]]. Le trajet du rèn mài continue son ascension en passant par RM 8 (shén què), le **centre de l’ombilic**, puis RM 9 (shuǐ fēn), pour rencontre le zù tài yīn (canal Rt) au point RM 10 (xià wǎn)[[n8]] et les shǒu tài yáng (canal IG), shǒu shǎo yáng (canal TF) et zú yáng míng (canal E) au point RM 12 (zhōng wǎn)[[n9]], puis à nouveau les shǒu tài yáng (canal IG) et zú yáng míng (canal E) au point RM 13 (shàng wǎn).",
+     "Il pénètre ensuite la **poitrine** au point RM 16 (zhōng tíng), passant par RM 17 (dàn zhōng)[[n10]], lieu de rencontre avec le zù tài yīn (canal Rt), zú shào yīn (canal Rn), shǒu tài yáng (canal IG) et shǒu shǎo yáng (canal TF)[[n11]], avant d’aboutir au point RM 22 (tiān tū), où il rencontre le yīn wéi mài[[n12]].",
+     "Il monte encore pour s’écouler dans la **gorge**[[n13]] au point RM 23 (lián quán), où il rencontre à nouveau le yīn wéi mài[[n14]].",
+     "Enfin, son trajet monte à la **mâchoire**, où il termine à RM 24 (chéng jiāng) dans le **sillon mento-labial** et où il croise les zú yáng míng (canal E), shǒu yáng míng (canal GI) et dū mài[[n15]].",
+     "Il contourne ensuite les **lèvres**, croise DM 28 (yín jiāo) et se connecte au zú yáng míng (canal E)[[n16]] et au dū mài[[n17]], au-dessous du **frein de la lèvre supérieure**, et, DM 26 (rén zhōng), où il rencontre à nouveau le zú yáng míng (canal E), mais également le shǒu yáng míng (canal GI)[[n18]].",
+     "De DM 26 (rén zhōng), deux branches traversent le **visage** et pénètrent les **régions sous-orbitaires**[[n19]], pour se connecter à nouveau au zú yáng míng (canal E), ainsi qu’avec le yáng qiāo mài, au point E 1 (chéng qì)[[n20]].",
+     "- Une branche vertébrale naît à l’intérieur de l’**abdomen inférieur**[[n21]] (repère 2) et monte sur la **face postérieure du corps** pour circuler dans la **colonne vertébrale**[[n22]]."
     ],
     "notes": [
      {
@@ -215,7 +215,7 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Le vaisseau luò-liaison du rèn mài[[n23]] commence au point RM 15 (jiū wěi)[[n24]] et se disperse dans l’abdomen."
+     "- Le vaisseau luò-liaison du rèn mài[[n23]] commence au point RM 15 (jiū wěi)[[n24]] et se disperse dans l’**abdomen**."
     ],
     "notes": [
      {
@@ -269,16 +269,16 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal",
     "paragraphs": [
-     "- La première branche[[n96]] (la branche principale) naît à l’intérieur de l’abdomen inférieur[[n97]], sous les reins[[n98]]. Il descend vers le centre de la symphyse pubienne[[n99]], se connecte aux organes génitaux et atteint RM 1 (huì yīn), entre le « yīn antérieur [urètre] et le yīn postérieur [anus][[n100]] ».",
-     "Chez la femme, il se dirige aux organes génitaux et se connecte à l’orifice extérieur de l’urètre puis rejoint RM 1 (huì yīn).",
-     "Chez l’homme, il passe au travers de la verge avant de se connecter à RM 1 (huì yīn)[[n101]].",
-     "Il se connecte ensuite à la colonne vertébrale en passant par DM 1 (cháng qiáng)[[n102]], point jiāo huì-intersection du zù shào yáng (canal de la vésicule biliaire, du shǒu shào yīn (canal Rn)[[n103]] et du rèn mài[[n104]], entre l’anus et le coccyx. Il remonte la ligne médiane postérieure, le long de la colonne vertébrale, à l’intérieur, circulant par les points DM 2 (yāo shū) à DM 16 (fēng fǔ)[[n105]].",
-     "- Depuis DM 12 (shēn zhù), situé sous l’apophyse épineuse de D3, il se sépare en deux branches secondaires qui rejoignent V 12 (fēng mén). Elles retournent à DM 13 (táo dào) et la branche principale du dū mài[[n106]] et du zù tài yáng (canal V)[[n107]]. Le trajet continue son ascension lors de laquelle il rencontre tous les canaux yáng au point DM 14 (dà zhuī)[[n108]] et le yáng wéi mài au point DM 15 (yǎ mén)[[n109]], où il se connecte à la racine de la langue[[n110]].",
-     "- Arrivé à DM 16 (fēng fǔ), l’ « entrepôt du vent », au niveau de la nuque[[n111]], où il rencontre à nouveau le yáng wéi mài et le zù tài yáng (canal V)[[n112]], une branche pénètre dans le cerveau[[n113]].",
-     "Le trajet principal continue le long de la nuque et va jusqu’au vertex, parcourant les points DM 17 (nǎo hù), « porte du cerveau » et point jiāo huì-intersection du zù tài yáng (canal V)[[n114]], DM 18 (qiáng jiān), DM 19 (hòu dǐng) et DM 20 (bǎi huì), où il rencontre à nouveau tous les canaux yáng[[n115]]. Enfin, il descend le long de la ligne médiane antérieure du front, passant par DM 24 (shén tíng), où il rencontre à nouveau le zù tài yáng (canal V), mais également le zú yáng míng (canal E)[[n116]]. Il continue à descendre, passant par le nez au point DM 25 (sù liáo), jusqu’à la lèvre supérieure, au point DM 26 (rén zhōng), où il rencontre le zú yáng míng (canal E) et le shǒu yáng míng (canal GI)[[n117]]. Il descend ensuite à la pointe de la gouttière labiale, où il rencontre à nouveau le shǒu yáng míng (canal GI) au point DM 27 (duì duān)[[n118]], pour enfin se terminer au frein interne de la lèvre supérieure, au DM 28 (yín jiāo)[[n119]], et y rencontrer à nouveau le zú yáng míng (canal E)[[n120]] et se connecter au rèn mài[[n121]].",
-     "- La deuxième branche (la branche abdominale) part de l’abdomen inférieur, encercle les organes génitaux[[n122]], circule à travers RM 1 (huì yīn)[[n123]], et suit la ligne médiane antérieure, traversant: l’ombilic, le cœur, la gorge, le menton et contournant les lèvres. Elle se divise alors en deux et rejoint les deux régions sous orbitaires au milieu des paupières inférieures[[n124]].",
-     "- La troisième branche (la branche dorsale) part du canthus interne, là où le canal du zù tài yáng (canal V) commence, à V 1 (jīng míng). Elle remonte traversant le front rejoignant le vertex à DM 20 (bǎi huì), où elle s’unit avec le zù jué yīn (canal F)[[n125]] et, à nouveau tous les canaux yáng[[n126]]. Elle se connecte à nouveau avec le cerveau. Puis, elle redescend le long de la nuque, du dos et rejoint V 12 (fēng mén)[[n127]] (ou V 11 (dà zhù))[[n128]], descend soit, première hypothèse, le long de la colonne vertébrale, à 1,5 cùn de chaque côté de l’axe, pénétrant ainsi les muscles paravertébraux, suivant la branche médiale du zù tài yáng (canal V); soit, seconde hypothèse, la branche descend les points Huá Tuó jiā jǐ xué[[n129]] le long de la colonne vertébrale, à 0,5 cùn de chaque côté de l’axe[[n130]], avant d’arriver au niveau des lombes[[n131]] pour se connecter aux reins[[n132]].",
-     "- La quatrième branche (la branche spinale) commence dans l’abdomen inférieur, va aux organes génitaux externes, passe par le périnée au point RM 1 (huì yīn), traverse la fesse[[n133]], se connecte au zú shào yīn (canal Rn) et montent ensemble à la face interne de la cuisse[[n134]]. Le dū mài se connecte également avec le trajet principal du zù tài yáng (canal V) au point V 35 (huì yáng)[[n135]], avant d’entrer dans la colonne vertébrale[[n136]] et dans les reins[[n137]]."
+     "- La première branche[[n96]] (la branche principale) naît à l’intérieur de l’**abdomen inférieur**[[n97]], sous les **reins**[[n98]]. Il descend vers le **centre de la symphyse pubienne**[[n99]], se connecte aux **organes génitaux** et atteint RM 1 (huì yīn), entre le « yīn antérieur [urètre] et le yīn postérieur [**anus**][[n100]] ».",
+     "Chez la femme, il se dirige aux **organes génitaux** et se connecte à l’**orifice extérieur de l’urètre** puis rejoint RM 1 (huì yīn).",
+     "Chez l’homme, il passe au travers de la **verge** avant de se connecter à RM 1 (huì yīn)[[n101]].",
+     "Il se connecte ensuite à la **colonne vertébrale** en passant par DM 1 (cháng qiáng)[[n102]], point jiāo huì-intersection du zù shào yáng (canal de la vésicule biliaire, du shǒu shào yīn (canal Rn)[[n103]] et du rèn mài[[n104]], entre l’**anus** et le **coccyx**. Il remonte la **ligne médiane postérieure**, le long de la **colonne vertébrale**, à l’intérieur, circulant par les points DM 2 (yāo shū) à DM 16 (fēng fǔ)[[n105]].",
+     "- Depuis DM 12 (shēn zhù), situé sous l’**apophyse épineuse de D3**, il se sépare en deux branches secondaires qui rejoignent V 12 (fēng mén). Elles retournent à DM 13 (táo dào) et la branche principale du dū mài[[n106]] et du zù tài yáng (canal V)[[n107]]. Le trajet continue son ascension lors de laquelle il rencontre tous les canaux yáng au point DM 14 (dà zhuī)[[n108]] et le yáng wéi mài au point DM 15 (yǎ mén)[[n109]], où il se connecte à la **racine de la langue**[[n110]].",
+     "- Arrivé à DM 16 (fēng fǔ), l’ « entrepôt du vent », au niveau de la **nuque**[[n111]], où il rencontre à nouveau le yáng wéi mài et le zù tài yáng (canal V)[[n112]], une branche pénètre dans le **cerveau**[[n113]].",
+     "Le trajet principal continue le long de la **nuque** et va jusqu’au **vertex**, parcourant les points DM 17 (nǎo hù), « porte du **cerveau** » et point jiāo huì-intersection du zù tài yáng (canal V)[[n114]], DM 18 (qiáng jiān), DM 19 (hòu dǐng) et DM 20 (bǎi huì), où il rencontre à nouveau tous les canaux yáng[[n115]]. Enfin, il descend le long de la **ligne médiane antérieure du front**, passant par DM 24 (shén tíng), où il rencontre à nouveau le zù tài yáng (canal V), mais également le zú yáng míng (canal E)[[n116]]. Il continue à descendre, passant par le **nez** au point DM 25 (sù liáo), jusqu’à la **lèvre supérieure**, au point DM 26 (rén zhōng), où il rencontre le zú yáng míng (canal E) et le shǒu yáng míng (canal GI)[[n117]]. Il descend ensuite à la **pointe de la gouttière labiale**, où il rencontre à nouveau le shǒu yáng míng (canal GI) au point DM 27 (duì duān)[[n118]], pour enfin se terminer au **frein interne de la lèvre supérieure**, au DM 28 (yín jiāo)[[n119]], et y rencontrer à nouveau le zú yáng míng (canal E)[[n120]] et se connecter au rèn mài[[n121]].",
+     "- La deuxième branche (la branche abdominale) part de l’**abdomen inférieur**, encercle les **organes génitaux**[[n122]], circule à travers RM 1 (huì yīn)[[n123]], et suit la **ligne médiane antérieure**, traversant: l’**ombilic**, le **cœur**, la **gorge**, le **menton** et contournant les **lèvres**. Elle se divise alors en deux et rejoint les deux **régions sous orbitaires** au **milieu des paupières inférieures**[[n124]].",
+     "- La troisième branche (la branche dorsale) part du **canthus interne**, là où le canal du zù tài yáng (canal V) commence, à V 1 (jīng míng). Elle remonte traversant le **front** rejoignant le **vertex** à DM 20 (bǎi huì), où elle s’unit avec le zù jué yīn (canal F)[[n125]] et, à nouveau tous les canaux yáng[[n126]]. Elle se connecte à nouveau avec le **cerveau**. Puis, elle redescend le long de la **nuque**, du **dos** et rejoint V 12 (fēng mén)[[n127]] (ou V 11 (dà zhù))[[n128]], descend soit, première hypothèse, le long de la **colonne vertébrale**, à 1,5 cùn de chaque côté de l’axe, pénétrant ainsi les **muscles paravertébraux**, suivant la branche médiale du zù tài yáng (canal V); soit, seconde hypothèse, la branche descend les points Huá Tuó jiā jǐ xué[[n129]] le long de la **colonne vertébrale**, à 0,5 cùn de chaque côté de l’axe[[n130]], avant d’arriver au niveau des **lombes**[[n131]] pour se connecter aux **reins**[[n132]].",
+     "- La quatrième branche (la branche spinale) commence dans l’**abdomen inférieur**, va aux **organes génitaux externes**, passe par le **périnée** au point RM 1 (huì yīn), traverse la **fesse**[[n133]], se connecte au zú shào yīn (canal Rn) et montent ensemble à la **face interne de la cuisse**[[n134]]. Le dū mài se connecte également avec le trajet principal du zù tài yáng (canal V) au point V 35 (huì yáng)[[n135]], avant d’entrer dans la **colonne vertébrale**[[n136]] et dans les **reins**[[n137]]."
     ],
     "notes": [
      {
@@ -664,9 +664,9 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Le vaisseau luò-liaison du dū mài commence au point DM 1 (cháng qiáng)[[n138]], entre l’anus et la pointe du coccyx.",
-     "- Il monte des deux côtés de la colonne vertébrale, jusqu’à la nuque et se déploie dans la région de l’occiput.",
-     "- Dans la région scapulaire, il se relie avec le zù tài yáng (canal V) et parcourt la colonne vertébrale."
+     "- Le vaisseau luò-liaison du dū mài commence au point DM 1 (cháng qiáng)[[n138]], entre l’**anus** et la **pointe du coccyx**.",
+     "- Il monte des deux côtés de la **colonne vertébrale**, jusqu’à la **nuque** et se déploie dans la **région de l’occiput**.",
+     "- Dans la **région scapulaire**, il se relie avec le zù tài yáng (canal V) et parcourt la **colonne vertébrale**."
     ],
     "notes": [
      {
@@ -1098,10 +1098,10 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il débute au bord radial de l'extrémité de l'index au point GI 1 (shāng yáng)[[n1]] et monte en longeant ce bord, il circule au bord radial du 2ème métacarpien et passe par GI 4 (hé gǔ), puis pénètre entre les tendons du court et du long extenseur du pouce à GI 5 (yáng xī). Il monte et longe le bord antéro-externe de l'avant-bras puis circule au niveau de la face externe du coude à GI 11 (qū chí), et continue à monter sur le bord antéro-latéral du bras pour atteindre le bord antérieur de l'acromion. De là, il passe à l'arrière de la clavicule, puis rejoint le shǒu tài yáng (canal IG) au point IG 12 (bǐng fēng) dans la fosse supraépineuse, et se connecte au dū mài au point DM 14 (dà zhuī), entre les vertèbres C7 et T1. Il retourne vers la face antérieure du corps avant de descendre pour pénétrer dans le creux sus-claviculaire, à E 12 (qūe pén).",
-     "- Une branche descend rejoindre le poumon (organe zàng) puis traverse le diaphragme avant de se lier au gros intestin (organe fǔ)[[n2]].",
-     "- Une autre branche relie le gros intestin au zú yáng míng (canal E) au point E 37 (shàng jù xù).",
-     "- Une branche part du creux sus-claviculaire, monte en longeant la face latérale du cou, traverse la région de la mandibule et entre dans la gencive inférieure[[n3]], elle contourne les lèvres en passant par RM 24 (chéng jiāng) et croise le zú yáng míng (canal E) au point E 4 (dì cāng), puis le dū mài à DM 26 (rén zhōng). La branche gauche se dirige à droite et la branche droite se dirige à gauche en se croisant au point DM 26 (rén zhōng)[[n4]]. Le shǒu yáng míng (canal GI) se termine au bord externe de l'aile du nez[[n5]] au point GI 20 (yíng xiāng)[[n6]]."
+     "- Il débute au **bord radial de l'extrémité de l'index** au point GI 1 (shāng yáng)[[n1]] et monte en longeant ce bord, il circule au **bord radial du 2ème métacarpien** et passe par GI 4 (hé gǔ), puis pénètre entre les **tendons du court et du long extenseur du pouce** à GI 5 (yáng xī). Il monte et longe le **bord antéro-externe de l'avant-bras** puis circule au niveau de la **face externe du coude** à GI 11 (qū chí), et continue à monter sur le **bord antéro-latéral du bras** pour atteindre le **bord antérieur de l'acromion**. De là, il passe à l'arrière de la **clavicule**, puis rejoint le shǒu tài yáng (canal IG) au point IG 12 (bǐng fēng) dans la **fosse supraépineuse**, et se connecte au dū mài au point DM 14 (dà zhuī), entre les **vertèbres C7 et T1**. Il retourne vers la **face antérieure du corps** avant de descendre pour pénétrer dans le **creux sus-claviculaire**, à E 12 (qūe pén).",
+     "- Une branche descend rejoindre le **poumon** (organe zàng) puis traverse le **diaphragme** avant de se lier au **gros intestin** (organe fǔ)[[n2]].",
+     "- Une autre branche relie le **gros intestin** au zú yáng míng (canal E) au point E 37 (shàng jù xù).",
+     "- Une branche part du **creux sus-claviculaire**, monte en longeant la **face latérale du cou**, traverse la **région de la mandibule** et entre dans la **gencive inférieure**[[n3]], elle contourne les **lèvres** en passant par RM 24 (chéng jiāng) et croise le zú yáng míng (canal E) au point E 4 (dì cāng), puis le dū mài à DM 26 (rén zhōng). La branche gauche se dirige à droite et la branche droite se dirige à gauche en se croisant au point DM 26 (rén zhōng)[[n4]]. Le shǒu yáng míng (canal GI) se termine au **bord externe de l'aile du nez**[[n5]] au point GI 20 (yíng xiāng)[[n6]]."
     ],
     "notes": [
      {
@@ -1231,8 +1231,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Le shǒu yáng míng jīng bié (canal distinct GI) se détache du canal principal au niveau de la main[[n7]], monte le long du bras et passe dans la région du point GI 15 (jiān yú), puis se lie à la colonne vertébrale au niveau du DM 14 (dà zhuī).",
-     "- Il pénètre dans la cavité corporelle et descend se connecter avec le gros intestin, il remonte se connecter avec le poumon. Il remonte au niveau du creux sus-claviculaire et continue à monter pour se relier à son canal principal à la gorge[[n8]]."
+     "- Le shǒu yáng míng jīng bié (canal distinct GI) se détache du canal principal au niveau de la **main**[[n7]], monte le long du **bras** et passe dans la région du point GI 15 (jiān yú), puis se lie à la **colonne vertébrale** au niveau du DM 14 (dà zhuī).",
+     "- Il pénètre dans la **cavité corporelle** et descend se connecter avec le **gros intestin**, il remonte se connecter avec le **poumon**. Il remonte au niveau du **creux sus-claviculaire** et continue à monter pour se relier à son canal principal à la **gorge**[[n8]]."
     ],
     "notes": [
      {
@@ -1295,10 +1295,10 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Le shǒu yáng míng luò mài (vaisseau liaison GI) naît au niveau du point GI 6 (piān lì)[[n9]], 3 cùn proximal du pli du poignet, et va rejoindre le shǒu tài yīn (canal P)[[n10]].",
-     "- Une autre branche circule le long du membre supérieur[[n11]] jusqu'à GI 15 (jiān yú), continue à monter jusqu'à la mandibule et se divise en deux branches:",
-     "- une branche pénètre dans la gencive inférieure[[n12]];",
-     "- une branche pénètre dans l'oreille, où elle se relie aux canaux du shǒu tài yáng (canal IG), shǒu shào yáng (canal TF) et zù shào yáng (canal VB)[[n13]]."
+     "- Le shǒu yáng míng luò mài (vaisseau liaison GI) naît au niveau du point GI 6 (piān lì)[[n9]], 3 cùn proximal du **pli du poignet**, et va rejoindre le shǒu tài yīn (canal P)[[n10]].",
+     "- Une autre branche circule le long du **membre supérieur**[[n11]] jusqu'à GI 15 (jiān yú), continue à monter jusqu'à la **mandibule** et se divise en deux branches:",
+     "- une branche pénètre dans la **gencive inférieure**[[n12]];",
+     "- une branche pénètre dans l'**oreille**, où elle se relie aux canaux du shǒu tài yáng (canal IG), shǒu shào yáng (canal TF) et zù shào yáng (canal VB)[[n13]]."
     ],
     "notes": [
      {
@@ -1395,11 +1395,11 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Le shǒu yáng míng jīng jīn (canal tendineux GI) naît au bord radial de l'extrémité de l'index[[n14]], se lie au dos du poignet et monte sur l'avant-bras. Il se connecte au bord latéral du coude et continue à monter le long du bord antéro-latéral du bras et se lie dans la région de GI 15 (jiān yú).",
-     "- Une branche enveloppe la colonne vertébrale, de C7 à T5, et s'attache à la colonne vertébrale dans la zone dorsale haute.",
-     "- La branche principale monte jusqu'au cou puis sur la joue.",
-     "- Une branche se sépare et se connecte sur le bord du nez.",
-     "- La branche principale monte en avant de l'oreille en passant en avant du shǒu tài yáng jīng jīn (canal tendineux IG), passe par la tempe[[n15]] et enveloppe la tête et descend sur la face opposée du visage jusqu'à la mandibule."
+     "- Le shǒu yáng míng jīng jīn (canal tendineux GI) naît au **bord radial de l'extrémité de l'index**[[n14]], se lie au **dos du poignet** et monte sur l'**avant-bras**. Il se connecte au **bord latéral du coude** et continue à monter le long du **bord antéro-latéral du bras** et se lie dans la région de GI 15 (jiān yú).",
+     "- Une branche enveloppe la **colonne vertébrale**, de C7 à T5, et s'attache à la **colonne vertébrale** dans la **zone dorsale haute**.",
+     "- La branche principale monte jusqu'au **cou** puis sur la **joue**.",
+     "- Une branche se sépare et se connecte sur le **bord du nez**.",
+     "- La branche principale monte en avant de l'**oreille** en passant en avant du shǒu tài yáng jīng jīn (canal tendineux IG), passe par la **tempe**[[n15]] et enveloppe la **tête** et descend sur la **face opposée du visage** jusqu'à la **mandibule**."
     ],
     "notes": [
      {
@@ -1507,15 +1507,15 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Le canal du zú yáng míng (canal E) débute au bord externe de l'aile du nez au point GI 20 (yíng xiāng)[[n1]], il monte le long de la racine du nez puis rencontre le zù tài yáng (canal V) au V 1 (jīng míng), puis il descend en contournant la paupière inférieure pour aller jusqu'au milieu de cette dernière et descend parallèlement au nez (en passant par E 2 (sì bái), E 3 (jù 1iáo). Il pénètre ensuite dans la gencive supérieure, en ressort et croise le dū mài à DM 26 (rén zhōng), puis contourne les lèvres à E 4 (dì cāng). Il croise le rèn mài au point RM 24 (chéng jiāng), puis se dirige vers l'angle mandibulaire en longeant la mâchoire inférieure (E 5 (dà yíng)).",
-     "De l'angle mandibulaire (E 6 (jiá chē), il monte tout droit en passant en avant de l'oreille, où il croise le zù shào yáng (canal VB) au point VB 3 (shàng guān) puis VB 6 (xuán lí), VB 5 (xuán lú) et VB 4 (hàn yàn), il atteint l'angle frontal au point E 8 (tóu wéi).",
-     "- De l'angle frontal, il longe la ligne antérieure des cheveux pour se connecter à nouveau avec le dū mài à DM 24 (shén tíng).",
-     "- Une branche part du point E 5 (dà yíng), au bord inférieur de la mandibule et descend en longeant la gorge jusqu'au bord supérieur de la clavicule au point E 11 (qì shě). De là, elle circule vers la face postérieure en direction du dos pour se lier une nouvelle fois au dū mài au point DM 14 (dà zhuī), où elle se connecte avec les autres canaux yáng. Elle se dirige à nouveau vers la face antérieure du corps pour pénétrer dans le creux sus-claviculaire au point E 12 (qūe pén). À partir de là, deux branches se divisent:",
-     "- la première descend et traverse le diaphragme avant de rejoindre le rèn mài à RM 13 (shàng wǎn) et RM 12 (zhōng wǎn), puis elle se lie à l'estomac et à la rate (y compris au pancréas). Partant de la bouche inférieure de l'estomac (pylore), cette branche descend rejoindre la seconde au point E 30 (qì chōng);",
-     "- la deuxième branche descend du creux sus-claviculaire pour rejoindre le mamelon, puis dévie vers l'intérieur et descend tout droit, 2 cùn à l'extérieur de la ligne médiane antérieure, pour atteindre le point E 30 (qì chōng), 2 cùn à l'extérieure du bord supérieur de la symphyse pubienne, où elle rejoint la première branche.",
-     "- Le trajet principal repart d’E 30 (qì chōng) et descend au niveau de la face antérieure de la cuisse en passant par E 31 (bì guān), avant de descendre légèrement à l'extérieur de la patella au point E 35 (dú bí). Il continue à descendre le long du bord antéro-externe du tibia, se décale légèrement vers la partie externe de la jambe au point E 40 (fēng lóng) avant d'atteindre le dos du pied au point E 41 (jiě xī). Le trajet termine sa course à l'extrémité externe du 2ème orteil à E 45 (lì duì).",
-     "- Une branche part du point E 36 (zú sān lǐ) pour aller jusqu'au bord externe du 3ème orteil.",
-     "- Une autre branche part du dos du pied au point E 42 (chōng yáng) pour aller rejoindre le zù tài yīn (canal Rt) à l'extrémité interne du gros orteil."
+     "- Le canal du zú yáng míng (canal E) débute au **bord externe de l'aile du nez** au point GI 20 (yíng xiāng)[[n1]], il monte le long de la **racine du nez** puis rencontre le zù tài yáng (canal V) au V 1 (jīng míng), puis il descend en contournant la **paupière inférieure** pour aller jusqu'au milieu de cette dernière et descend parallèlement au **nez** (en passant par E 2 (sì bái), E 3 (jù 1iáo). Il pénètre ensuite dans la **gencive supérieure**, en ressort et croise le dū mài à DM 26 (rén zhōng), puis contourne les **lèvres** à E 4 (dì cāng). Il croise le rèn mài au point RM 24 (chéng jiāng), puis se dirige vers l'**angle mandibulaire** en longeant la **mâchoire inférieure** (E 5 (dà yíng)).",
+     "De l'**angle mandibulaire** (E 6 (jiá chē), il monte tout droit en passant en avant de l'**oreille**, où il croise le zù shào yáng (canal VB) au point VB 3 (shàng guān) puis VB 6 (xuán lí), VB 5 (xuán lú) et VB 4 (hàn yàn), il atteint l'**angle frontal** au point E 8 (tóu wéi).",
+     "- De l'**angle frontal**, il longe la **ligne antérieure des cheveux** pour se connecter à nouveau avec le dū mài à DM 24 (shén tíng).",
+     "- Une branche part du point E 5 (dà yíng), au **bord inférieur de la mandibule** et descend en longeant la **gorge** jusqu'au **bord supérieur de la clavicule** au point E 11 (qì shě). De là, elle circule vers la **face postérieure** en direction du **dos** pour se lier une nouvelle fois au dū mài au point DM 14 (dà zhuī), où elle se connecte avec les autres canaux yáng. Elle se dirige à nouveau vers la **face antérieure du corps** pour pénétrer dans le **creux sus-claviculaire** au point E 12 (qūe pén). À partir de là, deux branches se divisent:",
+     "- la première descend et traverse le **diaphragme** avant de rejoindre le rèn mài à RM 13 (shàng wǎn) et RM 12 (zhōng wǎn), puis elle se lie à l'**estomac** et à la **rate** (y compris au **pancréas**). Partant de la **bouche inférieure de l'estomac (pylore)**, cette branche descend rejoindre la seconde au point E 30 (qì chōng);",
+     "- la deuxième branche descend du **creux sus-claviculaire** pour rejoindre le **mamelon**, puis dévie vers l'intérieur et descend tout droit, 2 cùn à l'extérieur de la **ligne médiane antérieure**, pour atteindre le point E 30 (qì chōng), 2 cùn à l'extérieure du **bord supérieur de la symphyse pubienne**, où elle rejoint la première branche.",
+     "- Le trajet principal repart d’E 30 (qì chōng) et descend au niveau de la **face antérieure de la cuisse** en passant par E 31 (bì guān), avant de descendre légèrement à l'extérieur de la **patella** au point E 35 (dú bí). Il continue à descendre le long du **bord antéro-externe du tibia**, se décale légèrement vers la **partie externe de la jambe** au point E 40 (fēng lóng) avant d'atteindre le **dos du pied** au point E 41 (jiě xī). Le trajet termine sa course à l'**extrémité externe du 2ème orteil** à E 45 (lì duì).",
+     "- Une branche part du point E 36 (zú sān lǐ) pour aller jusqu'au **bord externe du 3ème orteil**.",
+     "- Une autre branche part du **dos du pied** au point E 42 (chōng yáng) pour aller rejoindre le zù tài yīn (canal Rt) à l'**extrémité interne du gros orteil**."
     ],
     "notes": [
      {
@@ -1702,8 +1702,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Le canal distinct de l'estomac se détache du canal principal dans la zone de la face antérieure de la cuisse[[n2]].",
-     "- Il monte sur l'abdomen et pénètre en profondeur dans la cavité abdominale, se lie à l'estomac puis se répand dans la rate, il monte et traverse le cœur. Il continue son ascension en longeant l'œsophage puis la gorge, passe par la bouche, monte jusqu'à la racine du nez et se connecte à mù xì (connexions oculaires) lui permettant de se connecter avec les yeux et le cerveau. Il se réunit enfin avec le canal principal de l'estomac."
+     "- Le canal distinct de l'estomac se détache du canal principal dans la zone de la **face antérieure de la cuisse**[[n2]].",
+     "- Il monte sur l'**abdomen** et pénètre en profondeur dans la **cavité abdominale**, se lie à l'**estomac** puis se répand dans la **rate**, il monte et traverse le **cœur**. Il continue son ascension en longeant l'**œsophage** puis la **gorge**, passe par la **bouche**, monte jusqu'à la **racine du nez** et se connecte à mù xì (connexions oculaires) lui permettant de se connecter avec les **yeux** et le **cerveau**. Il se réunit enfin avec le canal principal de l'estomac."
     ],
     "notes": [
      {
@@ -1763,8 +1763,8 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Le vaisseau luò-liaison de l'estomac nait 8 cùn au-dessus de la pointe de la malléole externe, au niveau du E 40 (fēng lóng) d'où une branche part vers l'interne pour se lier au zù tài yīn (canal Rt)[[n3]].",
-     "- Une branche monte en suivant le bord antéro-externe du tibia, suit le trajet du canal principal de l'estomac, monte en direction de la tête, se rassemble à la tête et à la nuque où elle se lie au DM 14 (dà zhuī). Elle redescend se lier à la gorge."
+     "- Le vaisseau luò-liaison de l'**estomac** nait 8 cùn au-dessus de la **pointe de la malléole externe**, au niveau du E 40 (fēng lóng) d'où une branche part vers l'interne pour se lier au zù tài yīn (canal Rt)[[n3]].",
+     "- Une branche monte en suivant le **bord antéro-externe du tibia**, suit le trajet du canal principal de l'estomac, monte en direction de la **tête**, se rassemble à la **tête** et à la **nuque** où elle se lie au DM 14 (dà zhuī). Elle redescend se lier à la **gorge**."
     ],
     "notes": [
      {
@@ -1833,10 +1833,10 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Le canal tendineux de l'estomac nait au niveau des 2ème, 3ème et 4ème orteils[[n4]]. Il se connecte sur le dos du pied, monte le long du bord externe de la jambe, se connecte à la fibula et au bord externe du genou. Il continue à monter et se lie à la hanche et au grand trochanter, puis passe par la région des hypocondres et la partie basse de la région thoracique latérale, il se lie à la colonne vertébrale, dans la zone de T7, T8, T9.",
-     "- Une autre branche part du dos du pied et monte en longeant le tibia avant de se lier au centre du genou, se lie avec la tête de la fibula et avec le canal tendineux du zù shào yáng (canal tendineux VB). Elle continue à monter en longeant le muscle droit antérieur de la cuisse et se lie au niveau antéro-supérieur de la cuisse, puis elle se connecte aux organes génitaux externes. Elle continue sa montée et se répand sur l'abdomen et le thorax en couvrant le canal principal de l'estomac, elle se connecte à la fosse sus-claviculaire, s'étend au cou et se connecte à la bouche, autour des lèvres.",
-     "- Une branche se lie à la région sous-orbitaire, puis à la racine du nez avant de monter se connecter au canal tendineux du zù tài yáng (canal tendineux V). Le canal tendineux de l'estomac couvre le contour de la paupière inférieure alors que le canal tendineux de la vessie couvre le contour de la paupière supérieure.",
-     "- Une autre branche part du maxillaire inférieur et se lie en avant de l'oreille."
+     "- Le canal tendineux de l'estomac nait au niveau des **2ème, 3ème et 4ème orteils**[[n4]]. Il se connecte sur le **dos du pied**, monte le long du **bord externe de la jambe**, se connecte à la **fibula** et au **bord externe du genou**. Il continue à monter et se lie à la **hanche** et au **grand trochanter**, puis passe par la **région des hypocondres** et la **partie basse de la région thoracique latérale**, il se lie à la **colonne vertébrale**, dans la zone de T7, T8, T9.",
+     "- Une autre branche part du **dos du pied** et monte en longeant le **tibia** avant de se lier au **centre du genou**, se lie avec la **tête de la fibula** et avec le canal tendineux du zù shào yáng (canal tendineux VB). Elle continue à monter en longeant le **muscle droit antérieur de la cuisse** et se lie au **niveau antéro-supérieur de la cuisse**, puis elle se connecte aux **organes génitaux externes**. Elle continue sa montée et se répand sur l'**abdomen** et le **thorax** en couvrant le canal principal de l'estomac, elle se connecte à la **fosse sus-claviculaire**, s'étend au **cou** et se connecte à la **bouche**, autour des **lèvres**.",
+     "- Une branche se lie à la **région sous-orbitaire**, puis à la **racine du nez** avant de monter se connecter au canal tendineux du zù tài yáng (canal tendineux V). Le canal tendineux de l'estomac couvre le **contour de la paupière inférieure** alors que le canal tendineux de la vessie couvre le **contour de la paupière supérieure**.",
+     "- Une autre branche part du **maxillaire inférieur** et se lie en avant de l'**oreille**."
     ],
     "notes": [
      {
@@ -2356,11 +2356,11 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il naît au centre du cœur[[n1]] et émerge du système du cœur[[n2]], c’est-à-dire sous le cœur pour donner naissance à trois branches:",
-     "- la première branche (repère 1) traverse le diaphragme et se relie à l’intestin grêle[[n3]];",
-     "- la deuxième branche (repère 2) monte, pour suivre l’œsophage, longer la gorge et se connecter au système oculaire[[n4]] et au cerveau[[n5]];",
-     "- la troisième branche (repère 3) monte en traversant les poumons pour émerger au centre du creux axillaire à C 1 (jí quán), point où débute le trajet externe.",
-     "À partir de ce point, le trajet poursuit son cheminement sur le bord postérieur de la face interne du bras, se positionne en arrière du shǒu tài yīn (canal P) et du shǒu jué yīn (canal EC), et atteint le bord antéro-interne du pli du coude. Le trajet principal continue le long du bord postérieur de la face interne de l’avant-bras, arrive au bord cubital de l’articulation du poignet dans la région de l’os pisiforme et traverse la paume de la main entre les 4ème et 5ème métacarpiens, suit le bord radial du petit doigt jusqu’à son extrémité à C 9 (shào chōng)[[n6]].",
+     "- Il naît au **centre du cœur**[[n1]] et émerge du **système du cœur**[[n2]], c’est-à-dire sous le **cœur** pour donner naissance à trois branches:",
+     "- la première branche (repère 1) traverse le **diaphragme** et se relie à l’**intestin grêle**[[n3]];",
+     "- la deuxième branche (repère 2) monte, pour suivre l’**œsophage**, longer la **gorge** et se connecter au **système oculaire**[[n4]] et au **cerveau**[[n5]];",
+     "- la troisième branche (repère 3) monte en traversant les **poumons** pour émerger au **centre du creux axillaire** à C 1 (jí quán), point où débute le trajet externe.",
+     "À partir de ce point, le trajet poursuit son cheminement sur le **bord postérieur de la face interne du bras**, se positionne en arrière du shǒu tài yīn (canal P) et du shǒu jué yīn (canal EC), et atteint le **bord antéro-interne du pli du coude**. Le trajet principal continue le long du **bord postérieur de la face interne de l’avant-bras**, arrive au **bord cubital de l’articulation du poignet** dans la région de l’**os pisiforme** et traverse la **paume de la main** entre les **4ème et 5ème métacarpiens**, suit le **bord radial du petit doigt** jusqu’à son extrémité à C 9 (shào chōng)[[n6]].",
      "- Une branche interne relie l’extrémité distale du trajet du shǒu shào yīn (canal C) au shǒu tài yáng (canal IG)."
     ],
     "notes": [
@@ -2486,8 +2486,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Le canal distinct du cœur se détache du canal principal du cœur au niveau du creux axillaire[[n7]] dans la région de C 1 (jí quán) pour plonger dans la poitrine au point VB 22 (yuān yè).",
-     "Il se connecte avec le cœur[[n8]], monte afin de traverser le cou et la gorge[[n9]] en se liant au RM 23 (lián quán), émerge au visage et se réunit avec le shǒu tài yáng (canal IG) au canthus interne de l’œil au point V 1 (jīng míng)[[n10]]."
+     "- Le canal distinct du cœur se détache du canal principal du cœur au niveau du **creux axillaire**[[n7]] dans la région de C 1 (jí quán) pour plonger dans la **poitrine** au point VB 22 (yuān yè).",
+     "Il se connecte avec le **cœur**[[n8]], monte afin de traverser le **cou** et la **gorge**[[n9]] en se liant au RM 23 (lián quán), émerge au **visage** et se réunit avec le shǒu tài yáng (canal IG) au **canthus interne de l’œil** au point V 1 (jīng míng)[[n10]]."
     ],
     "notes": [
      {
@@ -2554,7 +2554,7 @@ window.MTC_TRAJETS = [
     "paragraphs": [
      "- Le point luò-liaison du canal du cœur naît au point C 5 (tōng lǐ)[[n11]].",
      "- Le vaisseau liaison du shǒu shào yīn (canal C) se dirige vers l’extérieur pour rejoindre le shǒu tài yáng (canal IG).",
-     "- Une autre branche suit le trajet principal du shǒu shào yīn (canal C), pénètre dans le cœur, se relie avec la racine de la langue, monte se connecter au système de l’œil et au cerveau."
+     "- Une autre branche suit le trajet principal du shǒu shào yīn (canal C), pénètre dans le **cœur**, se relie avec la **racine de la langue**, monte se connecter au **système de l’œil** et au **cerveau**."
     ],
     "notes": [
      {
@@ -2619,8 +2619,8 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Le canal tendineux du cœur naît au bord interne du petit doigt[[n12]], se connecte d’abord à l’os pisiforme au niveau de C 7 (shén mén) et ensuite au bord interne du coude dans la région de C 3 (shào hǎi).",
-     "Il continue son ascension le long du bras, pénètre dans l’aisselle dans la zone VB 22 (yuān yè) et rencontre le canal tendineux du poumon dans la région du sein. Il se connecte au thorax au point RM 17 (dàn zhōng) pour descendre traverser le diaphragme et rejoindre l’ombilic au niveau du RM 8 (shén què)[[n13]]."
+     "- Le canal tendineux du cœur naît au **bord interne du petit doigt**[[n12]], se connecte d’abord à l’**os pisiforme** au niveau de C 7 (shén mén) et ensuite au **bord interne du coude** dans la région de C 3 (shào hǎi).",
+     "Il continue son ascension le long du **bras**, pénètre dans l’**aisselle** dans la zone VB 22 (yuān yè) et rencontre le canal tendineux du poumon dans la **région du sein**. Il se connecte au **thorax** au point RM 17 (dàn zhōng) pour descendre traverser le **diaphragme** et rejoindre l’**ombilic** au niveau du RM 8 (shén què)[[n13]]."
     ],
     "notes": [
      {
@@ -2688,11 +2688,11 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Le trajet externe du shǒu tài yáng naît au bord ulnaire (interne) de l’extrémité de l’auriculaire pour suivre le bord ulnaire de la main et atteindre le poignet au niveau de l’apophyse styloïde de l'ulna. Il poursuit son ascension le long du bord latéropostérieur de l’avant-bras et parvient au coude où il passe entre l’olécrâne de l'ulna et l’épicondyle médial. Ensuite, il continue son trajet sur le bord postérieur de la face externe du bras et atteint l’articulation de l’épaule, passe en zigzaguant par la région scapulaire, traversant la fosse infraépineuse et la fosse supraépineuse de la scapula. Il atteint le haut de l’épaule et du dos où il croise successivement V 41 (fù fēn), V 11 (dà zhù) et DM 14 (dà zhuī)[[n1]]. Le canal régulier continue son cheminement pour descendre en avant dans le creux supraclaviculaire au niveau du E 12 (qūe pén) où une branche interne se sépare du circuit externe.",
-     "- Le trajet externe émerge de la fosse supraclaviculaire, monte sur la face latérale du cou, traverse la joue et arrive à l’angle externe de l’œil où il croise le zù shào yáng (canal VB) au niveau du point VB 1 (tóng zǐ liáo), pour se diriger ensuite vers l’avant de l’oreille et se connecter au TF 22 (ěr hé liáo) et pénétrer dans l’oreille au niveau du point IG 19 (tīng gōng).",
-     "- Une branche interne part de la joue, longe le bord du nez jusqu’à sa racine et arrive à l’angle interne de l’œil où elle se connecte avec le zù tài yáng (canal V) au niveau du V 1 (jīng míng)[[n2]].",
-     "- À partir de la fosse supraclaviculaire et donc du E 12 (qūe pén), la branche interne qui se sépare du trajet externe pénètre dans la cavité thoracique dans la région de RM 17 (dàn zhōng), se relie avec le cœur[[n3]], descend en longeant l’œsophage, traverse le diaphragme, atteint l’estomac, croise rèn mài à RM 13 (shàng wǎn) et RM 12 (zhōng wǎn) pour entrer dans l’intestin grêle.",
-     "- Une branche interne émerge de l’intestin grêle pour descendre le long de la jambe jusqu’au point E 39 (xià jù xù), point xià hé-réunion inférieure de l'intestin grêle[[n4]]."
+     "- Le trajet externe du shǒu tài yáng naît au **bord ulnaire (interne) de l’extrémité de l’auriculaire** pour suivre le **bord ulnaire de la main** et atteindre le **poignet** au niveau de l’**apophyse styloïde de l'ulna**. Il poursuit son ascension le long du **bord latéropostérieur de l’avant-bras** et parvient au **coude** où il passe entre l’**olécrâne de l'ulna** et l’**épicondyle médial**. Ensuite, il continue son trajet sur le **bord postérieur de la face externe du bras** et atteint l’**articulation de l’épaule**, passe en zigzaguant par la **région scapulaire**, traversant la **fosse infraépineuse** et la **fosse supraépineuse de la scapula**. Il atteint le **haut de l’épaule et du dos** où il croise successivement V 41 (fù fēn), V 11 (dà zhù) et DM 14 (dà zhuī)[[n1]]. Le canal régulier continue son cheminement pour descendre en avant dans le **creux supraclaviculaire** au niveau du E 12 (qūe pén) où une branche interne se sépare du circuit externe.",
+     "- Le trajet externe émerge de la **fosse supraclaviculaire**, monte sur la **face latérale du cou**, traverse la **joue** et arrive à l’**angle externe de l’œil** où il croise le zù shào yáng (canal VB) au niveau du point VB 1 (tóng zǐ liáo), pour se diriger ensuite vers l’avant de l’**oreille** et se connecter au TF 22 (ěr hé liáo) et pénétrer dans l’**oreille** au niveau du point IG 19 (tīng gōng).",
+     "- Une branche interne part de la **joue**, longe le **bord du nez** jusqu’à sa racine et arrive à l’**angle interne de l’œil** où elle se connecte avec le zù tài yáng (canal V) au niveau du V 1 (jīng míng)[[n2]].",
+     "- À partir de la **fosse supraclaviculaire** et donc du E 12 (qūe pén), la branche interne qui se sépare du trajet externe pénètre dans la **cavité thoracique** dans la région de RM 17 (dàn zhōng), se relie avec le **cœur**[[n3]], descend en longeant l’**œsophage**, traverse le **diaphragme**, atteint l’**estomac**, croise rèn mài à RM 13 (shàng wǎn) et RM 12 (zhōng wǎn) pour entrer dans l’**intestin grêle**.",
+     "- Une branche interne émerge de l’**intestin grêle** pour descendre le long de la **jambe** jusqu’au point E 39 (xià jù xù), point xià hé-réunion inférieure de l'intestin grêle[[n4]]."
     ],
     "notes": [
      {
@@ -2836,7 +2836,7 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal divergent",
     "paragraphs": [
-     "- Le canal divergent se sépare de l'intestin grêle au niveau de l’articulation de l’épaule, dans la zone d’IG 10 (nào shù)[[n5]], pénètre dans le creux axillaire au niveau de C 1 (jí quán), entre dans la cavité thoracique dans la région du VB 22 (yuān yè), traverse le cœur[[n6]], descend dans l’abdomen, se relie à l’intestin grêle[[n7]]."
+     "- Le canal divergent se sépare de l'**intestin grêle** au niveau de l’**articulation de l’épaule**, dans la zone d’IG 10 (nào shù)[[n5]], pénètre dans le **creux axillaire** au niveau de C 1 (jí quán), entre dans la **cavité thoracique** dans la région du VB 22 (yuān yè), traverse le **cœur**[[n6]], descend dans l’**abdomen**, se relie à l’**intestin grêle**[[n7]]."
     ],
     "notes": [
      {
@@ -2893,8 +2893,8 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Il naît à IG 7 (zhī zhèng) et rejoint le shǒu shào yīn canal du cœur sur la face interne de l’avant-bras.",
-     "- Une branche circule en montant le long du trajet du shǒu tài yáng (canal IG), traverse le coude, et atteint l’épaule au niveau de l’acromion dans la région de GI 15 (jiān yú)[[n8]]."
+     "- Il naît à IG 7 (zhī zhèng) et rejoint le shǒu shào yīn canal du cœur sur la **face interne de l’avant-bras**.",
+     "- Une branche circule en montant le long du trajet du shǒu tài yáng (canal IG), traverse le **coude**, et atteint l’**épaule** au niveau de l’**acromion** dans la région de GI 15 (jiān yú)[[n8]]."
     ],
     "notes": [
      {
@@ -2951,8 +2951,8 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Le canal tendineux de l'intestin grêle naît à l’extrémité du petit doigt, se connecte au dos du poignet dans la région d'IG 5 (yáng gǔ), monte sur le bord interne de l’avant-bras et se connecte au coude. Il poursuit son ascension le long du bras, pénètre et se connecte en dessous du creux axillaire et circule à travers la scapula pour longer la face latérale du cou et se connecter à la mastoïde en arrière de l’oreille.",
-     "- De là, une petite branche pénètre dans l’oreille. Le trajet principal contourne ensuite l’oreille en passant au-dessus de l’oreille[[n9]] et descend se connecter à la mandibule. Il remonte ensuite en passant par les dents pour rejoindre le canthus externe de l’œil dans la zone de VB 1 (tóng zǐ liáo)[[n10]], monte pour se connecter à l’angle du front[[n11]]."
+     "- Le canal tendineux de l'intestin grêle naît à l’**extrémité du petit doigt**, se connecte au **dos du poignet** dans la région d'IG 5 (yáng gǔ), monte sur le **bord interne de l’avant-bras** et se connecte au **coude**. Il poursuit son ascension le long du **bras**, pénètre et se connecte en dessous du **creux axillaire** et circule à travers la **scapula** pour longer la **face latérale du cou** et se connecter à la **mastoïde** en arrière de l’**oreille**.",
+     "- De là, une petite branche pénètre dans l’**oreille**. Le trajet principal contourne ensuite l’**oreille** en passant au-dessus de l’**oreille**[[n9]] et descend se connecter à la **mandibule**. Il remonte ensuite en passant par les **dents** pour rejoindre le **canthus externe de l’œil** dans la zone de VB 1 (tóng zǐ liáo)[[n10]], monte pour se connecter à l’**angle du front**[[n11]]."
     ],
     "notes": [
      {
@@ -3049,14 +3049,14 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il naît au canthus interne de l’œil au niveau du V 1 (jīng míng)[[n1]], traverse le front (repère 1 sur le schéma), croise le dū mài à DM 24 (shén tíng) et le zù shào yáng (canal VB) à VB 15 (tóu lín qì), circule à 1,5 cùn de la ligne médiane de la tête jusqu’au vertex où il rejoint de nouveau le dū mài au niveau du DM 20 (bǎi huì). D’ici, le zù tài yáng (canal V) se sépare en deux branches.",
-     "- Une branche interne part du vertex se dirige vers la zone pariétale (repère 2) et croise le zù shào yáng (canal VB) au niveau de VB 7 (qū bìn), VB 8 (shuài gǔ), VB 9 (tiān chōng), VB 10 (fú bái), VB 11 (tóu qiào yīn) et VB 12 (wán gǔ)[[n2]].",
-     "- Une seconde branche (trajet principal) part du vertex (repère 3), pénètre dans le crâne et se relie au cerveau, se connecte au dū mài dans la zone de DM 17 (nǎo hù). Elle émerge en surface pour descendre le long de la nuque et se réunir de nouveau au dū mài à DM 14 (dà zhuī) et DM 13 (táo dào). Dans cette zone, au niveau de V 10 (tiān zhù), le trajet se sépare de nouveau en deux branches.",
-     "- La première branche (médiale) descend parallèlement à la colonne vertébrale (repère 4), à 1,5 cùn de la ligne médiane et du dū mài[[n3]] jusqu’à la région lombaire au point V 23 (shèn shù) où elle plonge en profondeur pour rejoindre les reins[[n4]] et se relier à la vessie (repère 5).",
-     "- Une branche secondaire se sépare de la région lombaire (repère 6), descend le long du sacrum[[n5]] en passant par la région fessière[[n6]] et la face postérieure de la cuisse jusqu’au creux poplité au niveau du V 40 (wěi zhōng).",
-     "- La seconde branche (latérale), qui se détache de la zone de la nuque, part de V 10 (tiān zhù) (repère 7), se décale vers l’extérieur et descend à 3 cùn de la ligne médiane jusqu’à la région de l’articulation coxo-iliaque[[n7]] où elle se décale à l’extérieur pour rencontrer le zù shào yáng (canal VB) au niveau du VB 30 (huán tiào).",
-     "Elle poursuit sa descente sur la face postéro-externe de la cuisse jusqu’au creux poplité où elle rencontre la branche précédente au centre du creux poplité à V 40 (wěi zhōng).",
-     "D’ici une seule branche descend sur la face postérieure de la jambe (repère 8), traverse le muscle gastrocnémien, puis se décale légèrement à l’extérieur pour longer le bord postérieur de la malléole latérale, atteindre la tubérosité du 5ème métatarsien et se terminer au bord externe du petit orteil[[n8]] où une branche interne relie le zú shào yīn (canal Rn)."
+     "- Il naît au **canthus interne de l’œil** au niveau du V 1 (jīng míng)[[n1]], traverse le **front** (repère 1 sur le schéma), croise le dū mài à DM 24 (shén tíng) et le zù shào yáng (canal VB) à VB 15 (tóu lín qì), circule à 1,5 cùn de la **ligne médiane de la tête** jusqu’au **vertex** où il rejoint de nouveau le dū mài au niveau du DM 20 (bǎi huì). D’ici, le zù tài yáng (canal V) se sépare en deux branches.",
+     "- Une branche interne part du **vertex** se dirige vers la **zone pariétale** (repère 2) et croise le zù shào yáng (canal VB) au niveau de VB 7 (qū bìn), VB 8 (shuài gǔ), VB 9 (tiān chōng), VB 10 (fú bái), VB 11 (tóu qiào yīn) et VB 12 (wán gǔ)[[n2]].",
+     "- Une seconde branche (trajet principal) part du **vertex** (repère 3), pénètre dans le **crâne** et se relie au **cerveau**, se connecte au dū mài dans la zone de DM 17 (nǎo hù). Elle émerge en surface pour descendre le long de la **nuque** et se réunir de nouveau au dū mài à DM 14 (dà zhuī) et DM 13 (táo dào). Dans cette zone, au niveau de V 10 (tiān zhù), le trajet se sépare de nouveau en deux branches.",
+     "- La première branche (médiale) descend parallèlement à la **colonne vertébrale** (repère 4), à 1,5 cùn de la **ligne médiane** et du dū mài[[n3]] jusqu’à la **région lombaire** au point V 23 (shèn shù) où elle plonge en profondeur pour rejoindre les **reins**[[n4]] et se relier à la **vessie** (repère 5).",
+     "- Une branche secondaire se sépare de la **région lombaire** (repère 6), descend le long du **sacrum**[[n5]] en passant par la **région fessière**[[n6]] et la **face postérieure de la cuisse** jusqu’au **creux poplité** au niveau du V 40 (wěi zhōng).",
+     "- La seconde branche (latérale), qui se détache de la **zone de la nuque**, part de V 10 (tiān zhù) (repère 7), se décale vers l’extérieur et descend à 3 cùn de la **ligne médiane** jusqu’à la **région de l’articulation coxo-iliaque**[[n7]] où elle se décale à l’extérieur pour rencontrer le zù shào yáng (canal VB) au niveau du VB 30 (huán tiào).",
+     "Elle poursuit sa descente sur la **face postéro-externe de la cuisse** jusqu’au **creux poplité** où elle rencontre la branche précédente au **centre du creux poplité** à V 40 (wěi zhōng).",
+     "D’ici une seule branche descend sur la **face postérieure de la jambe** (repère 8), traverse le **muscle gastrocnémien**, puis se décale légèrement à l’extérieur pour longer le **bord postérieur de la malléole latérale**, atteindre la **tubérosité du 5ème métatarsien** et se terminer au **bord externe du petit orteil**[[n8]] où une branche interne relie le zú shào yīn (canal Rn)."
     ],
     "notes": [
      {
@@ -3228,8 +3228,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du tú tài yáng jīng bié (canal distinct V)",
     "paragraphs": [
-     "- Le zú tài yáng jīng bié (canal distinct V) se détache du canal principal dans la zone du creux poplité à V 40 (wěi zhōng), pénètre dans la région de l’anus en passant par V 36 (chéng fú), rentre dans la cavité abdominale, se connecte à la vessie et se relie aux reins.",
-     "Puis il remonte en suivant les muscles paravertébraux, pénètre et se répand dans le cœur, continue à circuler vers le haut, émerge à la nuque et se connecte au canal principal de la vessie[[n9]]."
+     "- Le zú tài yáng jīng bié (canal distinct V) se détache du canal principal dans la zone du **creux poplité** à V 40 (wěi zhōng), pénètre dans la **région de l’anus** en passant par V 36 (chéng fú), rentre dans la **cavité abdominale**, se connecte à la **vessie** et se relie aux **reins**.",
+     "Puis il remonte en suivant les **muscles paravertébraux**, pénètre et se répand dans le **cœur**, continue à circuler vers le haut, émerge à la **nuque** et se connecte au canal principal de la vessie[[n9]]."
     ],
     "notes": [
      {
@@ -3280,8 +3280,8 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du zú tài yáng luò mài (vaisseau liaison V)",
     "paragraphs": [
-     "- Le zú tài yáng luò mài (vaisseau liaison V) naît au niveau du point V 58 (fēi yáng)[[n10]], 7 cùn au-dessus la malléole médiale.",
-     "- Il se détache du canal principal de la vessie au niveau du muscle gastrocnémien et rejoint le zú shào yīn (canal Rn)[[n11]]."
+     "- Le zú tài yáng luò mài (vaisseau liaison V) naît au niveau du point V 58 (fēi yáng)[[n10]], 7 cùn au-dessus la **malléole médiale**.",
+     "- Il se détache du canal principal de la vessie au niveau du **muscle gastrocnémien** et rejoint le zú shào yīn (canal Rn)[[n11]]."
     ],
     "notes": [
      {
@@ -3336,17 +3336,17 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du zú tài yáng jīng jīn (canal tendineux V)",
     "paragraphs": [
-     "- Le zú tài yáng jīng jīn (canal tendineux V) naît au petit orteil, se connecte à la malléole externe et remonte pour se connecter à la face latérale du genou.",
-     "- Une branche se détache en dessous de la malléole externe, se connecte au talon, monte le long du tendon calcanéen (tendon d’Achille) jusqu’à la partie externe du creux poplité.",
-     "- Une autre branche débute à la zone de convergence des deux chefs du gastrocnémien et remonte se connecter au bord interne du creux poplité.",
-     "Ces deux dernières branches se connectent à la région fessière où elles se rejoignent, pour monter jusqu’à la nuque[[n12]].",
-     "- D’ici une déviation se détache pour se connecter à la racine de la langue[[n13]], tandis que le trajet principal continu à monter, se connecte à l’occiput, contourne le sommet du crâne pour rejoindre le nez[[n14]] et se nouer à la pommette au niveau d’IG 18 (quán liáo)[[n15]].",
-     "- À partir de ce dernier, une branche remonte pour couvrir la zone de la paupière supérieure[[n16]].",
-     "Deux autres branches se détachent du trajet principal dans la zone du dos.",
-     "- La première branche remonte du dos pour se connecter à l’épaule dans la région de GI 15 (jiān yú).",
-     "- La deuxième branche passe sous l’aisselle, rejoint la zone claviculaire où elle se divise en deux.",
-     "- La première déviation remonte vers la zone en arrière de l’oreille pour se connecter dans la région de la mastoïde au niveau de VB 12 (wán gǔ),",
-     "- tandis que l’autre remonte obliquement vers la pommette au niveau d’IG 18 (quán liáo)."
+     "- Le zú tài yáng jīng jīn (canal tendineux V) naît au **petit orteil**, se connecte à la **malléole externe** et remonte pour se connecter à la **face latérale du genou**.",
+     "- Une branche se détache en dessous de la **malléole externe**, se connecte au **talon**, monte le long du **tendon calcanéen (tendon d’Achille)** jusqu’à la **partie externe du creux poplité**.",
+     "- Une autre branche débute à la **zone de convergence des deux chefs du gastrocnémien** et remonte se connecter au **bord interne du creux poplité**.",
+     "Ces deux dernières branches se connectent à la **région fessière** où elles se rejoignent, pour monter jusqu’à la **nuque**[[n12]].",
+     "- D’ici une déviation se détache pour se connecter à la **racine de la langue**[[n13]], tandis que le trajet principal continu à monter, se connecte à l’**occiput**, contourne le **sommet du crâne** pour rejoindre le **nez**[[n14]] et se nouer à la **pommette** au niveau d’IG 18 (quán liáo)[[n15]].",
+     "- À partir de ce dernier, une branche remonte pour couvrir la **zone de la paupière supérieure**[[n16]].",
+     "Deux autres branches se détachent du trajet principal dans la zone du **dos**.",
+     "- La première branche remonte du **dos** pour se connecter à l’**épaule** dans la région de GI 15 (jiān yú).",
+     "- La deuxième branche passe sous l’**aisselle**, rejoint la **zone claviculaire** où elle se divise en deux.",
+     "- La première déviation remonte vers la **zone en arrière de l’oreille** pour se connecter dans la **région de la mastoïde** au niveau de VB 12 (wán gǔ),",
+     "- tandis que l’autre remonte obliquement vers la **pommette** au niveau d’IG 18 (quán liáo)."
     ],
     "notes": [
      {
@@ -3534,13 +3534,13 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il débute par une branche interne sous le petit orteil, au niveau du V 67 (zhì yīn)[[n1]], et se dirige obliquement vers le centre de la plante du pied, où il émerge en surface au Rn 1 (yǒng quán) pour se diriger vers le bord inférieur de la tubérosité de l'os naviculaire, passer sous et derrière la malléole médiale puis pénétrer dans le talon. Ensuite, le trajet principal remonte le long de la face médiale de la jambe, rencontre le zù tài yīn (canal Rt) au Rt 6 (sān yīn jiāo), atteint le muscle gastrocnémien, passe sur le bord médial du creux poplité au niveau du Rn 10 (yīn gǔ), entre le muscle semi-tendineux et le muscle semi-membraneux, pour continuer à monter le long du bord postérieur de la face médiale de la cuisse jusqu’au périnée. Au périnée, le trajet du canal des reins se divise en deux branches: une interne et une externe.",
-     "- La branche interne part du périnée, pénètre dans la colonne vertébrale à partir du DM 1 (cháng qiáng), atteint les lombes et se déverse dans les reins.",
-     "- Les reins donnent naissance à deux branches:",
-     "- la première descend et se relie aux points RM 4 (guān yuán) et RM 3 (zhōng jí) pour se connecter ensuite à la vessie;",
-     "- la deuxième monte traverser le foie puis le diaphragme, pénètre dans les poumons et continue son ascension en longeant la trachée et la gorge pour atteindre la racine de la langue.",
-     "- De cette branche s’en détache une autre des poumons, se réunit au coeur, croise le shǒu jué yīn (canal EC) et se distribue dans la cavité thoracique dans la zone du RM 17 (dàn zhōng).",
-     "- La branche externe part du périnée, se dirige en avant vers la face antérieure du corps avant d’émerger au bord supérieur de la symphyse pubienne au niveau du Rn 11 (héng gǔ). Elle continue son ascension à 0,5 cùn de la ligne médiane[[n2]] en traversant l’abdomen jusqu’à 6 cùn au-dessus de l’ombilic, au Rn 21 (yōu mén). D’ici, le trajet rejoint en diagonal le 5ème espace intercostal au Rn 22 (bù láng) en circulant 2 cùn à l'extérieur de la ligne médiane d’où il continue à monter jusqu’au bord inférieur de la clavicule pour se terminer au Rn 27 (shū fǔ)."
+     "- Il débute par une branche interne sous le **petit orteil**, au niveau du V 67 (zhì yīn)[[n1]], et se dirige obliquement vers le **centre de la plante du pied**, où il émerge en surface au Rn 1 (yǒng quán) pour se diriger vers le **bord inférieur de la tubérosité de l'os naviculaire**, passer sous et derrière la **malléole médiale** puis pénétrer dans le **talon**. Ensuite, le trajet principal remonte le long de la **face médiale de la jambe**, rencontre le zù tài yīn (canal Rt) au Rt 6 (sān yīn jiāo), atteint le **muscle gastrocnémien**, passe sur le **bord médial du creux poplité** au niveau du Rn 10 (yīn gǔ), entre le **muscle semi-tendineux** et le **muscle semi-membraneux**, pour continuer à monter le long du **bord postérieur de la face médiale de la cuisse** jusqu’au **périnée**. Au **périnée**, le trajet du canal des reins se divise en deux branches: une interne et une externe.",
+     "- La branche interne part du **périnée**, pénètre dans la **colonne vertébrale** à partir du DM 1 (cháng qiáng), atteint les **lombes** et se déverse dans les **reins**.",
+     "- Les **reins** donnent naissance à deux branches:",
+     "- la première descend et se relie aux points RM 4 (guān yuán) et RM 3 (zhōng jí) pour se connecter ensuite à la **vessie**;",
+     "- la deuxième monte traverser le **foie** puis le **diaphragme**, pénètre dans les **poumons** et continue son ascension en longeant la **trachée** et la **gorge** pour atteindre la **racine de la langue**.",
+     "- De cette branche s’en détache une autre des **poumons**, se réunit au **coeur**, croise le shǒu jué yīn (canal EC) et se distribue dans la **cavité thoracique** dans la zone du RM 17 (dàn zhōng).",
+     "- La branche externe part du **périnée**, se dirige en avant vers la **face antérieure du corps** avant d’émerger au **bord supérieur de la symphyse pubienne** au niveau du Rn 11 (héng gǔ). Elle continue son ascension à 0,5 cùn de la **ligne médiane**[[n2]] en traversant l’**abdomen** jusqu’à 6 cùn au-dessus de l’**ombilic**, au Rn 21 (yōu mén). D’ici, le trajet rejoint en diagonal le **5ème espace intercostal** au Rn 22 (bù láng) en circulant 2 cùn à l'extérieur de la **ligne médiane** d’où il continue à monter jusqu’au **bord inférieur de la clavicule** pour se terminer au Rn 27 (shū fǔ)."
     ],
     "notes": [
      {
@@ -3681,9 +3681,9 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Il se détache du canal principal au niveau du creux poplité, à partir du Rn 10 (yīn gǔ)[[n3]], se réunit au zù tài yáng (canal V) dans la zone du V 40 (wěi zhōng), monte parallèlement au zù tài yáng (canal V) jusqu’à la partie postérosupérieure de la cuisse au V 36 (chéng fú) où il pénètre l’anus et rejoint la vessie et les reins. Ensuite, il continue son ascension jusqu’à la 2ème vertèbre lombaire en passant par le V 23 (shèn shū).",
+     "- Il se détache du canal principal au niveau du **creux poplité**, à partir du Rn 10 (yīn gǔ)[[n3]], se réunit au zù tài yáng (canal V) dans la zone du V 40 (wěi zhōng), monte parallèlement au zù tài yáng (canal V) jusqu’à la **partie postérosupérieure de la cuisse** au V 36 (chéng fú) où il pénètre l’**anus** et rejoint la **vessie** et les **reins**. Ensuite, il continue son ascension jusqu’à la **2ème vertèbre lombaire** en passant par le V 23 (shèn shū).",
      "- Une branche se détache du trajet principal pour se relier au dài mài.",
-     "Le trajet principal continue sa montée pour se connecter à la racine de la langue, au point RM 23 (lián quán) et émerger à la nuque où il se réunit avec le canal divergent de la vessie, dans la zone du V 10 (tiān zhù)."
+     "Le trajet principal continue sa montée pour se connecter à la **racine de la langue**, au point RM 23 (lián quán) et émerger à la **nuque** où il se réunit avec le canal divergent de la vessie, dans la zone du V 10 (tiān zhù)."
     ],
     "notes": [
      {
@@ -3756,9 +3756,9 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Il nait en arrière de la malléole médiale au Rn 4 (dà zhōng)[[n4]], contourne le talon et rejoint le zù tài yáng (canal V).",
-     "- Une autre branche circule en suivant le trajet du canal principal du zú shào yīn (canal Rn) sur la jambe et jusqu’au périnée, d’où elle pénètre dans la colonne lombaire à partir du DM 1 (cháng qiáng).",
-     "- D’ici, une branche remonte le long des lombaires et une autre se détache des vertèbres pour se connecter dans une zone en dessous du coeur."
+     "- Il nait en arrière de la **malléole médiale** au Rn 4 (dà zhōng)[[n4]], contourne le **talon** et rejoint le zù tài yáng (canal V).",
+     "- Une autre branche circule en suivant le trajet du canal principal du zú shào yīn (canal Rn) sur la jambe et jusqu’au **périnée**, d’où elle pénètre dans la **colonne lombaire** à partir du DM 1 (cháng qiáng).",
+     "- D’ici, une branche remonte le long des **lombaires** et une autre se détache des **vertèbres** pour se connecter dans une **zone en dessous du coeur**."
     ],
     "notes": [
      {
@@ -3837,10 +3837,10 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Il nait à l’extrémité inférieure du petit orteil[[n5]], se dirige vers le centre de la plante du pied et croise le canal tendineux de la rate sous la malléole médiale.",
-     "- Une branche se dirige vers le talon où elle rejoint le canal tendineux de la vessie.",
-     "Le trajet principal remonte avec le canal tendineux de la rate jusqu’à la partie supérieure de la cuisse où il se connecte à la région génitale jusqu’à RM 2 (qū gǔ) et RM 3 (zhōng jí).",
-     "- D’ici il plonge dans l’interne, poursuit son ascension le long de la face médiale de la colonne vertébrale jusqu’à l’occiput où il rejoint le canal tendineux de la vessie."
+     "- Il nait à l’**extrémité inférieure du petit orteil**[[n5]], se dirige vers le **centre de la plante du pied** et croise le canal tendineux de la rate sous la **malléole médiale**.",
+     "- Une branche se dirige vers le **talon** où elle rejoint le canal tendineux de la vessie.",
+     "Le trajet principal remonte avec le canal tendineux de la rate jusqu’à la **partie supérieure de la cuisse** où il se connecte à la **région génitale** jusqu’à RM 2 (qū gǔ) et RM 3 (zhōng jí).",
+     "- D’ici il plonge dans l’interne, poursuit son ascension le long de la **face médiale de la colonne vertébrale** jusqu’à l’**occiput** où il rejoint le canal tendineux de la vessie."
     ],
     "notes": [
      {
@@ -3931,11 +3931,11 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il naît au centre de la poitrine[[n1]], au niveau du RM 17 (dàn zhōng) où se termine l’une des branches internes du zú shào yīn (canal Rn) pour se diviser immédiatement en deux branches:",
-     "- la première descend pour traverser le diaphragme[[n2]] et l’abdomen, reliant ainsi successivement le trois foyers (foyer supérieur, foyer médian et foyer inférieur)[[n3]].",
-     "- la deuxième branche part du centre du thorax horizontalement vers les seins, émerge à la région costale, 1 cùn à l'extérieur du mamelon au EC 1 (tiān chí)[[n4]], 3 cùn en dessous de l'aisselle[[n5]], puis remonte au creux axillaire pour redescendre en suivant la face antérieure du bras, passant entre le shǒu tài yīn (canal P) et le shǒu shào yīn (canal C) jusqu'au milieu du pli du coude à EC 3 (qū zé).",
-     "- Elle poursuit sa descente le long de la face antérieure de l'avant-bras, passant entre les deux tendons (tendon du long palmaire et tendon du fléchisseur radial du carpe), pénètre dans la paume de la main, et suit le bord ulnaire du médius jusqu'à son extrémité distale au EC 9 (zhōng chōng).",
-     "- Une branche interne part du centre de la paume de la main[[n6]], suit le bord ulnaire de l'annulaire jusqu'à son extrémité au niveau du TF 1 (guān chōng) pour se relier avec le shǒu shào yáng (canal TF)."
+     "- Il naît au **centre de la poitrine**[[n1]], au niveau du RM 17 (dàn zhōng) où se termine l’une des branches internes du zú shào yīn (canal Rn) pour se diviser immédiatement en deux branches:",
+     "- la première descend pour traverser le **diaphragme**[[n2]] et l’**abdomen**, reliant ainsi successivement le **trois foyers** (foyer supérieur, foyer médian et foyer inférieur)[[n3]].",
+     "- la deuxième branche part du **centre du thorax** horizontalement vers les **seins**, émerge à la **région costale**, 1 cùn à l'extérieur du **mamelon** au EC 1 (tiān chí)[[n4]], 3 cùn en dessous de l'**aisselle**[[n5]], puis remonte au **creux axillaire** pour redescendre en suivant la **face antérieure du bras**, passant entre le shǒu tài yīn (canal P) et le shǒu shào yīn (canal C) jusqu'au **milieu du pli du coude** à EC 3 (qū zé).",
+     "- Elle poursuit sa descente le long de la **face antérieure de l'avant-bras**, passant entre les deux tendons (**tendon du long palmaire** et **tendon du fléchisseur radial du carpe**), pénètre dans la **paume de la main**, et suit le **bord ulnaire du médius** jusqu'à son extrémité distale au EC 9 (zhōng chōng).",
+     "- Une branche interne part du **centre de la paume de la main**[[n6]], suit le **bord ulnaire de l'annulaire** jusqu'à son extrémité au niveau du TF 1 (guān chōng) pour se relier avec le shǒu shào yáng (canal TF)."
     ],
     "notes": [
      {
@@ -4064,8 +4064,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Il se détache du shǒu jué yīn (canal EC) à 3 cùn en dessous du de VB 22 (yuān yè)[[n7]], pénètre dans la cavité thoracique, et se connecte successivement aux trois foyers (foyer supérieur, foyer médian et foyer inférieur) (repère 1).",
-     "- Une branche monte le long de la gorge (repère 2), émerge derrière l'oreille, sous la mastoïde, pour s’unir au canal distinct (jīng biè du shǒu shào yáng (canal TF)[[n8]]."
+     "- Il se détache du shǒu jué yīn (canal EC) à 3 cùn en dessous du de VB 22 (yuān yè)[[n7]], pénètre dans la **cavité thoracique**, et se connecte successivement aux **trois foyers** (foyer supérieur, foyer médian et foyer inférieur) (repère 1).",
+     "- Une branche monte le long de la **gorge** (repère 2), émerge derrière l'**oreille**, sous la **mastoïde**, pour s’unir au canal distinct (jīng biè du shǒu shào yáng (canal TF)[[n8]]."
     ],
     "notes": [
      {
@@ -4136,8 +4136,8 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Il naît à 2 cùn du pli palmaire du poignet au EC 6 (nèi guān)[[n9]], se disperse entre les deux tendons (tendon du long palmaire et tendon du fléchisseur radial du carpe) et rejoint le shǒu shào yáng (canal TF).",
-     "- Une branche remonte le long du canal shǒu jué yīn (canal EC), passe par le centre du thorax au point RM 17 (dàn zhōng) et pénètre pour se connecter au système du cœur[[n10]]."
+     "- Il naît à 2 cùn du **pli palmaire du poignet** au EC 6 (nèi guān)[[n9]], se disperse entre les deux tendons (**tendon du long palmaire** et **tendon du fléchisseur radial du carpe**) et rejoint le shǒu shào yáng (canal TF).",
+     "- Une branche remonte le long du canal shǒu jué yīn (canal EC), passe par le **centre du thorax** au point RM 17 (dàn zhōng) et pénètre pour se connecter au **système du cœur**[[n10]]."
     ],
     "notes": [
      {
@@ -4196,11 +4196,11 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Il naît à l'extrémité du médius[[n11]] et suit le canal tendineux du poumon, se connecte au bord interne du coude, circule sur la face interne du bras, et se connecte sous le creux axillaire[[n12]].",
+     "- Il naît à l'**extrémité du médius**[[n11]] et suit le canal tendineux du poumon, se connecte au **bord interne du coude**, circule sur la **face interne du bras**, et se connecte sous le **creux axillaire**[[n12]].",
      "- D’ici, le trajet se sépare en trois branches:",
-     "- la première descend se disperser dans la zone antérolatérale de la partie inférieure du thorax.",
-     "- la deuxième descend se disperser dans la zone postérolatérale de la partie inférieure du thorax.",
-     "- la troisième pénètre vers le centre de la poitrine[[n13]], se répand dans le thorax et se connecte avec le diaphragme."
+     "- la première descend se disperser dans la **zone antérolatérale de la partie inférieure du thorax**.",
+     "- la deuxième descend se disperser dans la **zone postérolatérale de la partie inférieure du thorax**.",
+     "- la troisième pénètre vers le **centre de la poitrine**[[n13]], se répand dans le **thorax** et se connecte avec le **diaphragme**."
     ],
     "notes": [
      {
@@ -4296,13 +4296,13 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il nait à l'angle unguéal cubital de l'annulaire au point TF 1 (guān chōng)[[n1]] et se dirige vers la face dorsale de la main en passant entre les 4ème et le 5ème métacarpiens. Il continue son ascension sur la face dorsale de l'avant-bras entre ulna et cubitus jusqu’à la pointe de l’olécrâne en passant par le TF 10 (tiān jǐng).",
-     "D’ici il longe la face postérieure du bras, atteint le bord postérieur de l'épaule au TF 14 (jiān liáo), croise le shǒu tài yáng (canal IG) au point IG 12 (bǐng fēng) et le dū mài au point DM 14 (dà zhuī), puis il revient sur le trapèze au niveau du TF 15 (tiān liáo) en passant par le point le plus haut de l’épaule où il croise le zù shào yáng[[n2]] au point VB 21 (jiān jǐng)[[n3]]. Le trajet redescend vers la face antérieure du corps pour entrer dans la zone claviculaire[[n4]] au point E 12 (qūe pén), pénètre dans le creux sus-claviculaire, se distribue dans la zone entre les deux seins, à hauteur du RM 17 (dàn zhōng) et se répand dans l’enveloppe du cœur[[n5]].",
-     "Il continue à descendre, traversant le diaphragme pour relier successivement les trois foyers (foyer supérieur, foyer médian et foyer inférieur)[[n6]] jusqu’au niveau de la vessie.",
-     "- De cette zone une branche interne descend jusqu’au creux poplité pour se lier au V 39 (wěi yáng)[[n7]].",
-     "- Une branche part de la zone située entre les deux seins, au RM 17 (dàn zhōng)[[n8]], émerge au creux sus-claviculaire, remonte sur la face latérale du cou vers la mastoïde où elle croise le zù shào yáng (canal VB) au point VB 11 (tóu qiào yīn).",
-     "Ensuite, le trajet contourne l’apex de l’oreille, va jusqu'à l'angle de la ligne antérieure des cheveux, croise de nouveau le zù shào yáng (canal VB) aux points VB 4 (hàn yàn), VB 5 (xuán lú) et VB 6 (xuán lí) pour redescendre d’abord vers la mandibule et remonter après vers la région sous-orbitaire[[n9]] où elle croise le shǒu tài yáng (canal IG) au niveau du IG 18 (quán liáo).",
-     "- Une branche part de la région rétroauriculaire du point TF 17 (yī fēng) pénètre dans l'oreille, réapparaît en avant du pavillon de l'oreille[[n10]], croise le shǒu tài yáng (canal IG) à IG 19 (tīng gōng), le zù shào yáng (canal VB) à VB 3 (shàng guān) et se termine à l’angle externe du sourcil[[n11]] au point TF 23 (sī zú kōng) en croisant la branche précédente[[n12]].",
+     "- Il nait à l'**angle unguéal cubital de l'annulaire** au point TF 1 (guān chōng)[[n1]] et se dirige vers la **face dorsale de la main** en passant entre les **4ème et le 5ème métacarpiens**. Il continue son ascension sur la **face dorsale de l'avant-bras** entre **ulna** et **cubitus** jusqu’à la **pointe de l’olécrâne** en passant par le TF 10 (tiān jǐng).",
+     "D’ici il longe la **face postérieure du bras**, atteint le **bord postérieur de l'épaule** au TF 14 (jiān liáo), croise le shǒu tài yáng (canal IG) au point IG 12 (bǐng fēng) et le dū mài au point DM 14 (dà zhuī), puis il revient sur le **trapèze** au niveau du TF 15 (tiān liáo) en passant par le **point le plus haut de l’épaule** où il croise le zù shào yáng[[n2]] au point VB 21 (jiān jǐng)[[n3]]. Le trajet redescend vers la **face antérieure du corps** pour entrer dans la **zone claviculaire**[[n4]] au point E 12 (qūe pén), pénètre dans le **creux sus-claviculaire**, se distribue dans la **zone entre les deux seins**, à hauteur du RM 17 (dàn zhōng) et se répand dans l’**enveloppe du cœur**[[n5]].",
+     "Il continue à descendre, traversant le **diaphragme** pour relier successivement les **trois foyers** (foyer supérieur, foyer médian et foyer inférieur)[[n6]] jusqu’au niveau de la **vessie**.",
+     "- De cette zone une branche interne descend jusqu’au **creux poplité** pour se lier au V 39 (wěi yáng)[[n7]].",
+     "- Une branche part de la zone située entre les deux seins, au RM 17 (dàn zhōng)[[n8]], émerge au **creux sus-claviculaire**, remonte sur la **face latérale du cou** vers la **mastoïde** où elle croise le zù shào yáng (canal VB) au point VB 11 (tóu qiào yīn).",
+     "Ensuite, le trajet contourne l’**apex de l’oreille**, va jusqu'à l'**angle de la ligne antérieure des cheveux**, croise de nouveau le zù shào yáng (canal VB) aux points VB 4 (hàn yàn), VB 5 (xuán lú) et VB 6 (xuán lí) pour redescendre d’abord vers la **mandibule** et remonter après vers la **région sous-orbitaire**[[n9]] où elle croise le shǒu tài yáng (canal IG) au niveau du IG 18 (quán liáo).",
+     "- Une branche part de la **région rétroauriculaire** du point TF 17 (yī fēng) pénètre dans l'**oreille**, réapparaît en avant du **pavillon de l'oreille**[[n10]], croise le shǒu tài yáng (canal IG) à IG 19 (tīng gōng), le zù shào yáng (canal VB) à VB 3 (shàng guān) et se termine à l’**angle externe du sourcil**[[n11]] au point TF 23 (sī zú kōng) en croisant la branche précédente[[n12]].",
      "- Une branche interne jaillit du point TF 23 (sī zú kōng) pour relier le premier point du zù shào yáng (canal VB), le VB 1 (tóng zǐ liáo)[[n13]]."
     ],
     "notes": [
@@ -4498,8 +4498,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Il se détache du trajet principal dans la zone au-dessus de l’oreille[[n14]] et se dirige vers le vertex au point DM 20 (bǎi huì)[[n15]].",
-     "D’ici il redescend dans la zone de TF 16 (tiān yǒu)[[n16]], pénètre dans le creux sus-claviculaire, se diffuse successivement dans les trois foyers (foyer supérieur, foyer médian et foyer inférieur) tout en traversant le cœur."
+     "- Il se détache du trajet principal dans la **zone au-dessus de l’oreille**[[n14]] et se dirige vers le **vertex** au point DM 20 (bǎi huì)[[n15]].",
+     "D’ici il redescend dans la zone de TF 16 (tiān yǒu)[[n16]], pénètre dans le **creux sus-claviculaire**, se diffuse successivement dans les **trois foyers** (foyer supérieur, foyer médian et foyer inférieur) tout en traversant le **cœur**."
     ],
     "notes": [
      {
@@ -4555,9 +4555,9 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "Il nait sur la face postérieure de l’avant-bras au point TF 5 (wài guān) à 2 cùn proximal du pli du poignet[[n17]].",
+     "Il nait sur la **face postérieure de l’avant-bras** au point TF 5 (wài guān) à 2 cùn proximal du **pli du poignet**[[n17]].",
      "- Une première branche rejoint le shǒu jué yīn (canal EC).",
-     "- Une autre branche remonte en suivant le trajet principal, passe au-dessus de l’épaule, redescend au centre de la poitrine, se relie au canal principal du shǒu jué yīn (canal EC) pour se diffuser ensemble dans les trois foyers."
+     "- Une autre branche remonte en suivant le trajet principal, passe au-dessus de l’**épaule**, redescend au **centre de la poitrine**, se relie au canal principal du shǒu jué yīn (canal EC) pour se diffuser ensemble dans les **trois foyers**."
     ],
     "notes": [
      {
@@ -4624,9 +4624,9 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "Il nait à l'extrémité de l'annulaire au point TF 1 (guān chōng)[[n18]], se connecte sur le dos du poignet[[n19]], monte le long de la face externe de l'avant-bras entre les canaux tendineux du shǒu yáng míng (canal GI) et du shǒu tài yáng (canal IG), jusqu’à l’olécrâne[[n20]]. Il continue son ascension sur la face externe du bras jusqu’au bord postérieur de l’acromion[[n21]], longe la face latérale du cou jusqu’à l’angle de la mandibule[[n22]] en se connectant au canal tendineux du shǒu tài yáng.",
-     "- Une branche part de l'angle de la mandibule, pénètre et se relie avec la racine de la langue.",
-     "- Une autre branche continue à monter à partir de l'angle de la mandibule jusqu'à la région antérieure de l'oreille, puis jusqu’au canthus externe de l'œil pour envelopper ensuite le front[[n23]] et se connecter avec l'angle temporal et se connecter au point VB 13 (běn shén)[[n24]]."
+     "Il nait à l'**extrémité de l'annulaire** au point TF 1 (guān chōng)[[n18]], se connecte sur le **dos du poignet**[[n19]], monte le long de la **face externe de l'avant-bras** entre les canaux tendineux du shǒu yáng míng (canal GI) et du shǒu tài yáng (canal IG), jusqu’à l’**olécrâne**[[n20]]. Il continue son ascension sur la **face externe du bras** jusqu’au **bord postérieur de l’acromion**[[n21]], longe la **face latérale du cou** jusqu’à l’**angle de la mandibule**[[n22]] en se connectant au canal tendineux du shǒu tài yáng.",
+     "- Une branche part de l'**angle de la mandibule**, pénètre et se relie avec la **racine de la langue**.",
+     "- Une autre branche continue à monter à partir de l'**angle de la mandibule** jusqu'à la **région antérieure de l'oreille**, puis jusqu’au **canthus externe de l'œil** pour envelopper ensuite le **front**[[n23]] et se connecter avec l'**angle temporal** et se connecter au point VB 13 (běn shén)[[n24]]."
     ],
     "notes": [
      {
@@ -4733,20 +4733,20 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il nait au canthus externe de l’œil[[n1]] au point VB 1 (tóng zǐ liáo)[[n2]], redescend en avant de l’oreille à VB 2 (tīng huì) (repère 1 sur le schéma) pour remonter à l'angle frontal où il croise le zú yáng míng (canal E) au point E 8 (tóu wéi).",
-     "De cette zone le trajet redescend vers la zone supéro-antérieure de l’oreille jusqu'à VB 7 (qū bìn) (repère 2), contourne l’oreille jusqu’à la mastoïde et le point VB 12 (wán gǔ) en croisant le shǒu shào yáng (canal TF) aux points TF 22 (ěr hé liáo) puis TF 20 (jiǎo sūn).",
-     "De l’apophyse mastoïdienne, le zù shào yáng (canal VB) décrit une courbe (repère 3) jusqu’à la zone de l’angle frontal au VB 13 (běn shén) et descend jusqu’à la région sus-orbitaire à VB 14 (yáng bái).",
-     "De ce point, le trajet décrit une nouvelle courbe pour repartir en arrière (repère 4), traverse l’occiput jusqu'à VB 20 (fēng chí), longe le sommet du trapèze (repère 5) au point VB 21 (jiān jǐng), passe par le sommet de l’épaule au point TF 15 (tiān liáo), se connecte au dū mài au point DM 14 (dà zhuī)[[n3]], revient vers l’épaule (repère 6) en croisant le zù tài yáng (canal V) et à nouveau le shǒu tài yáng (canal IG) au point IG 12 (bǐng fēng) et se dirige vers la face antérieure du corps pour se déverser dans le creux sus-claviculaire à E 12 (qūe pén).",
-     "- Une branche part de la région rétro-auriculaire dans la zone du VB 20 (fēng chí) (repère 7), croise le shǒu shào yáng (canal TF) au point TF 17 (yī fēng), pénètre dans l'oreille, ressort en avant de l'oreille et va jusqu’au canthus externe de l’œil au point VB 1 (tóng zǐ liáo) en passant par les points IG 19 (tīng gōng) et E 7 (xià guān).",
-     "- Une autre branche part du canthus externe du VB 1 (tóng zǐ liáo), descend à l’angle de la mandibule (repère 8) où il croise le zú yáng míng (canal E) au point E 5 (dà yíng), croise à nouveau le shǒu shào yáng (canal TF) en remontant vers la région sous-orbitaire, croise le zù tài yáng à V 1 (jīng míng) au canthus interne de l’œil[[n4]] et redescend en longeant l’angle mandibulaire (repère 9) au point E 6 (jiá chē) et le cou à E 9 (rén yíng) jusqu’à la zone sus-claviculaire où elle rejoint le canal principal du zù shào yáng (canal VB) dans la zone du E 12 (qūe pén).",
-     "Le trajet principal du zù shào yáng (canal VB) se divise en deux branches au niveau de la zone sus-claviculaire:",
-     "- La branche interne descend dans le thorax (repère 10), se connecte au shǒu jué yīn (canal EC) dans la zone du EC 1 (tiān chí), traverse le diaphragme, communique avec le foie, pénètre dans la vésicule biliaire, circule dans la région thoracique latérale, traverse l’abdomen, la région lombaire et émerge dans l’aine au point E 30 (qì chōng).",
-     "D’ici, elle contourne les parties génitales[[n5]], puis pénètre profondément (repère 11) pour ressortir dans la région du sacrum où elle rencontre le canal du zù tài yáng aux points V 31 (shàng liáo)[[n6]], V 32 (cì liáo), V 33 (zhōng liáo) et V 34 (xià liáo), ainsi que le dū mài au point DM 1 (cháng qiáng)[[n7]] puis se dirige horizontalement à l’extérieur pour émerger au point VB 30 (huán tiào)[[n8]].",
-     "- La branche externe descend du creux sus-claviculaire en avant de l'aisselle (repère 12) en passant par VB 22 (yuān yè) puis VB 23 (zhé jīn)[[n9]], longe la paroi latérale du thorax et l’extrémité des côtes flottantes à VB 24 (rì yuè) puis F 13 (zhāng mén), se dirige vers l’hypocondre au point VB 25 (jīng mén), descend vers l’aine et continue jusqu’au point VB 29 (jū liáo) et VB 30 (huán tiào), à la hanche.",
-     "D’ici le trajet principal descend sur la face externe de la cuisse (repère 13) en passant par VB 31 (fēng shì), puis du genou à VB 33 (xī yáng guān).",
-     "Il continue à descendre sur la face antérieure de la fibula (repère 14) au point VB 34 (yáng líng quán) jusqu'à sa partie inférieure à VB 39 (xuán zhōng) où il atteint le bord antérieur de la malléole latérale à VB 40 (qiū xū).",
-     "Ensuite il passe sur le dos du pied et se termine au bord externe du 4ème orteil au point VB 44 (zú qiào yīn).",
-     "- Une branche interne part du dos du pied du point VB 41 (zú lín qì), traverse les métatarses (repère 15) et se relie au zù jué yīn (canal F) sur le gros orteil[[n10]]."
+     "- Il nait au **canthus externe de l’œil**[[n1]] au point VB 1 (tóng zǐ liáo)[[n2]], redescend en avant de l’**oreille** à VB 2 (tīng huì) (repère 1 sur le schéma) pour remonter à l'**angle frontal** où il croise le zú yáng míng (canal E) au point E 8 (tóu wéi).",
+     "De cette zone le trajet redescend vers la **zone supéro-antérieure de l’oreille** jusqu'à VB 7 (qū bìn) (repère 2), contourne l’**oreille** jusqu’à la **mastoïde** et le point VB 12 (wán gǔ) en croisant le shǒu shào yáng (canal TF) aux points TF 22 (ěr hé liáo) puis TF 20 (jiǎo sūn).",
+     "De l’**apophyse mastoïdienne**, le zù shào yáng (canal VB) décrit une courbe (repère 3) jusqu’à la **zone de l’angle frontal** au VB 13 (běn shén) et descend jusqu’à la **région sus-orbitaire** à VB 14 (yáng bái).",
+     "De ce point, le trajet décrit une nouvelle courbe pour repartir en arrière (repère 4), traverse l’**occiput** jusqu'à VB 20 (fēng chí), longe le **sommet du trapèze** (repère 5) au point VB 21 (jiān jǐng), passe par le **sommet de l’épaule** au point TF 15 (tiān liáo), se connecte au dū mài au point DM 14 (dà zhuī)[[n3]], revient vers l’**épaule** (repère 6) en croisant le zù tài yáng (canal V) et à nouveau le shǒu tài yáng (canal IG) au point IG 12 (bǐng fēng) et se dirige vers la **face antérieure du corps** pour se déverser dans le **creux sus-claviculaire** à E 12 (qūe pén).",
+     "- Une branche part de la **région rétro-auriculaire** dans la zone du VB 20 (fēng chí) (repère 7), croise le shǒu shào yáng (canal TF) au point TF 17 (yī fēng), pénètre dans l'**oreille**, ressort en avant de l'**oreille** et va jusqu’au **canthus externe de l’œil** au point VB 1 (tóng zǐ liáo) en passant par les points IG 19 (tīng gōng) et E 7 (xià guān).",
+     "- Une autre branche part du **canthus externe** du VB 1 (tóng zǐ liáo), descend à l’**angle de la mandibule** (repère 8) où il croise le zú yáng míng (canal E) au point E 5 (dà yíng), croise à nouveau le shǒu shào yáng (canal TF) en remontant vers la **région sous-orbitaire**, croise le zù tài yáng à V 1 (jīng míng) au **canthus interne de l’œil**[[n4]] et redescend en longeant l’**angle mandibulaire** (repère 9) au point E 6 (jiá chē) et le **cou** à E 9 (rén yíng) jusqu’à la **zone sus-claviculaire** où elle rejoint le canal principal du zù shào yáng (canal VB) dans la zone du E 12 (qūe pén).",
+     "Le trajet principal du zù shào yáng (canal VB) se divise en deux branches au niveau de la **zone sus-claviculaire**:",
+     "- La branche interne descend dans le **thorax** (repère 10), se connecte au shǒu jué yīn (canal EC) dans la zone du EC 1 (tiān chí), traverse le **diaphragme**, communique avec le **foie**, pénètre dans la **vésicule biliaire**, circule dans la **région thoracique latérale**, traverse l’**abdomen**, la **région lombaire** et émerge dans l’**aine** au point E 30 (qì chōng).",
+     "D’ici, elle contourne les **parties génitales**[[n5]], puis pénètre profondément (repère 11) pour ressortir dans la **région du sacrum** où elle rencontre le canal du zù tài yáng aux points V 31 (shàng liáo)[[n6]], V 32 (cì liáo), V 33 (zhōng liáo) et V 34 (xià liáo), ainsi que le dū mài au point DM 1 (cháng qiáng)[[n7]] puis se dirige horizontalement à l’extérieur pour émerger au point VB 30 (huán tiào)[[n8]].",
+     "- La branche externe descend du **creux sus-claviculaire** en avant de l'**aisselle** (repère 12) en passant par VB 22 (yuān yè) puis VB 23 (zhé jīn)[[n9]], longe la **paroi latérale du thorax** et l’**extrémité des côtes flottantes** à VB 24 (rì yuè) puis F 13 (zhāng mén), se dirige vers l’**hypocondre** au point VB 25 (jīng mén), descend vers l’**aine** et continue jusqu’au point VB 29 (jū liáo) et VB 30 (huán tiào), à la **hanche**.",
+     "D’ici le trajet principal descend sur la **face externe de la cuisse** (repère 13) en passant par VB 31 (fēng shì), puis du **genou** à VB 33 (xī yáng guān).",
+     "Il continue à descendre sur la **face antérieure de la fibula** (repère 14) au point VB 34 (yáng líng quán) jusqu'à sa partie inférieure à VB 39 (xuán zhōng) où il atteint le **bord antérieur de la malléole latérale** à VB 40 (qiū xū).",
+     "Ensuite il passe sur le **dos du pied** et se termine au **bord externe du 4ème orteil** au point VB 44 (zú qiào yīn).",
+     "- Une branche interne part du **dos du pied** du point VB 41 (zú lín qì), traverse les **métatarses** (repère 15) et se relie au zù jué yīn (canal F) sur le **gros orteil**[[n10]]."
     ],
     "notes": [
      {
@@ -4987,9 +4987,9 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal distinct",
     "paragraphs": [
-     "- Il se détache du zù shào yáng (canal VB)[[n11]] à la partie supéro-externe de la cuisse et il s'incurve vers la face antérieure de celle-ci, pénètre dans la région pubienne au bord des poils où il croise le canal distinct du foie dans la région du RM 2 (qū gǔ).",
-     "- D’ici, le trajet du canal distinct monte vers la région thoracique latérale dans la zone du F 13 (zhāng mén), pénètre dans le thorax, se connecte à la vésicule biliaire, au foie et au cœur.",
-     "- Il poursuit son ascension en longeant l'œsophage, émerge à la mandibule, se disperse dans la joue, se relie aux connexions de l'œil et se réunit avec le canal régulier de la vésicule biliaire au canthus externe au point VB 1 (tóng zǐ liáo)."
+     "- Il se détache du zù shào yáng (canal VB)[[n11]] à la **partie supéro-externe de la cuisse** et il s'incurve vers la face antérieure de celle-ci, pénètre dans la **région pubienne au bord des poils** où il croise le canal distinct du foie dans la région du RM 2 (qū gǔ).",
+     "- D’ici, le trajet du canal distinct monte vers la **région thoracique latérale** dans la zone du F 13 (zhāng mén), pénètre dans le **thorax**, se connecte à la **vésicule biliaire**, au **foie** et au **cœur**.",
+     "- Il poursuit son ascension en longeant l'**œsophage**, émerge à la **mandibule**, se disperse dans la **joue**, se relie aux **connexions de l'œil** et se réunit avec le canal régulier de la vésicule biliaire au **canthus externe** au point VB 1 (tóng zǐ liáo)."
     ],
     "notes": [
      {
@@ -5064,9 +5064,9 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Il nait à VB 37 (guāng míng)[[n12]], 5 cùn au-dessus de la malléole latérale.",
+     "- Il nait à VB 37 (guāng míng)[[n12]], 5 cùn au-dessus de la **malléole latérale**.",
      "- Une branche rejoint le zù jué yīn (canal F).",
-     "- Une autre branche descend et se diffuse sur le dos du pied au niveau du troisième, quatrième et cinquième orteil."
+     "- Une autre branche descend et se diffuse sur le **dos du pied** au niveau du **troisième, quatrième et cinquième orteil**."
     ],
     "notes": [
      {
@@ -5130,15 +5130,15 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Il nait au 4ème orteil[[n13]], se connecte à la face antérieure de la malléole latérale[[n14]], monte en suivant la face externe du tibia et se connecte à la face externe du genou.",
-     "- D’ici une branche se détache de la partie supérieure de la fibula et se dirige vers la face antérieure de la cuisse[[n15]].",
-     "- Le trajet principal continue à monter de la face externe du genou en longeant la face externe de la cuisse jusqu’au grand trochanter.",
-     "- D’ici, une branche se détache pour aller se disperser dans la région sacrée.",
-     "- Le trajet principal monte du grand trochanter jusqu'aux côtes flottantes, en longeant la face latérale du thorax, continue son ascension en passant en avant de l'aisselle, se relie au thorax et aux seins, et se connecte au creux sus-claviculaire[[n16]].",
-     "- D’ici, le trajet continue à circuler vers le haut, passe en arrière de l'oreille, atteint l'angle frontal, et se relie au vertex[[n17]].",
-     "- De l’angle frontal, une branche redescend jusqu'à la mandibule, pour remonter ensuite jusqu’à l’arcade zygomatique[[n18]] où elle se divise en deux:",
-     "- La première branche se connecte à la racine du nez.",
-     "- La seconde se connecte avec le canthus externe de l'œil[[n19]]."
+     "- Il nait au **4ème orteil**[[n13]], se connecte à la **face antérieure de la malléole latérale**[[n14]], monte en suivant la **face externe du tibia** et se connecte à la **face externe du genou**.",
+     "- D’ici une branche se détache de la **partie supérieure de la fibula** et se dirige vers la **face antérieure de la cuisse**[[n15]].",
+     "- Le trajet principal continue à monter de la **face externe du genou** en longeant la **face externe de la cuisse** jusqu’au **grand trochanter**.",
+     "- D’ici, une branche se détache pour aller se disperser dans la **région sacrée**.",
+     "- Le trajet principal monte du **grand trochanter** jusqu'aux **côtes flottantes**, en longeant la **face latérale du thorax**, continue son ascension en passant en avant de l'**aisselle**, se relie au **thorax** et aux **seins**, et se connecte au **creux sus-claviculaire**[[n16]].",
+     "- D’ici, le trajet continue à circuler vers le haut, passe en arrière de l'**oreille**, atteint l'**angle frontal**, et se relie au **vertex**[[n17]].",
+     "- De l’**angle frontal**, une branche redescend jusqu'à la **mandibule**, pour remonter ensuite jusqu’à l’**arcade zygomatique**[[n18]] où elle se divise en deux:",
+     "- La première branche se connecte à la **racine du nez**.",
+     "- La seconde se connecte avec le **canthus externe de l'œil**[[n19]]."
     ],
     "notes": [
      {
@@ -5310,14 +5310,14 @@ window.MTC_TRAJETS = [
     "type": "principal",
     "title": "Trajet du canal principal",
     "paragraphs": [
-     "- Il nait à la face dorsale du gros orteil au niveau du F 1 (dà dūn)[[n1]], passe entre le premier et le deuxième métatarsien, remonte sur la face médiale du dos du pied, circule à 1 cùn en avant de la malléole médiale en passant par F 4 (zhōng fēng) et remonte sur la face médiale de la jambe où il croise le zù tài yīn (canal Rt) à 3 cùn au-dessus de la malléole médiale. Il continue son ascension vers le haut et à 8 cùn au-dessus de la malléole médiale, il croise et passe en arrière du zù tài yīn (canal Rt)[[n2]].",
-     "Après avoir traversé la partie médiale du pli du creux poplité, le trajet continue à monter en longeant la face médiale de la cuisse, passant par F 9 (yīn bāo)[[n3]], pour atteindre la région poilue du pubis dans la zone du F 12 (jí mài)[[n4]].",
-     "D’ici, il remonte dans la région de l’aine où il croise à nouveau le zù tài yīn (canal Rt) aux points Rt 12 (chōng mén) et Rt 13 (fù shě).",
-     "Il plonge dans la région du pubis, contourne les organes génitaux externes[[n5]] avant de remonter jusqu'à l'abdomen inférieur en passant par RM 2 (qū gǔ), RM 3 (zhōng jí) et RM 4 (guān yuán). Il continue son ascension en traversant obliquement l’abdomen[[n6]].",
-     "Au niveau du point F 13 (zhāng mén), il contourne l'estomac[[n7]], se relie au foie et à la vésicule biliaire pour ensuite traverser le diaphragme et la poitrine.",
-     "- Une branche se détache du foie pour monter pénétrer dans le poumon et se relier au shǒu tài yīn (canal P).",
-     "- Après avoir traversé le diaphragme, la branche initiale longe le bord postérieur de la gorge, pénètre dans le nasopharynx, se relie aux connexions de l'œil, monte et émerge au front pour rencontrer le dū mài au vertex[[n8]].",
-     "- Une branche part de mù xì, descend en circulant dans la joue et contourne les lèvres."
+     "- Il nait à la **face dorsale du gros orteil** au niveau du F 1 (dà dūn)[[n1]], passe entre le **premier et le deuxième métatarsien**, remonte sur la **face médiale du dos du pied**, circule à 1 cùn en avant de la **malléole médiale** en passant par F 4 (zhōng fēng) et remonte sur la **face médiale de la jambe** où il croise le zù tài yīn (canal Rt) à 3 cùn au-dessus de la **malléole médiale**. Il continue son ascension vers le haut et à 8 cùn au-dessus de la **malléole médiale**, il croise et passe en arrière du zù tài yīn (canal Rt)[[n2]].",
+     "Après avoir traversé la **partie médiale du pli du creux poplité**, le trajet continue à monter en longeant la **face médiale de la cuisse**, passant par F 9 (yīn bāo)[[n3]], pour atteindre la **région poilue du pubis** dans la zone du F 12 (jí mài)[[n4]].",
+     "D’ici, il remonte dans la **région de l’aine** où il croise à nouveau le zù tài yīn (canal Rt) aux points Rt 12 (chōng mén) et Rt 13 (fù shě).",
+     "Il plonge dans la **région du pubis**, contourne les **organes génitaux externes**[[n5]] avant de remonter jusqu'à l'**abdomen inférieur** en passant par RM 2 (qū gǔ), RM 3 (zhōng jí) et RM 4 (guān yuán). Il continue son ascension en traversant obliquement l’**abdomen**[[n6]].",
+     "Au niveau du point F 13 (zhāng mén), il contourne l'**estomac**[[n7]], se relie au **foie** et à la **vésicule biliaire** pour ensuite traverser le **diaphragme** et la **poitrine**.",
+     "- Une branche se détache du **foie** pour monter pénétrer dans le **poumon** et se relier au shǒu tài yīn (canal P).",
+     "- Après avoir traversé le **diaphragme**, la branche initiale longe le **bord postérieur de la gorge**, pénètre dans le **nasopharynx**, se relie aux **connexions de l'œil**, monte et émerge au **front** pour rencontrer le dū mài au **vertex**[[n8]].",
+     "- Une branche part de mù xì, descend en circulant dans la **joue** et contourne les **lèvres**."
     ],
     "notes": [
      {
@@ -5480,8 +5480,8 @@ window.MTC_TRAJETS = [
     "type": "distinct",
     "title": "Trajet du canal divergent",
     "paragraphs": [
-     "- Il se détache du zù jué yīn (canal F) sur la face dorsale du pied[[n9]], monte en suivant la face médiale de la jambe jusqu'à la région poilue du pubis.",
-     "D’ici, il se réunit avec le canal divergent du zú shào yáng jīng bié (canal distinct VB)[[n10]], traverse l’abdomen jusqu’au point F 13 (zhāng mén) où il plonge dans l’interne. Il se répand dans le foie, la vésicule biliaire et le cœur. Ensuite, le trajet poursuit son ascension le long du cou, traverse l’angle de la mandibule, se diffuse dans la face avant d’aller se réunir avec le zú shào yáng jīng bié (canal distinct VB), au canthus latéral (vers VB 1 (tóng zǐ liáo)) où il se connecte aux connexions de l'œil."
+     "- Il se détache du zù jué yīn (canal F) sur la **face dorsale du pied**[[n9]], monte en suivant la **face médiale de la jambe** jusqu'à la **région poilue du pubis**.",
+     "D’ici, il se réunit avec le canal divergent du zú shào yáng jīng bié (canal distinct VB)[[n10]], traverse l’**abdomen** jusqu’au point F 13 (zhāng mén) où il plonge dans l’interne. Il se répand dans le **foie**, la **vésicule biliaire** et le **cœur**. Ensuite, le trajet poursuit son ascension le long du **cou**, traverse l’**angle de la mandibule**, se diffuse dans la **face** avant d’aller se réunir avec le zú shào yáng jīng bié (canal distinct VB), au **canthus latéral** (vers VB 1 (tóng zǐ liáo)) où il se connecte aux **connexions de l'œil**."
     ],
     "notes": [
      {
@@ -5541,8 +5541,8 @@ window.MTC_TRAJETS = [
     "type": "luo",
     "title": "Trajet du vaisseau liaison",
     "paragraphs": [
-     "- Il nait à F 5 (lì gōu)[[n11]], à 5 cùn au-dessus de la malléole médiale et rejoint le zù shào yáng (canal VB).",
-     "- Une branche circule en direction proximale en suivant le tibia et se connecte aux organes génitaux externes."
+     "- Il nait à F 5 (lì gōu)[[n11]], à 5 cùn au-dessus de la **malléole médiale** et rejoint le zù shào yáng (canal VB).",
+     "- Une branche circule en direction proximale en suivant le **tibia** et se connecte aux **organes génitaux externes**."
     ],
     "notes": [
      {
@@ -5596,7 +5596,7 @@ window.MTC_TRAJETS = [
     "type": "tendineux",
     "title": "Trajet du canal tendineux",
     "paragraphs": [
-     "- Il nait sur la face dorsale du gros orteil au F 1 (dà dūn)[[n12]], il remonte pour se connecter en avant de la malléole médiale au point F 4 (zhōng fēng), circule sur la face médiale du tibia, et se connecte au bord inférieur du condyle médial du tibia. Il continue à monter sur la face médiale de la cuisse, circulant entre le zú tài yìn jīng jīn (canal tendineux Rt) et le zú shào yīn jīng jīn (canal tendineux Rn), se connecte au pubis dans la région du RM 3 (zhōng jí) et circule en direction caudale (vers le bas) se répandre aux organes génitaux externes[[n13]]."
+     "- Il nait sur la **face dorsale du gros orteil** au F 1 (dà dūn)[[n12]], il remonte pour se connecter en avant de la **malléole médiale** au point F 4 (zhōng fēng), circule sur la **face médiale du tibia**, et se connecte au **bord inférieur du condyle médial du tibia**. Il continue à monter sur la **face médiale de la cuisse**, circulant entre le zú tài yìn jīng jīn (canal tendineux Rt) et le zú shào yīn jīng jīn (canal tendineux Rn), se connecte au **pubis** dans la région du RM 3 (zhōng jí) et circule en direction caudale (vers le bas) se répandre aux **organes génitaux externes**[[n13]]."
     ],
     "notes": [
      {
@@ -5657,11 +5657,11 @@ window.MTC_TRAJETS = [
     "type": "vaisseau",
     "title": "Trajet",
     "paragraphs": [
-     "- La première branche[[n15]] naît à l’intérieur de l’abdomen inférieur[[n16]], et descend jusqu’au périnée où elle émerge au niveau de RM 1 (huì yīn)[[n17]] (repère 1). Elle va aux organes génitaux[[n18]], puis se réunit avec le canal du zú yáng míng (canal E) au niveau du point E 30 (qì chōng)[[n19]] (repère 2) et avec le canal du zú shào yīn (canal Rn)[[n20]], où elle monte sur l’abdomen de chaque côté de l’ombilic en suivant le trajet du zú shào yīn (canal Rn): elle monte en passant par les points Rn 11 (héng gǔ), au niveau de la symphyse pubienne, puis Rn 12 (dà hè), Rn 13 (qì xué), Rn 14 (sì mǎn) et Rn 15 (zhōng zhù), rejoint la ligne médiane où elle croise RM 7 (yīn jiāo)[[n21]], 1 cùn en dessous de l’ombilic, avant de retrouver son trajet initial, 0,5 cùn en dehors de la ligne médiane, passant alors par les points Rn 16 (huāng shū), Rn 17 (shāng qū), Rn 18 (shí guān), Rn 19 (yīn dū), Rn 20 (fù tōng gǔ) et Rn 21 (yōu mén)[[n22]] (repère 3). Enfin, cette branche se disperse dans la région du thorax[[n23]] (repère 4).",
-     "- Une deuxième branche monte jusqu’à la gorge[[n24]] et l’arrière du nez, entoure les lèvres, longe le bord du nez pour atteindre l’orbite de l’œil[[n25]] – où se termine le canal du rèn mài[[n26]] (repère 5).",
-     "- De RM 1 (huì yīn), une troisième branche monte sur la face postérieure du corps[[n27]], circuler dans la colonne vertébrale[[n28]] et se relier au dū mài[[n29]] (repère 6). Puis, elle part du bas abdomen, sort devant, et rejoint la colonne des deux côtés, comme une ceinture, et se relie au dài mài[[n30]] (repère 7).",
-     "- Une quatrième branche naît en dessous des reins, au niveau de Rn 11 (héng gǔ), émerge dans la région d’E 30 (qì chōng), puis circule sur la face interne de la cuisse[[n31]] (repère 8), passe par le creux poplité[[n32]], descend le long de la face interne du tibia, arrive et pénètre dans la partie postérieure de la malléole médiale, pénètre le talon[[n33]], et court jusqu’à la plante du pied[[n34]] (repère 9).",
-     "- Enfin, depuis la malléole, une cinquième branche traverse les os du tarse, descend jusqu’à E 42 (chōng yáng), et se dirige vers le gros orteil[[n35]] (repère 10)."
+     "- La première branche[[n15]] naît à l’intérieur de l’**abdomen inférieur**[[n16]], et descend jusqu’au **périnée** où elle émerge au niveau de RM 1 (huì yīn)[[n17]] (repère 1). Elle va aux **organes génitaux**[[n18]], puis se réunit avec le canal du zú yáng míng (canal E) au niveau du point E 30 (qì chōng)[[n19]] (repère 2) et avec le canal du zú shào yīn (canal Rn)[[n20]], où elle monte sur l’**abdomen** de chaque côté de l’**ombilic** en suivant le trajet du zú shào yīn (canal Rn): elle monte en passant par les points Rn 11 (héng gǔ), au niveau de la **symphyse pubienne**, puis Rn 12 (dà hè), Rn 13 (qì xué), Rn 14 (sì mǎn) et Rn 15 (zhōng zhù), rejoint la **ligne médiane** où elle croise RM 7 (yīn jiāo)[[n21]], 1 cùn en dessous de l’**ombilic**, avant de retrouver son trajet initial, 0,5 cùn en dehors de la **ligne médiane**, passant alors par les points Rn 16 (huāng shū), Rn 17 (shāng qū), Rn 18 (shí guān), Rn 19 (yīn dū), Rn 20 (fù tōng gǔ) et Rn 21 (yōu mén)[[n22]] (repère 3). Enfin, cette branche se disperse dans la **région du thorax**[[n23]] (repère 4).",
+     "- Une deuxième branche monte jusqu’à la **gorge**[[n24]] et l’**arrière du nez**, entoure les **lèvres**, longe le **bord du nez** pour atteindre l’**orbite de l’œil**[[n25]] – où se termine le canal du rèn mài[[n26]] (repère 5).",
+     "- De RM 1 (huì yīn), une troisième branche monte sur la **face postérieure du corps**[[n27]], circuler dans la **colonne vertébrale**[[n28]] et se relier au dū mài[[n29]] (repère 6). Puis, elle part du **bas abdomen**, sort devant, et rejoint la **colonne** des deux côtés, comme une ceinture, et se relie au dài mài[[n30]] (repère 7).",
+     "- Une quatrième branche naît en dessous des **reins**, au niveau de Rn 11 (héng gǔ), émerge dans la région d’E 30 (qì chōng), puis circule sur la **face interne de la cuisse**[[n31]] (repère 8), passe par le **creux poplité**[[n32]], descend le long de la **face interne du tibia**, arrive et pénètre dans la **partie postérieure de la malléole médiale**, pénètre le **talon**[[n33]], et court jusqu’à la **plante du pied**[[n34]] (repère 9).",
+     "- Enfin, depuis la **malléole**, une cinquième branche traverse les **os du tarse**, descend jusqu’à E 42 (chōng yáng), et se dirige vers le **gros orteil**[[n35]] (repère 10)."
     ],
     "notes": [
      {
@@ -5881,8 +5881,8 @@ window.MTC_TRAJETS = [
     "type": "vaisseau",
     "title": "Trajet",
     "paragraphs": [
-     "- Le yīn qiāo mài naît au centre du talon[[n106]], et émerge en arrière du point Rn 2 (rán gǔ)[[n107]]. Puis monte avec le zú shào yīn jusqu’au point Rn 6 (zhào hǎi)[[n108]] et traverse le bord postérieur de la malléole médiale pour atteindre Rn 8 (jiāo xìn). Il s’écoule ensuite le long du bord postéro-médial du membre inférieur. En passant par le périnée[[n109]], il atteint la région du pubis et les organes génitaux externes. Il monte ensuite sur le bord médial de l’abdomen et du thorax, puis pénètre dans le creux sus-claviculaire[[n110]], d’où il remonte latéralement vers le haut, à l’extérieur de la pomme d’Adam, à travers la gorge[[n111]], et en passant par E 9 (rén yíng)[[n112]], où il émerge. D’ici, il atteint le bord médial de la région zygomatique[[n113]]. II continue à monter et longe le bord du nez pour atteindre le canthus interne de l’œil au niveau du V 1 (jīng míng) où il se réunit avec le zù tài yáng (canal V), le zú yáng míng (canal E) et le yáng qiāo mài[[n114]].",
-     "De là, il monte ensuite pénétrer dans le cerveau[[n115]]."
+     "- Le yīn qiāo mài naît au **centre du talon**[[n106]], et émerge en arrière du point Rn 2 (rán gǔ)[[n107]]. Puis monte avec le zú shào yīn jusqu’au point Rn 6 (zhào hǎi)[[n108]] et traverse le **bord postérieur de la malléole médiale** pour atteindre Rn 8 (jiāo xìn). Il s’écoule ensuite le long du **bord postéro-médial du membre inférieur**. En passant par le **périnée**[[n109]], il atteint la **région du pubis** et les **organes génitaux externes**. Il monte ensuite sur le **bord médial de l’abdomen et du thorax**, puis pénètre dans le **creux sus-claviculaire**[[n110]], d’où il remonte latéralement vers le haut, à l’extérieur de la **pomme d’Adam**, à travers la **gorge**[[n111]], et en passant par E 9 (rén yíng)[[n112]], où il émerge. D’ici, il atteint le **bord médial de la région zygomatique**[[n113]]. II continue à monter et longe le **bord du nez** pour atteindre le **canthus interne de l’œil** au niveau du V 1 (jīng míng) où il se réunit avec le zù tài yáng (canal V), le zú yáng míng (canal E) et le yáng qiāo mài[[n114]].",
+     "De là, il monte ensuite pénétrer dans le **cerveau**[[n115]]."
     ],
     "notes": [
      {
@@ -5991,12 +5991,12 @@ window.MTC_TRAJETS = [
     "type": "vaisseau",
     "title": "Trajet",
     "paragraphs": [
-     "- Le yáng qiāo mài naît au centre du talon[[n116]], puis émerge sous la malléole médiale (repère 1), au niveau du V 62 (shēn mài)[[n117]], puis s’écoule sur la face latérale du talon au niveau du V 61 (pú cān)[[n118]], et monte le long du bord postérieur de la malléole latérale.",
-     "Il circule sur la face latérale du membre inférieur, au bord postérieur de la fibula, en passant par V 59 (fù yáng)[[n119]], puis au niveau de la face latérale de la cuisse, jusqu’à la hanche, en passant par VB 29 (jū liáo)[[n120]] (repère 2).",
-     "Il arrive sur le tronc, et circule à la partie postérieure de la région thoracique latérale, pour ensuite monter sur la face postérolatérale du thorax, puis il passe par le pli axillaire postérieur, et s’enroule sur l’épaule, en passant par IG 10 (nào shū)[[n121]], GI 16 (jù gǔ)[[n122]] et enfin par GI 15 (jiān yú)[[n123]] (repère 3).",
-     "Il longe ensuite le cou, en passant par E 9 (rén yíng)[[n124]], arrive aux coins des lèvres, en passant par E 4 (dì cāng)[[n125]], où il rencontre les canaux du zú et shǒu yáng míng, ainsi que le rèn mài[[n126]]. Puis il monte avec le zú yáng míng en passant par E 3 (jù 1iáo)[[n127]], et rencontre à nouveau le rèn mài à E 1 (chéng qì)[[n128]]. Il va ensuite au canthus interne de l’œil[[n129]], à V 1 (jīng míng), où il se réunit avec le zù tài yáng (canal V), le zú yáng míng (canal E) et le yīn qiāo mài[[n130]].",
-     "Enfin, il continue de monter et suit le zù tài yáng (canal V) au niveau du front (repère 4). Il se courbe ensuite à travers la région temporale pour passer en arrière de l’oreille et rencontrer le zù shào yáng (canal VB), au niveau du VB 20 (fēng chí)[[n131]].",
-     "De VB 20 (fēng chí), le yáng qiāo mài pénètre dans le cerveau puis rejoint le système oculaire[[n132]]."
+     "- Le yáng qiāo mài naît au **centre du talon**[[n116]], puis émerge sous la **malléole médiale** (repère 1), au niveau du V 62 (shēn mài)[[n117]], puis s’écoule sur la **face latérale du talon** au niveau du V 61 (pú cān)[[n118]], et monte le long du **bord postérieur de la malléole latérale**.",
+     "Il circule sur la **face latérale du membre inférieur**, au **bord postérieur de la fibula**, en passant par V 59 (fù yáng)[[n119]], puis au niveau de la **face latérale de la cuisse**, jusqu’à la **hanche**, en passant par VB 29 (jū liáo)[[n120]] (repère 2).",
+     "Il arrive sur le **tronc**, et circule à la **partie postérieure de la région thoracique latérale**, pour ensuite monter sur la **face postérolatérale du thorax**, puis il passe par le **pli axillaire postérieur**, et s’enroule sur l’**épaule**, en passant par IG 10 (nào shū)[[n121]], GI 16 (jù gǔ)[[n122]] et enfin par GI 15 (jiān yú)[[n123]] (repère 3).",
+     "Il longe ensuite le **cou**, en passant par E 9 (rén yíng)[[n124]], arrive aux **coins des lèvres**, en passant par E 4 (dì cāng)[[n125]], où il rencontre les canaux du zú et shǒu yáng míng, ainsi que le rèn mài[[n126]]. Puis il monte avec le zú yáng míng en passant par E 3 (jù 1iáo)[[n127]], et rencontre à nouveau le rèn mài à E 1 (chéng qì)[[n128]]. Il va ensuite au **canthus interne de l’œil**[[n129]], à V 1 (jīng míng), où il se réunit avec le zù tài yáng (canal V), le zú yáng míng (canal E) et le yīn qiāo mài[[n130]].",
+     "Enfin, il continue de monter et suit le zù tài yáng (canal V) au niveau du **front** (repère 4). Il se courbe ensuite à travers la **région temporale** pour passer en arrière de l’**oreille** et rencontrer le zù shào yáng (canal VB), au niveau du VB 20 (fēng chí)[[n131]].",
+     "De VB 20 (fēng chí), le yáng qiāo mài pénètre dans le **cerveau** puis rejoint le **système oculaire**[[n132]]."
     ],
     "notes": [
      {
@@ -6155,8 +6155,8 @@ window.MTC_TRAJETS = [
     "type": "vaisseau",
     "title": "Trajet",
     "paragraphs": [
-     "- Le yīn wéi mài naît au niveau de la face médiale de la jambe[[n133]], et émerge au niveau du Rn 9 (zhù bīn)[[n134]], cinq cùn au-dessus de la malléole médiale[[n135]], puis il circule le long de la face médiale du membre inférieur[[n136]]. Il atteint l’abdomen et se réunit avec le zù tài yīn (canal Rt) au niveau de Rt 12 (chōng mén)[[n137]], Rt 13 (fù shě)[[n138]], Rt 15 (dà héng) et Rt 16 (fù āi)[[n139]], puis continue à monter jusqu’à la région thoracique latérale où il se réunit avec le zù jué yīn (canal F) au niveau de F 14 (qī mén).",
-     "Il monte ensuite, en traversant le diaphragme et la poitrine, à la gorge et se réunit avec le rèn mài au niveau de RM 22 (tiān tū) et RM 23 (lián quán)[[n140]]."
+     "- Le yīn wéi mài naît au niveau de la **face médiale de la jambe**[[n133]], et émerge au niveau du Rn 9 (zhù bīn)[[n134]], cinq cùn au-dessus de la **malléole médiale**[[n135]], puis il circule le long de la **face médiale du membre inférieur**[[n136]]. Il atteint l’**abdomen** et se réunit avec le zù tài yīn (canal Rt) au niveau de Rt 12 (chōng mén)[[n137]], Rt 13 (fù shě)[[n138]], Rt 15 (dà héng) et Rt 16 (fù āi)[[n139]], puis continue à monter jusqu’à la **région thoracique latérale** où il se réunit avec le zù jué yīn (canal F) au niveau de F 14 (qī mén).",
+     "Il monte ensuite, en traversant le **diaphragme** et la **poitrine**, à la **gorge** et se réunit avec le rèn mài au niveau de RM 22 (tiān tū) et RM 23 (lián quán)[[n140]]."
     ],
     "notes": [
      {
@@ -6252,9 +6252,9 @@ window.MTC_TRAJETS = [
     "type": "vaisseau",
     "title": "Trajet",
     "paragraphs": [
-     "- Le yáng wéi mài[[n141]] naît au niveau de la face latérale du talon[[n142]], au niveau du V 63 (jīn mén g)[[n143]], en avant et en dessous de la malléole médiale. Il monte en suivant le trajet du zù shào yáng (canal VB), en passant par VB 35 (yáng jiāo), et circule sur la face latérale du membre inférieur, et passe par l’articulation de la hanche[[n144]]. Il circule sur la partie postérolatérale de la région thoracique latérale et du thorax, atteint le pli axillaire postérieur, et monte sur l’épaule où il rencontre le shǒu yáng míng (canal GI), shǒu tài yáng (canal IG) et zù tài yáng (canal V) au point GI 14 (bì nào)[[n145]], puis le shǒu shǎo yáng (canal TF) au point TF 13 (nào huì)[[n146]], puis continue son ascension en passant IG 10 (nào shū)[[n147]], TF 15 (tiān liáo)[[n148]] et, enfin, VB 21 (jiān jǐng), où il rencontre les canaux zù shào yáng (canal VB)[[n149]], shǒu shǎo yáng (canal TF)[[n150]] et zú yáng míng (canal E)[[n151]].",
-     "Il longe ensuite le cou et l’oreille, pour arriver au front[[n152]], VB 13 (běn shén) puis VB 14 (yáng bái)[[n153]], et se répand de chaque côté de la tête en passant par les points du zù shào yáng (canal VB): VB 15 (tóu lín qì), VB 16 (mù chuāng), VB 17 (zhèng yíng), VB 18 (chéng líng), VB 19 (nǎo kōng), jusqu’à VB 20 (fēng chí)[[n154]].",
-     "Enfin, il revient sur la nuque où il se réunit avec le dū mài, au niveau de DM 16 (fēng fǔ) et DM 15 (yǎ mén)[[n155]], où il se termine."
+     "- Le yáng wéi mài[[n141]] naît au niveau de la **face latérale du talon**[[n142]], au niveau du V 63 (jīn mén g)[[n143]], en avant et en dessous de la **malléole médiale**. Il monte en suivant le trajet du zù shào yáng (canal VB), en passant par VB 35 (yáng jiāo), et circule sur la **face latérale du membre inférieur**, et passe par l’**articulation de la hanche**[[n144]]. Il circule sur la **partie postérolatérale de la région thoracique latérale** et du **thorax**, atteint le **pli axillaire postérieur**, et monte sur l’**épaule** où il rencontre le shǒu yáng míng (canal GI), shǒu tài yáng (canal IG) et zù tài yáng (canal V) au point GI 14 (bì nào)[[n145]], puis le shǒu shǎo yáng (canal TF) au point TF 13 (nào huì)[[n146]], puis continue son ascension en passant IG 10 (nào shū)[[n147]], TF 15 (tiān liáo)[[n148]] et, enfin, VB 21 (jiān jǐng), où il rencontre les canaux zù shào yáng (canal VB)[[n149]], shǒu shǎo yáng (canal TF)[[n150]] et zú yáng míng (canal E)[[n151]].",
+     "Il longe ensuite le **cou** et l’**oreille**, pour arriver au **front**[[n152]], VB 13 (běn shén) puis VB 14 (yáng bái)[[n153]], et se répand de chaque côté de la **tête** en passant par les points du zù shào yáng (canal VB): VB 15 (tóu lín qì), VB 16 (mù chuāng), VB 17 (zhèng yíng), VB 18 (chéng líng), VB 19 (nǎo kōng), jusqu’à VB 20 (fēng chí)[[n154]].",
+     "Enfin, il revient sur la **nuque** où il se réunit avec le dū mài, au niveau de DM 16 (fēng fǔ) et DM 15 (yǎ mén)[[n155]], où il se termine."
     ],
     "notes": [
      {
@@ -6397,8 +6397,8 @@ window.MTC_TRAJETS = [
     "type": "vaisseau",
     "title": "Trajet",
     "paragraphs": [
-     "- Dài mài trouve son origine dans la région des hypocondres[[n156]]. Le trajet émerge au niveau de L2; l’éminent Lǐ Shí Zhēn précise au point F 13 (zhāng mén)[[n157]]. Puis il circule au niveau de la région thoracique latérale[[n158]] en passant entre les cartilages terminaux des côtes 11 et 12 et descend ensuite obliquement à l’abdomen inférieur. Il se réunit avec le zù shào yáng (canal VB) au niveau de VB 26 (dài mài)[[n159]], VB 27 (wǔ shū)[[n160]] et VB 28 (wéi dào)[[n161]].",
-     "Il entoure la taille comme une ceinture, enveloppant les lombes et l’abdomen[[n162]]."
+     "- Dài mài trouve son origine dans la **région des hypocondres**[[n156]]. Le trajet émerge au niveau de **L2**; l’éminent Lǐ Shí Zhēn précise au point F 13 (zhāng mén)[[n157]]. Puis il circule au niveau de la **région thoracique latérale**[[n158]] en passant entre les **cartilages terminaux des côtes 11 et 12** et descend ensuite obliquement à l’**abdomen inférieur**. Il se réunit avec le zù shào yáng (canal VB) au niveau de VB 26 (dài mài)[[n159]], VB 27 (wǔ shū)[[n160]] et VB 28 (wéi dào)[[n161]].",
+     "Il entoure la **taille** comme une ceinture, enveloppant les **lombes** et l’**abdomen**[[n162]]."
     ],
     "notes": [
      {
