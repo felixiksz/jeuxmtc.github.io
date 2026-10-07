@@ -21,15 +21,19 @@
   const thanksHtml = () => {
     const THANKS = supporters();
     if(!THANKS.length) return "";
-    // chaque prénom dans une couleur vive tirée au hasard (jamais deux voisins de la même couleur)
+    // chaque prénom reçoit automatiquement sa couleur vive, tirée de son nom (toujours la même), jamais celle de son voisin
+    // (ni du premier pour le dernier, puisque la liste défile en boucle)
     const COLORS = ["#d33a2c", "#2e9a4a", "#2b5fd9", "#d9a400", "#8a3fd1", "#e6731a", "#139e9a"];
-    let last = -1;
-    const names = THANKS.map(n => {
-      let i = Math.floor(Math.random() * COLORS.length);
-      if(i === last) i = (i + 1 + Math.floor(Math.random() * (COLORS.length - 1))) % COLORS.length;
-      last = i;
-      return '<span style="color:' + COLORS[i] + '">' + esc(n) + "</span>";
-    }).join(", ");
+    const pick = [];
+    THANKS.forEach((n, k) => {
+      let h = 0;
+      for(const ch of n.toLowerCase()) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+      let i = h % COLORS.length;
+      const avoid = new Set([pick[k - 1], k === THANKS.length - 1 && k > 1 ? pick[0] : undefined]);
+      while(avoid.has(i)) i = (i + 1) % COLORS.length;
+      pick.push(i);
+    });
+    const names = THANKS.map((n, k) => '<span style="color:' + COLORS[pick[k]] + '">' + esc(n) + "</span>").join(", ");
     const dur = Math.max(9, Math.round((THANKS.join(", ").length * 0.62 + 12) / 1.4));
     return '<span class="mm-thanks">Projet soutenu par :' +
       '<span class="mm-ticker" style="--tk-dur:' + dur + 's"><span class="mm-ticker-track">' +
