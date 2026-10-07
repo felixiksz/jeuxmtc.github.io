@@ -107,6 +107,7 @@ body.mtc-menu-open{ overflow:hidden; }
   font-family:'Archivo', sans-serif; font-weight:400; font-size:10.5px; line-height:1.3; letter-spacing:.06em; text-transform:uppercase;
   margin:1px 0 10px; color:color-mix(in srgb, var(--text-color) 45%, var(--page-bg)); transition:color .15s ease; }
 /* séparateur ✦ (sous les grands mots, ligne de version) */
+#mtcMainMenu .mm-heart{ margin-right:.45em; font-family:'Archivo', 'Segoe UI Symbol', sans-serif; }
 #mtcMainMenu .mm-star{ font-style:normal; font-size:.8em; margin:0 .55em; position:relative; top:-.05em; }
 #mtcMainMenu .mm-entry:hover .mm-sum{ color:var(--text-color); }
 #mtcMainMenu .mm-entry.on .mm-sum{ visibility:hidden; max-width:0; }

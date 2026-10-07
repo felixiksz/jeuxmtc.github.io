@@ -26,7 +26,7 @@
     return '<span class="mm-thanks">Projet soutenu par :' +
       '<span class="mm-ticker" style="--tk-dur:' + dur + 's"><span class="mm-ticker-track">' +
       '<span class="mm-ticker-copy">' + names + '</span><span class="mm-ticker-copy" aria-hidden="true">' + names + "</span>" +
-      "</span></span>Merci !</span>";
+      '</span></span><span class="mm-heart" aria-hidden="true">❤︎</span>Merci !</span>';
   };
   const DISCUSSIONS_URL = "https://github.com/felixiksz/jeuxmtc.github.io/discussions";
   const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Suivi"], ["reglages", "Réglages"]];
