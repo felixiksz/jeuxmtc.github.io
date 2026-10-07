@@ -9,6 +9,8 @@ let src = fs.readFileSync(ROOT + "/02-01-point-details-data.js", "utf8").replace
 eval(src);
 eval(fs.readFileSync(ROOT + "/22-20-pharma-data.js", "utf8"));
 eval(fs.readFileSync(ROOT + "/fiches-corrections.js", "utf8"));
+// ajouts du cours (contenu du jeu) : comptés comme des corrections publiées
+try{ eval(fs.readFileSync(ROOT + "/fiches-ajouts.js", "utf8").split("(function(){")[0]); const A = window.MTC_FICHE_ADDITIONS || {}; window.MTC_FICHE_CORRECTIONS = window.MTC_FICHE_CORRECTIONS || {points:{}, pharma:{}}; ["points", "pharma"].forEach(d => Object.entries(A[d] || {}).forEach(([id, f]) => { window.MTC_FICHE_CORRECTIONS[d][id] = Object.assign({}, f, window.MTC_FICHE_CORRECTIONS[d][id] || {}); })); }catch(e){}
 const P = global.POINT_DETAILS, H = {}; (window.PHARMA_HERBS || []).forEach(h => { H[h.id] = h; });
 const corr = window.MTC_FICHE_CORRECTIONS || {points:{}, pharma:{}};
 const imp = JSON.parse(fs.readFileSync(ROOT + "/Import_tableau pharma_pro(1).json", "utf8")).pharmacology || {};

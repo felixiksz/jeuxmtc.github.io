@@ -28,6 +28,7 @@ const CORE_ASSETS = [
   "21-19-stats-time-filter.js",
   "22-20-pharma-data.js",
   "22-21-pharma-fiches-completes.js",
+  "fiches-ajouts.js",
   "23-21-pharma-game-v1.js",
   "24-22-pharma-herb-panel.js",
   "25-23-pharma-cheatsheet-essentielles.js",
