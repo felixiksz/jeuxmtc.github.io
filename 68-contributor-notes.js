@@ -107,9 +107,7 @@
     style();
     if(!isContributor() && !isAdmin()) return '<div class="mtc-contrib"><button type="button" class="mtc-contrib-join" data-contrib="join" title="Accéder aux notes partagées">Contribuer</button></div>';
     loadNotes();
-    const author = authorName(), col = authorColor(author);
     return '<div class="mtc-contrib"><div class="row">' +
-      ('<span class="by-legend" style="--a:' + col + '">● en couleur : notes de ' + esc(author.split(",")[0]) + "</span>") +
       '<button type="button" data-contrib="thread" data-domain="' + domain + '" data-id="' + esc(id) + '" data-label="' + esc(label || id) + '">Notes signées des contributeur·ices</button>' +
       '<button type="button" class="quit" data-contrib="quit">ne plus contribuer</button></div></div>';
   }
@@ -143,6 +141,18 @@
     const author = authorName(), name = author.split(",")[0];
     return '<div class="mtc-shared-in" style="--a:' + authorColor(author) + '" title="Note partagée de ' + esc(name) + '"><p class="txt">' + esc(text) + '</p><span class="by">— ' + esc(name) + "</span></div>";
   }
+  function insertInBox(box, html){
+    box.insertAdjacentHTML("afterend", html);
+    const el = box.nextElementSibling, cs = getComputedStyle(box);
+    el.style.background = cs.backgroundColor;
+    el.style.margin = "0 0 " + cs.marginBottom;
+    el.style.padding = "2px " + cs.paddingRight + " " + cs.paddingBottom + " " + cs.paddingLeft;
+    el.style.borderRadius = "0 0 " + cs.borderBottomRightRadius + " " + cs.borderBottomLeftRadius;
+    el.style.width = box.offsetWidth ? box.offsetWidth + "px" : "";
+    el.style.boxSizing = "border-box";
+    box.style.marginBottom = "0";
+    box.style.borderBottomLeftRadius = box.style.borderBottomRightRadius = "0";
+  }
   function decoratePharma(container, id){
     const mine = sharedFor("pharma", id);
     if(!container || !mine) return;
@@ -153,9 +163,8 @@
       const ta = sec.querySelector("textarea");
       const text = freshPart(mine[k], (ta ? ta.value : "") + "\n" + sec.textContent);
       if(!text) return;
-      const title = sec.querySelector(".pharma-editable-title");
-      if(title) title.insertAdjacentHTML("afterend", sharedHtml(text));
-      else sec.insertAdjacentHTML("afterbegin", sharedHtml(text));
+      if(ta) insertInBox(ta, sharedHtml(text));
+      else sec.insertAdjacentHTML("beforeend", sharedHtml(text));
     });
   }
   function decoratePoint(){
@@ -181,8 +190,8 @@
         content.insertAdjacentHTML("beforeend", '<details class="point-info-section" open><summary>' + esc(label === "VS" ? "VS." : label) + "</summary></details>");
         sec = content.lastElementChild;
       }
-      const display = sec.querySelector(".point-note-display");
-      if(display) display.insertAdjacentHTML("afterend", sharedHtml(text));
+      const box = sec.querySelector(".acu-comparison-editable") || sec.querySelector(".point-note-display");
+      if(box) insertInBox(box, sharedHtml(text));
       else sec.insertAdjacentHTML("beforeend", sharedHtml(text));
     });
   }
