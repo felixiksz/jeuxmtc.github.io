@@ -129,6 +129,9 @@
   const flat = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   // qui a des notes sur cette fiche : l'admin (sauf pour elle-même : ses notes sont dans ses champs, mergeIntoAdmin)
   // puis chaque contributeur·ice qui a partagé ses notes (contributions.json), chacun·e dans sa couleur
+  // compte GitHub → signature affichée (l'admin publie aussi depuis le compte du dépôt)
+  const SIGNATURES = {felixiksz:"emesepap"};
+  const signature = login => SIGNATURES[String(login).toLowerCase()] || login;
   function sourcesFor(domain, id){
     const list = [];
     if(!enabled() || !id || !(isContributor() || isAdmin())) return list;
@@ -142,13 +145,14 @@
     const C = window.MTC_CONTRIBUTIONS;
     Object.entries((C && C.authors) || {}).forEach(([login, a]) => {
       const fields = a && a[domain] && a[domain][id];
-      if(fields) list.push({name:login, color:authorColor(login), fields});
+      const name = signature(login);
+      if(fields) list.push({name, color:authorColor(name), fields});
     });
     // notes signées du fil de la fiche (giscus « Notes — point … ») : dans le champ Notes, une couleur par auteur·ice
     const thread = C && C.threads && C.threads[domain] && C.threads[domain][id];
     if(Array.isArray(thread)){
       const byLogin = {};
-      thread.forEach(n => { if(n && n.login && n.text) (byLogin[n.login] = byLogin[n.login] || []).push(n.text); });
+      thread.forEach(n => { if(n && n.login && n.text){ const who = signature(n.login); (byLogin[who] = byLogin[who] || []).push(n.text); } });
       Object.entries(byLogin).forEach(([login, texts]) => {
         const same = list.find(s => s.name === login);
         const notes = texts.join("\n\n");
