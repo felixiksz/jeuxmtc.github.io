@@ -1,12 +1,15 @@
-# Partage des notes des joueur·euses : une discussion dans la catégorie « Contributions »
-# (bouton « Partager mes notes » du jeu) est lue, vérifiée et ajoutée à contributions.json.
+# Notes partagées :
+# - une discussion dans la catégorie « Contributions » (bouton « Partager mes notes » du jeu) est lue,
+#   vérifiée et ajoutée à contributions.json (authors) ;
+# - un fil « Notes — point … » / « Notes — substance … » (notes signées d'une fiche) est relu à chaque
+#   commentaire ajouté, modifié ou supprimé, et rangé dans contributions.json (threads).
 name: Contributions de notes
 
 on:
   discussion:
     types: [created, edited]
   discussion_comment:
-    types: [created, edited]
+    types: [created, edited, deleted]
 
 permissions:
   contents: write
@@ -18,7 +21,7 @@ concurrency:
 
 jobs:
   contributions:
-    if: github.event.discussion.category.slug == 'contributions'
+    if: github.event.discussion.category.slug == 'contributions' || startsWith(github.event.discussion.title, 'Notes — ')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +32,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCUSSION_ID: ${{ github.event.discussion.node_id }}
-        run: node tools/contributions-action.js
+        run: |
+          if [ "${{ github.event.discussion.category.slug }}" = "contributions" ]; then node tools/contributions-action.js; else node tools/notes-threads-action.js; fi
       - name: Publier
         run: |
           if git diff --quiet -- contributions.json; then echo "Rien de nouveau."; exit 0; fi

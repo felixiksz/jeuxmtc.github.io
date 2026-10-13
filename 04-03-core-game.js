@@ -997,7 +997,9 @@ function pointIndicationsSearchText(point){
 
 function pointNotesSearchText(point){
   const details = POINT_DETAILS[point] || {};
-  return getEditablePointNote(point, details.notes || "");
+  // + les notes partagées (contributeur·ices, notes signées des fiches) visibles pour cette personne
+  const shared = typeof window.mtcSharedNotesText === "function" ? window.mtcSharedNotesText("points", point) : "";
+  return getEditablePointNote(point, details.notes || "") + (shared ? " " + shared : "");
 }
 
 function pointLocalStorageText(prefix, point){

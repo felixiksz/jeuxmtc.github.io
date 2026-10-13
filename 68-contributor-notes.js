@@ -144,8 +144,22 @@
       const fields = a && a[domain] && a[domain][id];
       if(fields) list.push({name:login, color:authorColor(login), fields});
     });
+    // notes signées du fil de la fiche (giscus « Notes — point … ») : dans le champ Notes, une couleur par auteur·ice
+    const thread = C && C.threads && C.threads[domain] && C.threads[domain][id];
+    if(Array.isArray(thread)){
+      const byLogin = {};
+      thread.forEach(n => { if(n && n.login && n.text) (byLogin[n.login] = byLogin[n.login] || []).push(n.text); });
+      Object.entries(byLogin).forEach(([login, texts]) => {
+        const same = list.find(s => s.name === login);
+        const notes = texts.join("\n\n");
+        if(same) same.fields = Object.assign({}, same.fields, {notes:[same.fields.notes, notes].filter(Boolean).join("\n\n")});
+        else list.push({name:login, color:authorColor(login), fields:{notes}});
+      });
+    }
     return list;
   }
+  // texte de toutes les notes partagées visibles d'une fiche, pour la Recherche (champ « notes »)
+  window.mtcSharedNotesText = (domain, id) => sourcesFor(domain, id).map(s => Object.values(s.fields || {}).join(" ")).join(" ");
   // seulement les lignes que la personne n'a pas déjà dans le champ (ni répétées dans la note elle-même)
   function freshPart(text, already){
     const have = flat(already), seen = new Set();

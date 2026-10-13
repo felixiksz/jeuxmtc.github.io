@@ -844,7 +844,8 @@
     if(scope === "indications") return getHerbSearchIndications(herb);
     if(scope === "contre_indications") return getHerbSearchContreIndications(herb);
     if(scope === "preparation") return getHerbSearchPreparation(herb);
-    if(scope === "notes") return [herb?.esprit || "", getHerbEsprit(herb), getHerbNotes(herb)].join(" ");
+    if(scope === "notes") return [herb?.esprit || "", getHerbEsprit(herb), getHerbNotes(herb),
+      typeof window.mtcSharedNotesText === "function" && herb ? window.mtcSharedNotesText("pharma", herb.id) : ""].join(" ");
     if(scope === "synthese") return getHerbSearchSynthese(herb);
     if(scope === "ingredients") return getHerbSearchIngredients(herb);
     if(scope === "recherches_modernes") return getHerbSearchRecherchesModernes(herb);
