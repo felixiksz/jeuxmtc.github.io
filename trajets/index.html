@@ -296,7 +296,7 @@
     <button type="button" class="tool" id="editToggle" aria-pressed="false">✎ Modifier</button>
     <button type="button" class="tool" id="netToggle">Plan des intersections</button>
     <button type="button" class="tool" id="allPlaces">Correspondances…</button>
-    <button type="button" class="tool" id="printPlans" title="Les plans de tous les trajets, en noir et blanc, un canal par page">Imprimer les plans</button>
+    <button type="button" class="tool admin-only" id="printPlans" title="Les plans de tous les trajets, en noir et blanc : un fichier SVG (image vectorielle) par plan, dans un .zip">Plans en SVG</button>
   </div>
 </header>
 <main id="main"></main>
@@ -385,7 +385,7 @@
   const data = window.MTC_TRAJETS || [];
   const PLACES = window.MTC_TRAJETS_PLACES || {};
   const nav = document.getElementById("nav");
-  document.getElementById("printPlans").addEventListener("click", () => printPlans());
+  document.getElementById("printPlans").addEventListener("click", () => downloadPlans());
   (function(){
     const KEY = "mtc_trajets_nav_closed", btn = document.getElementById("navToggle");
     const set = closed => {
@@ -883,6 +883,71 @@
 
   const zoneBands = html => (html.match(/<g class="node zonepass"[\s\S]*?<\/g>/g) || []).join("");
   const stationsOnly = html => html.replace(/<g class="node zonepass"[\s\S]*?<\/g>/g, "");
+  // fichier .zip sans compression (les SVG sont petits) : en-têtes locaux, répertoire central, CRC32
+  function makeZip(files){
+    const enc = new TextEncoder(), crcTable = [];
+    for(let n = 0; n < 256; n++){ let c = n; for(let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; crcTable[n] = c >>> 0; }
+    const crc32 = bytes => { let c = 0xFFFFFFFF; for(const b of bytes) c = crcTable[(c ^ b) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+    const parts = [], central = [];
+    let offset = 0;
+    files.forEach(f => {
+      const name = enc.encode(f.name), data = enc.encode(f.text), crc = crc32(data);
+      const local = new DataView(new ArrayBuffer(30));
+      local.setUint32(0, 0x04034b50, true); local.setUint16(4, 20, true); local.setUint16(6, 0x0800, true);
+      local.setUint32(14, crc, true); local.setUint32(18, data.length, true); local.setUint32(22, data.length, true); local.setUint16(26, name.length, true);
+      parts.push(new Uint8Array(local.buffer), name, data);
+      const cd = new DataView(new ArrayBuffer(46));
+      cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
+      cd.setUint32(16, crc, true); cd.setUint32(20, data.length, true); cd.setUint32(24, data.length, true); cd.setUint16(28, name.length, true);
+      cd.setUint32(42, offset, true);
+      central.push(new Uint8Array(cd.buffer), name);
+      offset += 30 + name.length + data.length;
+    });
+    const cdSize = central.reduce((n, a) => n + a.length, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+    end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+    return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type:"application/zip"});
+  }
+  // plans en noir et blanc, chacun en image vectorielle autonome (SVG) : usage personnel (admin)
+  const SVG_BW = "text{fill:#000;font-family:Archivo,Arial,sans-serif;font-size:10.5px}text.xfer{font-size:9px}tspan{fill:#000}" +
+    ".br-label{font-weight:700;font-size:10px}path{stroke:#000;opacity:1}circle{stroke:#000}circle[fill='#ffe27a']{display:none}" +
+    ".zonepass rect{fill:#fff;stroke:#000;stroke-width:.8;opacity:1}.zonepass rect[fill='#f6dcd2']{fill:#d6d6d6}.zlabel{font-size:10px}" +
+    "circle[fill='var(--point)']{fill:#000}";
+  function planFiles(){
+    const keepCurrent = current, keepTypes = Object.assign({}, TYPES_ON), keepEditing = editing;
+    Object.keys(TYPES_ON).forEach(k => { TYPES_ON[k] = true; });
+    editing = false;
+    const files = [];
+    try{
+      data.forEach((c, ci) => {
+        current = c.code;
+        c.sections.forEach(s => {
+          const html = planSvg(s, sectionName(c, s));
+          const m = /<svg width="(\d+(?:\.\d+)?)" height="(\d+(?:\.\d+)?)"[^>]*>([\s\S]*?)<\/svg><\/div>/.exec(html);
+          if(!m) return;
+          const W = +m[1], H = +m[2], title = c.code + " — " + sectionName(c, s);
+          const inner = m[3].replace(/var\(--(?:line|point|organ|zone|canal)\)/g, "#000");
+          const svg = '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + (H + 26) + '" viewBox="0 -26 ' + W + " " + (H + 26) + '">' +
+            "<style>" + SVG_BW + "</style>" +
+            '<text x="4" y="-9" style="font-family:\'Libre Baskerville\',Georgia,serif;font-size:13px;font-weight:700">' + esc(title) + "</text>" + inner + "</svg>\n";
+          const slug = (String(ci + 1).padStart(2, "0") + "-" + c.code + "-" + s.type).replace(/[^A-Za-z0-9_-]+/g, "-");
+          files.push({name:slug + ".svg", text:svg});
+        });
+      });
+    }finally{
+      current = keepCurrent; Object.assign(TYPES_ON, keepTypes); editing = keepEditing;
+    }
+    return files;
+  }
+  function downloadPlans(){
+    const files = planFiles();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(makeZip(files));
+    a.download = "plans-trajets-noir-et-blanc.zip";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
   // version imprimable : tous les plans, en noir et blanc, un canal par page (fenêtre à part, Imprimer / PDF)
   function printPlans(){
     const keepCurrent = current, keepTypes = Object.assign({}, TYPES_ON), keepEditing = editing;
