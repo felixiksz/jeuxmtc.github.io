@@ -296,6 +296,7 @@
     <button type="button" class="tool" id="editToggle" aria-pressed="false">✎ Modifier</button>
     <button type="button" class="tool" id="netToggle">Plan des intersections</button>
     <button type="button" class="tool" id="allPlaces">Correspondances…</button>
+    <button type="button" class="tool" id="printPlans" title="Les plans de tous les trajets, en noir et blanc, un canal par page">Imprimer les plans</button>
   </div>
 </header>
 <main id="main"></main>
@@ -384,6 +385,7 @@
   const data = window.MTC_TRAJETS || [];
   const PLACES = window.MTC_TRAJETS_PLACES || {};
   const nav = document.getElementById("nav");
+  document.getElementById("printPlans").addEventListener("click", () => printPlans());
   (function(){
     const KEY = "mtc_trajets_nav_closed", btn = document.getElementById("navToggle");
     const set = closed => {
@@ -881,6 +883,64 @@
 
   const zoneBands = html => (html.match(/<g class="node zonepass"[\s\S]*?<\/g>/g) || []).join("");
   const stationsOnly = html => html.replace(/<g class="node zonepass"[\s\S]*?<\/g>/g, "");
+  // version imprimable : tous les plans, en noir et blanc, un canal par page (fenêtre à part, Imprimer / PDF)
+  function printPlans(){
+    const keepCurrent = current, keepTypes = Object.assign({}, TYPES_ON), keepEditing = editing;
+    Object.keys(TYPES_ON).forEach(k => { TYPES_ON[k] = true; });
+    editing = false;
+    let body = "";
+    try{
+      data.forEach(c => {
+        current = c.code;
+        const plans = c.sections.map(s => planSvg(s, sectionName(c, s)).replace(/<div class="legend">[\s\S]*?<\/div>/, "")).filter(Boolean);
+        if(plans.length) body += '<section class="canal"><h2>' + esc(c.code + " — " + c.name) + "</h2>" + plans.join("") + "</section>";
+      });
+    }finally{
+      current = keepCurrent; Object.assign(TYPES_ON, keepTypes); editing = keepEditing;
+    }
+    const fonts = new URL("../fonts/fonts.css", location.href).href;
+    const legend = '<p class="leg"><span><svg width="12" height="12"><circle cx="6" cy="6" r="4.5" fill="#000"/></svg> point</span>' +
+      '<span><svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="#fff" stroke="#000" stroke-width="1.8"/><circle cx="7" cy="7" r="3" fill="#000"/></svg> point partagé avec d’autres canaux (sigles en dessous)</span>' +
+      '<span><svg width="30" height="12"><rect x="1" y="1" width="28" height="10" rx="5" fill="#fff" stroke="#000" stroke-width=".8"/></svg> zone traversée</span>' +
+      '<span><svg width="30" height="12"><rect x="1" y="1" width="28" height="10" rx="5" fill="#d6d6d6" stroke="#000" stroke-width=".8"/></svg> organe</span>' +
+      '<span><svg width="12" height="12"><circle cx="6" cy="6" r="4.5" fill="#fff" stroke="#000" stroke-width="1.6"/></svg> canal rejoint</span>' +
+      '<span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#000" stroke-width="2"/></svg> branche externe</span>' +
+      '<span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#000" stroke-width="2" stroke-dasharray="6 4"/></svg> branche interne</span>' +
+      "<span><b>n</b> : début de la branche n</span></p>";
+    const doc = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Plans des trajets des canaux</title>' +
+      '<link rel="stylesheet" href="' + fonts + '"><style>' +
+      ":root{ --line:#000; --point:#000; --organ:#000; --zone:#000; --canal:#000; }" +
+      "@page{ size:A4; margin:12mm; }" +
+      "body{ margin:0; padding:16px; font-family:Archivo, sans-serif; color:#000; background:#fff; }" +
+      ".bar{ display:flex; gap:12px; align-items:center; margin:0 0 14px; font-size:13px; }" +
+      ".bar button{ font:inherit; font-weight:700; border:1px solid #000; background:#fff; border-radius:999px; padding:5px 14px; cursor:pointer; }" +
+      "h1{ font-family:'Libre Baskerville', Georgia, serif; font-size:20px; margin:0 0 4px; }" +
+      ".leg{ display:flex; flex-wrap:wrap; gap:6px 16px; font-size:10.5px; margin:0 0 10px; }" +
+      ".leg span{ display:inline-flex; align-items:center; gap:5px; }" +
+      ".canal{ break-before:page; }" +
+      ".canal:first-of-type{ break-before:auto; }" +
+      "h2{ font-family:'Libre Baskerville', Georgia, serif; font-size:17px; margin:0 0 8px; border-bottom:1px solid #000; padding-bottom:4px; }" +
+      ".plan{ break-inside:avoid; margin:0 0 7mm; }" +
+      ".plan h4{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; margin:0 0 3px; }" +
+      "svg{ max-width:100%; height:auto; }" +
+      ".plan-scroll svg{ display:block; max-height:240mm; }" +
+      "svg text{ fill:#000 !important; font-family:Archivo, sans-serif; font-size:10.5px; }" +
+      "svg text.xfer{ font-size:9px; } svg tspan{ fill:#000 !important; }" +
+      "svg .br-label{ font-weight:700; font-size:10px; }" +
+      "svg path{ stroke:#000 !important; opacity:1 !important; }" +
+      "svg circle{ stroke:#000 !important; }" +
+      'svg circle[fill="#ffe27a"]{ display:none; }' +
+      "svg .zonepass rect{ fill:#fff !important; stroke:#000; stroke-width:.8; opacity:1 !important; }" +
+      'svg .zonepass rect[fill="#f6dcd2"]{ fill:#d6d6d6 !important; }' +
+      "svg .zlabel{ font-size:10px; }" +
+      "@media print{ .bar{ display:none; } body{ padding:0; } }" +
+      '</style></head><body><div class="bar"><button type="button" onclick="window.print()">Imprimer / Enregistrer en PDF</button>' +
+      "<span>A4 portrait, un canal par page ; dans la fenêtre d’impression, choisis « noir et blanc ».</span></div>" +
+      "<h1>Plans des trajets des canaux</h1>" + legend + body + "</body></html>";
+    const w = window.open("", "_blank");
+    if(!w){ window.alert("La fenêtre d’impression a été bloquée : autorise les fenêtres surgissantes pour ce site."); return; }
+    w.document.open(); w.document.write(doc); w.document.close();
+  }
   function planSvg(s, title){
     if(!s.branches || !s.branches.length) return "";
     // « Canal X » juste à côté d'un carrefour qui affiche déjà X : doublon retiré
