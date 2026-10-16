@@ -86,6 +86,7 @@
   .plan h4{ margin:0 0 4px; font-size:.85rem; color:var(--muted); }
   .plan-scroll{ overflow-x:auto; max-width:100%; }
   .plan svg{ display:block; }
+  .plan svg .node text{ paint-order:stroke; stroke:var(--bg, #fff); stroke-width:3.5px; stroke-linejoin:round; }   /* une ligne qui passe ne barre pas l’étiquette */
   .zonepass .zlabel{ font-size:10px; font-style:italic; fill:#7a6f55; }
   .zonepass{ cursor:pointer; }
   .plan .br-label.int{ fill:#7d84b8; }
@@ -297,6 +298,7 @@
     <button type="button" class="tool" id="netToggle">Plan des intersections</button>
     <button type="button" class="tool" id="allPlaces">Correspondances…</button>
     <button type="button" class="tool admin-only" id="printPlans" title="Les plans de tous les trajets, en noir et blanc : un fichier SVG (image vectorielle) par plan, dans un .zip">Plans en SVG</button>
+    <button type="button" class="tool admin-only" id="printPlansPng" title="Les plans de tous les trajets, en noir et blanc : une image PNG par plan, dans un .zip">Plans en PNG</button>
   </div>
 </header>
 <main id="main"></main>
@@ -386,6 +388,7 @@
   const PLACES = window.MTC_TRAJETS_PLACES || {};
   const nav = document.getElementById("nav");
   document.getElementById("printPlans").addEventListener("click", () => downloadPlans());
+  document.getElementById("printPlansPng").addEventListener("click", () => downloadPlansPng());
   (function(){
     const KEY = "mtc_trajets_nav_closed", btn = document.getElementById("navToggle");
     const set = closed => {
@@ -891,7 +894,7 @@
     const parts = [], central = [];
     let offset = 0;
     files.forEach(f => {
-      const name = enc.encode(f.name), data = enc.encode(f.text), crc = crc32(data);
+      const name = enc.encode(f.name), data = f.bytes || enc.encode(f.text), crc = crc32(data);
       const local = new DataView(new ArrayBuffer(30));
       local.setUint32(0, 0x04034b50, true); local.setUint16(4, 20, true); local.setUint16(6, 0x0800, true);
       local.setUint32(14, crc, true); local.setUint32(18, data.length, true); local.setUint32(22, data.length, true); local.setUint16(26, name.length, true);
@@ -910,7 +913,7 @@
     return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type:"application/zip"});
   }
   // plans en noir et blanc, chacun en image vectorielle autonome (SVG) : usage personnel (admin)
-  const SVG_BW = "text{fill:#000;font-family:Archivo,Arial,sans-serif;font-size:10.5px}text.xfer{font-size:9px}tspan{fill:#000}" +
+  const SVG_BW = "text{fill:#000;font-family:Archivo,Arial,sans-serif;font-size:10.5px;paint-order:stroke;stroke:#fff;stroke-width:7px;stroke-linejoin:round}text.xfer{font-size:9px}tspan{fill:#000}" +
     ".br-label{font-weight:700;font-size:10px}path{stroke:#000;opacity:1}circle{stroke:#000}circle[fill='#ffe27a']{display:none}" +
     ".zonepass rect{fill:#fff;stroke:#000;stroke-width:.8;opacity:1}.zonepass rect[fill='#f6dcd2']{fill:#d6d6d6}.zlabel{font-size:10px}" +
     "circle[fill='var(--point)']{fill:#000}";
@@ -940,6 +943,37 @@
     }
     return files;
   }
+  // même chose en images PNG (3 × la taille d'écran, fond blanc) : une par plan
+  async function plansPngZip(){
+    const out = [];
+    for(const f of planFiles()){
+      const m = /width="(\d+(?:\.\d+)?)" height="(\d+(?:\.\d+)?)"/.exec(f.text);
+      const W = +m[1], H = +m[2], S = 3;
+      const url = URL.createObjectURL(new Blob([f.text], {type:"image/svg+xml"}));
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+      const cv = document.createElement("canvas");
+      cv.width = Math.round(W * S); cv.height = Math.round(H * S);
+      const ctx = cv.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
+      ctx.drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      const blob = await new Promise(res => cv.toBlob(res, "image/png"));
+      out.push({name:f.name.replace(/\.svg$/, ".png"), bytes:new Uint8Array(await blob.arrayBuffer())});
+    }
+    return makeZip(out);
+  }
+  async function downloadPlansPng(){
+    const btn = document.getElementById("printPlansPng");
+    if(btn) btn.disabled = true;
+    try{
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(await plansPngZip());
+      a.download = "plans-trajets-noir-et-blanc-png.zip";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }finally{ if(btn) btn.disabled = false; }
+  }
+  window.mtcPlansPngZip = plansPngZip;
   function downloadPlans(){
     const files = planFiles();
     const a = document.createElement("a");
@@ -1137,7 +1171,7 @@
       });
     });
     return '<div class="plan"><h4>Plan des vaisseaux du ' + esc(title) + '</h4><div class="plan-scroll"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img">' +
-      zoneBands(stations) + lines + stationsOnly(stations) + nums + "</svg></div>" +
+      lines + zoneBands(stations) + stationsOnly(stations) + nums + "</svg></div>" +
       '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="background:#efe9d8;border-radius:4px;width:16px"></i>quartier traversé (zone du corps)</span><span><i style="background:#f6dcd2;border-radius:4px;width:16px"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span><span><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#9aa0c8" stroke-width="2.4" stroke-dasharray="6 4"/></svg>branche interne</span></div></div>';
   }
 
