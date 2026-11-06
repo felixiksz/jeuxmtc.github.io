@@ -214,14 +214,35 @@
       // n'apparaît pas à l'ouverture suivante et la sha d'écriture est fausse.
       const response = await fetch(url, {headers: apiHeaders(cfg), cache:"no-store"});
       if(response.status === 404) continue;
-      if(!response.ok) throw new Error(`GitHub a répondu ${response.status} pour ${relativePath}`);
+      if(!response.ok){
+        let detail = "";
+        try{ detail = (await response.json()).message || ""; }catch(e){}
+        const err = new Error(`GitHub a répondu ${response.status}${detail ? " (" + detail + ")" : ""} pour ${relativePath}`);
+        err.status = response.status;
+        throw err;
+      }
       const payload = await response.json();
+      // fichier de plus de 1 Mo : l'API ne renvoie pas son contenu, on le télécharge directement
+      if(!payload.content && payload.download_url){
+        const raw = await fetch(payload.download_url, {headers: apiHeaders(cfg), cache:"no-store"});
+        if(!raw.ok) throw new Error(`Téléchargement de ${relativePath} impossible (${raw.status})`);
+        return {sha: payload.sha, data: JSON.parse(await raw.text()), path: relativePath};
+      }
       const content = base64ToUtf8(payload.content || "");
       return {sha: payload.sha, data: JSON.parse(content), path: relativePath};
     }
     return null; // 404 sur les deux emplacements candidats : ce canal n'existe pas encore côté Assistant
   }
 
+  // traduction des erreurs GitHub les plus courantes
+  function explainError(error){
+    const s = error && error.status, msg = String(error && error.message || error || "erreur inconnue");
+    if(s === 401) return "la clé est refusée : expirée, révoquée ou mal copiée. Crée une nouvelle clé (fine-grained) et colle-la dans les réglages. " + msg;
+    if(s === 403) return "la clé n’a pas le droit de lire ce dépôt : dans les réglages de la clé sur GitHub, ajoute ce dépôt (Repository access) avec « Contents : Read and write ». " + msg;
+    if(s === 404) return "dépôt ou chemin introuvable : vérifie le propriétaire, le nom du dépôt et la branche. " + msg;
+    if(/Failed to fetch|NetworkError|Load failed/i.test(msg)) return "pas de connexion à GitHub (réseau, ou extension qui bloque api.github.com). " + msg;
+    return msg;
+  }
   function afterMerge(){
     try{
       if(typeof window.normalizeOldPointDetails === "function") window.normalizeOldPointDetails();
@@ -299,15 +320,16 @@
     const cfg = config();
     let totalPoints = 0;
     let failedChannels = [];
+    let firstError = null;
 
     // Tous les canaux en parallèle (au lieu d'un par un) : la synchro
     // d'ouverture est terminée en une ou deux secondes.
     const results = await Promise.all(CHANNEL_CODES.map(code =>
-      fetchChannelFile(cfg, code).then(file => ({code, file}), () => ({code, failed:true}))
+      fetchChannelFile(cfg, code).then(file => ({code, file}), error => ({code, failed:true, error}))
     ));
     const fresh = {};
     results.forEach(result => {
-      if(result.failed){ failedChannels.push(result.code); return; }
+      if(result.failed){ failedChannels.push(result.code); if(!firstError) firstError = result.error; return; }
       if(!result.file) return; // 404 : ce canal n'existe pas encore côté Assistant
       totalPoints += mergeChannelIntoPointDetails(result.file.data);
       fresh[result.code] = result.file.data;
@@ -332,7 +354,7 @@
     }
 
     const failSuffix = failedChannels.length
-      ? ` (${failedChannels.length} canal/canaux en erreur : ${failedChannels.join(", ")})`
+      ? ` (${failedChannels.length} canal/canaux en erreur : ${failedChannels.join(", ")}) — ${explainError(firstError)}`
       : "";
     setStatus(
       totalPoints > 0

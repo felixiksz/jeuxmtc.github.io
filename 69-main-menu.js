@@ -423,13 +423,13 @@
     if(!ranges.length) return;
     // rubriques repliées qui contiennent le mot : ouvertes
     ranges.forEach(r => { const d = r.startContainer.parentElement.closest("details"); if(d) d.open = true; });
-    if(window.CSS && CSS.highlights && window.Highlight){
-      CSS.highlights.set("mtc-search", new Highlight(...ranges));
-    }else{
-      ranges.slice().reverse().forEach(r => { const m = document.createElement("mark"); m.className = "mtc-search-mark"; try{ r.surroundContents(m); }catch(e){} });
-    }
-    const first = ranges[0].startContainer.parentElement;
-    if(first && first.scrollIntoView) setTimeout(() => first.scrollIntoView({block:"center", behavior:"smooth"}), 60);
+    // balises <mark> (marche dans tous les navigateurs, y compris Firefox et les tablettes) ; de la fin vers le début
+    // pour que les positions dans un même texte restent justes
+    const marks = [];
+    ranges.slice().reverse().forEach(r => { const m = document.createElement("mark"); m.className = "mtc-search-mark"; try{ r.surroundContents(m); marks.unshift(m); }catch(e){} });
+    // la fiche descend jusqu'au premier mot trouvé (après l'ouverture du panneau)
+    const first = marks[0];
+    if(first) [80, 700].forEach(ms => setTimeout(() => { if(first.isConnected) first.scrollIntoView({block:"center", behavior:ms > 100 ? "smooth" : "auto"}); }, ms));
   }
   function watchSearchHighlight(){
     const content = byId("pointPanelContent");
