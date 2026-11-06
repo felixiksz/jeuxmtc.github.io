@@ -992,7 +992,8 @@ function pointFunctionsSearchText(point){
 
 function pointIndicationsSearchText(point){
   const details = POINT_DETAILS[point] || {};
-  return flattenSearchText(details.indications || "");
+  const extra = Array.isArray(details.__githubExtraFields) ? details.__githubExtraFields.map(f => f && f.value || "").join(" ") : "";
+  return flattenSearchText(details.indications || "") + (extra ? " " + flattenSearchText(extra) : "");
 }
 
 function pointNotesSearchText(point){
@@ -4168,6 +4169,7 @@ function hideSupportBloodDrop(){
 
   if(supportBloodDropFrame){
     cancelAnimationFrame(supportBloodDropFrame);
+    clearTimeout(supportBloodDropFrame);
     supportBloodDropFrame = null;
   }
 
@@ -4393,8 +4395,14 @@ function stepSupportBloodDropPhysics(time){
     "important"
   );
 
-  supportBloodDropFrame =
-    requestAnimationFrame(stepSupportBloodDropPhysics);
+  if(drop.classList.contains("support-blooddrop-idle")){
+    supportBloodDropFrame = setTimeout(() => {
+      supportBloodDropFrame = requestAnimationFrame(stepSupportBloodDropPhysics);
+    }, 250);
+  }else{
+    supportBloodDropFrame =
+      requestAnimationFrame(stepSupportBloodDropPhysics);
+  }
 }
 
 function maybeReplaySupportCoffeeReminder(){

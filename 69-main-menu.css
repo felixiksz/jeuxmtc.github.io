@@ -80,6 +80,10 @@ body.mtc-menu-open #mtcBottomIcons, body.mtc-menu-loading #mtcBottomIcons{ displ
 /* téléphone : pas la place pour « Soutenir le jeu » à côté des icônes ; la goutte reste */
 @media (max-width:560px){ #mtcSupportLabel{ display:none !important; } }
 
+/* mot cherché, surligné en fluo dans la fiche */
+::highlight(mtc-search){ background-color:#e4ff3d; color:#000; }
+mark.mtc-search-mark{ background:#e4ff3d; color:#000; border-radius:2px; }
+
 /* le grand menu */
 #mtcMainMenu{
   position:fixed; inset:0; z-index:9500; display:none;

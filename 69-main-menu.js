@@ -386,6 +386,61 @@
     box.addEventListener("click", e => { const b = e.target.closest("[data-for]"); if(b) clickId(b.dataset.for); });
     document.body.appendChild(box);
   }
+  // mot cherché surligné en fluo dans la fiche ouverte (sans tenir compte des accents ni des majuscules)
+  const fold = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  function searchWords(){
+    const panel = byId("advancedSearchPanel");
+    const input = panel && [...panel.querySelectorAll('input[type="search"], input[type="text"], input:not([type])')].find(i => i.value.trim());
+    return input ? fold(input.value).split(/[\s,;]+/).filter(w => w.length >= 3) : [];
+  }
+  function clearSearchMarks(root){
+    if(window.CSS && CSS.highlights) CSS.highlights.delete("mtc-search");
+    (root || document).querySelectorAll("mark.mtc-search-mark").forEach(m => m.replaceWith(...m.childNodes));
+  }
+  function highlightFiche(){
+    const content = byId("pointPanelContent");
+    if(!content) return;
+    clearSearchMarks(content);
+    const words = searchWords();
+    if(!words.length) return;
+    const ranges = [];
+    const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {acceptNode:n =>
+      n.parentElement.closest("script, style, textarea, button, .mtc-contrib") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+    for(let n = walker.nextNode(); n; n = walker.nextNode()){
+      // texte sans accents, avec la position de chaque caractère dans le texte d'origine
+      let flat = "", map = [];
+      for(let i = 0; i < n.data.length; i++){ const f = fold(n.data[i]); for(const c of f){ flat += c; map.push(i); } }
+      words.forEach(w => {
+        let at = flat.indexOf(w);
+        while(at >= 0){
+          const r = document.createRange();
+          r.setStart(n, map[at]); r.setEnd(n, map[at + w.length - 1] + 1);
+          ranges.push(r);
+          at = flat.indexOf(w, at + w.length);
+        }
+      });
+    }
+    if(!ranges.length) return;
+    // rubriques repliées qui contiennent le mot : ouvertes
+    ranges.forEach(r => { const d = r.startContainer.parentElement.closest("details"); if(d) d.open = true; });
+    if(window.CSS && CSS.highlights && window.Highlight){
+      CSS.highlights.set("mtc-search", new Highlight(...ranges));
+    }else{
+      ranges.slice().reverse().forEach(r => { const m = document.createElement("mark"); m.className = "mtc-search-mark"; try{ r.surroundContents(m); }catch(e){} });
+    }
+    const first = ranges[0].startContainer.parentElement;
+    if(first && first.scrollIntoView) setTimeout(() => first.scrollIntoView({block:"center", behavior:"smooth"}), 60);
+  }
+  function watchSearchHighlight(){
+    const content = byId("pointPanelContent");
+    if(!content || content.dataset.mtcSearchMark) return;
+    content.dataset.mtcSearchMark = "1";
+    let timer = 0;
+    const later = () => { clearTimeout(timer); timer = setTimeout(highlightFiche, 120); };
+    new MutationObserver(later).observe(content, {childList:true});
+    const panel = byId("advancedSearchPanel");
+    if(panel) panel.addEventListener("input", later);
+  }
   function watchSearchFocus(){
     const panel = byId("advancedSearchPanel");
     if(!panel || panel.dataset.mtcFocusWatch) return;
@@ -527,7 +582,8 @@
     paintStreak();
     setTimeout(maybeAskSupport, 2500);
     ensureSupportLabel();
-    setInterval(ensureSupportLabel, 700);
+    setInterval(() => { if(!document.hidden) ensureSupportLabel(); }, 1500);
+    watchSearchHighlight();
     window.addEventListener("resize", ensureSupportLabel);
     const badge = byId("dailyStreakBadge");
     if(badge) new MutationObserver(paintStreak).observe(badge, {childList:true, subtree:true, characterData:true});
