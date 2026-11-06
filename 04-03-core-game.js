@@ -5658,9 +5658,15 @@ function getEditablePointNote(point, originalNote){
   const saved =
     localStorage.getItem(noteStorageKey(point));
 
-  return saved !== null
-    ? saved
-    : (originalNote || "");
+  if(saved === null) return originalNote || "";
+  // note du cours + note perso : la note perso ne fait plus disparaître celle du cours ;
+  // seules les lignes du cours absentes de la note perso sont ajoutées, au-dessus
+  const original = String(originalNote || "").trim();
+  if(!original) return saved;
+  const flat = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const have = flat(saved);
+  const missing = original.split("\n").filter(line => { const k = flat(line); return k && !have.includes(k); }).join("\n").trim();
+  return missing ? missing + "\n\n" + saved : saved;
 }
 
 function formatNoteTextForDisplay(value){

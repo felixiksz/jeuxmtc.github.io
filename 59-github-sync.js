@@ -314,6 +314,7 @@
     });
 
     afterMerge();
+    const pulled = pullPersonalFields(fresh);
 
     syncInFlight = false;
     setBusy(false);
@@ -335,10 +336,48 @@
       : "";
     setStatus(
       totalPoints > 0
-        ? `Synchronisé : ${totalPoints} point(s) mis à jour depuis GitHub${failSuffix}.`
+        ? `Synchronisé : ${totalPoints} point(s) mis à jour depuis GitHub${pulled ? ", " + pulled + " note(s) ou association(s) perso récupérée(s)" : ""}${failSuffix}.`
         : `Aucune donnée récupérée${failSuffix || " — vérifie le token, le dépôt et le nom de la branche."}`
     );
     updateLastSyncLabel();
+  }
+
+  // Notes et associations perso : jusqu'ici seulement envoyées, jamais relues (un autre appareil ne les
+  // recevait pas). Pour chaque point : si ce navigateur n'a pas changé sa valeur depuis la dernière synchro,
+  // il prend celle de GitHub ; s'il l'a changée et GitHub non, il la renvoie ; si les deux ont changé,
+  // il garde les deux textes (rien n'est perdu) et renvoie le résultat.
+  const PERSONAL = {note:"mtc_point_note_", associations:"mtc_point_associations_"};
+  function pullPersonalFields(channels){
+    let n = 0;
+    const flat = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+    Object.values(channels || {}).forEach(list => (list || []).forEach(entry => {
+      const point = normalizePointCode(entry && entry.point);
+      if(!point) return;
+      Object.entries(PERSONAL).forEach(([field, prefix]) => {
+        const remote = entry[field] == null ? "" : String(entry[field]);
+        let local = null;
+        try{ local = localStorage.getItem(prefix + point); }catch(error){}
+        const base = storageGet(baselineKey(field, point));
+        if(!remote.trim()) return;
+        if(local === remote){ rememberBaseline(field, point, remote); return; }
+        if(local == null || !local.trim() || local === base){
+          try{ localStorage.setItem(prefix + point, remote); }catch(error){}
+          rememberBaseline(field, point, remote); n++;
+          return;
+        }
+        if(remote === base){ schedulePush(point, field, local); return; }
+        // modifié des deux côtés : on garde les deux (les lignes déjà présentes ne sont pas répétées)
+        const have = flat(local);
+        const extra = remote.split("\n").filter(line => { const k = flat(line); return k && !have.includes(k); }).join("\n").trim();
+        const merged = extra ? local.replace(/\s+$/, "") + "\n\n" + extra : local;
+        try{ localStorage.setItem(prefix + point, merged); }catch(error){}
+        schedulePush(point, field, merged); n++;
+      });
+    }));
+    if(n){
+      try{ if(window.refreshCurrentPointPanel) window.refreshCurrentPointPanel(); }catch(error){}
+    }
+    return n;
   }
 
   // --- Réparation ponctuelle (bug corrigé : la clé poussée était "notes" au
@@ -459,7 +498,10 @@
             rememberBaseline(field, point, retryFinalValue);
           }
         }
-      }catch(retryError){}
+      }catch(retryError){
+        storageSet("mtc_github_sync_last_error", new Date().toISOString() + " — " + point + " (" + field + ") : " + (retryError && retryError.message || retryError));
+        setStatus("Écriture impossible pour " + point + " (" + field + ") : " + (retryError && retryError.message || retryError) + ". Vérifie que la clé a « Contents : Read and write » sur le dépôt.");
+      }
     }
   }
 
@@ -479,6 +521,12 @@
     if(!response.ok) throw new Error(`PUT ${relativePath} a échoué (${response.status})`);
   }
 
+  const pushTimers = {};
+  function schedulePush(point, field, value){
+    const key = field + "|" + point;
+    clearTimeout(pushTimers[key]);
+    pushTimers[key] = setTimeout(() => { delete pushTimers[key]; pushPointFieldToGithub(point, field, value); }, 2000);
+  }
   function wrapWithGithubPush(name, field, valueReader){
     const original = window[name];
     if(typeof original !== "function" || original.__githubPushWrapped) return;
@@ -488,7 +536,7 @@
         if(!isConfigured()) return result;
         const point = valueReader.point(arguments);
         const value = valueReader.value(arguments, point);
-        if(point && value != null) pushPointFieldToGithub(point, field, value);
+        if(point && value != null) schedulePush(point, field, value);
       }catch(error){}
       return result;
     };
@@ -534,7 +582,7 @@
         const point = editable.dataset.acuPointId;
         const rawField = editable.dataset.acuCompareEdit;
         const field = FIELD_MAP[rawField];
-        if(point && field) pushPointFieldToGithub(point, field, editable.innerText || "");
+        if(point && field) schedulePush(point, field, editable.innerText || "");
       }catch(error){}
       return result;
     };
