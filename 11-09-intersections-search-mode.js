@@ -190,9 +190,7 @@
                 placeholder="Ajoute tes remarques personnelles sur ce point..."
               >${escapeHtml(noteValue)}</textarea>
 
-              <div class="point-note-hint">
-                Clique sur le crayon pour écrire. Tes notes restent dans ce navigateur. Tu peux toujours les exporter pour les sauvegarder, puis importer pour les récupérer sur un autre appareil ou navigateur.
-              </div>
+              <div class="point-note-hint"><span class="search-help-wrap"><button type="button" class="search-help" aria-label="Aide">?</button><span class="search-help-text">Clique sur le crayon pour écrire. Tes notes restent dans ce navigateur. Tu peux toujours les exporter pour les sauvegarder, puis importer pour les récupérer sur un autre appareil ou navigateur.</span></span></div>
             </details>
           `;
         }

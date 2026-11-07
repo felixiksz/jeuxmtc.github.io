@@ -84,6 +84,10 @@ body.mtc-menu-open #mtcBottomIcons, body.mtc-menu-loading #mtcBottomIcons{ displ
 ::highlight(mtc-search){ background-color:#e4ff3d; color:#000; }
 mark.mtc-search-mark{ background:#e4ff3d; color:#000; border-radius:2px; }
 
+/* aides des fiches (notes, associations) : rangées derrière un « ? » à droite */
+.point-note-hint, .point-panel .point-association-hint{ text-align:right; opacity:1 !important; margin-top:4px; }
+.point-note-hint .search-help-text, .point-association-hint .search-help-text{ left:auto !important; right:0 !important; transform:none !important; text-align:left; }
+
 /* le grand menu */
 #mtcMainMenu{
   position:fixed; inset:0; z-index:9500; display:none;

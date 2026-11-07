@@ -256,7 +256,7 @@
               title="Modifier les associations avec saisie assistée">${display}</div>
             <button type="button" class="mtc-assisted-edit-pencil" data-assisted-edit-trigger="1" title="Modifier les associations" aria-label="Modifier les associations">✎</button>
           </div>
-          <div class="point-association-hint">Tape le nom ou le code d’un point, puis choisis-le dans les propositions. La correction est enregistrée automatiquement dans ce navigateur.</div>
+          <div class="point-association-hint"><span class="search-help-wrap"><button type="button" class="search-help" aria-label="Aide">?</button><span class="search-help-text">Tape le nom ou le code d’un point, puis choisis-le dans les propositions. La correction est enregistrée automatiquement dans ce navigateur.</span></span></div>
         </div>
       </details>
     `;
@@ -308,9 +308,7 @@
                 placeholder="Ajoute tes remarques personnelles sur ce point..."
               >${safeEscapeHtml(noteValue)}</textarea>
 
-              <div class="point-note-hint">
-                Clique sur le crayon pour écrire. Tes notes restent dans ce navigateur. Tu peux toujours les exporter pour les sauvegarder, puis importer pour les récupérer sur un autre appareil ou navigateur.
-              </div>
+              <div class="point-note-hint"><span class="search-help-wrap"><button type="button" class="search-help" aria-label="Aide">?</button><span class="search-help-text">Clique sur le crayon pour écrire. Tes notes restent dans ce navigateur. Tu peux toujours les exporter pour les sauvegarder, puis importer pour les récupérer sur un autre appareil ou navigateur.</span></span></div>
             </details>
           `;
         }
