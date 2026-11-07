@@ -388,39 +388,78 @@
   }
   // mot cherché surligné en fluo dans la fiche ouverte (sans tenir compte des accents ni des majuscules)
   const fold = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  function searchWords(){
+  function searchTerms(){
     const panel = byId("advancedSearchPanel");
     const input = panel && [...panel.querySelectorAll('input[type="search"], input[type="text"], input:not([type])')].find(i => i.value.trim());
-    return input ? fold(input.value).split(/[\s,;]+/).filter(w => w.length >= 3) : [];
+    if(!input) return null;
+    const q = fold(input.value).replace(/\s+/g, " ").trim();
+    return {phrase:q.includes(" ") ? q : null, words:q.split(/[\s,;]+/).filter(w => w.length >= 3)};
   }
   function clearSearchMarks(root){
     if(window.CSS && CSS.highlights) CSS.highlights.delete("mtc-search");
+    (root || document).querySelectorAll(".mtc-search-excerpt").forEach(x => x.remove());
     (root || document).querySelectorAll("mark.mtc-search-mark").forEach(m => m.replaceWith(...m.childNodes));
+  }
+  // texte sans accents, avec la position de chaque caractère dans le texte d'origine
+  function flatten(text){
+    let flat = "", map = [];
+    for(let i = 0; i < text.length; i++){ const f = fold(text[i]); for(const c of f){ flat += c; map.push(i); } }
+    return {flat, map};
+  }
+  function findIn(text, terms){
+    const {flat, map} = flatten(text), hits = [];
+    terms.forEach(w => {
+      let at = flat.indexOf(w);
+      while(at >= 0){ hits.push([map[at], map[at + w.length - 1] + 1]); at = flat.indexOf(w, at + w.length); }
+    });
+    return hits.sort((a, b) => a[0] - b[0]);
+  }
+  function collect(content, terms){
+    const ranges = [], areas = [];
+    const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {acceptNode:n =>
+      n.parentElement.closest("script, style, textarea, button, .mtc-contrib, .mtc-search-excerpt") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+    for(let n = walker.nextNode(); n; n = walker.nextNode()){
+      findIn(n.data, terms).forEach(([s, e]) => { const r = document.createRange(); r.setStart(n, s); r.setEnd(n, e); ranges.push(r); });
+    }
+    // champs modifiables (zones de texte) : on ne peut pas y surligner, on montre un extrait au-dessus
+    content.querySelectorAll("textarea").forEach(ta => {
+      if(ta.closest(".mtc-contrib") || !ta.value) return;
+      const hits = findIn(ta.value, terms);
+      if(hits.length) areas.push({ta, hits});
+    });
+    return {ranges, areas};
+  }
+  function excerptHtml(text, hits){
+    const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    return hits.slice(0, 3).map(([s, e]) => {
+      let a = Math.max(0, s - 70), b = Math.min(text.length, e + 70);
+      // l'extrait commence et finit sur des mots entiers
+      if(a > 0){ const sp = text.slice(a, s).search(/\s/); if(sp >= 0) a += sp + 1; }
+      if(b < text.length){ const sp = text.slice(e, b).search(/\s\S*$/); if(sp >= 0) b = e + sp; }
+      return (a > 0 ? "… " : "") + esc(text.slice(a, s)) + '<mark class="mtc-search-mark">' + esc(text.slice(s, e)) + "</mark>" + esc(text.slice(e, b)) + (b < text.length ? " …" : "");
+    }).join("<br>");
   }
   function highlightFiche(){
     const content = byId("pointPanelContent");
     if(!content) return;
     clearSearchMarks(content);
-    const words = searchWords();
-    if(!words.length) return;
-    const ranges = [];
-    const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {acceptNode:n =>
-      n.parentElement.closest("script, style, textarea, button, .mtc-contrib") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
-    for(let n = walker.nextNode(); n; n = walker.nextNode()){
-      // texte sans accents, avec la position de chaque caractère dans le texte d'origine
-      let flat = "", map = [];
-      for(let i = 0; i < n.data.length; i++){ const f = fold(n.data[i]); for(const c of f){ flat += c; map.push(i); } }
-      words.forEach(w => {
-        let at = flat.indexOf(w);
-        while(at >= 0){
-          const r = document.createRange();
-          r.setStart(n, map[at]); r.setEnd(n, map[at + w.length - 1] + 1);
-          ranges.push(r);
-          at = flat.indexOf(w, at + w.length);
-        }
-      });
-    }
-    if(!ranges.length) return;
+    const terms = searchTerms();
+    if(!terms || (!terms.phrase && !terms.words.length)) return;
+    // l'expression entière d'abord ; ses mots un par un seulement si elle n'est nulle part dans la fiche
+    let found = terms.phrase ? collect(content, [terms.phrase]) : {ranges:[], areas:[]};
+    if(!found.ranges.length && !found.areas.length && terms.words.length) found = collect(content, terms.words);
+    const {ranges, areas} = found;
+    if(!ranges.length && !areas.length) return;
+    const excerpts = areas.map(({ta, hits}) => {
+      const box = document.createElement("div");
+      box.className = "mtc-search-excerpt";
+      box.innerHTML = excerptHtml(ta.value, hits);
+      ta.parentNode.insertBefore(box, ta);
+      const d = ta.closest("details"); if(d) d.open = true;
+      // la zone de texte défile aussi jusqu'au mot
+      try{ ta.scrollTop = Math.max(0, ta.scrollHeight * hits[0][0] / ta.value.length - ta.clientHeight / 2); }catch(e){}
+      return box;
+    });
     // rubriques repliées qui contiennent le mot : ouvertes
     ranges.forEach(r => { const d = r.startContainer.parentElement.closest("details"); if(d) d.open = true; });
     // balises <mark> (marche dans tous les navigateurs, y compris Firefox et les tablettes) ; de la fin vers le début
@@ -428,7 +467,7 @@
     const marks = [];
     ranges.slice().reverse().forEach(r => { const m = document.createElement("mark"); m.className = "mtc-search-mark"; try{ r.surroundContents(m); marks.unshift(m); }catch(e){} });
     // la fiche descend jusqu'au premier mot trouvé (après l'ouverture du panneau)
-    const first = marks[0];
+    const first = [marks[0], excerpts[0]].filter(Boolean).sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1)[0];
     if(first) [80, 700].forEach(ms => setTimeout(() => { if(first.isConnected) first.scrollIntoView({block:"center", behavior:ms > 100 ? "smooth" : "auto"}); }, ms));
   }
   function watchSearchHighlight(){

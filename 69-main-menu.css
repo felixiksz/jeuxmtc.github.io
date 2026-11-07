@@ -83,6 +83,7 @@ body.mtc-menu-open #mtcBottomIcons, body.mtc-menu-loading #mtcBottomIcons{ displ
 /* mot cherché, surligné en fluo dans la fiche */
 ::highlight(mtc-search){ background-color:#e4ff3d; color:#000; }
 mark.mtc-search-mark{ background:#e4ff3d; color:#000; border-radius:2px; }
+.mtc-search-excerpt{ margin:4px 0 6px; font-size:.86em; line-height:1.4; }
 
 /* aides des fiches (notes, associations) : rangées derrière un « ? » à droite */
 .point-note-hint, .point-panel .point-association-hint{ text-align:right; opacity:1 !important; margin-top:4px; }

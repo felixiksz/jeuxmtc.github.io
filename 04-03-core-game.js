@@ -1066,11 +1066,14 @@ function pointSearchHaystack(point, scopes){
   );
 }
 
-function pointMatchesKeywords(point, keywords, scopes){
-  const query = normalizeSearchText(keywords).trim();
+function pointMatchesKeywords(point, keywords, scopes, mode){
+  const query = normalizeSearchText(keywords).replace(/\s+/g, " ").trim();
   if(!query) return true;
 
   const haystack = pointSearchHaystack(point, scopes);
+
+  // plusieurs mots : l'expression telle quelle (pour mettre ces fiches en tête des résultats)
+  if(mode === "phrase") return haystack.replace(/\s+/g, " ").includes(query);
 
   return query
     .split(/\s+/)
@@ -1206,11 +1209,16 @@ function getAdvancedSearchFilters(){
 function advancedSearchResults(){
   const filters = getAdvancedSearchFilters();
 
-  return allSearchPoints()
+  const found = allSearchPoints()
     .filter(point => pointMatchesKeywords(point, filters.keywords, filters.scopes))
     .filter(point => pointMatchesCategory(point, filters.category))
     .filter(point => pointMatchesCanal(point, filters.canal))
     .filter(point => pointMatchesCorrespondenceCanal(point, filters.correspondences));
+
+  // plusieurs mots : les fiches où ils se suivent (« chong mai ») passent en tête
+  if(!normalizeSearchText(filters.keywords).trim().includes(" ")) return found;
+  const exact = new Set(found.filter(point => pointMatchesKeywords(point, filters.keywords, filters.scopes, "phrase")));
+  return [...found.filter(point => exact.has(point)), ...found.filter(point => !exact.has(point))];
 }
 
 function searchPointTitle(point){

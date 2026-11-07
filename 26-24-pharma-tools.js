@@ -854,11 +854,13 @@
     return "";
   }
 
-  function herbMatchesKeywords(herb, keywords, scopes){
+  function herbMatchesKeywords(herb, keywords, scopes, mode){
     const query = normalizeText(keywords);
     if(!query) return true;
     const activeScopes = Array.isArray(scopes) && scopes.length ? scopes : SEARCH_SCOPES;
     const haystack = normalizeText(activeScopes.map(scope => herbSearchTextForScope(herb, scope)).join(" "));
+    // plusieurs mots : l'expression telle quelle (pour mettre ces fiches en tête des résultats)
+    if(mode === "phrase") return haystack.includes(query);
     return query.split(/\s+/).filter(Boolean).every(word => haystack.includes(word));
   }
 
@@ -883,6 +885,9 @@
 
   function pharmaSearchResults(){
     const filters = getPharmaSearchFilters();
+    // plusieurs mots : les substances où ils se suivent (« chong mai ») passent en tête
+    const several = normalizeText(filters.keywords).includes(" ");
+    const exact = herb => several && herbMatchesKeywords(herb, filters.keywords, filters.scopes, "phrase") ? 0 : 1;
     return allHerbs()
       .filter(herb => herbMatchesKeywords(herb, filters.keywords, filters.scopes))
       .filter(herb => !filters.classCode || String(herb.classCode) === filters.classCode)
@@ -891,7 +896,7 @@
       .filter(herb => herbMatchesFilterValues(herb, "toxicity", filters.toxicityActive ? filters.toxicities : [], filters.toxicityLogic))
       .filter(herb => herbMatchesFilterValues(herb, "tropism", filters.tropismActive ? filters.tropisms : [], filters.tropismLogic))
       .filter(herb => herbMatchesActions(herb, filters.actionActive ? filters.actions : [], filters.actionLogic))
-      .sort((a,b) => normalizeText(herbLabel(a)).localeCompare(normalizeText(herbLabel(b)), "fr"));
+      .sort((a,b) => exact(a) - exact(b) || normalizeText(herbLabel(a)).localeCompare(normalizeText(herbLabel(b)), "fr"));
   }
 
   function scopeCheckboxHtml(scope, label, selected){
