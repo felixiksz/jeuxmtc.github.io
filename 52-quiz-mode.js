@@ -702,11 +702,19 @@
       handleAction(actionButton.getAttribute("data-quiz-action"), actionButton);
     }, true);
 
+    // une seule vérification à la fois, un quart de seconde après la dernière série de changements :
+    // avant, chaque petite modification de la page relisait tout le suivi des points
+    // (des dizaines de fois à l'ouverture d'une fiche, très lent sur tablette)
+    let checkTimer = 0;
     const observer = new MutationObserver(() => {
-      ensureQuizButton();
-      removeQuizButtonIfNeeded();
-      ensureDueReviewButton();
-      maybeResumeQuizAfterPanelClose();
+      if(checkTimer) return;
+      checkTimer = window.setTimeout(() => {
+        checkTimer = 0;
+        ensureQuizButton();
+        removeQuizButtonIfNeeded();
+        ensureDueReviewButton();
+        maybeResumeQuizAfterPanelClose();
+      }, 250);
     });
     observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
     window.setTimeout(ensureQuizButton, 400);
