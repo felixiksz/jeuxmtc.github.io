@@ -87,6 +87,7 @@ const CORE_ASSETS = [
   "soutiens.js",
   "69-main-menu.js",
   "69-main-menu.css",
+  "70-progress-sync.js",
   "fonts/archivo-300-800-normal-latin-ext.woff2",
   "fonts/archivo-300-800-normal-latin.woff2",
   "fonts/fonts.css",

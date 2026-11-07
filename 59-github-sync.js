@@ -45,6 +45,8 @@
     const cfg = config();
     return Boolean(cfg.token && cfg.owner && cfg.repo);
   }
+  // réglages partagés avec la synchro de la progression (70-progress-sync.js)
+  window.mtcGithubSyncConfig = () => isConfigured() ? config() : null;
 
   // Chemin confirmé côté Assistant Diagnostic via `git ls-tree` sur leur dépôt :
   // pas de dossier "data/" à la racine.

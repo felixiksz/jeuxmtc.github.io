@@ -89,6 +89,7 @@
     return next;
   }
   window.mtcRecordDailyPlay = recordTodaysPlaySilently;
+  window.mtcRenderStreakBadge = () => renderBadge(loadStreak());
 
   function wrapRecordStatsGameFinished(){
     const original = window.recordStatsGameFinished;
