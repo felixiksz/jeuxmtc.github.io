@@ -13,7 +13,7 @@
 
   const TAB_KEY = "mtc_main_menu_tab_v1";
   // numéro de version du jeu : majeur.mineur (le premier chiffre change pour une refonte, le second pour des ajouts)
-  const MTC_VERSION = "2.1";
+  const MTC_VERSION = "2.2";
   window.MTC_VERSION = MTC_VERSION;
   // soutiens du projet : soutiens.js, modifiable en mode admin (Réglages → Soutiens), publié sur le dépôt
   const supporters = () => (Array.isArray(window.MTC_SUPPORTERS) ? window.MTC_SUPPORTERS : []).map(s => String(s).trim()).filter(Boolean);
