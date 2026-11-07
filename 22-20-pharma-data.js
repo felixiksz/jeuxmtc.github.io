@@ -1599,7 +1599,7 @@
     "posologie": "6 à 15 g",
     "actions": [
       "Calmer l'Esprit/le Shen",
-      "Tranquiliser le cœur",
+      "Tranquilliser le cœur",
       "Nourrir le Foie",
       "Retenir la transpiration"
     ],
@@ -2846,8 +2846,8 @@
     "posologie": "5 à 15g",
     "actions": [
       "Faire s'écouler l'eau",
-      "Dégager a strangurie",
-      "Exsuder l'Hulidité",
+      "Dégager la strangurie",
+      "Exsuder l'Humidité",
       "Arrêter la diarrhée",
       "Clarifier le Foie",
       "Eclaircir les yeux",
@@ -2908,10 +2908,10 @@
     "posologie": "10 à 15g",
     "actions": [
       "Faire s'écouler l'eau",
-      "Exsuder l'Hulidité",
+      "Exsuder l'Humidité",
       "Soutenir la Rate",
       "Harmoniser l'Estomac",
-      "Tranquiliser le cœur",
+      "Tranquilliser le cœur",
       "Calmer le Shen"
     ],
     "esprit": "",
@@ -2938,7 +2938,7 @@
     "posologie": "10 à 20g",
     "actions": [
       "Faire s'écouler l'eau",
-      "Dégager a strangurie",
+      "Dégager la strangurie",
       "Clarifier la Chaleur",
       "Libérer la Canicule",
       "Rassembler l'Humidité",
@@ -3078,8 +3078,8 @@
     "posologie": "6 à 12g",
     "actions": [
       "Faire s'écouler l'eau",
-      "Dégager a strangurie",
-      "Exsuder l'Hulidité",
+      "Dégager la strangurie",
+      "Exsuder l'Humidité",
       "Purger la Chaleur"
     ],
     "esprit": "",
@@ -3105,7 +3105,7 @@
     "tropisme": "Rate, Rein, Poumon, Vessie",
     "posologie": "10 à 15g",
     "actions": [
-      "Exsuder l'Hulidité",
+      "Exsuder l'Humidité",
       "Faire s'écouler l'urine"
     ],
     "esprit": "",
@@ -3327,7 +3327,7 @@
       "Calmer le Yang (Foie ou Cœur)",
       "Recevoir le Qi (Na Qi)",
       "Equilibrer le Foie",
-      "Tranquiliser la frayeur",
+      "Tranquilliser la frayeur",
       "Calmer l'Esprit",
       "Affiner l'ouïe",
       "Eclaircir la vue",
@@ -3357,7 +3357,7 @@
     "actions": [
       "Calmer le Yang (Foie ou Cœur)",
       "Equilibrer le Foie",
-      "Tranquiliser la frayeur",
+      "Tranquilliser la frayeur",
       "Calmer l'Esprit",
       "Retenir la transpiration",
       "Affermir le Jing",
@@ -5035,7 +5035,7 @@
     "hanzi": "山药",
     "nom": "Rhizome séché de l'igname de Chine",
     "nature": "Neutre / Equilibré",
-    "saveur": "Doux",
+    "saveur": "Doux (Astringent selon certain.es)",
     "tropisme": "Poumon, Rate, Reins",
     "posologie": "15 à 250g",
     "actions": [
