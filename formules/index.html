@@ -45,8 +45,6 @@
   .role{ display:inline-block; font-size:.72rem; font-weight:800; color:#fff; border-radius:999px; padding:1px 8px; white-space:nowrap; }
   .role.jun{ background:var(--jun); } .role.chen{ background:var(--chen); } .role.zuo{ background:var(--zuo); } .role.shi{ background:var(--shi); } .role.none{ background:#999; }
   .rnote{ display:block; font-size:.72rem; color:var(--muted); margin-top:2px; }
-  details.verif{ margin-top:16px; background:#fff8e1; border:1px solid #f0dca0; border-radius:10px; padding:6px 10px; font-size:.85rem; }
-  details.verif summary{ cursor:pointer; font-weight:700; color:#8a6200; }
   .stats{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:.8rem; color:var(--muted); margin-bottom:10px; }
   .msg{ padding:30px 10px; color:var(--muted); }
   /* jeu */
@@ -115,7 +113,7 @@
 <script src="../beta-config.js?v=20261005-c"></script>
 <script src="../beta-gate.js?v=20261007-b"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261005-l"></script>
+<script src="../beta-modules.js?v=20261107-a"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -270,7 +268,6 @@
   const section = (title, text) => text ? "<h3>" + esc(title) + '</h3><p class="txt">' + esc(readable(text)) + "</p>" : "";
   function renderBrowse(){
     const f = FORMS.find(x => x.id === current) || FORMS[0];
-    const verif = Array.isArray(f.a_verifier) ? f.a_verifier.filter(Boolean) : (f.a_verifier ? [f.a_verifier] : []);
     main.innerHTML = '<select class="pick" id="pick">' + FORMS.map(x => '<option value="' + esc(x.id) + '"' + (x.id === f.id ? " selected" : "") + ">" + esc(fname(x)) + "</option>").join("") + "</select>" +
       '<div class="stats">' + FORMS.length + " formules · " + allItems.length + " substances citées, dont " + linked + " reliées à une fiche de la pharmacopée du jeu (survol : nature, saveur, tropisme)</div>" +
       "<h2>" + esc(fname(f)) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
@@ -283,8 +280,7 @@
       section("Tableau clinique", f.tableau_clinique) +
       section("Contre-indications et précautions", f.contre_indications_precautions) +
       section("Modifications courantes", f.modifications_courantes) +
-      section("Comparaison avec des formules proches", f.comparaison_formules_proches) +
-      (verif.length ? '<details class="verif"><summary>À vérifier (' + verif.length + ")</summary><ul>" + verif.map(v => "<li>" + esc(typeof v === "string" ? v : JSON.stringify(v)) + "</li>").join("") + "</ul></details>" : "");
+      section("Comparaison avec des formules proches", f.comparaison_formules_proches);
     const pick = document.getElementById("pick");
     pick.addEventListener("change", () => { current = pick.value; renderBrowse(); renderNav(); });
   }
