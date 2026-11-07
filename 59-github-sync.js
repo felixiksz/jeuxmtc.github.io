@@ -380,9 +380,20 @@
         let local = null;
         try{ local = localStorage.getItem(prefix + point); }catch(error){}
         const base = storageGet(baselineKey(field, point));
-        if(!remote.trim()) return;
+        const dirty = isDirty(field, point);
+        if(!remote.trim()){
+          // vidée sur un autre appareil (elle avait déjà été synchronisée) : vidée ici aussi
+          if(!dirty && base.trim() && local != null && local.trim()){
+            keepReplaced(field, point, local);
+            try{ localStorage.removeItem(prefix + point); }catch(error){}
+            rememberBaseline(field, point, ""); n++;
+          }
+          return;
+        }
         if(local === remote){ rememberBaseline(field, point, remote); return; }
-        if(local == null || !local.trim() || local === base){
+        if(!dirty || local == null || !local.trim() || local === base){
+          // rien de modifié ici depuis le dernier envoi : la version de GitHub remplace (suppressions comprises)
+          if(local != null && local.trim()) keepReplaced(field, point, local);
           try{ localStorage.setItem(prefix + point, remote); }catch(error){}
           rememberBaseline(field, point, remote); n++;
           return;
@@ -486,6 +497,22 @@
     storageSet(baselineKey(field, point), finalValue == null ? "" : String(finalValue));
   }
 
+  // « modifié sur cet appareil, pas encore envoyé » : seul cas où la version locale passe avant GitHub
+  function dirtyKey(field, point){ return `mtc_github_sync_dirty_${field}_${point}`; }
+  function isDirty(field, point){ return !!storageGet(dirtyKey(field, point)); }
+  function markSent(field, point){
+    if(pushTimers[field + "|" + point]) return; // une nouvelle frappe attend encore son envoi
+    try{ localStorage.removeItem(dirtyKey(field, point)); }catch(error){}
+  }
+  // ancienne version remplacée par celle de GitHub : gardée de côté (les 200 dernières), au cas où
+  function keepReplaced(field, point, value){
+    try{
+      const list = JSON.parse(localStorage.getItem("mtc_github_sync_replaced_v1") || "[]");
+      list.push({date:new Date().toISOString(), point, field, value});
+      localStorage.setItem("mtc_github_sync_replaced_v1", JSON.stringify(list.slice(-200)));
+    }catch(error){}
+  }
+
   async function pushPointFieldToGithub(point, field, value){
     if(!isConfigured()) return;
     const code = String(point || "").match(/^[A-Za-z]+/);
@@ -504,6 +531,7 @@
 
       await putChannelFile(cfg, file.path, file.data, file.sha, `Jeu MTC : mise à jour ${field} de ${point}`);
       rememberBaseline(field, point, finalValue);
+      markSent(field, point);
     }catch(error){
       // Une seule retentative en cas de conflit (SHA périmé par une écriture
       // concurrente côté Assistant) ; l'écriture locale a de toute façon déjà
@@ -518,6 +546,7 @@
             retryEntry[field] = retryFinalValue;
             await putChannelFile(cfg, retryFile.path, retryFile.data, retryFile.sha, `Jeu MTC : mise à jour ${field} de ${point}`);
             rememberBaseline(field, point, retryFinalValue);
+            markSent(field, point);
           }
         }
       }catch(retryError){
@@ -546,6 +575,7 @@
   const pushTimers = {};
   function schedulePush(point, field, value){
     const key = field + "|" + point;
+    storageSet(dirtyKey(field, point), "1");
     clearTimeout(pushTimers[key]);
     pushTimers[key] = setTimeout(() => { delete pushTimers[key]; pushPointFieldToGithub(point, field, value); }, 2000);
   }
@@ -747,6 +777,14 @@
         window.setTimeout(() => { if(isConfigured()) syncFromGitHub(); }, 400);
       });
     }
+    let lastAuto = Date.now();
+    const syncOnReturn = () => {
+      if(document.hidden || !isConfigured() || Date.now() - lastAuto < 60000) return;
+      lastAuto = Date.now();
+      syncFromGitHub();
+    };
+    document.addEventListener("visibilitychange", syncOnReturn);
+    window.addEventListener("focus", syncOnReturn);
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, {once:true});
