@@ -24,3 +24,4 @@
   details.balsyst summary{ cursor:pointer; font-weight:700; }
   details.balsyst table{ border-collapse:collapse; margin-top:8px; }
   details.balsyst td, details.balsyst th{ border-bottom:1px solid var(--hair, #ddd); padding:3px 10px 3px 0; text-align:left; }
+  #balVal{ display:none !important; }   /* validation automatique */

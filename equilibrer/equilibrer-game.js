@@ -63,7 +63,7 @@ window.mtcEquilibrer = function(main){
       }
       if(B.aff.every(a => ALL.some(b => links(b, a).length))) break;
     }
-    B.pick = new Set(); B.done = false; B.result = "";
+    B.pick = new Set(); B.done = false; B.result = ""; B.round = (B.round || 0) + 1;
   }
   function render(){
     const chip = c => '<b class="balc" style="color:' + ink(c) + '" title="' + esc(NAMES[c]) + '">' + esc(c) + "</b>";
@@ -138,6 +138,11 @@ window.mtcEquilibrer = function(main){
           '<br><span class="balsm">Solutions minimales' + (opt.length > 1 ? " (" + opt.length + ")" : "") + " :</span><br>" + opt.slice(0, 8).map(fmt).join("<br>");
       render();
     });
+    // validation automatique dès que tous les canaux atteints sont équilibrés (le bouton « Valider » reste caché)
+    if(!B.done && B.aff.every(a => [...B.pick].some(b => links(b, a).length))){
+      const sig = B.round + "|" + [...B.pick].sort().join(",");
+      if(B.autoSig !== sig){ B.autoSig = sig; setTimeout(() => { const v = document.getElementById("balVal"); if(v && !B.done && B.round + "|" + [...B.pick].sort().join(",") === sig) v.click(); }, 350); }
+    }
   }
   return {start:newCase, render};
 };

@@ -67,6 +67,11 @@
   table.fam td.blank span{ display:inline-block; min-width:30px; padding:1px 6px; border:1.5px dashed currentColor; border-radius:999px; }
   table.fam td.blank.sel span{ border-style:solid; box-shadow:0 3px 10px var(--shadow-color); }
   .famwrap{ overflow-x:auto; }
+  #fVal, #fSys, #pVal, #gVal, #rVal, #qVal, #mVal{ display:none !important; }   /* validation automatique */
+  table.fam td.res-ok span, table.fam td.res-no span{ display:inline-block; padding:2px 9px; border-radius:999px; border:2px solid; white-space:nowrap; font-weight:800; }
+  table.fam td.res-ok span{ border-color:#1a8a3a; color:#1a8a3a; background:color-mix(in srgb, #1a8a3a 12%, var(--page-bg)); }
+  table.fam td.res-no span{ border-color:#c0392b; color:#c0392b; background:color-mix(in srgb, #c0392b 14%, var(--page-bg)); }
+  table.fam td.res-no s{ text-decoration-thickness:2px; }
   details.rappel{ margin-top:26px; font-size:.86rem; }
   details.rappel summary{ cursor:pointer; font-weight:700; }
   details.rappel ul{ margin:6px 0; padding-left:18px; }
@@ -76,12 +81,12 @@
   details.more summary{ cursor:pointer; font-weight:700; }
   details.more ul{ margin:4px 0; padding-left:18px; }
 </style>
-<link href="../equilibrer/equilibrer.css?v=20261107-a" rel="stylesheet">
+<link href="../equilibrer/equilibrer.css?v=20261108-a" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 <script src="circuits-data.js?v=20261107-a"></script>
-<script src="../equilibrer/equilibrer-game.js?v=20261107-b"></script>
+<script src="../equilibrer/equilibrer-game.js?v=20261108-a"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261107-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
@@ -242,11 +247,22 @@
   function bindPalette(fn){ main.querySelectorAll(".pc").forEach(b => b.addEventListener("click", () => fn(b.dataset.c))); }
   function bindCells(fn){ main.querySelectorAll(".gnode.open").forEach(n => n.addEventListener("click", () => fn(+n.dataset.i))); }
   const on = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener("click", fn); };
+  // validation automatique : dès que la réponse est complète, elle est vérifiée (le bouton « Valider » reste caché)
+  const AUTO = {}, CUR = {};
+  function auto(id, ready, sig){
+    CUR[id] = ready ? sig : null;
+    if(!ready){ AUTO[id] = null; return; }
+    if(AUTO[id] === sig) return;
+    AUTO[id] = sig;
+    setTimeout(() => { if(CUR[id] !== sig) return; const b = document.getElementById(id); if(b) b.click(); }, 350);
+  }
+  let ROUND = 0;
 
   // ================= 1. Fermer le circuit =================
   const F = {two:false};
   try{ F.two = !!JSON.parse(localStorage.getItem(KEY + "_two") || "false"); }catch(e){}
   function newFermer(){
+    F.round = ++ROUND;
     F.c = rnd(BASE);
     F.hide = shuffle([0, 1, 2, 3]).slice(0, F.two ? 2 : 1).sort();
     F.cells = F.c.grid.map((x, i) => F.hide.includes(i) ? null : x);
@@ -311,6 +327,8 @@
         (F.fails ? ' <span class="sm">Circuit fermé après ' + F.fails + " essai" + (F.fails > 1 ? "s" : "") + " manqué" + (F.fails > 1 ? "s" : "") + ".</span>" : "");
       renderFermer();
     });
+    if(F.phase === "place") auto("fVal", F.hide.every(i => F.cells[i]), F.round + "|" + F.cells.join(","));
+    else if(!F.sysRes) auto("fSys", edgesOf(F.cells).every(([i, j]) => (F.sys[i + "-" + j] || []).length >= links(F.cells[i], F.cells[j]).length), F.round + "|" + JSON.stringify(F.sys));
   }
 
   // ================= 2. Les trois plaintes =================
@@ -319,6 +337,7 @@
   const P = {};
   function neighbours(c, x){ return c.grid.filter(y => y !== x && links(x, y).length); }
   function newPlaintes(){
+    P.round = ++ROUND;
     const r = Math.random();
     P.step = "niveau"; P.fails = 0; P.msg = ""; P.pick = new Set(); P.asked = false; P.done = false; P.marks = null;
     if(r < .2){
@@ -421,6 +440,9 @@
       renderPlaintes();
     });
     on("pAsk", () => { P.asked = true; P.msg = ""; renderPlaintes(); });
+    if(P.step === "famille" && !P.done) auto("pVal", P.pick.size >= family(P.A).length + 1, P.round + "f" + [...P.pick].sort());
+    if(P.step === "trans") auto("pVal", P.pick.size >= 2, P.round + "t" + [...P.pick].sort());
+    if(P.step === "circuit") auto("pVal", P.hide.every(i => P.cells[i]), P.round + "c" + P.cells.join(","));
   }
 
   // ================= 3. Propagation =================
@@ -431,7 +453,7 @@
       const X = rnd(ORD), Y = rnd(family(X));
       const Zs = family(Y).filter(z => z !== X && !family(X).includes(z) && both(X, z).filter(w => w !== Y).length);
       if(!Zs.length) continue;
-      Object.assign(G, {X, Y, Z:rnd(Zs), step:1, pick:new Set(), fails:0, msg:"", shown:null, done:false});
+      Object.assign(G, {round:++ROUND, X, Y, Z:rnd(Zs), step:1, pick:new Set(), fails:0, msg:"", shown:null, done:false});
       return;
     }
   }
@@ -510,6 +532,10 @@
       if(G.step === 4){ G.done = true; record("propagation", G.fails === 0); }
       renderPropagation();
     });
+    if(!G.shown){
+      const ill = G.step === 1 ? [X] : G.step === 2 ? [X, Y] : [X, Y, Z];
+      auto("gVal", [...G.pick].filter(c => G.step === 3 || !ill.includes(c)).length >= propAnswer().length, G.round + "|" + G.step + "|" + [...G.pick].sort());
+    }
   }
 
   // ================= 4. Grille des familles =================
@@ -519,6 +545,7 @@
   try{ R.lvl = Math.min(LEVELS.length - 1, Math.max(0, +JSON.parse(localStorage.getItem(KEY + "_gridlvl") || "0") || 0)); }catch(e){}
   const saveLvl = () => { try{ localStorage.setItem(KEY + "_gridlvl", JSON.stringify(R.lvl)); }catch(e){} };
   function newGrille(){
+    R.round = ++ROUND;
     const all = []; ORD.forEach(c => [1, 2, 3, 4, 5].forEach(n => all.push(c + "|" + n)));
     R.gl = R.lvl; R.blank = new Set(shuffle(all).slice(0, LEVELS[R.lvl])); R.fill = {}; R.done = false; R.msg = "";
     R.sel = [...all].find(k => R.blank.has(k));
@@ -529,7 +556,9 @@
       const k = c + "|" + n, ans = mate(c, n);
       if(!R.blank.has(k)) return "<td>" + chip(ans) + "</td>";
       const f = R.fill[k];
-      if(R.done) return '<td>' + (f === ans ? '<span class="ok">' + esc(ans) + "</span>" : '<span class="no">' + (f ? "<s>" + esc(f) + "</s> " : "") + "</span>" + chip(ans)) + "</td>";
+      // corrections bien visibles : case juste encadrée en vert, case fausse encadrée en rouge avec la réponse barrée puis la bonne
+      if(R.done) return f === ans ? '<td class="res-ok"><span>✓ ' + chip(ans) + "</span></td>"
+        : '<td class="res-no"><span>' + (f ? "<s>" + esc(f) + "</s>" : "✗") + " → " + chip(ans) + "</span></td>";
       return '<td class="blank' + (R.sel === k ? " sel" : "") + '" data-k="' + k + '"><span' + (f ? ' style="color:' + ink(f) + '"' : "") + ">" + (f ? esc(f) : "&nbsp;") + "</span></td>";
     }).join("") + "</tr>").join("");
     main.innerHTML = aide('Le tableau récapitulatif du rééquilibrage des canaux : pour chaque canal, le canal qui le rééquilibre dans chacun des cinq systèmes. Clique sur une case vide, puis sur un canal.') +
@@ -555,11 +584,14 @@
       const ks = [...R.blank], good = ks.filter(k => { const [c, n] = k.split("|"); return R.fill[k] === mate(c, +n); }).length;
       const perfect = good === ks.length, up = perfect && R.lvl < LEVELS.length - 1;
       R.done = true; record("grille", perfect);
+      const wrong = ks.filter(k => { const [c, n] = k.split("|"); return R.fill[k] !== mate(c, +n); });
       R.msg = (perfect ? '<span class="ok">' + praise() + "</span> " : "") + good + " case" + (good > 1 ? "s" : "") + " juste" + (good > 1 ? "s" : "") + " sur " + ks.length + "." +
-        (up ? " Niveau suivant : " + LEVELS[R.lvl + 1] + " cases vides." : perfect ? " Tu as rempli toute la grille !" : " Une grille parfaite fait passer au niveau suivant.");
+        (wrong.length ? '<br><span class="no">À revoir :</span> ' + wrong.map(k => { const [c, n] = k.split("|"); return chip(c) + " système " + n + " → " + chip(mate(c, +n)) + (R.fill[k] ? ' <span class="sm">(pas ' + esc(R.fill[k]) + ")</span>" : ""); }).join(" · ") : "") +
+        (up ? "<br>Niveau suivant : " + LEVELS[R.lvl + 1] + " cases vides." : perfect ? "<br>Tu as rempli toute la grille !" : "<br>Une grille parfaite fait passer au niveau suivant.");
       if(up){ R.lvl++; saveLvl(); }
       renderGrille();
     });
+    if(!R.done) auto("rVal", [...R.blank].every(k => R.fill[k]), R.round + JSON.stringify(R.fill));
   }
 
   // ================= 5. Quel circuit ? =================
@@ -576,7 +608,7 @@
   const Q5 = {};
   function newQuel(){
     const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv", "statique"]);
-    Object.assign(Q5, {t, pick:new Set(), done:false, msg:"", answer:null});
+    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null});
     if(t === "indications" || t === "actions"){
       const c = rnd(CIRC), pool = t === "indications" ? shuffle(c.indications) : shuffle(c.actions.slice(1).filter(x => !GENERIC.test(x)));
       let k = Math.min(t === "indications" ? 2 : 3, pool.length), lines = pool.slice(0, k);
@@ -635,6 +667,8 @@
         "Dynamique seulement : " + nYin + " canaux yīn pour " + (4 - nYin) + " yáng, les polarités n’alternent pas. Ces circuits ouvrent de nouvelles perspectives de traitement (chapitre 13).");
       Q5.msg += circuitCard(Q5.c); renderQuel();
     }));
+    if(!Q5.done && (t === "indications" || t === "actions")) auto("qVal", Q5.pick.size >= 4, Q5.round + "|" + [...Q5.pick].sort());
+    if(!Q5.done && t === "astuceInv") auto("qVal", Q5.pick.size >= 2, Q5.round + "|" + [...Q5.pick].sort());
   }
 
   // ================= 6. Les quatre membres =================
@@ -653,7 +687,7 @@
       sol[x] = (hand ? "b" : "j") + (hand === yang ? side : other);   // main yáng et pied yīn d'un côté, main yīn et pied yáng de l'autre
     });
     const given = rnd(c.grid);
-    Object.assign(M, {c, sol, given, place:{[sol[given]]:given}, sel:c.grid.find(x => x !== given), done:false, msg:""});
+    Object.assign(M, {round:++ROUND, c, sol, given, place:{[sol[given]]:given}, sel:c.grid.find(x => x !== given), done:false, msg:""});
   }
   function renderMembres(){
     const placed = Object.values(M.place);
@@ -695,6 +729,7 @@
         ", les canaux yīn " + chips(yin).replace(", ", " et ") + " sur " + onLimb(M.sol[yin.find(x => HAND.has(x))]) + " et " + onLimb(M.sol[yin.find(x => !HAND.has(x))]) + ". Exemple du cours : shào yáng en haut à droite et en bas à gauche, jué yīn en haut à gauche et en bas à droite.</span>";
       renderMembres();
     });
+    if(!M.done) auto("mVal", M.c.grid.every(x => Object.values(M.place).includes(x)), M.round + JSON.stringify(M.place));
   }
 
   // ================= navigation =================
