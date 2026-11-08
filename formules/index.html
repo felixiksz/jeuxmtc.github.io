@@ -90,14 +90,14 @@
   .decide .choices{ grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); }
   .reveal{ margin-top:12px; font-size:.9rem; }
 </style>
-<link href="../modules-theme.css?v=20261007-a" rel="stylesheet">
+<link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
 <body>
 <nav id="nav"></nav>
 <header>
-  <a class="tool" href="../index.html?admin=1" title="Retour au jeu">← Jeu</a>
+  <a class="tool home" href="../index.html?admin=1" title="Retour à l’accueil">← Accueil</a>
   <h1>Formules <sup class="beta" title="Version bêta">β</sup></h1>
   <div class="tools">
     <span class="srcinfo" id="srcinfo"></span>
@@ -110,10 +110,10 @@
 <script src="../22-20-pharma-data.js?v=20261001-qinghao"></script>
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
-<script src="../beta-config.js?v=20261005-c"></script>
-<script src="../beta-gate.js?v=20261007-b"></script>
+<script src="../beta-config.js?v=20261108-a"></script>
+<script src="../beta-gate.js?v=20261107-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261107-a"></script>
+<script src="../beta-modules.js?v=20261107-c"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){

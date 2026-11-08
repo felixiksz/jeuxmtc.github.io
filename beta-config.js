@@ -1,6 +1,6 @@
 /* ============================================================
    beta-config.js
-   Réglages des modules bêta (Trajets, Formules).
+   Réglages des modules bêta (Trajets, Formules, Circuits).
    - public : par module, false = réservé aux admins ; true = ouvert à
      tous les joueurs, après acceptation de la phase bêta et des
      commentaires de correction publics.
@@ -9,7 +9,7 @@
      que les commentaires ne sont pas encore activés.
    ============================================================ */
 window.MTC_BETA = {
-  public: {trajets: true, formules: true},
+  public: {trajets: true, formules: true, circuits: true},
   giscus: {
     repo: "felixiksz/jeuxmtc.github.io",
     repoId: "R_kgDOS3f7kg",

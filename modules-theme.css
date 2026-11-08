@@ -25,6 +25,8 @@ h1{ font-size:.86rem; font-weight:800; text-transform:uppercase; letter-spacing:
 .tool:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 6px 14px var(--shadow-color); }
 @media (max-width:700px){ .tools .tool{ font-size:.68rem; padding:4px 6px; } h1{ font-size:.78rem; } }
 .tool.on{ background:transparent; color:var(--text-color); border:0; box-shadow:0 4px 14px var(--shadow-color); }
+/* retour à l'accueil : couleur d'accent, distincte du titre de la page */
+.tool.home{ color:var(--mtc-accent); }
 
 /* barre de gauche */
 nav{ background:var(--page-bg); border-right:1px solid var(--hair); }
@@ -93,3 +95,11 @@ html.mtc-dark{ color-scheme:dark; }
 html .verifybtn{ background:transparent; border:0; border-bottom:1px solid currentColor; border-radius:0; padding:0 1px; color:var(--muted); font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; }
 html .verifybtn:hover{ color:var(--text-color); box-shadow:0 6px 8px -7px var(--shadow-color); }
 html .verifybtn.me{ background:transparent; color:#2c9a5c; border-color:#2c9a5c; }
+
+/* explications d'un jeu rangées derrière un « ? » (Réseaux, Équilibrer) */
+details.aide{ margin:0 0 10px; }
+details.aide > summary{ list-style:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%;
+  border:1.5px solid var(--mtc-accent); color:var(--mtc-accent); font-weight:800; font-size:.78rem; cursor:pointer; user-select:none; }
+details.aide > summary::-webkit-details-marker{ display:none; }
+details.aide[open] > summary{ background:var(--mtc-accent); color:var(--page-bg); }
+details.aide > p{ margin:6px 0 0; }

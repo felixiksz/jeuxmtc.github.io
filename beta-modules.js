@@ -37,6 +37,14 @@
       {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur dans une fiche ou un cas ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
+    circuits: [
+      {sel:"#modes", title:"「 ✦ RÉSEAUX ✦ 」", text:"Sept jeux sur les six systèmes et les circuits thérapeutiques de Dr Tán : Équilibrer, Fermer le circuit, Trois plaintes, Propagation, Grille des familles, Quel circuit ?, Quatre membres. Tout vient des cours « Les six systèmes des canaux unis », « Les circuits thérapeutiques » et « Méthode de l’équilibre global »."},
+      {sel:"svg.grid, svg.clock, svg.balclock, table.fam", title:"Le circuit", text:"Deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal est relié à ses deux voisins par un des cinq systèmes."},
+      {sel:".palette", title:"Répondre", text:"Clique sur un canal pour répondre. Quand plusieurs cases sont vides, clique d’abord sur la case, puis sur le canal."},
+      {sel:".score", title:"Score", text:"Chaque jeu garde son score, et chaque partie terminée compte pour ta série de jours."},
+      {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source (page du cours)."},
+      {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
+    ],
     jeu: [
       {sel:"#gCat", title:"Catégorie", text:"Joue sur toutes les formules ou sur une seule catégorie."},
       {sel:"#gMode", title:"Réponse", text:"4 choix (touches 1 à 4) ou saisie libre : en saisie libre, les tons ne comptent pas et des suggestions s’affichent."},
@@ -68,6 +76,10 @@
       return code ? ["Trajets — " + code, "le canal " + (b.title || code)] : ["Trajets", "le module Trajets"];
     }
     const h = decodeURIComponent(location.hash.slice(1));
+    if(module === "circuits"){
+      const b = document.querySelector("#modes .on"), name = b ? b.textContent : "Réseaux";
+      return ["Réseaux — " + name, "le jeu « " + name + " »"];
+    }
     if(h === "jeu") return ["Formules — jeu Substance manquante", "le jeu « Substance manquante »"];
     if(h === "cas") return ["Formules — jeu Cas clinique", "le jeu « Cas clinique »"];
     const t = document.querySelector("main h2");

@@ -70,7 +70,7 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
       "<p>Ce module est en <b>phase bêta</b> : il est encore en construction et en cours de vérification.</p>" +
       '<label><input type="checkbox" id="mtcBeta1"><span>J’ai compris que le contenu peut contenir des erreurs ou des imprécisions, et qu’il ne remplace pas le cours.</span></label>' +
       '<label><input type="checkbox" id="mtcBeta2"><span>J’accepte de signaler les erreurs que je repère en laissant des <b>commentaires de correction en ligne, visibles par tout le monde</b> (bouton « Corrections »). <small>Un compte GitHub est nécessaire pour écrire.</small></span></label>' +
-      '<div class="row"><a class="btn" href="../index.html">Retour au jeu</a><button type="button" class="go" id="mtcBetaGo" disabled>J’accepte et j’entre</button></div></div>';
+      '<div class="row"><a class="btn" href="../index.html">Retour à l’accueil</a><button type="button" class="go" id="mtcBetaGo" disabled>J’accepte et j’entre</button></div></div>';
     document.body.appendChild(veil);
     const c1 = veil.querySelector("#mtcBeta1"), c2 = veil.querySelector("#mtcBeta2"), go = veil.querySelector("#mtcBetaGo");
     const upd = () => { go.disabled = !(c1.checked && c2.checked); };
@@ -156,7 +156,7 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
       return false;
     }
     document.body.classList.add("mtc-beta-player");
-    // retour au jeu sans passer en mode admin
+    // retour à l'accueil sans passer en mode admin
     document.querySelectorAll('a[href*="index.html?admin=1"]').forEach(a => { a.href = "../index.html"; });
     if(!consented()) showConsent(opts || {});
     return true;

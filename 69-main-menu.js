@@ -163,7 +163,9 @@
       ] : [
         ["Grille", "Le jeu principal : retrouver les groupes de quatre points.", () => {}],
         window.MTCQuizTest && ["Quiz", "Questions à choix sur les points.", () => window.MTCQuizTest.open()],
-        ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("equilibrer"), "b"],
+        // série Réseaux (bêta) : elle contient Équilibrer ; tant qu'elle n'est pas ouverte, les joueur·ses gardent Équilibrer seul
+        (admin || isPublic("circuits")) ? ["「 ✦ RÉSEAUX ✦ 」", "Les six systèmes et les circuits de Dr Tán : équilibrer, fermer un circuit, trois plaintes, propagation, familles, quatre membres.", () => module("circuits"), "b"]
+          : ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("equilibrer"), "b"],
         (admin || isPublic("trajets")) && ["Itinéraire", "Relier deux points par le plan des intersections.", () => module("trajets", "itineraire"), "b"]
       ],
       reviser: [

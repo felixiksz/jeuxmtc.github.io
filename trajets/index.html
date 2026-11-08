@@ -267,7 +267,7 @@
   .places-index h3{ margin:14px 0 4px; color:var(--text); font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; }
   .places-index button{ font:inherit; font-size:.85rem; border:1px solid #dde; background:#fafaff; border-radius:999px; padding:1px 9px; margin:2px; cursor:pointer; }
 </style>
-<link href="../modules-theme.css?v=20261007-a" rel="stylesheet">
+<link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
@@ -275,7 +275,7 @@
 <nav id="nav" aria-label="Canaux"></nav>
 <button type="button" id="navToggle" aria-label="Masquer la liste des canaux" title="Masquer la liste des canaux">‹</button>
 <header>
-  <a class="tool" href="../index.html?admin=1" title="Retour au jeu">← Jeu</a>
+  <a class="tool home" href="../index.html?admin=1" title="Retour à l’accueil">← Accueil</a>
   <h1>Trajets des canaux <sup class="beta" title="Version bêta">β</sup></h1>
   <button type="button" class="tool typetoggle" id="typeToggle" aria-expanded="false">Types ▾</button>
   <div class="typefilter" id="typeFilter" role="group" aria-label="Types de trajets affichés">
@@ -307,10 +307,10 @@
   <div id="corrBody"></div>
 </aside>
 <div id="tip" role="tooltip"></div>
-<script src="../beta-config.js?v=20261005-c"></script>
-<script src="../beta-gate.js?v=20261007-b"></script>
+<script src="../beta-config.js?v=20261108-a"></script>
+<script src="../beta-gate.js?v=20261107-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261107-a"></script>
+<script src="../beta-modules.js?v=20261107-c"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){

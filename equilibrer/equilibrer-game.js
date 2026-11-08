@@ -1,0 +1,143 @@
+// Jeu « Équilibrer », partagé par equilibrer/index.html et le module Réseaux (circuits/index.html).
+// mtcEquilibrer(main) renvoie {start, render} : start tire un nouveau cas, render dessine le jeu dans main.
+window.mtcEquilibrer = function(main){
+  "use strict";
+  // Jeu « Équilibrer » : des canaux sont atteints ; choisir le moins de canaux équilibrants possible selon les six
+  // systèmes des canaux unis de Dr Richard Tán (cours « Les six systèmes des canaux unis »). Horloge chinoise des douze
+  // canaux ; rèn mài et dū mài hors de l'horloge, sur le passage du yíng qì (F → RM → DM → P), seulement pour le
+  // système 1. Un canal atteint peut en équilibrer un autre (pas lui-même).
+  // explications du jeu rangées derrière un « ? » (ouvert ou fermé : le choix reste d'un jeu à l'autre)
+  const aide = html => '<details class="aide"' + (window.mtcAideOpen ? " open" : "") + '><summary title="Explications" aria-label="Explications">?</summary><p class="src">' + html + "</p></details>";
+  main.addEventListener("toggle", e => { if(e.target.classList && e.target.classList.contains("aide")) window.mtcAideOpen = e.target.open; }, true);
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
+  const TAN_SYSTEMS = {
+    1:{name:"grands canaux de même nom (tóng míng)", pairs:[["P", "Rt"], ["GI", "E"], ["C", "Rn"], ["IG", "V"], ["EC", "F"], ["TF", "VB"], ["DM", "RM"]]},
+    2:{name:"six couches (zàng fǔ bié tōng)", pairs:[["P", "V"], ["GI", "F"], ["E", "EC"], ["Rt", "IG"], ["C", "VB"], ["Rn", "TF"]]},
+    3:{name:"biǎo / lǐ (surface / interne)", pairs:[["P", "GI"], ["E", "Rt"], ["C", "IG"], ["V", "Rn"], ["EC", "TF"], ["VB", "F"]]},
+    4:{name:"horloge opposée (zǐ wǔ)", pairs:[["P", "V"], ["GI", "Rn"], ["E", "EC"], ["Rt", "TF"], ["C", "VB"], ["IG", "F"]]},
+    5:{name:"canaux voisins sur l’horloge (liú zhù)", pairs:[["P", "F"], ["GI", "E"], ["Rt", "C"], ["IG", "V"], ["Rn", "EC"], ["TF", "VB"]]}
+  };
+  const NAMES = {P:"Shǒu tài yīn — poumon", GI:"Shǒu yáng míng — gros intestin", E:"Zú yáng míng — estomac", Rt:"Zú tài yīn — rate",
+    C:"Shǒu shào yīn — cœur", IG:"Shǒu tài yáng — intestin grêle", V:"Zú tài yáng — vessie", Rn:"Zú shào yīn — reins",
+    EC:"Shǒu jué yīn — enveloppe du cœur", TF:"Shǒu shào yáng — trois foyers", VB:"Zú shào yáng — vésicule biliaire", F:"Zú jué yīn — foie",
+    RM:"Rèn mài", DM:"Dū mài"};
+  const COLOR = {E:"#d9a400", Rt:"#d9a400", VB:"#2f9a3c", F:"#2f9a3c", C:"#e0261b", IG:"#e0261b", EC:"#e0261b", TF:"#e0261b",
+    V:"#1f5fd6", Rn:"#1f5fd6", RM:"#d77fa4", DM:"#6aa9d6"};
+  const ink = c => COLOR[c] || "var(--text-color)";   // métal (P, GI) : couleur des lettres du thème
+  const ORD = ["P", "GI", "E", "Rt", "C", "IG", "V", "Rn", "EC", "TF", "VB", "F"];
+  const ALL = ORD.concat(["RM", "DM"]);
+  const KEY = "mtc_balance_game_v1";
+  const PRAISE = ["Parfait !", "Super !", "Incroyable !", "Bravo !", "Au top !"];
+  const praise = () => PRAISE[Math.floor(Math.random() * PRAISE.length)];
+  const B = {on:new Set([1, 2, 3, 4, 5]), aff:[], pick:new Set(), done:false, hint:false, score:0, played:0, result:""};
+  try{ const s = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem("mtc_trajets_balance") || "{}"); if(Array.isArray(s.on) && s.on.length) B.on = new Set(s.on); B.hint = !!s.hint; B.score = s.score || 0; B.played = s.played || 0; }catch(e){}
+  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({on:[...B.on], hint:B.hint, score:B.score, played:B.played})); }catch(e){} };
+  const links = (b, a) => b === a ? [] : [...B.on].filter(n => TAN_SYSTEMS[n].pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
+  const pos = c => {
+    const pol = (a, r) => [170 + r * Math.cos(a), 170 + r * Math.sin(a)];
+    if(c === "RM") return pol(128 * Math.PI / 180, 188);
+    if(c === "DM") return pol(142 * Math.PI / 180, 188);
+    return pol(-Math.PI / 2 + (ORD.indexOf(c) - ORD.indexOf("C")) * Math.PI / 6, 125);   // C à midi, en haut
+  };
+  function optimum(){
+    for(let k = 1; k <= ALL.length; k++){
+      const sols = [];
+      const rec = (s, i) => {
+        if(s.length === k){ if(B.aff.every(a => s.some(b => links(b, a).length))) sols.push(s.slice()); return; }
+        for(let j = i; j < ALL.length; j++){ s.push(ALL[j]); rec(s, j + 1); s.pop(); }
+      };
+      rec([], 0);
+      if(sols.length) return sols;
+    }
+    return [];
+  }
+  function newCase(){
+    for(let tries = 0; tries < 50; tries++){
+      const n = 2 + Math.floor(Math.random() * 3);
+      const pool = B.on.has(1) && Math.random() < .2 ? ALL.slice() : ORD.slice();
+      B.aff = [];
+      while(B.aff.length < n){
+        const c = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+        if((c === "RM" || c === "DM") && B.aff.some(x => x === "RM" || x === "DM")) continue;
+        B.aff.push(c);
+      }
+      if(B.aff.every(a => ALL.some(b => links(b, a).length))) break;
+    }
+    B.pick = new Set(); B.done = false; B.result = "";
+  }
+  function render(){
+    const chip = c => '<b class="balc" style="color:' + ink(c) + '" title="' + esc(NAMES[c]) + '">' + esc(c) + "</b>";
+    let g = '<circle cx="170" cy="170" r="125" fill="none" stroke="currentColor" stroke-opacity=".2"/>';
+    const [f, rm, dm, pp] = ["F", "RM", "DM", "P"].map(pos);
+    const seg = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy) || 1, ux = dx / d * 21, uy = dy / d * 21;
+      return "M" + (a[0] + ux) + " " + (a[1] + uy) + " L" + (b[0] - ux) + " " + (b[1] - uy); };
+    g += '<path d="' + seg(f, rm) + " " + seg(rm, dm) + " " + seg(dm, pp) + '" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-dasharray="3 4"/>';
+    const mid = [(rm[0] + dm[0]) / 2, (rm[1] + dm[1]) / 2], md = Math.hypot(mid[0] - 170, mid[1] - 170) || 1;
+    g += '<text x="' + (mid[0] + (mid[0] - 170) / md * 34) + '" y="' + (mid[1] + (mid[1] - 170) / md * 34 + 3) + '" text-anchor="middle" class="balflow">YÍNG QÌ</text>';
+    B.pick.forEach(b => B.aff.forEach(a => {
+      const l = links(b, a); if(!l.length) return;
+      const [p1, p2] = [pos(b), pos(a)], mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2;
+      g += '<line x1="' + p1[0] + '" y1="' + p1[1] + '" x2="' + p2[0] + '" y2="' + p2[1] + '" stroke="var(--shadow-color)" stroke-width="1.8"/>' +
+        '<rect x="' + (mx - 14) + '" y="' + (my - 8) + '" width="28" height="16" fill="var(--page-bg)" stroke="var(--shadow-color)"/>' +
+        '<text x="' + mx + '" y="' + (my + 3.5) + '" text-anchor="middle" class="balsys">' + l.join("·") + "</text>";
+    }));
+    ALL.forEach(c => {
+      const [x, y] = pos(c), isA = B.aff.includes(c), isP = B.pick.has(c), mv = c === "RM" || c === "DM", off = mv && !B.on.has(1);
+      g += '<g class="balnode' + (off ? " off" : "") + '" data-c="' + c + '"><title>' + esc(NAMES[c]) + (off ? " — seulement dans le système 1" : "") + "</title>";
+      if(isA) g += '<circle cx="' + x + '" cy="' + y + '" r="24" fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="4 3"/>';
+      g += '<circle cx="' + x + '" cy="' + y + '" r="18" fill="' + (isP ? "var(--text-color)" : "var(--page-bg)") + '" stroke="' + ink(c) + '" stroke-width="' + (isP ? 2.6 : 1.6) + '"/>';
+      g += '<text x="' + x + '" y="' + (y + 4) + '" text-anchor="middle" class="ballbl" style="fill:' + (isP ? "var(--page-bg)" : ink(c)) + '">' + esc(c) + "</text>";
+      if(B.hint){ const n = B.aff.filter(a => links(c, a).length).length; if(n) g += '<text x="' + (x + 19) + '" y="' + (y - 14) + '" class="balhint">' + n + "</text>"; }
+      g += "</g>";
+    });
+    const cov = B.aff.map(a => {
+      const by = [...B.pick].map(b => [b, links(b, a)]).filter(x => x[1].length);
+      return "<li>" + (by.length ? '<span class="balok">✓</span>' : '<span class="balno">—</span>') + chip(a) +
+        (by.length ? ' <span class="balsm">équilibré par</span> ' + by.map(([b, l]) => chip(b) + ' <span class="balsm">(syst. ' + l.join(", ") + ")</span>").join(", ") : ' <span class="balsm">pas encore équilibré</span>') + "</li>";
+    }).join("");
+    const table = '<details class="balsyst"><summary>Rappel : les cinq systèmes</summary><table><tr><th>Système</th><th>Paires de canaux</th></tr>' +
+      Object.entries(TAN_SYSTEMS).map(([n, s]) => "<tr><td><b>" + n + "</b> · " + esc(s.name) + "</td><td>" + s.pairs.map(([a, b]) => chip(a) + "–" + chip(b)).join(" · ") + "</td></tr>").join("") +
+      "<tr><td><b>6</b> · même canal (zì jǐ)</td><td>le canal se rééquilibre lui-même : pas utilisé dans ce jeu</td></tr></table></details>";
+    main.innerHTML =
+      aide('Des canaux sont atteints : clique sur le moins de canaux possible pour les rééquilibrer tous, selon les six systèmes des canaux unis de Dr Tán. Un canal atteint peut en équilibrer un autre. Rèn mài et dū mài ne comptent que pour le système 1.') +
+      '<div class="balbar">Systèmes ' + [1, 2, 3, 4, 5].map(n => '<button type="button" class="balsysbtn' + (B.on.has(n) ? " on" : "") + '" data-n="' + n + '" title="' + esc(TAN_SYSTEMS[n].name) + '">' + n + "</button>").join("") +
+      '<label><input type="checkbox" id="balHint"' + (B.hint ? " checked" : "") + "> afficher le nombre de canaux équilibrés</label>" +
+      '<span class="balscore" title="Cas résolus avec le minimum de canaux / cas joués">' + B.score + (B.score > 1 ? " cas parfaits" : " cas parfait") + " sur " + B.played + "</span></div>" +
+      '<div class="ballay"><svg class="balclock" viewBox="-40 -50 420 420" role="img" aria-label="Horloge chinoise des douze canaux">' + g + "</svg>" +
+      '<div><div class="ballbltop">Canaux atteints</div><p class="balcase">' + B.aff.map(chip).join(" · ") + '</p><ul class="balcov">' + cov + "</ul>" +
+      '<div class="balact"><button type="button" class="tool" id="balVal"' + (B.done ? " disabled" : "") + '>Valider</button><button type="button" class="tool" id="balNext">Nouveau cas</button><button type="button" class="tool" id="balClr"' + (B.done ? " disabled" : "") + ">Effacer</button></div>" +
+      '<div class="balres">' + B.result + "</div>" + table + "</div></div>";
+    main.querySelectorAll(".balnode").forEach(n => n.addEventListener("click", () => {
+      const c = n.dataset.c;
+      if(B.done || ((c === "RM" || c === "DM") && !B.on.has(1))) return;
+      B.pick.has(c) ? B.pick.delete(c) : B.pick.add(c);
+      render();
+    }));
+    main.querySelectorAll(".balsysbtn").forEach(b => b.addEventListener("click", () => {
+      const n = +b.dataset.n;
+      if(B.on.has(n) && B.on.size > 1) B.on.delete(n); else B.on.add(n);
+      save(); newCase(); render();
+    }));
+    document.getElementById("balHint").addEventListener("change", e => { B.hint = e.target.checked; save(); render(); });
+    document.getElementById("balNext").addEventListener("click", () => { newCase(); render(); });
+    document.getElementById("balClr").addEventListener("click", () => { B.pick.clear(); render(); });
+    document.getElementById("balVal").addEventListener("click", () => {
+      if(!B.aff.every(a => [...B.pick].some(b => links(b, a).length))){ B.result = '<span class="balno">Il reste des canaux non équilibrés.</span>'; render(); return; }
+      const opt = optimum(), k = opt.length ? opt[0].length : 0;
+      B.done = true; B.played++;
+      if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
+      if(B.pick.size === k) B.score++;
+      save();
+      const fmt = s => s.map(b => chip(b) + ' <span class="balsm">(→ ' + B.aff.filter(x => links(b, x).length).map(x => esc(x) + " syst. " + links(b, x).join(", ")).join(" ; ") + ")</span>").join(" + ");
+      const mine = [...B.pick].sort().join("|");
+      const others = opt.filter(s => s.slice().sort().join("|") !== mine);
+      // solution minimale trouvée : juste une félicitation, et les autres solutions s'il y en a
+      B.result = B.pick.size === k
+        ? '<span class="balok">' + praise() + "</span>" + (others.length ? '<br><span class="balsm">Autres solutions possibles :</span><br>' + others.slice(0, 8).map(fmt).join("<br>") : "")
+        : "Tout est équilibré avec " + B.pick.size + " canaux ; le minimum est <b>" + k + "</b>." +
+          '<br><span class="balsm">Solutions minimales' + (opt.length > 1 ? " (" + opt.length + ")" : "") + " :</span><br>" + opt.slice(0, 8).map(fmt).join("<br>");
+      render();
+    });
+  }
+  return {start:newCase, render};
+};
