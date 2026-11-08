@@ -67,6 +67,11 @@
   table.fam td.blank span{ display:inline-block; min-width:30px; padding:1px 6px; border:1.5px dashed currentColor; border-radius:999px; }
   table.fam td.blank.sel span{ border-style:solid; box-shadow:0 3px 10px var(--shadow-color); }
   .famwrap{ overflow-x:auto; }
+  .compare{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px 22px; margin:10px 0; }
+  .cmpgrid{ max-width:230px; margin:4px 0; } .cmpgrid .rowlbl{ display:none; }
+  .cmpt{ font-weight:700; margin:2px 0 4px; }
+  .cmpl{ margin:0; padding-left:18px; font-size:.86rem; line-height:1.45; } .cmpl li{ margin:2px 0; }
+  .cmpl li.hit{ background:color-mix(in srgb, #1a8a3a 16%, transparent); border-radius:4px; padding:0 4px; }
   /* retour visuel (plus de bouton « Valider ») : juste en vert, faux en rouge, petite animation */
   @keyframes winpop{ 0%{ transform:scale(.6); opacity:0; } 60%{ transform:scale(1.18); } 100%{ transform:scale(1); opacity:1; } }
   @keyframes nope{ 0%, 100%{ transform:none; } 25%{ transform:translateX(-4px); } 75%{ transform:translateX(4px); } }
@@ -236,6 +241,21 @@
       const on = o.on && o.on.has(c), dis = (o.only && !o.only.includes(c)) || (o.off && o.off.has(c)), mk = o.mark && o.mark[c];
       return '<button type="button" class="pc' + (mk ? " mk-" + mk : "") + '" data-c="' + c + '" title="' + esc(NAMES[c]) + '" style="' + (on ? "background:" + ink(c) + ";color:var(--page-bg);border-color:" + ink(c) : "color:" + ink(c)) + '"' + (dis ? " disabled" : "") + ">" + c + "</button>";
     }).join("") + "</div>";
+  }
+  // quatre canaux quelconques rangés au mieux dans la grille (main en haut, pied en bas, mêmes polarités en diagonale)
+  function arrange(four){
+    const perms = a => a.length < 2 ? [a] : a.flatMap((x, i) => perms(a.slice(0, i).concat(a.slice(i + 1))).map(p => [x].concat(p)));
+    const score = g => g.filter((c, i) => HAND.has(c) === (i < 2)).length * 2 +
+      (YIN.has(g[0]) === YIN.has(g[3]) ? 1 : 0) + (YIN.has(g[1]) === YIN.has(g[2]) ? 1 : 0) + (YIN.has(g[0]) !== YIN.has(g[1]) ? 1 : 0) + (YIN.has(g[0]) ? .5 : 0);
+    return perms(four).reduce((best, g) => score(g) > score(best) ? g : best);
+  }
+  // comparaison côte à côte : ta réponse (schéma, nom du circuit s'il existe, ses indications ou actions) et la bonne
+  function compareHtml(mine, right, field, lines){
+    const own = findCircuit(mine);
+    const col = (label, cls, grid, c) => '<div class="cmpcol"><span class="verdict ' + cls + '">' + label + '</span><div class="cmpgrid">' + gridSvg(grid, {}) + "</div>" +
+      (c ? '<p class="cmpt">' + esc(c.title) + '</p><ul class="cmpl">' + c[field].map(x => "<li" + (lines.includes(x) ? ' class="hit"' : "") + ">" + esc(x) + "</li>").join("") + "</ul>"
+        : '<p class="sm">Ces quatre canaux ne forment pas un circuit du cours.</p>') + "</div>";
+    return '<div class="compare">' + col("Ta réponse", "no", own ? own.grid : arrange(mine), own) + col("Bonne réponse", "ok", right.grid, right) + "</div>";
   }
   const circuitCard = (c, opt) => '<div class="card"><p><b>Circuit ' + esc(c.title) + "</b> · " + gridTxt(c.grid) + (c.autre ? ' <span class="sm">(équilibre dynamique seulement)</span>' : "") + "</p>" +
     (opt && opt.ind === false ? "" : '<details class="more"' + (opt && opt.open ? " open" : "") + "><summary>Indications</summary><ul>" + c.indications.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul></details>") +
@@ -676,8 +696,12 @@
       }
       const fits = CIRC.filter(o => Q5.lines.every(l => o[t].includes(l)));
       const ok = fits.some(o => sameSet(o.grid, mine));
-      markPick((fits.find(o => sameSet(o.grid, mine)) || fits[0]).grid);
-      finish(ok, "") ; Q5.msg += fits.map(o => circuitCard(o)).join(""); renderQuel();
+      const right = fits.find(o => sameSet(o.grid, mine)) || fits[0];
+      markPick(right.grid);
+      finish(ok, "");
+      // mauvaise réponse : ta réponse et la bonne côte à côte
+      Q5.msg += ok ? circuitCard(right) : compareHtml(mine, right, t, Q5.lines);
+      renderQuel();
     });
     main.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
       const o = Q5.opts[+b.dataset.i], ok = o === Q5.a;
