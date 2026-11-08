@@ -190,7 +190,10 @@
         admin && ["Soutiens", "Les prénoms de « Projet soutenu par » (en bas du menu) : modifier et publier.", editSupporters],
         ["Notes", "Exporter ou importer tes notes et images, ou les partager avec les contributeur·ices." + notesStatus(), null, null, [["Exporter", () => call("exportPersonalNotes")], ["Importer", () => call("openImportPersonalNotesDialog")], ["Partager", () => call("mtcShareNotes")]]],
         ["Corrections", "Les commentaires publics des modules bêta.", () => window.open(DISCUSSIONS_URL, "_blank", "noopener")],
-        byId("mtcOfflineButton") && ["Hors connexion", "Préparer le jeu pour jouer sans internet.", () => clickId("mtcOfflineButton")]
+        byId("mtcOfflineButton") && ["Hors connexion", "Préparer le jeu pour jouer sans internet.", () => clickId("mtcOfflineButton")],
+        // mêmes montants que la goutte de sang (04-03-core-game.js : mtcSupportAmounts, mtcSupportAmountUrl)
+        ["Soutenir le projet", "Connections MTC est gratuit et sans publicité. Pour figurer parmi les mécènes, indique ton prénom ou alias dans la note PayPal.", null, null,
+          (window.mtcSupportAmounts || [3, 5, 10]).concat([0]).map(v => [v ? v + " €" : "Montant libre", () => giveSupport(v)])]
       ]
     };
     Object.keys(I).forEach(k => { I[k] = I[k].filter(Boolean); });
@@ -299,6 +302,11 @@
     if(!el) return;
     const n = streakCount();
     el.innerHTML = "Série " + n + "<small>jour" + (n > 1 ? "s" : "") + "</small>";
+  }
+  // don depuis Réglages → Soutenir le projet : même lien PayPal que la goutte, et la goutte se range comme après un don
+  function giveSupport(v){
+    try{ if(typeof markSupportCoffeeClicked === "function") markSupportCoffeeClicked(); if(typeof hideSupportBloodDrop === "function") hideSupportBloodDrop(); }catch(error){}
+    try{ window.open(window.mtcSupportAmountUrl ? window.mtcSupportAmountUrl(v) : supportLink(), "_blank", "noopener,noreferrer"); }catch(error){}
   }
   // soutien : une demande discrète, une seule fois par série, le jour où elle atteint SUPPORT_ASK_DAYS jours
   // (la série est identifiée par son premier jour, pour ne pas redemander pendant la même série)

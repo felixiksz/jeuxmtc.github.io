@@ -266,3 +266,5 @@ html body.mtc-menu-ui #supportCoffeeButton:not(.support-blooddrop-moving){ font-
 /* goutte animée : devant les panneaux du bas (elle s'y pose) ; goutte au repos : derrière eux, comme le reste du bas de l'écran */
 html body #supportCoffeeButton.support-blooddrop-moving{ z-index:9700 !important; }
 html body #supportCoffeeButton:not(.support-blooddrop-moving){ z-index:9050 !important; }
+/* menu ouvert : la goutte (et son texte) restent derrière l'écran du menu, même en mouvement */
+html body.mtc-menu-open #supportCoffeeButton, html body.mtc-menu-open #mtcSupportLabel{ z-index:9050 !important; }
