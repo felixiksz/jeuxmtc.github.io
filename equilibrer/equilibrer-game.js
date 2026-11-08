@@ -85,6 +85,9 @@ window.mtcEquilibrer = function(main){
       const [x, y] = pos(c), isA = B.aff.includes(c), isP = B.pick.has(c), mv = c === "RM" || c === "DM", off = mv && !B.on.has(1);
       g += '<g class="balnode' + (off ? " off" : "") + '" data-c="' + c + '"><title>' + esc(NAMES[c]) + (off ? " — seulement dans le système 1" : "") + "</title>";
       if(isA) g += '<circle cx="' + x + '" cy="' + y + '" r="24" fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="4 3"/>';
+      // après la vérification : une solution minimale entourée de vert, les canaux en trop de rouge
+      if(B.done && B.best){ if(B.best.includes(c)) g += '<circle cx="' + x + '" cy="' + y + '" r="28" fill="none" stroke="#1a8a3a" stroke-width="2.6"/>';
+        else if(isP) g += '<circle cx="' + x + '" cy="' + y + '" r="28" fill="none" stroke="#c0392b" stroke-width="2.6"/>'; }
       g += '<circle cx="' + x + '" cy="' + y + '" r="18" fill="' + (isP ? "var(--text-color)" : "var(--page-bg)") + '" stroke="' + ink(c) + '" stroke-width="' + (isP ? 2.6 : 1.6) + '"/>';
       g += '<text x="' + x + '" y="' + (y + 4) + '" text-anchor="middle" class="ballbl" style="fill:' + (isP ? "var(--page-bg)" : ink(c)) + '">' + esc(c) + "</text>";
       if(B.hint){ const n = B.aff.filter(a => links(c, a).length).length; if(n) g += '<text x="' + (x + 19) + '" y="' + (y - 14) + '" class="balhint">' + n + "</text>"; }
@@ -125,6 +128,7 @@ window.mtcEquilibrer = function(main){
       if(!B.aff.every(a => [...B.pick].some(b => links(b, a).length))){ B.result = '<span class="balno">Il reste des canaux non équilibrés.</span>'; render(); return; }
       const opt = optimum(), k = opt.length ? opt[0].length : 0;
       B.done = true; B.played++;
+      B.best = B.pick.size === k ? [...B.pick] : (opt[0] || []);
       if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
       if(B.pick.size === k) B.score++;
       save();

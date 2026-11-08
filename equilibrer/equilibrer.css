@@ -25,3 +25,5 @@
   details.balsyst table{ border-collapse:collapse; margin-top:8px; }
   details.balsyst td, details.balsyst th{ border-bottom:1px solid var(--hair, #ddd); padding:3px 10px 3px 0; text-align:left; }
   #balVal{ display:none !important; }   /* validation automatique */
+  @keyframes balpop{ 0%{ transform:scale(.6); opacity:0; } 60%{ transform:scale(1.18); } 100%{ transform:scale(1); opacity:1; } }
+  .balres .balok{ display:inline-block; animation:balpop .45s ease-out; }

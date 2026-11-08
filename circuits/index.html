@@ -67,6 +67,16 @@
   table.fam td.blank span{ display:inline-block; min-width:30px; padding:1px 6px; border:1.5px dashed currentColor; border-radius:999px; }
   table.fam td.blank.sel span{ border-style:solid; box-shadow:0 3px 10px var(--shadow-color); }
   .famwrap{ overflow-x:auto; }
+  /* retour visuel (plus de bouton « Valider ») : juste en vert, faux en rouge, petite animation */
+  @keyframes winpop{ 0%{ transform:scale(.6); opacity:0; } 60%{ transform:scale(1.18); } 100%{ transform:scale(1); opacity:1; } }
+  @keyframes nope{ 0%, 100%{ transform:none; } 25%{ transform:translateX(-4px); } 75%{ transform:translateX(4px); } }
+  .res .ok{ display:inline-block; animation:winpop .45s ease-out; } .res .no{ display:inline-block; animation:nope .35s ease; }
+  .pc.mk-ok{ outline:3px solid #1a8a3a; outline-offset:2px; } .pc.mk-no{ outline:3px solid #c0392b; outline-offset:2px; }
+  .verdict{ display:inline-block; font-weight:800; font-size:.8rem; letter-spacing:.03em; padding:2px 10px; border-radius:999px; border:2px solid; margin:0 0 8px; }
+  .verdict.ok{ color:#1a8a3a; border-color:#1a8a3a; background:color-mix(in srgb, #1a8a3a 12%, var(--page-bg)); }
+  .verdict.no{ color:#c0392b; border-color:#c0392b; background:color-mix(in srgb, #c0392b 12%, var(--page-bg)); }
+  .tagok{ font-size:.72rem; font-weight:800; color:#1a8a3a; border:1.5px solid #1a8a3a; border-radius:999px; padding:0 6px; margin-left:4px; font-family:"Archivo", sans-serif; }
+  .opt.chosen-ok{ outline:2px solid #1a8a3a; } .opt.chosen-no{ outline:2px solid #c0392b; }
   #fVal, #fSys, #pVal, #gVal, #rVal, #qVal, #mVal{ display:none !important; }   /* validation automatique */
   table.fam td.res-ok span, table.fam td.res-no span{ display:inline-block; padding:2px 9px; border-radius:999px; border:2px solid; white-space:nowrap; font-weight:800; }
   table.fam td.res-ok span{ border-color:#1a8a3a; color:#1a8a3a; background:color-mix(in srgb, #1a8a3a 12%, var(--page-bg)); }
@@ -81,12 +91,12 @@
   details.more summary{ cursor:pointer; font-weight:700; }
   details.more ul{ margin:4px 0; padding-left:18px; }
 </style>
-<link href="../equilibrer/equilibrer.css?v=20261108-a" rel="stylesheet">
+<link href="../equilibrer/equilibrer.css?v=20261108-b" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 <script src="circuits-data.js?v=20261107-a"></script>
-<script src="../equilibrer/equilibrer-game.js?v=20261108-a"></script>
+<script src="../equilibrer/equilibrer-game.js?v=20261108-b"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261107-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
@@ -201,8 +211,9 @@
       g += '<line x1="' + (p[0] + ux) + '" y1="' + (p[1] + uy) + '" x2="' + (q[0] - ux) + '" y2="' + (q[1] - uy) + '" stroke="currentColor" stroke-opacity=".8" stroke-width="2"/>';
       if(o.sys){
         const t = diag ? .3 : .5, mx = p[0] + dx * t, my = p[1] + dy * t, w = 12 + l.length * 9;
-        g += '<rect x="' + (mx - w / 2) + '" y="' + (my - 9) + '" width="' + w + '" height="18" rx="9" fill="var(--page-bg)" stroke="var(--shadow-color)"/>' +
-          '<text x="' + mx + '" y="' + (my + 3.5) + '" text-anchor="middle" class="syslbl">' + l.join("·") + "</text>";
+        const eok = o.edgeOk ? o.edgeOk[i + "-" + j] : null, ec = eok == null ? "var(--shadow-color)" : eok ? "#1a8a3a" : "#c0392b";
+        g += '<rect x="' + (mx - w / 2) + '" y="' + (my - 9) + '" width="' + w + '" height="18" rx="9" fill="var(--page-bg)" stroke="' + ec + '" stroke-width="' + (eok == null ? 1 : 2) + '"/>' +
+          '<text x="' + mx + '" y="' + (my + 3.5) + '" text-anchor="middle" class="syslbl" style="fill:' + ec + '">' + l.join("·") + "</text>";
       }
     }
     cells.forEach((c, i) => {
@@ -222,8 +233,8 @@
   function palette(o){
     o = o || {};
     return '<div class="palette">' + ORD.map(c => {
-      const on = o.on && o.on.has(c), dis = (o.only && !o.only.includes(c)) || (o.off && o.off.has(c));
-      return '<button type="button" class="pc" data-c="' + c + '" title="' + esc(NAMES[c]) + '" style="' + (on ? "background:" + ink(c) + ";color:var(--page-bg);border-color:" + ink(c) : "color:" + ink(c)) + '"' + (dis ? " disabled" : "") + ">" + c + "</button>";
+      const on = o.on && o.on.has(c), dis = (o.only && !o.only.includes(c)) || (o.off && o.off.has(c)), mk = o.mark && o.mark[c];
+      return '<button type="button" class="pc' + (mk ? " mk-" + mk : "") + '" data-c="' + c + '" title="' + esc(NAMES[c]) + '" style="' + (on ? "background:" + ink(c) + ";color:var(--page-bg);border-color:" + ink(c) : "color:" + ink(c)) + '"' + (dis ? " disabled" : "") + ">" + c + "</button>";
     }).join("") + "</div>";
   }
   const circuitCard = (c, opt) => '<div class="card"><p><b>Circuit ' + esc(c.title) + "</b> · " + gridTxt(c.grid) + (c.autre ? ' <span class="sm">(équilibre dynamique seulement)</span>' : "") + "</p>" +
@@ -290,7 +301,8 @@
     }
     main.innerHTML = aide('Un circuit : deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal a une entrée et une sortie : il est relié à ses deux voisins par un des cinq systèmes.') +
       '<div class="bar"><label><input type="checkbox" id="fTwo"' + (F.two ? " checked" : "") + "> deux canaux à trouver</label>" + scoreLine("fermer", "circuit fermé du premier coup", "circuits fermés du premier coup") + "</div>" +
-      '<div class="lay"><div>' + gridSvg(F.cells, {open:placing ? F.hide : [], sel:placing ? F.sel : null, sys:!!F.sysRes, marks:F.marks}) + "</div><div>" + right +
+      '<div class="lay"><div>' + gridSvg(F.cells, {open:placing ? F.hide : [], sel:placing ? F.sel : null, sys:!!F.sysRes, marks:F.marks,
+        edgeOk:F.sysRes ? Object.fromEntries(edges.map(([i, j]) => [i + "-" + j, sameSet(F.sys[i + "-" + j] || [], links(F.cells[i], F.cells[j]))])) : null}) + "</div><div>" + right +
       (placing && F.msg ? '<div class="res">' + F.msg + "</div>" : "") + "</div></div>" + rappel();
     document.getElementById("fTwo").addEventListener("change", e => { F.two = e.target.checked; try{ localStorage.setItem(KEY + "_two", JSON.stringify(F.two)); }catch(x){} newFermer(); renderFermer(); });
     bindCells(i => { if(F.cells[i] && F.sel === i) F.cells[i] = null; F.sel = i; F.msg = ""; renderFermer(); });
@@ -305,7 +317,7 @@
     on("fVal", () => {
       if(F.hide.some(i => !F.cells[i])){ F.msg = '<span class="no">Il reste une case vide.</span>'; renderFermer(); return; }
       if(gridOk(F.cells)){
-        F.phase = "sys"; F.c = findCircuit(F.cells) || F.c; F.marks = null;
+        F.phase = "sys"; F.c = findCircuit(F.cells) || F.c; F.marks = {}; F.hide.forEach(i => F.marks[i] = "ok");
         F.msg = "";
       } else {
         F.fails++;
@@ -339,7 +351,7 @@
   function newPlaintes(){
     P.round = ++ROUND;
     const r = Math.random();
-    P.step = "niveau"; P.fails = 0; P.msg = ""; P.pick = new Set(); P.asked = false; P.done = false; P.marks = null;
+    P.step = "niveau"; P.fails = 0; P.msg = ""; P.pick = new Set(); P.asked = false; P.done = false; P.marks = null; P.lvlRes = null; P.transOk = null;
     if(r < .2){
       P.level = 1; P.A = rnd(ORD); P.plaintes = [P.A, P.A, P.A]; P.c = null;
       return;
@@ -365,7 +377,8 @@
   }
   function plainteLi(c, i){
     const seen = P.plaintes.slice(0, i).includes(c);
-    return "<li>" + (seen ? "autre plainte du même canal, " + chip(c) : (EX[c] ? esc(EX[c][0].toUpperCase() + EX[c].slice(1)) + " · " : "Plainte du canal ") + chip(c)) + "</li>";
+    const trans = P.transOk != null && !seen && (c === P.A || c === P.B) ? '<span class="tagok">transmetteur</span>' : "";
+    return "<li>" + (seen ? "autre plainte du même canal, " + chip(c) : (EX[c] ? esc(EX[c][0].toUpperCase() + EX[c].slice(1)) + " · " : "Plainte du canal ") + chip(c)) + trans + "</li>";
   }
   function renderPlaintes(){
     let right = "", left = "";
@@ -376,7 +389,9 @@
     if(P.step === "niveau"){
       right = '<p class="q">Quel est le niveau d’atteinte ?</p><div class="act">' + [1, 2, 3].map(n => '<button type="button" class="tool lvl" data-n="' + n + '">Niveau ' + n + "</button>").join("") + "</div>";
     } else if(P.step === "famille"){
-      right = '<p class="q">Par quels canaux peut-on la traiter ?</p>' + palette({on:P.pick}) +
+      const fam1 = [P.A].concat(family(P.A)), mk1 = {};
+      if(P.done){ fam1.forEach(c => mk1[c] = "ok"); P.pick.forEach(c => { if(!fam1.includes(c)) mk1[c] = "no"; }); }
+      right = '<p class="q">Par quels canaux peut-on la traiter ?</p>' + palette({on:P.pick, mark:mk1}) +
         '<div class="act">' + (P.done ? "" : '<button type="button" class="tool" id="pVal">Valider</button>') + "</div>";
     } else if(P.step === "trans"){
       right = '<p class="q">Quels sont les canaux transmetteurs ?</p>' +
@@ -395,6 +410,7 @@
     }
     if(P.step === "circuit" || P.step === "interroger") left = gridSvg(P.cells, {open:P.step === "circuit" ? P.hide : [], sel:P.step === "circuit" ? P.sel : null, sys:P.step === "interroger", marks:P.marks});
     const done = P.done || P.asked;
+    if(P.lvlRes && P.step !== "niveau") right = '<span class="verdict ' + (P.lvlRes.ok ? "ok" : "no") + '">Niveau ' + P.lvlRes.n + (P.lvlRes.ok ? " ✓" : " ✗ → niveau " + P.level) + "</span>" + right;
     main.innerHTML = aide('Læ patient·e énonce ses trois plaintes principales, de la plus importante à la moins importante. Elles désignent les canaux atteints, le niveau d’atteinte, puis le circuit thérapeutique.') +
       '<div class="bar">' + scoreLine("plaintes", "cas réussi du premier coup", "cas réussis du premier coup") + "</div>" +
       '<div class="lay"><div>' + head + left + "</div><div>" + right + (P.msg ? '<div class="res">' + P.msg + "</div>" : "") +
@@ -402,6 +418,7 @@
     on("pNext", () => { newPlaintes(); renderPlaintes(); });
     main.querySelectorAll(".lvl").forEach(b => b.addEventListener("click", () => {
       const n = +b.dataset.n;
+      P.lvlRes = {n, ok:n === P.level};
       if(n !== P.level){ P.fails++; P.msg = '<span class="no">Non :</span> ' + esc(levelTxt[P.level]) + "."; }
       else P.msg = '<span class="ok">Oui :</span> ' + esc(levelTxt[n]) + ".";
       P.step = P.level === 1 ? "famille" : P.level === 2 ? "circuit" : "trans"; P.pick = new Set();
@@ -424,12 +441,13 @@
       } else if(P.step === "trans"){
         const ok = sameSet([...P.pick], [P.A, P.B]);
         if(!ok) P.fails++;
+        P.transOk = ok;
         P.msg = (ok ? '<span class="ok">Oui :</span> ' : '<span class="no">Réponse :</span> ') + chip(P.A) + " reçoit le facteur pathogène et le transmet à " + chip(P.B) + " (système " + links(P.A, P.B).join(" et ") + "), qui le transmet à " + chip(P.C) + " (système " + links(P.B, P.C).join(" et ") + ").";
         P.step = "circuit";
       } else if(P.step === "circuit"){
         if(P.hide.some(i => !P.cells[i])){ P.msg = '<span class="no">Il reste une case vide.</span>'; renderPlaintes(); return; }
         if(gridOk(P.cells)){
-          P.c = findCircuit(P.cells) || P.c; P.step = "interroger"; P.marks = null;
+          P.c = findCircuit(P.cells) || P.c; P.step = "interroger"; P.marks = {}; P.hide.forEach(i => P.marks[i] = "ok");
           record("plaintes", P.fails === 0);
           P.msg = '<span class="ok">' + praise() + "</span> " + (P.level === 3 ? "Le 4ᵉ canal transmet de " + chip(P.C) + " vers " + chip(P.A) + " : il est menacé, ou déjà atteint." : "Les deux autres canaux sont menacés, ou déjà atteints.");
         } else {
@@ -489,7 +507,8 @@
       const [x, y] = clockPos(c), sick = ill.indexOf(c), picked = G.pick.has(c), sh = G.shown && G.shown.includes(c);
       g += '<g class="cnode" data-c="' + c + '"><title>' + esc(NAMES[c]) + "</title>";
       if(sick >= 0) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="4 3"/><text x="' + (x + 20) + '" y="' + (y - 18) + '" class="order">' + (sick + 1) + "</text>";
-      if(sh) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#1a8a3a" stroke-width="2"/>';
+      if(sh) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#1a8a3a" stroke-width="2.4"/>';
+      else if(G.shown && picked && !(G.step !== 3 && sick >= 0)) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#c0392b" stroke-width="2.4"/>';
       g += '<circle cx="' + x + '" cy="' + y + '" r="19" fill="' + (picked ? ink(c) : "var(--page-bg)") + '" stroke="' + ink(c) + '" stroke-width="1.7"/>';
       g += '<text x="' + x + '" y="' + (y + 4) + '" text-anchor="middle" class="clbl" style="fill:' + (picked ? "var(--page-bg)" : ink(c)) + '">' + c + "</text></g>";
     });
@@ -608,7 +627,7 @@
   const Q5 = {};
   function newQuel(){
     const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv", "statique"]);
-    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null});
+    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null});
     if(t === "indications" || t === "actions"){
       const c = rnd(CIRC), pool = t === "indications" ? shuffle(c.indications) : shuffle(c.actions.slice(1).filter(x => !GENERIC.test(x)));
       let k = Math.min(t === "indications" ? 2 : 3, pool.length), lines = pool.slice(0, k);
@@ -625,13 +644,13 @@
     const t = Q5.t;
     if(t === "indications" || t === "actions"){
       q = (t === "indications" ? "Quel circuit a ces indications ?" : "Quel circuit a ces actions ?") + " Clique sur ses quatre canaux.";
-      body = '<div class="card">' + Q5.lines.map(l => "<p>" + (t === "indications" ? "➢ " : "– ") + esc(l) + "</p>").join("") + "</div>" + (Q5.done ? "" : palette({on:Q5.pick}));
+      body = '<div class="card">' + Q5.lines.map(l => "<p>" + (t === "indications" ? "➢ " : "– ") + esc(l) + "</p>").join("") + "</div>" + palette({on:Q5.pick, mark:Q5.mark});
     } else if(t === "astuce"){
       q = "Selon Dr Tán, les circuits incluant " + chips(Q5.pair).replace(", ", " et ") + " traitent :";
-      body = '<div class="opts">' + Q5.opts.map((o, i) => '<button type="button" class="tool opt" data-i="' + i + '"' + (Q5.done ? " disabled" : "") + ">" + esc(o.txt) + (Q5.done && o === Q5.a ? ' <span class="ok">✓</span>' : "") + "</button>").join("") + "</div>";
+      body = '<div class="opts">' + Q5.opts.map((o, i) => '<button type="button" class="tool opt" data-i="' + i + '"' + (Q5.done ? " disabled" : "") + (Q5.done && Q5.chosen === i ? (o === Q5.a ? ' style="outline:2px solid #1a8a3a"' : ' style="outline:2px solid #c0392b"') : "") + ">" + esc(o.txt) + (Q5.done && o === Q5.a ? ' <span class="ok">✓</span>' : Q5.done && Q5.chosen === i ? ' <span class="no">✗</span>' : "") + "</button>").join("") + "</div>";
     } else if(t === "astuceInv"){
       q = "Selon Dr Tán, quels canaux, réunis dans un circuit, traitent " + esc(Q5.a.txt) + " ? Clique sur les deux.";
-      body = Q5.done ? "" : palette({on:Q5.pick});
+      body = palette({on:Q5.pick, mark:Q5.mark});
     } else {
       q = "Ce circuit respecte-t-il l’équilibre statique ?";
       body = gridSvg(Q5.c.grid, {noPol:!Q5.done}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
@@ -644,20 +663,25 @@
       (Q5.msg ? '<div class="res">' + Q5.msg + "</div>" : "") + "</div>" + rappel();
     on("qNext", () => { newQuel(); renderQuel(); });
     bindPalette(c => { if(Q5.done) return; Q5.pick.has(c) ? Q5.pick.delete(c) : Q5.pick.add(c); renderQuel(); });
+    // marque les canaux : ceux de la bonne réponse en vert, les choix en trop en rouge
+    const markPick = ans => { Q5.mark = {}; ans.forEach(c => Q5.mark[c] = "ok"); Q5.pick.forEach(c => { if(!ans.includes(c)) Q5.mark[c] = "no"; }); };
     const finish = (ok, msg) => { Q5.done = true; record("quel", ok); Q5.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Non.</span> ') + msg; renderQuel(); };
     on("qVal", () => {
       const mine = [...Q5.pick];
       if(t === "astuceInv"){
         const ok = Q5.a.pairs.some(p => sameSet(p, mine));
+        markPick(Q5.a.pairs.find(p => sameSet(p, mine)) || Q5.a.pairs[0]);
         finish(ok, "Les circuits incluant " + Q5.a.pairs.map(p => chips(p).replace(", ", " et ")).join(", et ceux incluant ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + ".");
         return;
       }
       const fits = CIRC.filter(o => Q5.lines.every(l => o[t].includes(l)));
       const ok = fits.some(o => sameSet(o.grid, mine));
+      markPick((fits.find(o => sameSet(o.grid, mine)) || fits[0]).grid);
       finish(ok, "") ; Q5.msg += fits.map(o => circuitCard(o)).join(""); renderQuel();
     });
     main.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
       const o = Q5.opts[+b.dataset.i], ok = o === Q5.a;
+      Q5.chosen = +b.dataset.i;
       finish(ok, "Les circuits incluant " + chips(Q5.pair).replace(", ", " et ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + ".");
     }));
     main.querySelectorAll(".st").forEach(b => b.addEventListener("click", () => {
