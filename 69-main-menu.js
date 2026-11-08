@@ -192,7 +192,7 @@
         ["Corrections", "Les commentaires publics des modules bêta.", () => window.open(DISCUSSIONS_URL, "_blank", "noopener")],
         byId("mtcOfflineButton") && ["Hors connexion", "Préparer le jeu pour jouer sans internet.", () => clickId("mtcOfflineButton")],
         // mêmes montants que la goutte de sang (04-03-core-game.js : mtcSupportAmounts, mtcSupportAmountUrl)
-        ["Soutenir le projet", "Connections MTC est gratuit et sans publicité. Pour figurer parmi les mécènes, indique ton prénom ou alias dans la note PayPal.", null, null,
+        ["Soutenir le projet", "Ce jeu est gratuit et sans publicité. Pour figurer parmi les mécènes, indique ton prénom ou alias dans la note PayPal.", null, null,
           (window.mtcSupportAmounts || [3, 5, 10]).concat([0]).map(v => [v ? v + " €" : "Montant libre", () => giveSupport(v)])]
       ]
     };
@@ -324,7 +324,7 @@
     const box = document.createElement("div");
     box.id = "mtcSupportAsk";
     box.setAttribute("role", "status");
-    box.innerHTML = '<p><b>' + n + " jours de révision d’affilée, bravo !</b> Connections MTC est gratuit et sans publicité. " +
+    box.innerHTML = '<p><b>' + n + " jours de révision d’affilée, bravo !</b> Ce jeu est gratuit et sans publicité. " +
       "S’il t’aide dans tes révisions, un petit soutien le fait vivre.</p>" +
       '<p class="mtc-ask-note">Pour figurer parmi les mécènes du projet, merci d’indiquer ton prénom ou alias dans la note PayPal.</p>' +
       '<div class="mtc-ask-actions">' + (window.mtcSupportAmounts || [3, 5, 10]).concat([0]).map(v =>
