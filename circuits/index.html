@@ -468,7 +468,7 @@
       end = circ ? '<div class="card"><p>' + chips([X, Y, Z]) + " et " + chip(circ.grid.find(c => ![X, Y, Z].includes(c))) + " forment un circuit fermé : il bloque la propagation et élimine le facteur pathogène.</p></div>" + circuitCard(circ) : "";
     }
     main.innerHTML = aide('Un facteur pathogène se propage d’un canal à un canal de sa famille (les canaux qui le rééquilibrent). Lire cette propagation permet d’anticiper et de protéger le canal le plus menacé.') +
-      '<div class="bar">' + propBar() + scoreLine("propagation", "propagation suivie sans erreur", "propagations suivies sans erreur") + "</div>" +
+      '<div class="bar">' + propBar() + scoreLine("propagation", "cas suivi sans erreur", "cas suivis sans erreur") + "</div>" +
       '<div class="lay"><svg class="clock" viewBox="20 20 300 300" role="img" aria-label="Horloge chinoise des douze canaux">' + g + "</svg><div>" +
       '<p class="q">' + Q[G.step] + "</p>" +
       '<div class="act">' + (G.shown ? (G.done ? "" : '<button type="button" class="tool" id="gNext">Continuer</button>') : '<button type="button" class="tool" id="gVal">Valider</button><button type="button" class="tool" id="gClr">Effacer</button>') +
