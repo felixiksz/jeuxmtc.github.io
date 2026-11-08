@@ -238,12 +238,12 @@
   }
   const SCHEMAS = {1:"Schéma 1 · horizontale et diagonale", 2:"Schéma 2 · verticale et diagonale", 3:"Schéma 3 · horizontale et verticale", 0:"Autres circuits · équilibre dynamique seulement"};
   const rappel = () => '<details class="rappel"><summary>Rappel : les circuits du cours</summary>' +
+    '<div style="margin-top:8px">' + aide("Main en haut, pied en bas. Plein : yīn ; cerclé : yáng. Les traits relient les canaux qui se rééquilibrent.") + "</div>" +
     [1, 2, 3, 0].map(k => {
       const list = CIRC.filter(c => (c.autre ? 0 : schemaOf(c.grid)) === k);
       return list.length ? '<p class="lbltop" style="margin-top:12px">' + SCHEMAS[k] + '</p><div class="minis">' +
         list.map(c => '<div class="mini">' + gridSvg(c.grid, {}) + '<div class="sm">' + esc(c.title) + "</div></div>").join("") + "</div>" : "";
-    }).join("") +
-    '<p class="sm">Main en haut, pied en bas. Plein : yīn ; cerclé : yáng. Les traits relient les canaux qui se rééquilibrent.</p></details>';
+    }).join("") + "</details>";
   function bindPalette(fn){ main.querySelectorAll(".pc").forEach(b => b.addEventListener("click", () => fn(b.dataset.c))); }
   function bindCells(fn){ main.querySelectorAll(".gnode.open").forEach(n => n.addEventListener("click", () => fn(+n.dataset.i))); }
   const on = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener("click", fn); };
