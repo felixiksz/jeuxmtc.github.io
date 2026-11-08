@@ -37,6 +37,8 @@
   .polar, .rowlbl, .limblbl{ font:600 10px "Archivo", sans-serif; fill:var(--muted); letter-spacing:.04em; }
   .syslbl{ font:800 10px "Archivo", sans-serif; fill:var(--shadow-color); }
   .order{ font:800 10px "Archivo", sans-serif; fill:#c0392b; }
+  .propbar{ flex:1 1 300px; max-width:440px; height:auto; }
+  .steplbl{ font:600 11px "Archivo", sans-serif; fill:var(--muted); letter-spacing:.03em; } .steplbl.cur{ fill:var(--text-color); font-weight:800; }
   .lbltop{ font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0 0 4px; }
   .q{ font-family:"Libre Baskerville", Georgia, serif; font-size:1.05rem; margin:2px 0 10px; }
   .cc{ letter-spacing:.02em; }
@@ -425,6 +427,18 @@
     return both(X, Z).filter(w => w !== Y);
   }
   const clockPos = c => { const a = -Math.PI / 2 + (ORD.indexOf(c) - ORD.indexOf("C")) * Math.PI / 6; return [170 + 125 * Math.cos(a), 170 + 125 * Math.sin(a)]; };
+  // barre de progression : le chemin du facteur pathogène (niveau 1, niveau 2, niveau 3, protéger), couleur du halo du jeu
+  function propBar(){
+    const xs = [30, 154, 278, 402], names = ["niveau 1", "niveau 2", "niveau 3", "protéger"], cur = G.step - 1, done = i => i < cur || (G.done && i === cur);
+    let s = '<line x1="30" y1="14" x2="402" y2="14" stroke="currentColor" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="4 4"/>' +
+      (cur ? '<line x1="30" y1="14" x2="' + xs[cur] + '" y2="14" stroke="var(--shadow-color)" stroke-width="2"/>' : "");
+    xs.forEach((x, i) => {
+      s += i <= cur ? '<circle cx="' + x + '" cy="14" r="8" fill="' + (done(i) ? "var(--shadow-color)" : "var(--page-bg)") + '" stroke="var(--shadow-color)" stroke-width="2"/>'
+        : '<circle cx="' + x + '" cy="14" r="6" fill="var(--page-bg)" stroke="currentColor" stroke-opacity=".45" stroke-width="1.5"/>';
+      s += '<text x="' + x + '" y="40" text-anchor="middle" class="steplbl' + (i === cur ? " cur" : "") + '">' + names[i] + "</text>";
+    });
+    return '<svg class="propbar" viewBox="0 0 432 46" role="img" aria-label="Étape ' + G.step + ' sur 4">' + s + "</svg>";
+  }
   function renderPropagation(){
     const {X, Y, Z} = G;
     const ill = G.step >= 3 ? [X, Y, Z] : G.step === 2 ? [X, Y] : [X];
@@ -454,9 +468,9 @@
       end = circ ? '<div class="card"><p>' + chips([X, Y, Z]) + " et " + chip(circ.grid.find(c => ![X, Y, Z].includes(c))) + " forment un circuit fermé : il bloque la propagation et élimine le facteur pathogène.</p></div>" + circuitCard(circ) : "";
     }
     main.innerHTML = aide('Un facteur pathogène se propage d’un canal à un canal de sa famille (les canaux qui le rééquilibrent). Lire cette propagation permet d’anticiper et de protéger le canal le plus menacé.') +
-      '<div class="bar"><span class="sm">Étape ' + G.step + " sur 4</span>" + scoreLine("propagation", "propagation suivie sans erreur", "propagations suivies sans erreur") + "</div>" +
+      '<div class="bar">' + propBar() + scoreLine("propagation", "propagation suivie sans erreur", "propagations suivies sans erreur") + "</div>" +
       '<div class="lay"><svg class="clock" viewBox="20 20 300 300" role="img" aria-label="Horloge chinoise des douze canaux">' + g + "</svg><div>" +
-      '<p class="lbltop">Niveau ' + Math.min(G.step, 3) + '</p><p class="q">' + Q[G.step] + "</p>" +
+      '<p class="q">' + Q[G.step] + "</p>" +
       '<div class="act">' + (G.shown ? (G.done ? "" : '<button type="button" class="tool" id="gNext">Continuer</button>') : '<button type="button" class="tool" id="gVal">Valider</button><button type="button" class="tool" id="gClr">Effacer</button>') +
       '<button type="button" class="tool" id="gNew">' + (G.done ? "Nouvelle propagation" : "Autre cas") + "</button></div>" +
       (G.msg ? '<div class="res">' + G.msg + "</div>" : "") + end + "</div></div>" + rappel();
@@ -465,7 +479,9 @@
     on("gNew", () => { newPropagation(); renderPropagation(); });
     on("gNext", () => { G.step++; G.pick = new Set(); G.shown = null; G.msg = ""; renderPropagation(); });
     on("gVal", () => {
-      const ans = propAnswer(), mine = [...G.pick], ok = sameSet(mine, ans);
+      // cliquer sur un canal déjà atteint n'est pas une erreur (sauf à l'étape des transmetteurs, où ce sont eux la réponse)
+      const ill = G.step === 1 ? [X] : G.step === 2 ? [X, Y] : [X, Y, Z];
+      const ans = propAnswer(), mine = [...G.pick].filter(c => G.step === 3 || !ill.includes(c)), ok = sameSet(mine, ans);
       if(!ok) G.fails++;
       const miss = ans.filter(c => !G.pick.has(c)), extra = mine.filter(c => !ans.includes(c));
       let why = "";
