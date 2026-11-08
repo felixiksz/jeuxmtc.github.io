@@ -70,6 +70,8 @@
   details.rappel{ margin-top:26px; font-size:.86rem; }
   details.rappel summary{ cursor:pointer; font-weight:700; }
   details.rappel ul{ margin:6px 0; padding-left:18px; }
+  .minis{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px 16px; }
+  .mini .grid .rowlbl{ display:none; } .mini .sm{ text-align:center; line-height:1.3; }
   details.more{ margin:6px 0; font-size:.88rem; }
   details.more summary{ cursor:pointer; font-weight:700; }
   details.more ul{ margin:4px 0; padding-left:18px; }
@@ -186,11 +188,12 @@
   function gridSvg(cells, o){
     o = o || {};
     let g = '<text x="2" y="56" class="rowlbl">MAIN</text><text x="2" y="172" class="rowlbl">PIED</text>';
-    if(o.edges) for(let i = 0; i < 4; i++) for(let j = i + 1; j < 4; j++){
-      const a = cells[i], b = cells[j]; if(!a || !b) continue;
+    // liens toujours tracés, comme dans les schémas du cours ; pas vers une case que la personne est en train de remplir (ce serait la réponse)
+    if(o.edges !== false) for(let i = 0; i < 4; i++) for(let j = i + 1; j < 4; j++){
+      const a = cells[i], b = cells[j]; if(!a || !b || (o.open && (o.open.includes(i) || o.open.includes(j)))) continue;
       const l = links(a, b); if(!l.length) continue;
       const p = CELL[i], q = CELL[j], diag = i + j === 3, dx = q[0] - p[0], dy = q[1] - p[1], d = Math.hypot(dx, dy), ux = dx / d * 28, uy = dy / d * 28;
-      g += '<line x1="' + (p[0] + ux) + '" y1="' + (p[1] + uy) + '" x2="' + (q[0] - ux) + '" y2="' + (q[1] - uy) + '" stroke="currentColor" stroke-opacity=".55" stroke-width="1.6"/>';
+      g += '<line x1="' + (p[0] + ux) + '" y1="' + (p[1] + uy) + '" x2="' + (q[0] - ux) + '" y2="' + (q[1] - uy) + '" stroke="currentColor" stroke-opacity=".8" stroke-width="2"/>';
       if(o.sys){
         const t = diag ? .3 : .5, mx = p[0] + dx * t, my = p[1] + dy * t, w = 12 + l.length * 9;
         g += '<rect x="' + (mx - w / 2) + '" y="' + (my - 9) + '" width="' + w + '" height="18" rx="9" fill="var(--page-bg)" stroke="var(--shadow-color)"/>' +
@@ -199,13 +202,14 @@
     }
     cells.forEach((c, i) => {
       const [x, y] = CELL[i], open = o.open && o.open.includes(i), mk = o.marks && o.marks[i];
-      const yin = o.noPol ? null : (c ? YIN.has(c) : cellYin(cells, i));
+      // version B des schémas : yīn plein, yáng cerclé, dans la couleur du canal
+      const yin = o.noPol ? null : (c ? YIN.has(c) : cellYin(cells, i)), full = c && yin;
       g += '<g class="gnode' + (open ? " open" : "") + '" data-i="' + i + '">';
       if(o.sel === i) g += '<circle cx="' + x + '" cy="' + y + '" r="33" fill="none" stroke="var(--shadow-color)" stroke-width="2"/>';
       if(mk) g += '<circle cx="' + x + '" cy="' + y + '" r="33" fill="none" stroke="' + (mk === "ok" ? "#1a8a3a" : "#c0392b") + '" stroke-width="1.6" stroke-dasharray="4 3"/>';
-      g += '<circle cx="' + x + '" cy="' + y + '" r="26" fill="var(--page-bg)" stroke="' + (c ? ink(c) : "currentColor") + '" stroke-width="1.8"' + (c && !open ? "" : ' stroke-dasharray="4 4"') + "/>";
-      g += '<text x="' + x + '" y="' + (y + 5) + '" text-anchor="middle" class="glbl" style="fill:' + (c ? ink(c) : "currentColor") + '">' + (c ? esc(c) : "?") + "</text>";
-      if(yin != null) g += '<text x="' + x + '" y="' + (y + 43) + '" text-anchor="middle" class="polar">' + (yin ? "yīn" : "yáng") + "</text>";
+      g += '<circle cx="' + x + '" cy="' + y + '" r="26" fill="' + (full ? ink(c) : "var(--page-bg)") + '" stroke="' + (c ? ink(c) : "currentColor") + '" stroke-width="2.4"' + (c ? "" : ' stroke-dasharray="4 4"') + "/>";
+      g += '<text x="' + x + '" y="' + (y + 5) + '" text-anchor="middle" class="glbl" style="fill:' + (full ? (COLOR[c] ? "#fff" : "var(--page-bg)") : c ? ink(c) : "currentColor") + '">' + (c ? esc(c) : "?") + "</text>";
+      if(!c && yin != null) g += '<text x="' + x + '" y="' + (y + 43) + '" text-anchor="middle" class="polar">' + (yin ? "yīn" : "yáng") + "</text>";
       g += "<title>" + esc(c ? NAMES[c] : "Case à remplir") + "</title></g>";
     });
     return '<svg class="grid" viewBox="0 0 300 222" role="img" aria-label="Circuit : canaux de main en haut, canaux de pied en bas">' + g + "</svg>";
@@ -220,9 +224,21 @@
   const circuitCard = (c, opt) => '<div class="card"><p><b>Circuit ' + esc(c.title) + "</b> · " + gridTxt(c.grid) + (c.autre ? ' <span class="sm">(équilibre dynamique seulement)</span>' : "") + "</p>" +
     (opt && opt.ind === false ? "" : '<details class="more"' + (opt && opt.open ? " open" : "") + "><summary>Indications</summary><ul>" + c.indications.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul></details>") +
     '<details class="more"><summary>Actions</summary><ul>' + c.actions.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul></details></div>";
-  const rappel = () => '<details class="rappel"><summary>Rappel : les circuits du cours</summary><ul>' +
-    CIRC.map(c => "<li>" + gridTxt(c.grid) + " · " + esc(c.title) + (c.autre ? ' <span class="sm">(dynamique seulement)</span>' : "") + "</li>").join("") +
-    "</ul><p class=\"sm\">Lecture : haut gauche, haut droite / bas gauche, bas droite. Main en haut, pied en bas.</p></details>";
+  // schéma de l'équilibre statique (Méthode de l'équilibre global, p. 25-26) : 1 horizontale + diagonale, 2 verticale + diagonale,
+  // 3 horizontale + verticale, 4 tout relié
+  function schemaOf(g){
+    const L = (a, b) => links(a, b).length > 0, [a, b, c, d] = g;
+    const h = L(a, b) && L(c, d), v = L(a, c) && L(b, d), dg = L(a, d) && L(b, c);
+    return h && v && dg ? 4 : h && dg ? 1 : v && dg ? 2 : h && v ? 3 : 0;
+  }
+  const SCHEMAS = {1:"Schéma 1 · horizontale et diagonale", 2:"Schéma 2 · verticale et diagonale", 3:"Schéma 3 · horizontale et verticale", 0:"Autres circuits · équilibre dynamique seulement"};
+  const rappel = () => '<details class="rappel"><summary>Rappel : les circuits du cours</summary>' +
+    [1, 2, 3, 0].map(k => {
+      const list = CIRC.filter(c => (c.autre ? 0 : schemaOf(c.grid)) === k);
+      return list.length ? '<p class="lbltop" style="margin-top:12px">' + SCHEMAS[k] + '</p><div class="minis">' +
+        list.map(c => '<div class="mini">' + gridSvg(c.grid, {}) + '<div class="sm">' + esc(c.title) + "</div></div>").join("") + "</div>" : "";
+    }).join("") +
+    '<p class="sm">Main en haut, pied en bas. Plein : yīn ; cerclé : yáng. Les traits relient les canaux qui se rééquilibrent.</p></details>';
   function bindPalette(fn){ main.querySelectorAll(".pc").forEach(b => b.addEventListener("click", () => fn(b.dataset.c))); }
   function bindCells(fn){ main.querySelectorAll(".gnode.open").forEach(n => n.addEventListener("click", () => fn(+n.dataset.i))); }
   const on = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener("click", fn); };
@@ -258,7 +274,7 @@
     }
     main.innerHTML = aide('Un circuit : deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal a une entrée et une sortie : il est relié à ses deux voisins par un des cinq systèmes.') +
       '<div class="bar"><label><input type="checkbox" id="fTwo"' + (F.two ? " checked" : "") + "> deux canaux à trouver</label>" + scoreLine("fermer", "circuit fermé du premier coup", "circuits fermés du premier coup") + "</div>" +
-      '<div class="lay"><div>' + gridSvg(F.cells, {open:placing ? F.hide : [], sel:placing ? F.sel : null, edges:!placing, sys:!!F.sysRes, marks:F.marks}) + "</div><div>" + right +
+      '<div class="lay"><div>' + gridSvg(F.cells, {open:placing ? F.hide : [], sel:placing ? F.sel : null, sys:!!F.sysRes, marks:F.marks}) + "</div><div>" + right +
       (placing && F.msg ? '<div class="res">' + F.msg + "</div>" : "") + "</div></div>" + rappel();
     document.getElementById("fTwo").addEventListener("change", e => { F.two = e.target.checked; try{ localStorage.setItem(KEY + "_two", JSON.stringify(F.two)); }catch(x){} newFermer(); renderFermer(); });
     bindCells(i => { if(F.cells[i] && F.sel === i) F.cells[i] = null; F.sel = i; F.msg = ""; renderFermer(); });
@@ -358,7 +374,7 @@
           " : peu dérangeants, ou si habituels qu’iel ne les mentionnait plus, ou traités par le passé.</p><p class=\"sm\">Sans aucun symptôme, ce canal resterait dans le circuit : il le complète, harmonise la circulation et le changement de polarité, rééquilibre le yīn yáng.</p></div>" + circuitCard(P.c, {open:true})
           : '<div class="act"><button type="button" class="tool" id="pAsk">Interroger læ patient·e</button></div>');
     }
-    if(P.step === "circuit" || P.step === "interroger") left = gridSvg(P.cells, {open:P.step === "circuit" ? P.hide : [], sel:P.step === "circuit" ? P.sel : null, edges:P.step === "interroger", sys:P.step === "interroger", marks:P.marks});
+    if(P.step === "circuit" || P.step === "interroger") left = gridSvg(P.cells, {open:P.step === "circuit" ? P.hide : [], sel:P.step === "circuit" ? P.sel : null, sys:P.step === "interroger", marks:P.marks});
     const done = P.done || P.asked;
     main.innerHTML = aide('Læ patient·e énonce ses trois plaintes principales, de la plus importante à la moins importante. Elles désignent les canaux atteints, le niveau d’atteinte, puis le circuit thérapeutique.') +
       '<div class="bar">' + scoreLine("plaintes", "cas réussi du premier coup", "cas réussis du premier coup") + "</div>" +
