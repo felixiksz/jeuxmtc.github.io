@@ -67,10 +67,8 @@
   table.fam td.blank span{ display:inline-block; min-width:30px; padding:1px 6px; border:1.5px dashed currentColor; border-radius:999px; }
   table.fam td.blank.sel span{ border-style:solid; box-shadow:0 3px 10px var(--shadow-color); }
   .famwrap{ overflow-x:auto; }
-  .lvlpick{ display:inline-flex; align-items:center; gap:6px; font-weight:800; }
-  .lvlpick select{ font:inherit; font-weight:800; padding:2px 6px; }
-  .lvlstep{ font:inherit; font-weight:800; font-size:1.1rem; line-height:1; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--mtc-accent, var(--accent)); color:var(--mtc-accent, var(--accent)); background:var(--page-bg); cursor:pointer; padding:0; }
-  .lvlstep:disabled{ opacity:.3; cursor:default; }
+  .lvlpick{ display:inline-flex; align-items:center; gap:8px; flex:1 1 260px; max-width:420px; }
+  .lvlpick input[type="range"]{ flex:1; min-width:120px; accent-color:var(--mtc-accent, var(--accent)); }
   .compare{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px 22px; margin:10px 0; }
   .cmpgrid{ max-width:230px; margin:4px 0; } .cmpgrid .rowlbl{ display:none; }
   .cmpt{ font-weight:700; margin:2px 0 4px; }
@@ -587,6 +585,7 @@
   const R = {lvl:0};
   try{ R.lvl = Math.min(LEVELS.length - 1, Math.max(0, +JSON.parse(localStorage.getItem(KEY + "_gridlvl") || "0") || 0)); }catch(e){}
   const saveLvl = () => { try{ localStorage.setItem(KEY + "_gridlvl", JSON.stringify(R.lvl)); }catch(e){} };
+  const lvlTxt = i => "Niveau " + (i + 1) + " · " + (LEVELS[i] === 60 ? "toutes les cases vides" : LEVELS[i] + " cases vides");
   function newGrille(){
     R.round = ++ROUND;
     const all = []; ORD.forEach(c => [1, 2, 3, 4, 5].forEach(n => all.push(c + "|" + n)));
@@ -605,10 +604,10 @@
       return '<td class="blank' + (R.sel === k ? " sel" : "") + '" data-k="' + k + '"><span' + (f ? ' style="color:' + ink(f) + '"' : "") + ">" + (f ? esc(f) : "&nbsp;") + "</span></td>";
     }).join("") + "</tr>").join("");
     main.innerHTML = aide('Le tableau récapitulatif du rééquilibrage des canaux : pour chaque canal, le canal qui le rééquilibre dans chacun des cinq systèmes. Clique sur une case vide, puis sur un canal.') +
-      // choix libre du niveau : flèches pour monter ou descendre d'un niveau, liste pour aller directement à un niveau
-      '<div class="bar"><span class="lvlpick"><button type="button" class="lvlstep" id="rDown" aria-label="Niveau précédent"' + (R.gl ? "" : " disabled") + ">‹</button>" +
-      '<label>Niveau <select id="rLvl">' + LEVELS.map((n, i) => '<option value="' + i + '"' + (i === R.gl ? " selected" : "") + ">" + (i + 1) + " · " + (n === 60 ? "toutes les cases" : n + " cases") + "</option>").join("") + "</select></label>" +
-      '<button type="button" class="lvlstep" id="rUp" aria-label="Niveau suivant"' + (R.gl < LEVELS.length - 1 ? "" : " disabled") + ">›</button></span>" +
+      // choix du niveau avec un curseur, de facile (4 cases vides) à difficile (toute la grille)
+      '<div class="bar"><span class="lvlpick"><span class="sm">facile</span>' +
+      '<input type="range" id="rLvl" min="0" max="' + (LEVELS.length - 1) + '" step="1" value="' + R.gl + '" aria-label="Niveau">' +
+      '<span class="sm">difficile</span></span><b id="rLvlTxt">' + lvlTxt(R.gl) + "</b>" +
       scoreLine("grille", "grille parfaite", "grilles parfaites") + "</div>" +
       '<div class="famwrap"><table class="fam"><tr><th>Canal</th>' + [1, 2, 3, 4, 5].map(n => '<th title="' + esc(SYSNAME[n]) + '">' + n + "</th>").join("") + "</tr>" + rows + "</table></div>" +
       (R.done ? "" : palette()) +
@@ -616,9 +615,9 @@
       (R.msg ? '<div class="res">' + R.msg + "</div>" : "") +
       '<p class="sm">Systèmes : ' + [1, 2, 3, 4, 5].map(n => "<b>" + n + "</b> " + esc(SYSNAME[n])).join(" · ") + "</p>";
     const goLvl = i => { R.lvl = Math.max(0, Math.min(LEVELS.length - 1, i)); saveLvl(); newGrille(); renderGrille(); };
-    document.getElementById("rLvl").addEventListener("change", e => goLvl(+e.target.value));
-    on("rDown", () => goLvl(R.gl - 1));
-    on("rUp", () => goLvl(R.gl + 1));
+    const slider = document.getElementById("rLvl");
+    slider.addEventListener("input", e => { document.getElementById("rLvlTxt").textContent = lvlTxt(+e.target.value); });
+    slider.addEventListener("change", e => goLvl(+e.target.value));
     main.querySelectorAll("td.blank").forEach(td => td.addEventListener("click", () => { R.sel = td.dataset.k; renderGrille(); }));
     bindPalette(c => {
       if(R.done || !R.sel) return;
