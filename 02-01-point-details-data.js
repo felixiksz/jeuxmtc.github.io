@@ -1302,7 +1302,7 @@ const POINT_DETAILS = {
     "localisation": "Sur la face palmaire de l’avant-bras, sur la ligne reliant C7 (shén mén) et C3 (shào hǎi), 1 cùn au-dessus de C7 (shén mén), sur le bord radial du tendon du muscle fléchisseur ulnaire du carpe.",
     "methode_localisation": "Localiser le tendon du muscle fléchisseur ulnaire facilement palpable, s’insérant sur l’os pisiforme. C5 (tōng lǐ) se trouve directement sur la face radiale du tendon. C4 (líng dào), C6 (yīn xì) et C7 (shén mén) sont tous situés à des intervalles de 0,5 cùn. Diviser en 2 portions la ligne reliant C3 (shào hǎi) et C7 (shén mén), puis diviser en 2 la portion la plus distale, enfin diviser en 3 la portion distale afin de localiser C5 (tōng lǐ) qui se trouve au niveau du tiers le plus distal.",
     "methode_travail": "Puncture perpendiculaire de 0,3 à 1 cùn de profondeur, ou puncture oblique vers les doigts ou le coude.",
-    "categories_du_point": "- Point luò-liaison \n- Point étoile céleste de Mǎ Dān Yáng\n- Point d'ouverture du yin qiao mai",
+    "categories_du_point": "- Point luò-liaison \n- Point étoile céleste de Mǎ Dān Yáng",
     "correspondances": "- Yin qiao mai",
     "actions": "➢ Enrichit le sang et calme l’esprit. \n➢ Désobstrue les canaux et active les liaisons.\n➢ Régule le qi du coeur",
     "indications": "- Douleur cardiaque, mauvaise mémoire, insomnie, palpitations, agitation de l’organe, démence, dépression, manie, épilepsie, maux de tête, vertiges. \n- Gonflement et douleur de la gorge, perte soudaine de la voix, langue raide, langue douloureuse. \n- Douleur du bras et du poignet.",
