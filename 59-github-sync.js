@@ -249,6 +249,8 @@
     try{
       if(typeof window.normalizeOldPointDetails === "function") window.normalizeOldPointDetails();
       if(typeof window.ensurePointAssociationsField === "function") window.ensurePointAssociationsField();
+      // indications et actions de saignée (saignee-ajouts.js) : remises après les données synchronisées
+      if(typeof window.mtcApplySaignee === "function") window.mtcApplySaignee();
     }catch(error){}
   }
 

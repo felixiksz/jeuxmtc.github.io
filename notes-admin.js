@@ -92,7 +92,6 @@ window.MTC_SHARED_NOTES = {
    "notes": "Modèle Luo Émotionnel à trois niveaux : point Luo Yang pour l'émotion de base « Anxiété/sur-excitation ». (Sterman)"
   },
   "V40": {
-   "notes": "Saigner les minuscules vaisseaux autour de V40 pour douleurs lombaires. Libération immédiate.",
    "associations": "Clarifier et liberer la canicule (saignée): V 40 + EC 3\n\nV 40 + DM 26 : dégage et ouvre le qi du canal Tai Yang pour contrôler la douleur\nV 40 + DM 26 : par torsion ou contusion\nV 40 + DM 26 : par vent-froid avec raideur et/ou douleur lombaire (stimuler fortement DM 19 patient assis avant)\nV 40 + DM 26 — Circuits : Tai Yang/Shao Yin, Tai Yang/Tai Yin, Tai Yang/qi, Eau/Métal, Feu/Bois"
   },
   "V58": {
