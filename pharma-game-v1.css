@@ -2541,3 +2541,20 @@ body.game-finished html[data-study-domain="pharmacology"] .pharma-solved-point,
 html[data-study-domain="pharmacology"] body.game-finished .pharma-solved-point{
   pointer-events:auto !important;
 }
+
+/* photo libre (Wikimedia Commons) : crédit sous l'image */
+html[data-study-domain="pharmacology"] .pharma-photo-credit{
+  margin:4px 0 0;
+  font-size:.72rem;
+  line-height:1.35;
+  opacity:.75;
+  text-align:center;
+}
+html[data-study-domain="pharmacology"] .pharma-photo-credit a{ color:inherit; }
+/* choix parmi plusieurs photos libres */
+html[data-study-domain="pharmacology"] .pharma-photo-choices{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:6px 0 2px; }
+html[data-study-domain="pharmacology"] .pharma-photo-choice{ width:44px; height:44px; padding:0; border:2px solid transparent; border-radius:8px; overflow:hidden; cursor:pointer; background:none; opacity:.8; }
+html[data-study-domain="pharmacology"] .pharma-photo-choice:hover{ opacity:1; }
+html[data-study-domain="pharmacology"] .pharma-photo-choice.on{ border-color:var(--shadow-color); opacity:1; }
+html[data-study-domain="pharmacology"] .pharma-photo-choice img{ width:100%; height:100%; object-fit:cover; display:block; }
+html[data-study-domain="pharmacology"] .pharma-image-block.has-photo .pharma-image-actions{ top:10px; bottom:auto; }

@@ -278,21 +278,56 @@
     window.MTC_IMAGE_STORE.setImage(IMAGE_STORAGE_PREFIX, herbId, value || "");
   }
 
+  // photos libres (Wikimedia Commons, pharma-photos.js) : plusieurs par substance, chacun·e choisit la sienne (gardée dans ce navigateur)
+  const PHOTO_CHOICE_PREFIX = "mtc_pharma_photo_choice_";
+  // photos libres : pour l'instant seulement sur les appareils en mode admin (?admin=1 mémorisé)
+  function photosEnabled(){
+    try{ return localStorage.getItem("mtc_admin") === "1" || new URLSearchParams(location.search).get("admin") === "1"; }catch(e){ return false; }
+  }
+  function herbPhotos(id){ if(!photosEnabled()) return []; const list = window.MTC_PHARMA_PHOTOS && window.MTC_PHARMA_PHOTOS[id]; return Array.isArray(list) ? list : []; }
+  function chosenPhotoIndex(id){
+    const list = herbPhotos(id); let page = null;
+    try{ page = localStorage.getItem(PHOTO_CHOICE_PREFIX + id); }catch(e){}
+    const i = list.findIndex(p => p.page === page);
+    return i >= 0 ? i : 0;
+  }
+  function photoCreditHtml(photo){
+    return `${escapeHtml(photo.label ? photo.label + " · " : "")}Photo : ${escapeHtml(photo.author || "auteur inconnu")} · <a href="${escapeAttribute(photo.licenseUrl || photo.page)}" target="_blank" rel="noopener">${escapeHtml(photo.license)}</a> · <a href="${escapeAttribute(photo.page)}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+  }
+  window.mtcChoosePharmaPhoto = function(id, i){
+    const list = herbPhotos(id), photo = list[i]; if(!photo) return;
+    try{ localStorage.setItem(PHOTO_CHOICE_PREFIX + id, photo.page); }catch(e){}
+    document.querySelectorAll(`[data-pharma-image-block="${CSS.escape(id)}"]`).forEach(block => {
+      const img = block.querySelector(".pharma-image-preview img"); if(img) img.src = photo.thumb;
+      const credit = block.querySelector(".pharma-photo-credit"); if(credit) credit.innerHTML = photoCreditHtml(photo);
+      block.querySelectorAll("[data-pharma-photo-choice]").forEach(b => b.classList.toggle("on", +b.dataset.pharmaPhotoChoice === i));
+    });
+  };
+
   function renderImageBlock(herb){
-    const img = getHerbImage(herb);
+    const local = getHerbImage(herb);
+    // sans image perso : photo libre choisie (la première par défaut), avec auteur et licence
+    const photos = local ? [] : herbPhotos(herb.id);
+    const pick = photos.length ? chosenPhotoIndex(herb.id) : -1;
+    const photo = photos[pick] || null;
+    const img = local || (photo && photo.thumb);
     const hasImage = Boolean(img);
+    const credit = photo ? `<p class="pharma-photo-credit">${photoCreditHtml(photo)}</p>` +
+      (photos.length > 1 ? `<div class="pharma-photo-choices" aria-label="Choisir une autre photo">${photos.map((p, i) =>
+        `<button type="button" class="pharma-photo-choice${i === pick ? " on" : ""}" data-pharma-photo-choice="${i}" title="Photo ${i + 1} : ${escapeAttribute(p.label || "")}" onclick="event.preventDefault(); event.stopPropagation(); window.mtcChoosePharmaPhoto('${escapeAttribute(herb.id)}', ${i})"><img src="${escapeAttribute(p.thumb)}" alt="" loading="lazy"></button>`).join("")}</div>` : "") : "";
     return `
-      <section class="pharma-image-block ${hasImage ? "has-image" : "is-empty"}" data-pharma-image-block="${escapeAttribute(herb.id)}">
+      <section class="pharma-image-block ${hasImage ? "has-image" : "is-empty"}${photo ? " has-photo" : ""}" data-pharma-image-block="${escapeAttribute(herb.id)}">
         <div class="pharma-image-title">Image locale</div>
         <div class="pharma-image-preview">
-          ${hasImage ? `<img src="${escapeAttribute(img)}" alt="Image locale de ${escapeAttribute(getHerbLabel(herb))}">` : `<span class="pharma-image-empty">Aucune image locale</span>`}
+          ${hasImage ? `<img src="${escapeAttribute(img)}" alt="${photo ? "Photo" : "Image locale"} de ${escapeAttribute(getHerbLabel(herb))}" loading="lazy">` : `<span class="pharma-image-empty">Aucune image locale</span>`}
         </div>
+        ${credit}
         <div class="pharma-image-actions">
           <label class="pharma-image-upload">
             <span>${hasImage ? "Modifier l’image" : "Choisir une image"}</span>
             <input type="file" accept="image/*" data-pharma-image-input="${escapeAttribute(herb.id)}">
           </label>
-          <button type="button" data-pharma-image-remove="${escapeAttribute(herb.id)}" ${hasImage ? "" : "disabled"}>Supprimer</button>
+          <button type="button" data-pharma-image-remove="${escapeAttribute(herb.id)}" ${local ? "" : "disabled"}>Supprimer</button>
         </div>
         <p class="pharma-image-note">Image enregistrée localement dans ce navigateur.</p>
       </section>
