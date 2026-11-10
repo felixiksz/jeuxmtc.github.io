@@ -59,8 +59,14 @@
       {sel:"#cSpeed", title:"Vitesse de parole", text:"Lente, normale ou rapide, selon ta vitesse de lecture."}
     ]
   };
+  // seulement les étapes dont la zone est à l'écran (ouvert sur « Cas clinique », la fiche d'une formule n'est pas affichée)
   function steps(name){
-    return TOURS[name];
+    const visible = TOURS[name].filter(st => {
+      let sel = st.sel; try{ sel = typeof sel === "function" ? sel() : sel; }catch(e){ return false; }
+      const el = sel && document.querySelector(sel);
+      return el && el.getClientRects().length;
+    });
+    return visible.length ? visible : TOURS[name];
   }
   const ready = () => (window.mtcIsAdminPage && window.mtcIsAdminPage()) || (window.mtcBetaConsented && window.mtcBetaConsented());
   function tour(name, force){
