@@ -68,7 +68,7 @@ body.mtc-beta-player .admin-only, body.mtc-beta-player .edit-tools, body.mtc-bet
     veil.innerHTML = '<div class="mtc-beta-box" role="dialog" aria-modal="true" aria-labelledby="mtcBetaTitle">' +
       '<h2 id="mtcBetaTitle">' + esc(opts.title) + ' <span class="b">β</span></h2>' +
       "<p>Ce module est en <b>phase bêta</b> : il est encore en construction et en cours de vérification.</p>" +
-      '<label><input type="checkbox" id="mtcBeta1"><span>J’ai compris que le contenu peut contenir des erreurs ou des imprécisions, et qu’il ne remplace pas le cours.</span></label>' +
+      '<label><input type="checkbox" id="mtcBeta1"><span>J’ai compris que le contenu peut contenir des erreurs ou des imprécisions.</span></label>' +
       '<label><input type="checkbox" id="mtcBeta2"><span>J’accepte de signaler les erreurs que je repère en laissant des <b>commentaires de correction en ligne, visibles par tout le monde</b> (bouton « Corrections »). <small>Un compte GitHub est nécessaire pour écrire.</small></span></label>' +
       '<div class="row"><a class="btn" href="../index.html">Retour à l’accueil</a><button type="button" class="go" id="mtcBetaGo" disabled>J’accepte et j’entre</button></div></div>';
     document.body.appendChild(veil);
