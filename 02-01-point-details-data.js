@@ -2099,7 +2099,7 @@ const POINT_DETAILS = {
     "correspondances": "🖇️ yīn qiāo mài",
     "actions": "➢ Nourrit le yīn et régularise les règles\n➢ Favorise la gorge\n➢ Calme l’esprit et arrête les convulsions",
     "indications": "- Visage gonflé, yeux rouges et douloureux, vision trouble, acouphènes.\n- Gorge douloureuse et sèche, syndrome du noyau de prune, aphonie\nsoudaine.\n- Douleur cardiaque.\n- Insomnie et somnolence\n- Asthme.\n- Douleur abdominale, borborygme, diarrhée.\n- Règles irrégulières, dysménorrhée, aménorrhée, leucorrhées, prolapsus utérin, travail de\nl'accouchement difficile.\n- Hernie, émission séminale, rétention d'urine, mictions fréquentes, énurésie.\n- Épilepsie (surtout nocturne)\n- Phobie.\n- Pied gonflé et rouge.\n- Convulsions des mains et des pieds.\n- Disharmonie Rn-C",
-    "notes": "Bcp d'énergie dans ce point\nNotamment utilisé pour équilibre psy nocturne (yin qiao mai)\npoint d’ouverture du yin qiao mai → peut traiter les troubles neuro.",
+    "notes": "Bcp d'énergie dans ce point\n\nNotamment utilisé pour équilibre psy nocturne (yin qiao mai)\n\nAncrage des émotions\n\nMaître du yin qiao mai : au-delà de la douleur de cheville, « remarquable pour montrer l'état du psychisme à un endroit particulier de la mémoire ». (DiPasquale)\n\npoint d’ouverture du yin qiao mai → peut traiter les troubles neuro.",
     "associations": "",
     "canal": "Rn",
     "_source_sheet": "Rn",
