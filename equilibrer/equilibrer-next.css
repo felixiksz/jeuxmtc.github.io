@@ -1,0 +1,37 @@
+/* Jeu « Équilibrer » : styles partagés par equilibrer/index.html et le module Réseaux (circuits/index.html) */
+  .balbar{ display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; font-size:.88rem; margin:0 0 12px; }
+  .balbar details.aide{ margin:0; }
+  .balbar details.aide[open]{ flex:1 1 100%; }   /* explications ouvertes : sur toute la largeur, les commandes passent dessous */
+  .balsysgrp{ display:inline-flex; gap:3px; }
+  .balsysgrp .balsysbtn{ width:26px; height:26px; }
+  .ballvl input[type="range"]{ flex:1 1 120px; max-width:300px; accent-color:var(--mtc-accent, var(--accent)); }
+  .balsol{ display:block; width:100%; text-align:left; font:inherit; color:inherit; background:none; border:0; border-left:3px solid transparent; padding:3px 0 3px 8px; margin:2px 0; cursor:pointer; }
+  .balsol:hover{ border-left-color:var(--hair, #ddd); }
+  .balsol.on{ border-left-color:var(--shadow-color); background:color-mix(in srgb, var(--shadow-color) 10%, transparent); }
+  .balsysbtn{ font:inherit; font-weight:800; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--text-color); background:transparent; color:var(--text-color); cursor:pointer; padding:0; }
+  .balsysbtn.on{ background:var(--text-color); color:var(--page-bg); }
+  .balbar label{ display:inline-flex; gap:5px; align-items:center; cursor:pointer; }
+  .balscore{ margin-left:auto; font-weight:800; }
+  .ballay{ display:grid; grid-template-columns:minmax(260px, 440px) minmax(0, 1fr); gap:10px 26px; align-items:start; }
+  @media (max-width:760px){ .ballay{ grid-template-columns:1fr; } main{ padding:12px 14px 80px; } }
+  .balclock{ width:100%; height:auto; aspect-ratio:1 / 1; color:var(--text-color); }
+  .balnode{ cursor:pointer; } .balnode.off{ opacity:.3; cursor:default; }
+  .balnode:hover circle:not([stroke-dasharray]){ filter:drop-shadow(0 0 5px var(--shadow-color)); }
+  .ballbl{ font:700 12px "Archivo", sans-serif; } .balsys{ font:700 10px "Archivo", sans-serif; fill:var(--shadow-color); }
+  .balhint{ font:800 10px "Archivo", sans-serif; fill:var(--shadow-color); } .balflow{ font:9px "Archivo", sans-serif; letter-spacing:.08em; fill:currentColor; opacity:.6; }
+  .ballbltop{ font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  .balcase{ font-family:"Libre Baskerville", Georgia, serif; font-size:1.1rem; margin:4px 0 10px; }
+  .balc{ letter-spacing:.02em; }
+  .balcov{ list-style:none; margin:0 0 10px; padding:0; font-size:.92rem; }
+  .balcov li{ padding:7px 0; border-bottom:1px solid var(--hair, #ddd); display:flex; gap:7px; align-items:baseline; flex-wrap:wrap; }
+  .balok{ color:#1a8a3a; font-weight:800; } .balno{ color:#c0392b; font-weight:800; }
+  .balsm{ font-size:.8rem; color:var(--muted); }
+  .balact{ display:flex; gap:6px; flex-wrap:wrap; margin:12px 0; }
+  .balres{ font-family:"Libre Baskerville", Georgia, serif; font-size:.92rem; line-height:1.6; }
+  details.balsyst{ margin-top:22px; font-size:.86rem; }
+  details.balsyst summary{ cursor:pointer; font-weight:700; }
+  details.balsyst table{ border-collapse:collapse; margin-top:8px; }
+  details.balsyst td, details.balsyst th{ border-bottom:1px solid var(--hair, #ddd); padding:3px 10px 3px 0; text-align:left; }
+  #balVal{ display:none !important; }   /* validation automatique */
+  @keyframes balpop{ 0%{ transform:scale(.6); opacity:0; } 60%{ transform:scale(1.18); } 100%{ transform:scale(1); opacity:1; } }
+  .balres .balok{ display:inline-block; animation:balpop .45s ease-out; }

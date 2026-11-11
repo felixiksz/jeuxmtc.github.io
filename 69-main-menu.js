@@ -74,6 +74,7 @@
       '</span></span><span class="mm-heart" aria-hidden="true">❤︎</span>Merci !</span>';
   };
   const DISCUSSIONS_URL = "https://github.com/felixiksz/jeuxmtc.github.io/discussions";
+  const fxOn = k => { try{ return localStorage.getItem(k) !== "0"; }catch(e){ return true; } };
   const ENTRIES = [["jouer", "Jouer"], ["reviser", "Réviser"], ["suivi", "Suivi"], ["reglages", "Réglages"]];
 
   const byId = id => document.getElementById(id);
@@ -186,6 +187,13 @@
       reglages: [
         ["Affichage", "Thèmes de couleurs, son, prononciation.", openSettings],
         ["Aide", "Les tutoriels de chaque écran.", () => setTimeout(() => call("startTour"), 30)],
+        // récompenses des bonnes réponses (celebrate.js) : un clic change le réglage sans fermer le menu
+        admin && ["Sons et vibration", "À chaque réponse : un son doux, une petite vibration du téléphone.", null, null,
+          [["mtc_fx_sound", "Sons"], ["mtc_fx_vibrate", "Vibration"]].map(([key, label]) => {
+            const on = fxOn(key), fn = () => { try{ localStorage.setItem(key, on ? "0" : "1"); }catch(e){} if(!on && key === "mtc_fx_sound" && window.mtcPlayFx) window.mtcPlayFx("good"); };
+            fn.stay = true;
+            return [label + " : " + (on ? "oui" : "non"), fn];
+          })],
         admin && byId("mtcGithubSyncButton") && ["Synchronisation", "Tes notes sur plusieurs appareils.", () => clickId("mtcGithubSyncButton")],
         admin && ["Soutiens", "Les prénoms de « Projet soutenu par » (en bas du menu) : modifier et publier.", editSupporters],
         ["Notes", "Exporter ou importer tes notes et images, ou les partager avec les contributeur·ices." + notesStatus(), null, null, [["Exporter", () => call("exportPersonalNotes")], ["Importer", () => call("openImportPersonalNotesDialog")], ["Partager", () => call("mtcShareNotes")]]],
@@ -276,7 +284,7 @@
     const it = (current[row.dataset.k] || [])[+row.dataset.i];
     if(!it) return;
     const sub = t.closest(".mm-sub");
-    if(it[4]){ if(sub){ close(); it[4][+sub.dataset.sub][1](); } return; }
+    if(it[4]){ if(sub){ const fn = it[4][+sub.dataset.sub][1]; if(fn.stay){ fn(); render(); } else { close(); fn(); } } return; }
     if(!it[2]) return;
     if(!it[5]) close();   // « Série » : l'interrupteur du rappel laisse le menu ouvert
     it[2]();

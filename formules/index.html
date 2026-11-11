@@ -92,6 +92,7 @@
 </style>
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
+<script>try{if(localStorage.getItem("mtc_admin")==="1"||/[?&]admin=1/.test(location.search))document.write('<script src="../celebrate.js?v=20261111-g"><\/script>')}catch(e){}</script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
 <body>
@@ -315,7 +316,7 @@
     const q = GAME.q;
     if(q.answered) return;
     q.answered = ok ? "ok" : "ko"; q.picked = picked;
-    GAME.total++; if(ok){ GAME.score++; GAME.streak++; } else GAME.streak = 0;
+    GAME.total++; if(ok){ GAME.score++; GAME.streak++; if(window.mtcCelebrate) window.mtcCelebrate(1); } else { GAME.streak = 0; if(window.mtcMiss) window.mtcMiss(); }
     if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
     renderGame();
   }
@@ -758,6 +759,7 @@
     skipTyping();
     const ok = f.id === CASE.c.f.id;
     CASE.answered = ok ? "ok" : "ko"; CASE.picked = f;
+    if(ok && window.mtcCelebrate) window.mtcCelebrate(1); else if(!ok && window.mtcMiss) window.mtcMiss();
     CASE.total++;
     if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
     if(ok) CASE.score += Math.max(3, 10 - Math.max(0, CASE.asked - 2));
