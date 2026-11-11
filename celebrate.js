@@ -43,7 +43,9 @@
       rev = ac.createDelay(1); rev.delayTime.value = .13;
       const fb = ac.createGain(), wet = ac.createGain(), tone = ac.createBiquadFilter();
       fb.gain.value = .28; wet.gain.value = .22; tone.type = "lowpass"; tone.frequency.value = 2400;
-      rev.connect(tone); tone.connect(fb); fb.connect(rev); tone.connect(wet); wet.connect(out);
+      // appareils modestes (peu de mémoire ou de cœurs) : pas d'écho du tout, le son reste sec
+      const low = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+      if(!low){ rev.connect(tone); tone.connect(fb); fb.connect(rev); tone.connect(wet); wet.connect(out); }
     }
     if(ac.state === "suspended") ac.resume();
     return ac;
