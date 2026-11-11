@@ -53,7 +53,8 @@ window.MTC_CIRCUITS = [
    "troubles oculaires…",
    "troubles des mictions…",
    "fatigue, déséquilibres respiratoires et digestifs, allergies respiratoires, petit appétit, distension abdominale, diarrhée, faiblesse du système immunitaire, œdèmes…",
-   "dépression, apathie, asthénie…"
+   "dépression, apathie, asthénie…",
+   "trouble de tai yang avec implication du tai yin"
   ]
  },
  {
