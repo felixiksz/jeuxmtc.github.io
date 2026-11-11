@@ -194,7 +194,18 @@
     }
     const miss = window.mtcRecordMistake;
     if(typeof miss === "function" && !miss.__mtcGlow){
-      const w = function(){ window.mtcMiss(); return miss.apply(this, arguments); };
+      const w = function(detail){
+        window.mtcMiss();
+        const res = miss.apply(this, arguments);
+        // combinaison fausse, mais 3 points sur 4 appartiennent au même groupe : on le dit tout de suite
+        try{
+          const pts = detail && detail.points, sol = typeof solution !== "undefined" ? solution : null;
+          if(detail && detail.reason === "wrong-combo" && pts && sol && sol.some(g => !g.solved && pts.filter(p => g.points.includes(p)).length === 3)){
+            setTimeout(() => { const m = document.getElementById("message"); if(m && !/Presque/.test(m.textContent)) m.textContent = "Presque : 3 points sur 4 vont ensemble. " + m.textContent; }, 0);
+          }
+        }catch(e){}
+        return res;
+      };
       w.__mtcGlow = true;
       window.mtcRecordMistake = w;
     }

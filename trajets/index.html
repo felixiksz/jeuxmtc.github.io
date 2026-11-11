@@ -269,7 +269,7 @@
 </style>
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script>try{if(localStorage.getItem("mtc_admin")==="1"||/[?&]admin=1/.test(location.search))document.write('<script src="../celebrate.js?v=20261111-g"><\/script>')}catch(e){}</script>
+<script>try{if(localStorage.getItem("mtc_admin")==="1"||/[?&]admin=1/.test(location.search))document.write('<script src="../celebrate.js?v=20261111-h"><\/script>')}catch(e){}</script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
 <body>
@@ -1539,7 +1539,8 @@
     if(!RT || RT.phase !== "play") return;
     const lines = RT.linesAt[code] || [code.split(" ")[0]];
     if(code === RT.cur.code){ if(wanted && wanted !== RT.cur.line && lines.includes(wanted)) rtChange(wanted); return; }
-    if(!lines.includes(RT.cur.line)){ RT.msg = code + " n’est pas sur ta ligne (" + sigle(RT.cur.line) + ") : les points que tu peux atteindre sont ceux qui restent nets sur le plan."; showNetwork(); return; }
+    if(!lines.includes(RT.cur.line)){ if(window.mtcPlayFx) window.mtcPlayFx("miss"); RT.msg = code + " n’est pas sur ta ligne (" + sigle(RT.cur.line) + ") : les points que tu peux atteindre sont ceux qui restent nets sur le plan."; showNetwork(); return; }
+    if(code !== RT.end && window.mtcPlayFx) window.mtcPlayFx("good");
     RT.moves.push({type:"ride", from:RT.cur.code, to:code, line:RT.cur.line});
     rtReplay(); RT.msg = "";
     if(code !== RT.end && wanted && wanted !== RT.cur.line && lines.includes(wanted)) return rtChange(wanted);
