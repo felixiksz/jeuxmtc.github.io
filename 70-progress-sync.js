@@ -46,7 +46,13 @@
 
   let applying = false, running = false, again = false, timer = 0;
 
-  const cfgOf = () => typeof window.mtcGithubSyncConfig === "function" ? window.mtcGithubSyncConfig() : null;
+  // réglages de la synchro des notes (59-github-sync.js) ; dans les modules (Réseaux, Formules, Trajets), lus directement
+  function directCfg(){
+    const g = k => { try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } };
+    const c = {token:g("mtc_github_sync_token"), owner:g("mtc_github_sync_owner"), repo:g("mtc_github_sync_repo"), branch:g("mtc_github_sync_branch") || "main"};
+    return c.token && c.owner && c.repo ? c : null;
+  }
+  const cfgOf = () => typeof window.mtcGithubSyncConfig === "function" ? window.mtcGithubSyncConfig() : directCfg();
   const isObj = v => !!v && typeof v === "object" && !Array.isArray(v);
   const clone = v => v == null ? v : JSON.parse(JSON.stringify(v));
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -346,10 +352,13 @@
   window.addEventListener("mtc-github-sync", event => {
     if(event && event.detail && event.detail.source === "github") schedule(500);
   });
-  // en quittant l'onglet ou l'appli : envoi immédiat de ce qui attend
+  // en quittant l'onglet ou l'appli : envoi immédiat de ce qui attend ; en y revenant : on reprend ce que les autres appareils ont fait
   document.addEventListener("visibilitychange", () => {
     if(document.hidden && timer){ clearTimeout(timer); timer = 0; run(); }
+    else if(!document.hidden && cfgOf()) schedule(1200);
   });
+  // modules (pas de synchro des notes pour lancer la première synchro) : une synchro à l'ouverture
+  if(typeof window.mtcGithubSyncConfig !== "function" && cfgOf()) schedule(1500);
 
   window.mtcProgressSyncNow = run;
 })();
