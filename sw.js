@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "v2.3-20261112";
+const MTC_OFFLINE_VERSION = "v2.3-20261112-c";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -12,6 +12,7 @@ const CORE_ASSETS = [
   "05-04-final-corrections.js",
   "celebrate.js",
   "collection.js",
+  "install-guide.js",
   "06-05-stats-total-real-points.js",
   "07-06-search-normalization.js",
   "08-07-stats-v2.js",

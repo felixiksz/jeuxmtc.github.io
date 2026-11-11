@@ -188,6 +188,8 @@
       reglages: [
         ["Affichage", "Thèmes de couleurs, son, prononciation.", openSettings],
         ["Aide", "Les tutoriels de chaque écran.", () => setTimeout(() => call("startTour"), 30)],
+        // guide d'installation en raccourci (install-guide.js)
+        window.mtcOpenInstallGuide && ["Sur l’écran d’accueil", window.mtcIsInstalled && window.mtcIsInstalled() ? "Le jeu est installé sur cet appareil." : "Ajouter le jeu en raccourci, comme une application : le guide pour ton téléphone ou ton ordinateur.", () => window.mtcOpenInstallGuide()],
         // récompenses des bonnes réponses (celebrate.js) : un clic change le réglage sans fermer le menu
         ["Sons et vibration", "À chaque réponse : un son doux, une petite vibration du téléphone.", null, null,
           [["mtc_fx_sound", "Sons"], ["mtc_fx_vibrate", "Vibration"]].map(([key, label]) => {
