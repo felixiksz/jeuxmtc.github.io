@@ -25,6 +25,23 @@
     observer:null
   };
 
+  // récompenses et niveaux (en test sur les appareils admin)
+  const GAMI = (() => { try{ return localStorage.getItem("mtc_admin") === "1" || /[?&]admin=1/.test(location.search); }catch(e){ return false; } })();
+  // niveaux au curseur : 4, 8, 12, 16 paires, puis 16 paires sans couleurs d'aide ; 5 erreurs possibles
+  const MEMO_LEVELS = [{n:4, label:"4 paires"}, {n:8, label:"8 paires"}, {n:12, label:"12 paires"}, {n:16, label:"16 paires"}, {n:16, label:"16 paires, sans couleurs d’aide", noEasy:true}];
+  const MEMO_MAX_ERRORS = 5;
+  (function(){
+    if(!GAMI || document.getElementById("mtcMemoGamiStyle")) return;
+    const st = document.createElement("style"); st.id = "mtcMemoGamiStyle";
+    st.textContent = ".mtc-memo-levels{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.8rem; margin:0 0 10px; }" +
+      ".mtc-memo-levels input{ flex:1 1 140px; max-width:320px; accent-color:var(--shadow-color); }" +
+      ".mtc-memo-hearts{ letter-spacing:.12em; } .mtc-memo-combo{ font-weight:800; color:#1a8a3a; }" +
+      ".mtc-memo-stars{ display:block; font-size:.7em; letter-spacing:.2em; margin-top:4px; }" +
+      ".mtc-memo-over{ margin:8px 0; padding:8px 12px; border-left:3px solid #c0392b; color:#c0392b; font-weight:700; }";
+    (document.head || document.documentElement).appendChild(st);
+  })();
+  function memoLevel(){ try{ const v = +localStorage.getItem("mtc_memo_level"); return Number.isInteger(v) && v >= 0 && v < MEMO_LEVELS.length ? v : 1; }catch(e){ return 1; } }
+  function pickVisible(pairs){ return GAMI ? shuffle(pairs).slice(0, MEMO_LEVELS[memoLevel()].n) : pairs.slice(); }
   function byId(id){ return document.getElementById(id); }
   function isPharma(){ return document.documentElement.getAttribute("data-study-domain") === "pharmacology"; }
   function isFinished(){ return document.body.classList.contains("game-finished") || document.body.classList.contains("game-complete"); }
@@ -53,6 +70,7 @@
       matchIndex:state.matchIndex,
       foundPairs:state.foundPairs,
       easyMode:state.easyMode,
+      visibleIds:state.visiblePairs.map(pair => pair.id), errors:state.errors || 0, combo:state.combo || 0, over:!!state.over,
       finished:state.visiblePairs.length > 0 && state.matched.size === state.visiblePairs.length
     };
     saveStore(STORAGE_SESSION, payload);
@@ -348,7 +366,8 @@
     state.phase = saved.phase === "prep" ? "prep" : "game";
     state.gridSignature = saved.gridSignature;
     state.pairs = merged;
-    state.visiblePairs = merged.slice();
+    state.visiblePairs = Array.isArray(saved.visibleIds) && saved.visibleIds.length ? merged.filter(pair => saved.visibleIds.includes(pair.id)) : merged.slice();
+    state.errors = Number(saved.errors) || 0; state.combo = Number(saved.combo) || 0; state.over = !!saved.over;
     state.matched = new Set(Array.isArray(saved.matched) ? saved.matched : []);
     state.attempts = Number(saved.attempts) || 0;
     state.matchIndex = Number(saved.matchIndex) || state.matched.size || 0;
@@ -461,7 +480,8 @@
     state.hasSession = true;
     state.phase = "game";
     state.pairs = pairs.filter(pair => cleanText(pair.summary)).slice(0, 16);
-    state.visiblePairs = state.pairs.slice();
+    state.visiblePairs = pickVisible(state.pairs);
+    state.errors = 0; state.combo = 0; state.over = false;
     state.matched = new Set();
     state.attempts = 0;
     state.matchIndex = 0;
@@ -527,12 +547,17 @@
     state.phase = "game";
     assignEasyColors(state.pairs);
     const hintButton = isPharma() ? '<button type="button" data-memo-action="hint" class="secondary memo-hint-button">Astuce</button>' : '';
+    const lv = memoLevel(), noEasy = GAMI && MEMO_LEVELS[lv].noEasy;
+    if(noEasy) state.easyMode = false;
     const easyActive = state.easyMode ? " is-active" : "";
     content().innerHTML = headerHtml("Mémo", "") +
+      (GAMI ? '<div class="mtc-memo-levels"><span>facile</span><input type="range" id="mtcMemoLevel" min="0" max="' + (MEMO_LEVELS.length - 1) + '" step="1" value="' + lv + '" aria-label="Niveau"><span>difficile</span>' +
+        '<b id="mtcMemoLevelTxt">Niveau ' + (lv + 1) + " · " + MEMO_LEVELS[lv].label + "</b></div>" : "") +
       '<div class="mtc-memo-toolbar">' +
         '<span id="mtcMemoScore">0/' + state.visiblePairs.length + ' · 0 essai</span>' +
+        (GAMI ? '<span id="mtcMemoHearts" class="mtc-memo-hearts" title="Erreurs possibles"></span><span id="mtcMemoCombo" class="mtc-memo-combo" aria-live="polite"></span>' : "") +
         hintButton +
-        '<button type="button" data-memo-action="toggle-easy" class="secondary memo-easy-button' + easyActive + '" aria-pressed="' + (state.easyMode ? 'true' : 'false') + '">MODE FACILE</button>' +
+        (noEasy ? "" : '<button type="button" data-memo-action="toggle-easy" class="secondary memo-easy-button' + easyActive + '" aria-pressed="' + (state.easyMode ? 'true' : 'false') + '">MODE FACILE</button>') +
         '<span id="mtcMemoHint" class="mtc-memo-hint" aria-live="polite"></span>' +
       '</div>' +
       '<div id="mtcMemoBoard"></div>' +
@@ -544,6 +569,11 @@
     renderColumnsBoard();
     updateScore();
     saveSession();
+    const slider = byId("mtcMemoLevel");
+    if(slider){
+      slider.addEventListener("input", () => { const v = +slider.value; byId("mtcMemoLevelTxt").textContent = "Niveau " + (v + 1) + " · " + MEMO_LEVELS[v].label; });
+      slider.addEventListener("change", () => { try{ localStorage.setItem("mtc_memo_level", String(+slider.value)); }catch(e){} restartMemo(); });
+    }
   }
   function summaryContentHtml(pair){
     if(pair.summaryImage){
@@ -586,17 +616,32 @@
   function showMemoBravo(){
     const board = byId("mtcMemoBoard");
     if(!board || byId("mtcMemoWin")) return;
-    board.insertAdjacentHTML("beforebegin", '<div id="mtcMemoWin" class="game-over-title bravo-punch mtc-memo-win">BRAVO !</div>');
+    // ✦ selon les erreurs : aucune ✦✦✦, 1 ou 2 ✦✦, 3 ou 4 ✦
+    const e = state.errors || 0, stars = GAMI ? (e === 0 ? "✦✦✦" : e <= 2 ? "✦✦" : "✦") : "";
+    board.insertAdjacentHTML("beforebegin", '<div id="mtcMemoWin" class="game-over-title bravo-punch mtc-memo-win">BRAVO !' + (stars ? '<span class="mtc-memo-stars">' + stars + "</span>" : "") + "</div>");
+    if(GAMI && window.mtcCelebrate) window.mtcCelebrate(2);
   }
   function updateScore(){
     const score = byId("mtcMemoScore");
     if(score) score.textContent = state.matched.size + "/" + state.visiblePairs.length + " · " + state.attempts + (state.attempts > 1 ? " essais" : " essai");
+    const hearts = byId("mtcMemoHearts");
+    if(hearts){ const left = Math.max(0, MEMO_MAX_ERRORS - (state.errors || 0)); hearts.textContent = "♥".repeat(left) + "♡".repeat(MEMO_MAX_ERRORS - left); }
     if(state.matched.size === state.visiblePairs.length && state.visiblePairs.length){
       if(typeof window.mtcRecordDailyPlay === "function") window.mtcRecordDailyPlay();
       showMemoBravo();
     }
   }
   function markWrong(elements){
+    if(GAMI){
+      state.errors = (state.errors || 0) + 1; state.combo = 0;
+      const combo = byId("mtcMemoCombo"); if(combo) combo.textContent = "";
+      if(window.mtcMiss) window.mtcMiss();
+      if(state.errors >= MEMO_MAX_ERRORS){
+        state.over = true;
+        const board = byId("mtcMemoBoard");
+        if(board && !byId("mtcMemoOver")) board.insertAdjacentHTML("beforebegin", '<div id="mtcMemoOver" class="mtc-memo-over">5 erreurs : la partie est finie. Clique sur « Rejouer le mémo » pour recommencer.</div>');
+      }
+    }
     elements.filter(Boolean).forEach(el => el.classList.add("wrong"));
     window.setTimeout(() => elements.filter(Boolean).forEach(el => el.classList.remove("wrong", "selected")), 520);
   }
@@ -614,6 +659,16 @@
       zone.insertAdjacentHTML("beforeend", '<article class="mtc-memo-found-pair" data-found-id="' + escapeHtml(pair.id) + '" style="--memo-match-hue:' + String(hue) + '"><span class="mtc-memo-found-badge">' + escapeHtml(label) + '</span><b>' + escapeHtml(pair.label) + '</b>' + summaryHtml + '</article>');
     }
     resetMemoHint(null);
+    if(GAMI){
+      state.combo = (state.combo || 0) + 1;
+      const done = state.matched.size === state.visiblePairs.length;
+      if(!done){
+        // combo : paires trouvées d'affilée sans erreur, la lueur grandit
+        if(window.mtcCelebrate) window.mtcCelebrate(state.combo >= 3 ? 2 : 1);
+        const combo = byId("mtcMemoCombo"); if(combo) combo.textContent = state.combo >= 2 ? "Combo × " + state.combo : "";
+      }
+      if(zone && window.mtcBounce) window.mtcBounce(zone.lastElementChild);
+    }
     saveSession();
     return {label, hue};
   }
@@ -629,7 +684,7 @@
     });
   }
   function handleColumnsClick(button){
-    if(!button || button.classList.contains("matched")) return;
+    if(!button || button.classList.contains("matched") || state.over) return;
     const id = button.getAttribute("data-id");
     if(state.hintTargetId !== id) resetMemoHint(id);
     if(button.classList.contains("memo-name")){
@@ -653,6 +708,8 @@
     saveSession();
   }
   function restartMemo(){
+    state.visiblePairs = pickVisible(state.pairs);
+    state.errors = 0; state.combo = 0; state.over = false;
     state.matched = new Set();
     state.attempts = 0;
     state.matchIndex = 0;

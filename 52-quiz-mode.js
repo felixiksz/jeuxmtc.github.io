@@ -25,6 +25,31 @@
     return points.map(item => item.point).slice().sort().join(",");
   }
 
+  // réponse vérifiée par le jeu : 4 propositions au lieu de « Réponse » + auto-évaluation (en test sur les appareils admin)
+  const GAMI = (() => { try{ return localStorage.getItem("mtc_admin") === "1" || /[?&]admin=1/.test(location.search); }catch(e){ return false; } })();
+  (function(){
+    if(!GAMI || document.getElementById("mtcQuizGamiStyle")) return;
+    const st = document.createElement("style"); st.id = "mtcQuizGamiStyle";
+    st.textContent = ".mtc-quiz-choices{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; margin:14px 0 8px; }" +
+      ".mtc-quiz-choice{ font:600 1.15rem 'Libre Baskerville', Georgia, serif; padding:12px 8px; border:1.5px solid var(--text-color); border-radius:999px; background:transparent; color:var(--text-color); cursor:pointer; }" +
+      ".mtc-quiz-choice.good{ border-color:#1a8a3a; background:color-mix(in srgb, #1a8a3a 14%, var(--page-bg)); color:#1a8a3a; }" +
+      ".mtc-quiz-choice.bad{ border-color:#c0392b; color:#c0392b; text-decoration:line-through; }" +
+      ".mtc-quiz-choice:disabled{ cursor:default; } .mtc-quiz-choice:disabled:not(.good):not(.bad){ opacity:.4; }" +
+      ".mtc-quiz-dontknow{ background:none; border:0; color:var(--text-color); text-decoration:underline; cursor:pointer; font-size:.85rem; opacity:.7; }" +
+      ".mtc-quiz-verdict{ font-weight:800; margin:6px 0 10px; } .mtc-quiz-verdict.ok{ color:#1a8a3a; } .mtc-quiz-verdict.no{ color:#c0392b; }";
+    (document.head || document.documentElement).appendChild(st);
+  })();
+  const pointLabel = code => String(code || "").replace(/^([A-Za-z]+)(\d+)$/, "$1 $2");
+  // propositions : la bonne réponse, deux points du même canal, un autre point de la grille
+  function quizChoices(question){
+    const code = question.point, canal = canalOfPoint(code);
+    const all = Object.keys(window.POINT_DETAILS || {});
+    const same = shuffle(all.filter(p => p !== code && canalOfPoint(p) === canal));
+    const grid = shuffle(currentGridPoints().map(item => item.point).filter(p => p !== code && !same.slice(0, 2).includes(p)));
+    const pool = same.slice(0, 2).concat(grid.slice(0, 1));
+    shuffle(all).forEach(p => { if(pool.length < 3 && p !== code && !pool.includes(p)) pool.push(p); });
+    return shuffle([code].concat(pool.slice(0, 3)));
+  }
   function byId(id){ return document.getElementById(id); }
   function isPharma(){ return document.documentElement.getAttribute("data-study-domain") === "pharmacology"; }
   function isFinished(){ return document.body.classList.contains("game-finished") || document.body.classList.contains("game-complete"); }
@@ -515,14 +540,37 @@
     content().innerHTML = headerHtml("Quiz", "Question " + (state.index + 1) + " / " + total, (state.index / total) * 100) +
       '<div class="mtc-quiz-card">' +
         promptHtml +
+        (GAMI ? choicesHtml(question) : "") +
         (question.revealed
-          ? answerHtml(question) + ratingHtml()
-          : '<button type="button" class="mtc-quiz-reveal-button" data-quiz-action="reveal">Réponse</button>') +
+          ? answerHtml(question) + (GAMI ? "" : ratingHtml())
+          : (GAMI ? "" : '<button type="button" class="mtc-quiz-reveal-button" data-quiz-action="reveal">Réponse</button>')) +
       '</div>' +
       '<div class="mtc-quiz-nav">' +
         '<button type="button" data-quiz-action="prev" class="secondary"' + (state.index === 0 ? " disabled" : "") + '>Précédent</button>' +
         '<button type="button" data-quiz-action="next">' + (state.index === total - 1 ? "Terminer" : "Suivant") + '</button>' +
       '</div>';
+  }
+  function choicesHtml(question){
+    if(!question.choices) question.choices = quizChoices(question);
+    const done = question.revealed;
+    return '<div class="mtc-quiz-choices">' + question.choices.map((p, i) => {
+      const cls = done ? (p === question.point ? " good" : p === question.picked ? " bad" : "") : "";
+      return '<button type="button" class="mtc-quiz-choice' + cls + '" data-quiz-action="choose" data-i="' + i + '"' + (done ? " disabled" : "") + ">" + escapeHtml(pointLabel(p)) + "</button>";
+    }).join("") + "</div>" +
+      (done ? '<p class="mtc-quiz-verdict ' + (question.result ? "ok\">Juste !" : "no\">" + (question.picked ? "Non : c’était " + escapeHtml(pointLabel(question.point)) + "." : "C’était " + escapeHtml(pointLabel(question.point)) + ".")) + "</p>"
+        : '<button type="button" class="mtc-quiz-dontknow" data-quiz-action="dontknow">Je ne sais pas</button>');
+  }
+  // réponse choisie : vérifiée tout de suite ; juste = « je maîtrise », faux = « à revoir » (revient plus loin)
+  function answerChoice(index){
+    const question = state.questions[state.index];
+    if(!question || question.revealed) return;
+    const picked = index == null ? null : question.choices[index];
+    question.picked = picked; question.result = picked === question.point; question.revealed = true;
+    applyRating(question.result ? "good" : "again");
+    if(question.result){ if(window.mtcCelebrate) window.mtcCelebrate(1); }
+    else if(window.mtcMiss) window.mtcMiss();
+    renderCurrentQuestion();
+    if(question.result && window.mtcBounce) window.mtcBounce(content().querySelector(".mtc-quiz-choice.good"));
   }
   function renderCompletion(){
     content().innerHTML = headerHtml("Quiz terminé", state.questions.length + " points passés en revue.", 100) +
@@ -559,6 +607,10 @@
   // difficile ne boucle indéfiniment. "Je maîtrise" fait progresser le
   // niveau et le point n'est pas reproposé cette fois-ci.
   function rateCurrent(rating){
+    applyRating(rating);
+    goNext();
+  }
+  function applyRating(rating){
     if(typeof window.mtcRecordDailyPlay === "function") window.mtcRecordDailyPlay();   // la série compte tous les jeux
     const question = state.questions[state.index];
     if(!question) return;
@@ -571,9 +623,8 @@
       const respawn = Object.assign({}, question, {revealed:false, shownAt:null, retryCount:(question.retryCount || 0) + 1, lastResponseMs:responseMs});
       const spacing = 3 + Math.floor(Math.random() * 3);
       const insertAt = Math.min(state.questions.length, state.index + spacing);
-      state.questions.splice(insertAt, 0, respawn);
+      state.questions.splice(insertAt, 0, Object.assign(respawn, {choices:null, picked:null, result:null}));
     }
-    goNext();
   }
 
   // Le quiz se ferme pour laisser voir la fiche/la comparaison (leur
@@ -608,6 +659,8 @@
     else if(action === "restart") restartQuiz();
     else if(action === "choose-mode") chooseQuizMode(button && button.getAttribute("data-mode"));
     else if(action === "rate") rateCurrent(button && button.getAttribute("data-rating"));
+    else if(action === "choose") answerChoice(+(button && button.getAttribute("data-i")));
+    else if(action === "dontknow") answerChoice(null);
     else if(action === "play-audio" && point){
       const details = detailsForPoint(point);
       if(details.hanzi && typeof window.playMtcAudioByHanzi === "function") window.playMtcAudioByHanzi(details.hanzi, button);
