@@ -73,7 +73,12 @@
   table.fam th:first-child, table.fam td:first-child{ text-align:left; }
   table.fam td.blank{ cursor:pointer; min-width:34px; }
   table.fam td.blank span{ display:inline-block; min-width:30px; padding:1px 6px; border:1.5px dashed currentColor; border-radius:999px; }
-  table.fam td.blank.sel span{ border-style:solid; box-shadow:0 3px 10px var(--shadow-color); }
+  /* case choisie : halo bleu granuleux (grain de papier photo, masque --mtc-noise de celebrate.js), la case reste nette par-dessus */
+  table.fam td.blank.sel{ position:relative; }
+  table.fam td.blank.sel span{ border-style:solid; position:relative; z-index:1; background:var(--page-bg); }
+  table.fam td.blank.sel::before{ content:""; position:absolute; left:50%; top:50%; width:86px; height:44px; transform:translate(-50%, -46%); z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse 50% 50% at 50% 50%, var(--shadow-color) 0%, var(--shadow-color) 30%, color-mix(in srgb, var(--shadow-color) 55%, transparent) 55%, transparent 80%);
+    -webkit-mask-image:var(--mtc-noise, none); mask-image:var(--mtc-noise, none); -webkit-mask-size:160px 160px; mask-size:160px 160px; }
   .famwrap{ overflow-x:auto; }
   /* une ligne à la fois : progression des 12 lignes en petits traits */
   .famprog{ display:flex; gap:4px; margin:0 0 12px; max-width:420px; }
