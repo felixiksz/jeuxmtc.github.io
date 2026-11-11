@@ -95,7 +95,11 @@
       pick(SOUNDS[set])(BASE[set] + KEY);
     }catch(e){}
   }
-  window.mtcPlayFx = play;
+  // petite bonne réponse (une case, un système, un canal…) : son et courte vibration, chacun réglable (Réglages → Sons et vibration)
+  window.mtcPlayFx = function(kind){
+    play(kind);
+    if(kind === "good" && navigator.vibrate && pref("mtc_fx_vibrate")) try{ navigator.vibrate(15); }catch(e){}
+  };
   // objectif du jour : bonnes réponses comptées par date, tous jeux confondus
   const today = () => { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
   function dayCount(add){
