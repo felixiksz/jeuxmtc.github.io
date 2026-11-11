@@ -2,6 +2,7 @@
 // grid : [haut gauche, haut droite, bas gauche, bas droite] comme dans le cours (main en haut, pied en bas).
 // autre : circuits qui ne reposent que sur l'équilibre dynamique (chapitre 13).
 // Indications et actions : base des circuits d’Assistant-MTC (acupuncture/circuits/circuits.json), enrichie des notes personnelles (circuits_perso.json).
+// Fichier réécrit automatiquement par circuits-assistant-sync.js quand Assistant-MTC change.
 window.MTC_CIRCUITS = [
  {
   "title": "Tài yīn / yáng míng",
