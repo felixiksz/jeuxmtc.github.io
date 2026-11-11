@@ -137,7 +137,7 @@
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261110-a"></script>
+<script src="../beta-modules.js?v=20261112-a"></script>
 </head>
 <body>
 <header>
@@ -813,7 +813,7 @@
   const Q5 = {};
   function newQuel(){
     const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv", "statique"]);
-    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null, errs:0});
+    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null, errs:0, hints:0, hintMsgs:[], out:new Set(), showPol:false, shown:new Set()});
     if(t === "indications" || t === "actions"){
       const c = rnd(CIRC), pool = t === "indications" ? shuffle(c.indications) : shuffle(c.actions.slice(1).filter(x => !GENERIC.test(x)));
       let k = Math.min(t === "indications" ? 2 : 3, pool.length), lines = pool.slice(0, k);
@@ -825,6 +825,35 @@
       Q5.c = Math.random() < .5 ? rnd(CIRC.filter(c => c.autre)) : rnd(BASE);
     }
   }
+  // astuces progressives : elles ne donnent jamais toute la réponse (la réponse ne compte plus comme « bonne réponse » après une astuce)
+  function quelAstuce(){
+    const t = Q5.t, nYin = g => g.filter(c => YIN.has(c)).length;
+    if(t === "astuce"){
+      const faux = Q5.opts.map((o, i) => i).filter(i => Q5.opts[i] !== Q5.a && !Q5.out.has(i));
+      if(!faux.length) return null;
+      const i = rnd(faux); Q5.out.add(i);
+      return "Une réponse fausse est écartée : « " + esc(Q5.opts[i].txt) + " ».";
+    }
+    if(t === "statique"){
+      if(Q5.showPol) return null;
+      Q5.showPol = true;
+      return "Les polarités sont affichées : y a-t-il un canal yīn et un canal yáng sur chaque ligne, et la même polarité en diagonale ?";
+    }
+    const grids = t === "astuceInv" ? Q5.a.pairs : CIRC.filter(o => Q5.lines.every(l => o[t].includes(l))).map(o => o.grid);
+    const compat = grids.filter(g => [...Q5.pick].every(x => g.includes(x)));
+    if(Q5.hints === 1){
+      const n = grids.length, ys = [...new Set(grids.map(nYin))];
+      return (t === "astuceInv" ? n + " association" + (n > 1 ? "s" : "") + " possible" + (n > 1 ? "s" : "") + " dans le cours" : n + " circuit" + (n > 1 ? "s" : "") + " du cours correspond" + (n > 1 ? "ent" : "")) + "." +
+        (ys.length === 1 ? " Ce qui est cherché comprend " + ys[0] + (ys[0] > 1 ? " canaux" : " canal") + " yīn et " + (grids[0].length - ys[0]) + " yáng." : "");
+    }
+    const dejaDonne = Q5.shown;
+    if(dejaDonne.size >= 2) return null;
+    const pool = (compat.length ? compat : grids), commun = pool[0].filter(c => pool.every(g => g.includes(c)) && !Q5.pick.has(c) && !dejaDonne.has(c));
+    const choix = commun.length ? commun : pool[0].filter(c => !Q5.pick.has(c) && !dejaDonne.has(c));
+    if(!choix.length) return null;
+    const c = rnd(choix); dejaDonne.add(c);
+    return "Un des canaux cherchés : " + chips([c]) + ".";
+  }
   function renderQuel(){
     let q = "", body = "";
     const t = Q5.t;
@@ -833,20 +862,23 @@
       body = '<div class="card">' + Q5.lines.map(l => "<p>" + (t === "indications" ? "➢ " : "– ") + esc(l) + "</p>").join("") + "</div>" + palette({on:Q5.pick, mark:Q5.mark});
     } else if(t === "astuce"){
       q = "Selon Dr Tán, les circuits incluant " + chips(Q5.pair).replace(", ", " et ") + " traitent :";
-      body = '<div class="opts">' + Q5.opts.map((o, i) => '<button type="button" class="tool opt" data-i="' + i + '"' + (Q5.done ? " disabled" : "") + (Q5.done && Q5.chosen === i ? (o === Q5.a ? ' style="outline:2px solid #1a8a3a"' : ' style="outline:2px solid #c0392b"') : "") + ">" + esc(o.txt) + (Q5.done && o === Q5.a ? ' <span class="ok">✓</span>' : Q5.done && Q5.chosen === i ? ' <span class="no">✗</span>' : "") + "</button>").join("") + "</div>";
+      body = '<div class="opts">' + Q5.opts.map((o, i) => '<button type="button" class="tool opt" data-i="' + i + '"' + (Q5.done || Q5.out.has(i) ? " disabled" : "") + (Q5.out.has(i) ? ' style="opacity:.35;text-decoration:line-through"' : "") + (Q5.done && Q5.chosen === i ? (o === Q5.a ? ' style="outline:2px solid #1a8a3a"' : ' style="outline:2px solid #c0392b"') : "") + ">" + esc(o.txt) + (Q5.done && o === Q5.a ? ' <span class="ok">✓</span>' : Q5.done && Q5.chosen === i ? ' <span class="no">✗</span>' : "") + "</button>").join("") + "</div>";
     } else if(t === "astuceInv"){
       q = "Selon Dr Tán, quels canaux, réunis dans un circuit, traitent " + esc(Q5.a.txt) + " ? Clique sur les deux.";
       body = palette({on:Q5.pick, mark:Q5.mark});
     } else {
       q = "Ce circuit respecte-t-il l’équilibre statique ?";
-      body = gridSvg(Q5.c.grid, {noPol:!Q5.done}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
+      body = gridSvg(Q5.c.grid, {noPol:!(Q5.done || Q5.showPol)}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
     }
     main.innerHTML = '<div class="bar">' + aide('Les actions et indications des circuits, les astuces de Dr Tán et l’équilibre statique.') + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
       '<div style="max-width:720px"><p class="q">' + q + "</p>" + body +
+      (Q5.hintMsgs.length ? '<div class="card">' + Q5.hintMsgs.map(m => "<p><b>Astuce</b> · " + m + "</p>").join("") + (Q5.done ? "" : '<p class="sm">Avec astuce, la réponse ne compte pas comme bonne réponse.</p>') + "</div>" : "") +
       '<div class="act">' + (!Q5.done && (t === "indications" || t === "actions" || t === "astuceInv") ? '<button type="button" class="tool" id="qVal">Valider</button>' : "") +
+      (!Q5.done ? '<button type="button" class="tool" id="qHint" title="Un coup de pouce (la réponse ne comptera pas comme bonne réponse)">Astuce</button>' : "") +
       '<button type="button" class="tool" id="qNext">' + (Q5.done ? "Question suivante" : "Autre question") + "</button></div>" +
       (Q5.msg ? '<div class="res">' + Q5.msg + "</div>" : "") + "</div>" + rappel();
     on("qNext", () => nextRound("quel", newQuel));
+    on("qHint", () => { Q5.hints++; Q5.hintMsgs.push(quelAstuce() || (Q5.t === "astuce" || Q5.t === "statique" ? "Plus d’astuce possible." : "Plus d’astuce possible : à toi de retrouver les derniers canaux.")); renderQuel(); });
     bindHist("quel");
     bindPalette(c => {
       if(Q5.done || Q5.pick.has(c) || (Q5.mark && Q5.mark[c])) return;
@@ -859,27 +891,30 @@
     });
     // marque les canaux : ceux de la bonne réponse en vert, les choix en trop en rouge
     const markPick = ans => { Q5.mark = {}; ans.forEach(c => Q5.mark[c] = "ok"); Q5.pick.forEach(c => { if(!ans.includes(c)) Q5.mark[c] = "no"; }); };
-    const finish = (ok, msg) => { Q5.done = true; record("quel", ok); Q5.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Non.</span> ') + msg; renderQuel(); };
+    const finish = (ok, msg, presque) => { Q5.done = true; const vrai = ok && !Q5.hints; record("quel", vrai); Q5.msg = (vrai ? '<span class="ok">' + praise() + "</span> " : ok ? '<span class="ok">Trouvé, avec astuce.</span> ' : presque ? '<span class="no">Presque.</span> ' : '<span class="no">Non.</span> ') + msg; renderQuel(); };
     on("qVal", () => {
       const mine = [...Q5.pick];
       if(t === "astuceInv"){
         const ok = Q5.a.pairs.some(p => sameSet(p, mine)) && !Q5.errs;
         markPick(Q5.a.pairs.find(p => sameSet(p, mine)) || Q5.a.pairs[0]);
-        finish(ok, "Les circuits incluant " + Q5.a.pairs.map(p => chips(p).replace(", ", " et ")).join(", et ceux incluant ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + ".");
+        const autre = !ok && mine.length === 2 ? ASTUCES.find(a => a !== Q5.a && a.pairs.some(p => sameSet(p, mine))) : null;
+        finish(ok, "Les circuits incluant " + Q5.a.pairs.map(p => chips(p).replace(", ", " et ")).join(", et ceux incluant ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + "." +
+          (autre ? "<br>Ta paire " + chips(mine).replace(", ", " et ") + " correspond à autre chose : ces circuits traitent " + esc(autre.txt) + (autre.note ? " (" + esc(autre.note) + ")" : "") + "." : ""));
         return;
       }
       const fits = CIRC.filter(o => Q5.lines.every(l => o[t].includes(l)));
       const found = fits.some(o => sameSet(o.grid, mine)), ok = found && !Q5.errs;
       const right = fits.find(o => sameSet(o.grid, mine)) || fits[0];
       markPick(right.grid);
-      finish(ok, ok ? "" : "Trouvé, avec " + Q5.errs + " canal" + (Q5.errs > 1 ? "aux" : "") + " faux en chemin.");
+      finish(ok, ok ? "" : found ? "Tu as bien retrouvé le circuit, mais avec " + Q5.errs + (Q5.errs > 1 ? " canaux" : " canal") + " faux en chemin : il faut le trouver sans erreur pour que ça compte comme bonne réponse." : "Ce n’est pas le bon circuit.", found && !ok);
       Q5.msg += found ? circuitCard(right) : compareHtml(mine, right, t, Q5.lines);
       renderQuel();
     });
     main.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
       const o = Q5.opts[+b.dataset.i], ok = o === Q5.a;
       Q5.chosen = +b.dataset.i;
-      finish(ok, "Les circuits incluant " + chips(Q5.pair).replace(", ", " et ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + ".");
+      finish(ok, "Les circuits incluant " + chips(Q5.pair).replace(", ", " et ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + "." +
+        (ok ? "" : "<br>Ton choix, « " + esc(o.txt) + " », correspond aux circuits incluant " + o.pairs.map(p => chips(p).replace(", ", " et ")).join(", et à ceux incluant ") + (o.note ? " (" + esc(o.note) + ")" : "") + "."));
     }));
     main.querySelectorAll(".st").forEach(b => b.addEventListener("click", () => {
       const statique = !Q5.c.autre, ok = (b.dataset.v === "1") === statique;

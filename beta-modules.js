@@ -38,10 +38,14 @@
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
     circuits: [
-      {sel:"#modes", title:"「 ✦ RÉSEAUX ✦ 」", text:"Sept jeux sur les six systèmes et les circuits thérapeutiques de Dr Tán : Équilibrer, Fermer le circuit, Trois plaintes, Propagation, Grille des familles, Quel circuit ?, Quatre membres. Tout vient des cours « Les six systèmes des canaux unis », « Les circuits thérapeutiques » et « Méthode de l’équilibre global »."},
-      {sel:"svg.grid, svg.clock, svg.balclock, table.fam", title:"Le circuit", text:"Deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal est relié à ses deux voisins par un des cinq systèmes."},
-      {sel:".palette", title:"Répondre", text:"Clique sur un canal pour répondre. Quand plusieurs cases sont vides, clique d’abord sur la case, puis sur le canal."},
-      {sel:".score", title:"Score", text:"Chaque jeu garde son score, et chaque partie terminée compte pour ta série de jours."},
+      {sel:"#modes", title:"「 ✦ RÉSEAUX ✦ 」", text:"Sept jeux sur les six systèmes et les circuits thérapeutiques de Dr Tán, en trois familles : les liens entre canaux, le circuit, la clinique. Tout vient des cours « Les six systèmes des canaux unis », « Les circuits thérapeutiques » et « Méthode de l’équilibre global »."},
+      {sel:() => tourMark(".bar, .balbar"), title:"Réglages du jeu", text:"Le « ? » explique le jeu. Le curseur règle la difficulté, de facile à difficile : le niveau ne monte jamais tout seul. À droite, ton score."},
+      {sel:() => tourMark("#main svg.grid, #main svg.clock, #main svg.balclock, #main table.fam, #main svg.body"), title:"Le plateau", text:"Chaque bonne réponse s’allume en vert tout de suite, avec un petit son ; une erreur s’affiche en rouge. Les félicitations arrivent quand tout est trouvé."},
+      {sel:() => tourMark("#main .palette"), title:"Répondre", text:"Clique sur un canal pour répondre. Quand plusieurs cases sont vides, clique d’abord sur la case, puis sur le canal."},
+      {sel:() => tourMark("#qHint"), title:"Astuce", text:"Tu sèches ? Chaque clic donne un coup de pouce sans livrer toute la réponse : le nombre de circuits possibles, un canal, ou une mauvaise réponse écartée. Une réponse trouvée avec astuce ne compte pas comme bonne réponse."},
+      {sel:() => tourMark("#main .hnav"), title:"Revenir en arrière", text:"Les flèches ‹ › font revoir les parties précédentes. Sur téléphone, glisse vers la droite pour revenir, vers la gauche pour avancer."},
+      {sel:"#mastery", title:"Maîtrise des canaux", text:"Chaque anneau se remplit quand tu réussis avec ce canal et se vide un peu à chaque erreur. Les canaux les moins remplis reviennent plus souvent. Les deux canaux d’une famille pleins : palier."},
+      {sel:".mtc-goalbar", title:"Objectif du jour", text:"Le fin trait vert de la barre du haut se remplit à chaque bonne réponse, tous jeux confondus : 20 par jour. Les sons et la vibration se règlent dans Menu → Réglages."},
       {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source (page du cours)."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
@@ -59,6 +63,15 @@
       {sel:"#cSpeed", title:"Vitesse de parole", text:"Lente, normale ou rapide, selon ta vitesse de lecture."}
     ]
   };
+  // tutoriel : premier élément visible (hors rappel replié) marqué d'un id, pour que la bulle pointe le bon endroit
+  function tourMark(selector){
+    const el = [...document.querySelectorAll(selector)].find(e => e.getClientRects().length && !e.closest("details:not([open])"));
+    document.querySelectorAll("[data-tour-mark]").forEach(x => { if(x !== el){ x.removeAttribute("data-tour-mark"); if(x.id === "tourMark" + x.dataset.tourMarkN) x.removeAttribute("id"); } });
+    if(!el) return null;
+    if(!el.id){ const n = String(Math.random()).slice(2, 8); el.id = "tourMark" + n; el.dataset.tourMarkN = n; }
+    el.setAttribute("data-tour-mark", "");
+    return "#" + CSS.escape(el.id);
+  }
   // seulement les étapes dont la zone est à l'écran (ouvert sur « Cas clinique », la fiche d'une formule n'est pas affichée)
   function steps(name){
     const visible = TOURS[name].filter(st => {
@@ -71,7 +84,7 @@
   const ready = () => (window.mtcIsAdminPage && window.mtcIsAdminPage()) || (window.mtcBetaConsented && window.mtcBetaConsented());
   function tour(name, force){
     if(!window.mtcTour || (!force && !ready())) return;
-    window.mtcTour(steps(name), {key:"mtc_tour_" + name + "_v1", force});
+    window.mtcTour(steps(name), {key:"mtc_tour_" + name + (name === "circuits" ? "_v2" : "_v1"), force});
   }
 
   function corrTarget(module){
