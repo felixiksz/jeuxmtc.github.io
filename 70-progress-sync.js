@@ -10,7 +10,10 @@
    - série quotidienne : date la plus récente, série prolongée d'un
      appareil à l'autre ;
    - paniers, files de révision, points comparés : la dernière
-     modification l'emporte (réunion si les deux appareils ont changé).
+     modification l'emporte (réunion si les deux appareils ont changé) ;
+   - collection (points trouvés) : réunion, le plus grand nombre de fois l'emporte ;
+     maîtrise par canal (Réseaux) : la dernière modification l'emporte ;
+   - objectif du jour : chaque appareil écrit son compte du jour, le jeu affiche la somme.
    ============================================================ */
 (function(){
   "use strict";
@@ -23,8 +26,21 @@
     "mtc_pharma_review_basket_v1": "union",
     "mtc_acu_review_queue_v1": "union",
     "connections_mtc_comparison_points_v1": "latest",
-    "mtc_pharma_comparison_slots_v1": "latest"
+    "mtc_pharma_comparison_slots_v1": "latest",
+    "mtc_collection_v1": "collection",
+    "mtc_circuits_mastery_v1": "latest"
   };
+  const GOAL_KEY = "mtc_daily_goal_v1", GOAL_OTHERS_KEY = "mtc_daily_goal_others_v1";
+  const today = () => { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
+  // collection : points trouvés sur l'un ou l'autre appareil (le plus grand nombre de fois)
+  function mergeCollection(a, b){
+    const out = {acu:{}, pharma:{}};
+    [a, b].forEach(o => ["acu", "pharma"].forEach(dom => {
+      const src = o && o[dom] || {};
+      Object.keys(src).forEach(id => { out[dom][id] = Math.max(out[dom][id] || 0, Number(src[id]) || 0); });
+    }));
+    return out;
+  }
   const STREAK_KEY = "mtc_daily_streak_v1";
   const MASTERY_PREFIX = "mtc_quiz_mastery_";
 
@@ -219,7 +235,8 @@
       const remoteChanged = !!r && r.at !== state.baseAt[k];
       let final = local, at = state.baseAt[k] || null;
       if(localChanged && remoteChanged){
-        final = mode === "union" ? JSON.stringify(unionArr(parse(local, []), parse(r.value, []), k === "mtc_acu_review_queue_v1" ? 80 : 0)) : local;
+        final = mode === "union" ? JSON.stringify(unionArr(parse(local, []), parse(r.value, []), k === "mtc_acu_review_queue_v1" ? 80 : 0))
+          : mode === "collection" ? JSON.stringify(mergeCollection(parse(local, {}), parse(r.value, {}))) : local;
         at = now;
       }else if(localChanged){
         at = now;
@@ -243,6 +260,14 @@
       if(!same(rec, localM[p])){ write(MASTERY_PREFIX + p, rec); changedHere = true; }
     });
 
+    // objectif du jour : le compte de cet appareil, et la somme des autres appareils pour aujourd'hui
+    const goal = readJson(GOAL_KEY, null), day = today();
+    mine.goal = goal && goal.d === day ? {d:day, n:Number(goal.n) || 0} : {d:day, n:0};
+    let others = 0;
+    Object.entries(devices).forEach(([id, dev]) => { if(id !== me && dev && isObj(dev.goal) && dev.goal.d === day) others += Number(dev.goal.n) || 0; });
+    const prevOthers = readJson(GOAL_OTHERS_KEY, null);
+    if(!prevOthers || prevOthers.d !== day || prevOthers.n !== others){ write(GOAL_OTHERS_KEY, {d:day, n:others}); changedHere = true; }
+
     mine.updatedAt = now;
     devices[me] = mine;
     const next = {version:1, devices, shared:nextShared, streak:streak.lastPlayedDate ? streak : (remote.streak || null), mastery};
@@ -260,7 +285,7 @@
   }
 
   function refreshScreens(){
-    ["renderStatsPanelIfOpen", "updateBasketCount", "renderReviewBasketPanelIfOpen", "renderAdvancedSearchPanelIfOpen", "mtcRenderStreakBadge"].forEach(name => {
+    ["renderStatsPanelIfOpen", "updateBasketCount", "renderReviewBasketPanelIfOpen", "renderAdvancedSearchPanelIfOpen", "mtcRenderStreakBadge", "mtcDrawGoal"].forEach(name => {
       try{ if(typeof window[name] === "function") window[name](); }catch(e){}
     });
   }
@@ -309,7 +334,7 @@
   }
 
   // une partie, un quiz, un panier modifiés : envoi quelques secondes après
-  const tracked = key => COUNTERS.includes(key) || Object.prototype.hasOwnProperty.call(SHARED, key) || key === STREAK_KEY || String(key).indexOf(MASTERY_PREFIX) === 0;
+  const tracked = key => COUNTERS.includes(key) || Object.prototype.hasOwnProperty.call(SHARED, key) || key === STREAK_KEY || key === GOAL_KEY || String(key).indexOf(MASTERY_PREFIX) === 0;
   const originalSetItem = Storage.prototype.setItem;
   Storage.prototype.setItem = function(key, value){
     const result = originalSetItem.apply(this, arguments);

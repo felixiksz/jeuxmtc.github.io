@@ -111,7 +111,10 @@
     if(add){ o.n++; try{ localStorage.setItem(DAY, JSON.stringify(o)); }catch(e){} }
     return o.n;
   }
-  window.mtcDailyGoal = () => ({done:dayCount(false), goal:GOAL});
+  // bonnes réponses des autres appareils aujourd'hui (synchronisation de la progression, 70-progress-sync.js)
+  function othersToday(){ try{ const o = JSON.parse(localStorage.getItem("mtc_daily_goal_others_v1") || "null"); return o && o.d === today() ? Number(o.n) || 0 : 0; }catch(e){ return 0; } }
+  const dayTotal = add => dayCount(add) + othersToday();
+  window.mtcDailyGoal = () => ({done:dayTotal(false), goal:GOAL});
   const css =
     ".mtc-glow{ position:fixed; inset:0; pointer-events:none; z-index:2147483000; opacity:0;" +
     " background:radial-gradient(ellipse 75% 70% at 50% 45%, rgba(52,178,96,.10) 0%, rgba(52,178,96,.20) 55%, rgba(40,160,84,.42) 100%); }" +
@@ -127,8 +130,9 @@
     ".mtc-bounce{ animation:mtcBounce .55s cubic-bezier(.3,1.6,.5,1); }" +
     "g.mtc-bounce, svg .mtc-bounce{ transform-box:fill-box; transform-origin:center; }" +
     "@keyframes mtcBounce{ 0%{ transform:scale(1); } 45%{ transform:scale(1.22); } 100%{ transform:scale(1); } }" +
-    ".mtc-grain{ position:fixed; inset:0; pointer-events:none; z-index:2147482999; mix-blend-mode:overlay; opacity:.18; background-size:180px 180px;" +
-    " -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, transparent 78%, #000 100%); mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, transparent 78%, #000 100%); }" +
+    "html.mtc-grainy #mtcOpeningGlow, html.mtc-grainy .mtc-shade{ -webkit-mask-image:var(--mtc-noise); mask-image:var(--mtc-noise); -webkit-mask-size:160px 160px; mask-size:160px 160px; }" +
+    ".mtc-shade{ position:fixed; left:0; right:0; bottom:0; height:16px; pointer-events:none; z-index:9000; background:linear-gradient(to top, var(--shadow-color, #00f) 0%, transparent 100%); opacity:.75; }" +
+    "body:has(.advanced-search-panel.open, .review-basket-panel.open, .comparison-panel.open, .stats-panel.open) .mtc-shade{ display:none; }" +
     ".mtc-goalbar{ position:absolute; left:0; right:0; bottom:0; height:3px; pointer-events:none; z-index:2; background:rgba(26,138,58,.12); }" +
     ".mtc-goalbar i{ display:block; height:100%; width:0; background:#1a8a3a; transition:width 1s cubic-bezier(.2,.8,.2,1); }" +
     ".mtc-goalbar.top{ position:fixed; top:0; bottom:auto; z-index:9800; }" +
@@ -161,7 +165,7 @@
           host.appendChild(goalEl);
         }else{ goalEl.classList.add("top"); document.body.appendChild(goalEl); }
       }
-      const n = dayCount(false), w = Math.min(100, n / GOAL * 100);
+      const n = dayTotal(false), w = Math.min(100, n / GOAL * 100);
       goalEl.title = "Objectif du jour : " + Math.min(n, GOAL) + " / " + GOAL + " bonnes réponses, tous jeux confondus";
       goalEl.querySelector("b").textContent = n >= GOAL ? "objectif du jour atteint" : "objectif du jour · " + n + " / " + GOAL;
       goalEl.classList.toggle("full", n >= GOAL);
@@ -175,19 +179,24 @@
     try{ ensure(); if(!el) return; el.classList.remove("mtc-bounce"); void el.getBoundingClientRect(); el.classList.add("mtc-bounce");
       setTimeout(() => el.classList.remove("mtc-bounce"), 600); }catch(e){}
   };
-  // grain de papier photo, très léger, sur les ombres et les halos (mélange « overlay » : le blanc reste blanc, le noir reste noir)
+  // grain de papier photo, très léger, seulement dans les ombres portées : un masque de petits points posé sur les
+  // couches d'ombre (halo d'ouverture, ombre du bas de l'accueil) ; le fond et les pastilles ne sont pas touchés
   function addGrain(){
     try{
-      const low = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
-      if(low || document.querySelector(".mtc-grain") || !document.body) return;
+      if(!document.body || document.documentElement.classList.contains("mtc-grainy")) return;
       ensure();
-      const c = document.createElement("canvas"); c.width = c.height = 180;
-      const x = c.getContext("2d"), d = x.createImageData(180, 180);
-      for(let i = 0; i < d.data.length; i += 4){ const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+      // ombre du bas de l'accueil (sous les panneaux rangés) : une couche à part, qui peut recevoir le grain
+      if(document.getElementById("statsPanel") && !document.querySelector(".mtc-shade")){
+        const sh = document.createElement("div"); sh.className = "mtc-shade"; sh.setAttribute("aria-hidden", "true"); document.body.appendChild(sh);
+      }
+      const low = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+      if(low) return;
+      const c = document.createElement("canvas"); c.width = c.height = 160;
+      const x = c.getContext("2d"), d = x.createImageData(160, 160);
+      for(let i = 0; i < d.data.length; i += 4){ d.data[i] = d.data[i + 1] = d.data[i + 2] = 255; d.data[i + 3] = 150 + Math.random() * 105; }
       x.putImageData(d, 0, 0);
-      const g = document.createElement("div"); g.className = "mtc-grain"; g.setAttribute("aria-hidden", "true");
-      g.style.backgroundImage = "url(" + c.toDataURL() + ")";
-      document.body.appendChild(g);
+      document.documentElement.style.setProperty("--mtc-noise", "url(" + c.toDataURL() + ")");
+      document.documentElement.classList.add("mtc-grainy");
     }catch(e){}
   }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", addGrain); else addGrain();
@@ -212,7 +221,7 @@
         if(b >= 5 && !recordShown){ recordShown = true; strong = true; fx = "palier"; say("Nouveau record<small>" + streak + " d’affilée</small>"); }
       }
       if(streak % 5 === 0 && !(recordShown && streak === b + 1)){ strong = true; fx = "serie"; say("Série de " + streak + "<small>bonnes réponses d’affilée</small>"); }
-      const n = dayCount(true);
+      const n = dayTotal(true);
       if(n === GOAL){ strong = true; fx = "objectif"; say("Objectif du jour atteint<small>" + GOAL + " bonnes réponses</small>"); }
       replay(glow, strong ? "big" : "go");
       play(fx);
