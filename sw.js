@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "v2.3-20261112-g";
+const MTC_OFFLINE_VERSION = "v2.3-20261112-h";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -113,6 +113,7 @@ const CORE_ASSETS = [
   "audio-manifest.js",
   "bucket8-acu-export-import-fixes.css",
   "favicon.svg",
+  "icon-180.png",
   "icon-192.png",
   "icon-512.png",
   "index.html",
