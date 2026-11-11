@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script>/* appareils admin : nouvelle version en test (admin.html) */ try{ if(localStorage.getItem("mtc_admin") === "1" || /[?&]admin=1/.test(location.search)) location.replace("admin.html" + location.search + location.hash); }catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Réseaux</title>
@@ -24,6 +23,8 @@
   .src{ color:var(--muted); font-size:.88rem; margin:0 0 12px; max-width:760px; }
   .bar{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:.88rem; margin:0 0 12px; }
   .bar label{ display:inline-flex; gap:5px; align-items:center; cursor:pointer; }
+  /* le « ? » sur la même ligne que les réglages du jeu ; ouvert, l'explication prend toute la largeur */
+  .bar > details.aide{ margin:0; } .bar > details.aide[open]{ flex:1 1 100%; }
   .bar select{ font:inherit; padding:2px 6px; }
   .score{ margin-left:auto; font-weight:800; }
   .lay{ display:grid; grid-template-columns:minmax(240px, 380px) minmax(0, 1fr); gap:10px 28px; align-items:start; }
@@ -56,6 +57,12 @@
   .edges li{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:5px 0; border-bottom:1px solid var(--hair, #ddd); }
   .sysb{ font:inherit; font-weight:800; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--text-color); background:transparent; color:var(--text-color); cursor:pointer; padding:0; }
   .sysb.on{ background:var(--text-color); color:var(--page-bg); }
+  .sysb.good{ background:#1a8a3a; border-color:#1a8a3a; color:#fff; opacity:1; cursor:default; }
+  .sysb.bad{ border-color:#c0392b; color:#c0392b; text-decoration:line-through; opacity:.75; cursor:default; }
+  .sysb:disabled:not(.good):not(.bad){ opacity:.45; cursor:default; }
+  .hnav{ display:inline-flex; align-items:center; gap:6px; }
+  .hbtn{ font:700 1.1rem "Archivo", sans-serif; width:30px; height:30px; border:1.5px solid var(--text-color); border-radius:50%; background:transparent; color:var(--text-color); cursor:pointer; padding:0; line-height:1; }
+  .hbtn:disabled{ opacity:.25; cursor:default; }
   .sysb:disabled{ cursor:default; }
   .opts{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; margin:6px 0; }
   .opts .tool{ text-transform:none; font-size:.9rem; letter-spacing:0; font-weight:600; text-align:left; }
@@ -68,6 +75,22 @@
   table.fam td.blank span{ display:inline-block; min-width:30px; padding:1px 6px; border:1.5px dashed currentColor; border-radius:999px; }
   table.fam td.blank.sel span{ border-style:solid; box-shadow:0 3px 10px var(--shadow-color); }
   .famwrap{ overflow-x:auto; }
+  /* une ligne à la fois : progression des 12 lignes en petits traits */
+  .famprog{ display:flex; gap:4px; margin:0 0 12px; max-width:420px; }
+  .famprog i{ flex:1; height:4px; border-radius:2px; background:color-mix(in srgb, var(--shadow-color) 18%, var(--page-bg)); }
+  .famprog i.past{ background:var(--shadow-color); }
+  .famprog i.now{ background:color-mix(in srgb, var(--shadow-color) 55%, var(--page-bg)); }
+  table.famone{ font-size:1.05rem; } table.famone td{ padding:10px 10px; }
+  table.fam td.flashno span{ border:2px solid #c0392b !important; color:#c0392b; animation:flashno .5s ease-out; }
+  @keyframes flashno{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-4px); } 75%{ transform:translateX(4px); } }
+  table.fam td.was-ok span{ color:#1a8a3a; border-bottom:2px solid #1a8a3a; padding:0 2px; }
+  table.fam td.was-no span{ color:#c0392b; white-space:nowrap; } table.fam td.was-no s{ font-size:.8em; margin-right:3px; }
+  /* maîtrise par canal et objectif du jour, sous les jeux */
+  .mastery{ max-width:1100px; margin:8px auto 40px; padding:16px 22px 0; border-top:1px solid var(--hair, #ddd); }
+  .mhead{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; margin-bottom:8px; }
+  .mrings{ display:flex; flex-wrap:wrap; gap:6px 10px; }
+  .mcell{ display:inline-flex; flex-direction:column; align-items:center; width:46px; }
+  .mring{ font:700 11px "Archivo", sans-serif; } .msm{ font-size:.66rem; color:var(--muted); white-space:nowrap; }
   .lvlpick{ display:inline-flex; align-items:center; gap:8px; flex:1 1 260px; max-width:420px; }
   .lvlpick input[type="range"]{ flex:1; min-width:120px; accent-color:var(--mtc-accent, var(--accent)); }
   .compare{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px 22px; margin:10px 0; }
@@ -99,12 +122,13 @@
   details.more summary{ cursor:pointer; font-weight:700; }
   details.more ul{ margin:4px 0; padding-left:18px; }
 </style>
-<link href="../equilibrer/equilibrer.css?v=20261108-b" rel="stylesheet">
+<link href="../equilibrer/equilibrer.css?v=20261112-a" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
+<script src="../celebrate.js?v=20261112-a"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
-<script src="circuits-data.js?v=20261107-a"></script>
-<script src="../equilibrer/equilibrer-game.js?v=20261108-b"></script>
+<script src="circuits-data.js?v=20261112-a"></script>
+<script src="../equilibrer/equilibrer-game.js?v=20261112-a"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
@@ -118,6 +142,7 @@
   <div class="modes" id="modes"></div>
 </header>
 <main id="main"></main>
+<section id="mastery" class="mastery" aria-label="Maîtrise des canaux"></section>
 <script>
   // accès : admins, ou joueurs quand le module est ouvert (beta-config.js), après acceptation de la phase bêta
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"circuits", title:"Réseaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -132,6 +157,7 @@
   // en diagonale (équilibre statique), chaque canal relié à ses deux voisins par un des cinq systèmes (équilibre
   // dynamique). Ces règles redonnent exactement les 12 circuits du cours, ni plus ni moins.
   const main = document.getElementById("main"), modesEl = document.getElementById("modes");
+  new MutationObserver(() => { if(!BOUNCE) return; const el = main.querySelector(BOUNCE); BOUNCE = null; if(el && window.mtcBounce) window.mtcBounce(el); }).observe(main, {childList:true, subtree:true});
   // explications du jeu rangées derrière un « ? » (ouvert ou fermé : le choix reste d'un jeu à l'autre)
   const aide = html => '<details class="aide"' + (window.mtcAideOpen ? " open" : "") + '><summary title="Explications" aria-label="Explications">?</summary><p class="src">' + html + "</p></details>";
   main.addEventListener("toggle", e => { if(e.target.classList && e.target.classList.contains("aide")) window.mtcAideOpen = e.target.open; }, true);
@@ -164,7 +190,8 @@
   const chips = a => a.map(chip).join(", ");
   const gridTxt = g => chip(g[0]) + " " + chip(g[1]) + " / " + chip(g[2]) + " " + chip(g[3]);
   const PRAISE = ["Parfait !", "Super !", "Bravo !", "Au top !", "Exactement !"];
-  const praise = () => PRAISE[Math.floor(Math.random() * PRAISE.length)];
+  // félicitation : appelée seulement pour une bonne réponse, elle allume aussi la lueur verte (celebrate.js)
+  const praise = () => { if(window.mtcCelebrate) window.mtcCelebrate(1); return PRAISE[Math.floor(Math.random() * PRAISE.length)]; };
 
   // règles du cours sur une grille [haut gauche, haut droite, bas gauche, bas droite]
   function gridOk(cells){
@@ -200,11 +227,49 @@
   const KEY = "mtc_circuits_v1";
   let SC = {}; try{ SC = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }catch(e){}
   function record(m, ok){
-    const s = SC[m] || (SC[m] = {ok:0, played:0}); s.played++; if(ok) s.ok++;
+    const s = SC[m] || (SC[m] = {ok:0, played:0}); s.played++; if(ok) s.ok++; else if(window.mtcMiss) window.mtcMiss();
     try{ localStorage.setItem(KEY, JSON.stringify(SC)); }catch(e){}
     if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
   }
-  const scoreLine = (m, one, many) => { const s = SC[m] || {ok:0, played:0}; return '<span class="score">' + s.ok + " " + (s.ok > 1 ? many : one) + " sur " + s.played + "</span>"; };
+  const scoreLine = (m, one, many) => { const s = SC[m] || {ok:0, played:0}; return '<span class="score">' + s.ok + " " + (s.ok > 1 ? many : one) + "</span>"; };
+
+
+  // ---------- maîtrise par canal ----------
+  // chaque canal a un anneau qui se remplit : +1 par réussite, -1 par erreur (de 0 à 8). Les canaux les moins
+  // remplis reviennent plus souvent (Grille, Équilibrer). Quand les deux canaux d'une famille sont pleins : palier.
+  const MKEY = "mtc_circuits_mastery_v1", MMAX = 8;
+  let MS = {};
+  try{ MS = JSON.parse(localStorage.getItem(MKEY) || "{}") || {}; }catch(e){}
+  const masteryOf = c => (MS[c] && MS[c].v) || 0;
+  const FAMILIES = [["Tài yīn", ["P", "Rt"]], ["Shào yīn", ["C", "Rn"]], ["Jué yīn", ["EC", "F"]], ["Tài yáng", ["IG", "V"]], ["Shào yáng", ["TF", "VB"]], ["Yáng míng", ["GI", "E"]]];
+  const fullFam = () => FAMILIES.filter(([, p]) => p.every(c => masteryOf(c) >= MMAX)).map(f => f[0]);
+  function mastery(list, ok){
+    const before = fullFam();
+    list.forEach(c => { if(!ORD.includes(c)) return; const m = MS[c] || (MS[c] = {v:0, n:0}); m.n++; m.v = Math.max(0, Math.min(MMAX, m.v + (ok ? 1 : -1))); });
+    try{ localStorage.setItem(MKEY, JSON.stringify(MS)); }catch(e){}
+    FAMILIES.forEach(([name, p]) => { if(!before.includes(name) && p.every(c => masteryOf(c) >= MMAX) && window.mtcAnnounce) setTimeout(() => window.mtcAnnounce(name + " maîtrisé", p.join(" et ")), 900); });
+    drawMastery();
+  }
+  document.addEventListener("mtc-mastery", e => { const d = e.detail || {}; mastery(d.channels || [], !!d.ok); });
+  document.addEventListener("mtc-good", () => drawMastery());
+  function ring(size, r, frac, color, label, labelColor){
+    const L = 2 * Math.PI * r, c = size / 2;
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + " " + size + '" aria-hidden="true">' +
+      '<circle cx="' + c + '" cy="' + c + '" r="' + r + '" fill="none" stroke="var(--hair, #ddd)" stroke-width="4"/>' +
+      (frac > 0 ? '<circle cx="' + c + '" cy="' + c + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="4" stroke-linecap="round" stroke-dasharray="' + (L * frac).toFixed(1) + " " + L.toFixed(1) + '" transform="rotate(-90 ' + c + " " + c + ')"/>' : "") +
+      '<text x="' + c + '" y="' + (c + 4) + '" text-anchor="middle" class="mring" style="fill:' + labelColor + '">' + label + "</text></svg>";
+  }
+  function drawMastery(){
+    const el = document.getElementById("mastery"); if(!el) return;
+    el.innerHTML = '<div class="mhead"><span class="mgt">Maîtrise des canaux</span>' +
+      "</div>" +
+      '<div class="mrings">' + ORD.map(c => {
+        const m = MS[c] || {v:0, n:0}, weak = m.n >= 2 && m.v <= 2;
+        return '<span class="mcell" title="' + esc(NAMES[c]) + " : " + m.v + " / " + MMAX + '">' + ring(40, 16, m.v / MMAX, ink(c), esc(c), ink(c)) +
+          '<span class="msm">' + (m.v >= MMAX ? "maîtrisé" : weak ? "à revoir" : "&nbsp;") + "</span></span>";
+      }).join("") + "</div>";
+
+  }
 
   // ---------- dessins ----------
   const CELL = [[86, 52], [226, 52], [86, 168], [226, 168]];
@@ -291,6 +356,49 @@
     setTimeout(() => { if(CUR[id] !== sig) return; const b = document.getElementById(id); if(b) b.click(); }, 350);
   }
   let ROUND = 0;
+  // chaque bonne étape : petit son tout de suite ; chaque erreur : son d'erreur (la série repart de zéro)
+  // la bonne réponse trouvée rebondit (sélecteur de l'élément, retrouvé après le nouvel affichage)
+  let BOUNCE = null;
+  const stepFx = (ok, sel) => { if(ok){ BOUNCE = sel || null; if(window.mtcPlayFx) window.mtcPlayFx("good"); } else if(window.mtcMiss) window.mtcMiss(); };
+
+  // ---------- revenir aux parties précédentes (Fermer le circuit, Quel circuit ?, Quatre membres) ----------
+  // flèches ‹ › dans la barre, ou glisser vers la droite (partie précédente) / vers la gauche (partie suivante)
+  const HIST = {};
+  const H = m => HIST[m] || (HIST[m] = {list:[], pos:0, live:null});
+  const STATE = {fermer:() => F, quel:() => Q5, membres:() => M};
+  const DONE = {fermer:() => F.phase === "sys", quel:() => !!Q5.done, membres:() => !!M.done};
+  const RENDER = {fermer:() => renderFermer(), quel:() => renderQuel(), membres:() => renderMembres()};
+  const loadState = (obj, snap) => { Object.keys(obj).forEach(k => delete obj[k]); Object.assign(obj, structuredClone(snap)); };
+  const viewingPast = m => H(m).pos < H(m).list.length;
+  function histGo(m, d){
+    const h = H(m), st = STATE[m](), np = h.pos + d;
+    if(np < 0 || np > h.list.length) return;
+    if(!viewingPast(m)) h.live = structuredClone(st);
+    h.pos = np; loadState(st, np === h.list.length ? h.live : h.list[np]);
+    RENDER[m]();
+  }
+  // partie suivante : depuis une partie passée, on revient à la partie en cours ; sinon la partie finie est gardée
+  function nextRound(m, fresh){
+    if(viewingPast(m)){ histGo(m, H(m).list.length - H(m).pos); return; }
+    const h = H(m);
+    if(DONE[m]()){ h.list.push(structuredClone(STATE[m]())); if(h.list.length > 40) h.list.shift(); }
+    h.pos = h.list.length; h.live = null;
+    fresh(); RENDER[m]();
+  }
+  function histNav(m){
+    const h = H(m); if(!h.list.length) return "";
+    return '<span class="hnav"><button type="button" class="hbtn" data-d="-1"' + (h.pos ? "" : " disabled") + ' title="Partie précédente" aria-label="Partie précédente">‹</button>' +
+      (viewingPast(m) ? '<span class="sm">partie ' + (h.pos + 1) + " sur " + (h.list.length + 1) + "</span>" : "") +
+      '<button type="button" class="hbtn" data-d="1"' + (viewingPast(m) ? "" : " disabled") + ' title="Partie suivante" aria-label="Partie suivante">›</button></span>';
+  }
+  function bindHist(m){ main.querySelectorAll(".hbtn").forEach(b => b.addEventListener("click", () => histGo(m, +b.dataset.d))); }
+  let swX = null, swY = 0;
+  main.addEventListener("touchstart", e => { swX = STATE[mode] && e.touches.length === 1 ? e.touches[0].clientX : null; swY = e.touches[0] ? e.touches[0].clientY : 0; }, {passive:true});
+  main.addEventListener("touchend", e => {
+    if(swX == null) return;
+    const t = e.changedTouches[0], dx = t.clientX - swX, dy = t.clientY - swY; swX = null;
+    if(Math.abs(dx) > 70 && Math.abs(dy) < 50) histGo(mode, dx > 0 ? -1 : 1);
+  }, {passive:true});
 
   // ================= 1. Fermer le circuit =================
   const F = {two:false};
@@ -300,7 +408,7 @@
     F.c = rnd(BASE);
     F.hide = shuffle([0, 1, 2, 3]).slice(0, F.two ? 2 : 1).sort();
     F.cells = F.c.grid.map((x, i) => F.hide.includes(i) ? null : x);
-    F.sel = F.hide[0]; F.phase = "place"; F.fails = 0; F.msg = ""; F.sys = {}; F.marks = null; F.sysRes = null;
+    F.sel = F.hide[0]; F.phase = "place"; F.fails = 0; F.msg = ""; F.sys = {}; F.wrong = {}; F.marks = null; F.sysRes = null;
   }
   function edgesOf(cells){ const e = []; for(let i = 0; i < 4; i++) for(let j = i + 1; j < 4; j++) if(links(cells[i], cells[j]).length) e.push([i, j]); return e; }
   function renderFermer(){
@@ -314,16 +422,18 @@
     } else {
       right = '<p class="lbltop">Le circuit est fermé</p><p class="q">Par quel système chaque lien passe-t-il ?</p><ul class="edges">' +
         edges.map(([i, j]) => {
-          const k = i + "-" + j, picked = F.sys[k] || [], ans = links(F.cells[i], F.cells[j]);
-          const verdict = F.sysRes ? (sameSet(picked, ans) ? ' <span class="ok">✓</span>' : ' <span class="no">→ ' + ans.join(", ") + "</span>") : "";
-          return "<li>" + chip(F.cells[i]) + " — " + chip(F.cells[j]) + " " + [1, 2, 3, 4, 5].map(n => '<button type="button" class="sysb' + (picked.includes(n) ? " on" : "") + '" data-k="' + k + '" data-n="' + n + '" title="' + esc(SYSNAME[n]) + '"' + (F.sysRes ? " disabled" : "") + ">" + n + "</button>").join("") + verdict + "</li>";
+          // chaque bon système s'allume en vert dès qu'il est trouvé, un mauvais en rouge ; ✓ quand le lien est complet
+          const k = i + "-" + j, found = F.sys[k] || [], bad = (F.wrong && F.wrong[k]) || [], ans = links(F.cells[i], F.cells[j]), complete = sameSet(found, ans);
+          return "<li>" + chip(F.cells[i]) + " — " + chip(F.cells[j]) + " " + [1, 2, 3, 4, 5].map(n => {
+            const st = found.includes(n) ? " good" : bad.includes(n) ? " bad" : "";
+            return '<button type="button" class="sysb' + st + '" data-k="' + k + '" data-n="' + n + '" title="' + esc(SYSNAME[n]) + '"' + (F.sysRes || complete || st ? " disabled" : "") + ">" + n + "</button>";
+          }).join("") + (complete ? ' <span class="ok">✓</span>' : "") + "</li>";
         }).join("") + "</ul>" +
         '<p class="sm">Un lien peut passer par deux systèmes : clique sur les deux.</p>' +
-        '<div class="act">' + (F.sysRes ? "" : '<button type="button" class="tool" id="fSys">Valider</button>') + '<button type="button" class="tool" id="fNext">Circuit suivant</button></div>' +
+        '<div class="act">' + (F.sysRes ? "" : '<button type="button" class="tool" id="fSys">Valider</button>') + '<button type="button" class="tool" id="fNext">' + (viewingPast("fermer") ? "Revenir au circuit en cours" : "Circuit suivant") + "</button></div>" +
         (F.sysRes ? '<div class="res">' + F.sysRes + "</div>" + circuitCard(F.c) : "");
     }
-    main.innerHTML = aide('Un circuit : deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal a une entrée et une sortie : il est relié à ses deux voisins par un des cinq systèmes.') +
-      '<div class="bar"><label><input type="checkbox" id="fTwo"' + (F.two ? " checked" : "") + "> deux canaux à trouver</label>" + scoreLine("fermer", "circuit fermé du premier coup", "circuits fermés du premier coup") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Un circuit : deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal a une entrée et une sortie : il est relié à ses deux voisins par un des cinq systèmes.') + histNav("fermer") + '<label><input type="checkbox" id="fTwo"' + (F.two ? " checked" : "") + "> deux canaux à trouver</label>" + scoreLine("fermer", "circuit fermé du premier coup", "circuits fermés du premier coup") + "</div>" +
       '<div class="lay"><div>' + gridSvg(F.cells, {open:placing ? F.hide : [], sel:placing ? F.sel : null, sys:!!F.sysRes, marks:F.marks,
         edgeOk:F.sysRes ? Object.fromEntries(edges.map(([i, j]) => [i + "-" + j, sameSet(F.sys[i + "-" + j] || [], links(F.cells[i], F.cells[j]))])) : null}) + "</div><div>" + right +
       (placing && F.msg ? '<div class="res">' + F.msg + "</div>" : "") + "</div></div>" + rappel();
@@ -336,34 +446,40 @@
       renderFermer();
     });
     on("fClr", () => { F.hide.forEach(i => F.cells[i] = null); F.sel = F.hide[0]; F.msg = ""; F.marks = null; renderFermer(); });
-    on("fNext", () => { newFermer(); renderFermer(); });
+    on("fNext", () => nextRound("fermer", newFermer));
+    bindHist("fermer");
     on("fVal", () => {
       if(F.hide.some(i => !F.cells[i])){ F.msg = '<span class="no">Il reste une case vide.</span>'; renderFermer(); return; }
       if(gridOk(F.cells)){
         F.phase = "sys"; F.c = findCircuit(F.cells) || F.c; F.marks = {}; F.hide.forEach(i => F.marks[i] = "ok");
+        if(window.mtcPlayFx) window.mtcPlayFx("good");
         F.msg = "";
       } else {
-        F.fails++;
+        F.fails++; if(window.mtcMiss) window.mtcMiss();
         F.msg = '<span class="no">Pas encore.</span> ' + gridWhy(F.cells, F.hide);
         F.marks = {}; F.hide.forEach(i => F.marks[i] = "no");
       }
       renderFermer();
     });
     main.querySelectorAll(".sysb").forEach(b => b.addEventListener("click", () => {
-      const k = b.dataset.k, n = +b.dataset.n, l = F.sys[k] || (F.sys[k] = []);
-      l.includes(n) ? l.splice(l.indexOf(n), 1) : l.push(n);
+      const k = b.dataset.k, n = +b.dataset.n, [i, j] = k.split("-").map(Number), ans = links(F.cells[i], F.cells[j]);
+      if(!F.wrong) F.wrong = {};
+      // bon système : petit son de réussite tout de suite (la félicitation et la lueur viennent à la fin)
+      if(ans.includes(n)){ const l = F.sys[k] || (F.sys[k] = []); if(!l.includes(n)){ l.push(n); stepFx(true, '.sysb[data-k="' + k + '"][data-n="' + n + '"]'); } }
+      else { const w = F.wrong[k] || (F.wrong[k] = []); if(!w.includes(n)){ w.push(n); if(window.mtcMiss) window.mtcMiss(); } }
       renderFermer();
     }));
     on("fSys", () => {
-      const edges = edgesOf(F.cells), good = edges.filter(([i, j]) => sameSet(F.sys[i + "-" + j] || [], links(F.cells[i], F.cells[j]))).length;
-      const all = good === edges.length;
-      record("fermer", all && F.fails === 0);
-      F.sysRes = (all ? '<span class="ok">' + praise() + "</span> " : "") + good + " lien" + (good > 1 ? "s" : "") + " juste" + (good > 1 ? "s" : "") + " sur " + edges.length + "." +
+      // félicitations seulement à la fin, quand toutes les connexions sont trouvées
+      const errs = Object.values(F.wrong || {}).reduce((a, w) => a + w.length, 0), perfect = !errs && F.fails === 0;
+      record("fermer", perfect); mastery(F.c.grid, perfect);
+      F.sysRes = '<span class="ok">' + praise() + "</span> Toutes les connexions sont trouvées." +
+        (errs ? ' <span class="sm">' + errs + " système" + (errs > 1 ? "s" : "") + " faux en chemin.</span>" : "") +
         (F.fails ? ' <span class="sm">Circuit fermé après ' + F.fails + " essai" + (F.fails > 1 ? "s" : "") + " manqué" + (F.fails > 1 ? "s" : "") + ".</span>" : "");
       renderFermer();
     });
     if(F.phase === "place") auto("fVal", F.hide.every(i => F.cells[i]), F.round + "|" + F.cells.join(","));
-    else if(!F.sysRes) auto("fSys", edgesOf(F.cells).every(([i, j]) => (F.sys[i + "-" + j] || []).length >= links(F.cells[i], F.cells[j]).length), F.round + "|" + JSON.stringify(F.sys));
+    else if(!F.sysRes && !viewingPast("fermer")) auto("fSys", edgesOf(F.cells).every(([i, j]) => sameSet(F.sys[i + "-" + j] || [], links(F.cells[i], F.cells[j]))), F.round + "|" + JSON.stringify(F.sys));
   }
 
   // ================= 2. Les trois plaintes =================
@@ -414,11 +530,11 @@
     } else if(P.step === "famille"){
       const fam1 = [P.A].concat(family(P.A)), mk1 = {};
       if(P.done){ fam1.forEach(c => mk1[c] = "ok"); P.pick.forEach(c => { if(!fam1.includes(c)) mk1[c] = "no"; }); }
-      right = '<p class="q">Par quels canaux peut-on la traiter ?</p>' + palette({on:P.pick, mark:mk1}) +
+      right = '<p class="q">Par quels canaux peut-on la traiter ?</p>' + palette({on:P.pick, mark:P.done ? mk1 : (P.mk || {})}) +
         '<div class="act">' + (P.done ? "" : '<button type="button" class="tool" id="pVal">Valider</button>') + "</div>";
     } else if(P.step === "trans"){
       right = '<p class="q">Quels sont les canaux transmetteurs ?</p>' +
-        '<p class="sm">Un canal transmetteur reçoit le facteur pathogène et le transmet.</p>' + palette({on:P.pick, only:P.plaintes}) +
+        '<p class="sm">Un canal transmetteur reçoit le facteur pathogène et le transmet.</p>' + palette({on:P.pick, only:P.plaintes, mark:P.mk || {}}) +
         '<div class="act"><button type="button" class="tool" id="pVal">Valider</button></div>';
     } else if(P.step === "circuit"){
       right = '<p class="q">Complète le circuit thérapeutique.</p>' +
@@ -434,8 +550,7 @@
     if(P.step === "circuit" || P.step === "interroger") left = gridSvg(P.cells, {open:P.step === "circuit" ? P.hide : [], sel:P.step === "circuit" ? P.sel : null, sys:P.step === "interroger", marks:P.marks});
     const done = P.done || P.asked;
     if(P.lvlRes && P.step !== "niveau") right = '<span class="verdict ' + (P.lvlRes.ok ? "ok" : "no") + '">Niveau ' + P.lvlRes.n + (P.lvlRes.ok ? " ✓" : " ✗ → niveau " + P.level) + "</span>" + right;
-    main.innerHTML = aide('Læ patient·e énonce ses trois plaintes principales, de la plus importante à la moins importante. Elles désignent les canaux atteints, le niveau d’atteinte, puis le circuit thérapeutique.') +
-      '<div class="bar">' + scoreLine("plaintes", "cas réussi du premier coup", "cas réussis du premier coup") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Læ patient·e énonce ses trois plaintes principales, de la plus importante à la moins importante. Elles désignent les canaux atteints, le niveau d’atteinte, puis le circuit thérapeutique.') + scoreLine("plaintes", "cas réussi du premier coup", "cas réussis du premier coup") + "</div>" +
       '<div class="lay"><div>' + head + left + "</div><div>" + right + (P.msg ? '<div class="res">' + P.msg + "</div>" : "") +
       '<div class="act"><button type="button" class="tool" id="pNext">' + (done ? "Cas suivant" : "Autre cas") + "</button></div></div></div>" + rappel();
     on("pNext", () => { newPlaintes(); renderPlaintes(); });
@@ -444,27 +559,35 @@
       P.lvlRes = {n, ok:n === P.level};
       if(n !== P.level){ P.fails++; P.msg = '<span class="no">Non :</span> ' + esc(levelTxt[P.level]) + "."; }
       else P.msg = '<span class="ok">Oui :</span> ' + esc(levelTxt[n]) + ".";
-      P.step = P.level === 1 ? "famille" : P.level === 2 ? "circuit" : "trans"; P.pick = new Set();
+      stepFx(n === P.level);
+      P.step = P.level === 1 ? "famille" : P.level === 2 ? "circuit" : "trans"; P.pick = new Set(); P.mk = {}; P.stepErr = false;
       renderPlaintes();
     }));
-    if(P.step === "famille" || P.step === "trans") bindPalette(c => { if(P.done) return; P.pick.has(c) ? P.pick.delete(c) : P.pick.add(c); renderPlaintes(); });
+    if(P.step === "famille" || P.step === "trans") bindPalette(c => {
+      if(P.done || P.pick.has(c) || (P.mk && P.mk[c])) return;
+      const ans = P.step === "famille" ? [P.A].concat(family(P.A)) : [P.A, P.B];
+      P.mk = P.mk || {};
+      if(ans.includes(c)){ P.pick.add(c); P.mk[c] = "ok"; stepFx(true, '.pc[data-c="' + c + '"]'); }
+      else { P.mk[c] = "no"; P.stepErr = true; stepFx(false); }
+      renderPlaintes();
+    });
     if(P.step === "circuit"){
       bindCells(i => { if(P.cells[i] && P.sel === i) P.cells[i] = null; P.sel = i; renderPlaintes(); });
       bindPalette(c => { P.cells[P.sel] = c; P.marks = null; const nx = P.hide.find(i => !P.cells[i]); if(nx != null) P.sel = nx; renderPlaintes(); });
     }
     on("pVal", () => {
       if(P.step === "famille"){
-        const ans = [P.A].concat(family(P.A)), mine = [...P.pick];
-        const ok = sameSet(mine, ans);
+        const ans = [P.A].concat(family(P.A));
+        const ok = !P.stepErr;
         if(!ok) P.fails++;
         P.done = true; record("plaintes", P.fails === 0);
         P.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Réponse :</span> ') + "le canal atteint lui-même ou un canal de sa famille : " + chips(ans) + "." +
           '<br><span class="sm">' + family(P.A).map(x => chip(x) + " par le système " + links(P.A, x).join(" et ")).join(" · ") + "</span>" +
           '<br><span class="sm">La méthode de l’équilibre global s’applique aux niveaux 2 et 3.</span>';
       } else if(P.step === "trans"){
-        const ok = sameSet([...P.pick], [P.A, P.B]);
+        const ok = !P.stepErr;
         if(!ok) P.fails++;
-        P.transOk = ok;
+        P.transOk = ok; P.mk = {}; P.stepErr = false; if(ok) stepFx(true);
         P.msg = (ok ? '<span class="ok">Oui :</span> ' : '<span class="no">Réponse :</span> ') + chip(P.A) + " reçoit le facteur pathogène et le transmet à " + chip(P.B) + " (système " + links(P.A, P.B).join(" et ") + "), qui le transmet à " + chip(P.C) + " (système " + links(P.B, P.C).join(" et ") + ").";
         P.step = "circuit";
       } else if(P.step === "circuit"){
@@ -474,7 +597,7 @@
           record("plaintes", P.fails === 0);
           P.msg = '<span class="ok">' + praise() + "</span> " + (P.level === 3 ? "Le 4ᵉ canal transmet de " + chip(P.C) + " vers " + chip(P.A) + " : il est menacé, ou déjà atteint." : "Les deux autres canaux sont menacés, ou déjà atteints.");
         } else {
-          P.fails++; P.msg = '<span class="no">Pas encore.</span> ' + gridWhy(P.cells, P.hide);
+          P.fails++; stepFx(false); P.msg = '<span class="no">Pas encore.</span> ' + gridWhy(P.cells, P.hide);
           P.marks = {}; P.hide.forEach(i => P.marks[i] = "no");
         }
       }
@@ -494,7 +617,7 @@
       const X = rnd(ORD), Y = rnd(family(X));
       const Zs = family(Y).filter(z => z !== X && !family(X).includes(z) && both(X, z).filter(w => w !== Y).length);
       if(!Zs.length) continue;
-      Object.assign(G, {round:++ROUND, X, Y, Z:rnd(Zs), step:1, pick:new Set(), fails:0, msg:"", shown:null, done:false});
+      Object.assign(G, {round:++ROUND, X, Y, Z:rnd(Zs), step:1, pick:new Set(), bad:new Set(), fails:0, msg:"", shown:null, done:false});
       return;
     }
   }
@@ -530,7 +653,8 @@
       const [x, y] = clockPos(c), sick = ill.indexOf(c), picked = G.pick.has(c), sh = G.shown && G.shown.includes(c);
       g += '<g class="cnode" data-c="' + c + '"><title>' + esc(NAMES[c]) + "</title>";
       if(sick >= 0) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#c0392b" stroke-width="1.6" stroke-dasharray="4 3"/><text x="' + (x + 20) + '" y="' + (y - 18) + '" class="order">' + (sick + 1) + "</text>";
-      if(sh) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#1a8a3a" stroke-width="2.4"/>';
+      if(sh || (!G.shown && picked)) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#1a8a3a" stroke-width="2.4"/>';
+      else if(G.bad && G.bad.has(c)) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#c0392b" stroke-width="2.4"/>';
       else if(G.shown && picked && !(G.step !== 3 && sick >= 0)) g += '<circle cx="' + x + '" cy="' + y + '" r="25" fill="none" stroke="#c0392b" stroke-width="2.4"/>';
       g += '<circle cx="' + x + '" cy="' + y + '" r="19" fill="' + (picked ? ink(c) : "var(--page-bg)") + '" stroke="' + ink(c) + '" stroke-width="1.7"/>';
       g += '<text x="' + x + '" y="' + (y + 4) + '" text-anchor="middle" class="clbl" style="fill:' + (picked ? "var(--page-bg)" : ink(c)) + '">' + c + "</text></g>";
@@ -547,29 +671,34 @@
       const circ = W.map(w => findCircuit([X, Y, Z, w])).find(Boolean);
       end = circ ? '<div class="card"><p>' + chips([X, Y, Z]) + " et " + chip(circ.grid.find(c => ![X, Y, Z].includes(c))) + " forment un circuit fermé : il bloque la propagation et élimine le facteur pathogène.</p></div>" + circuitCard(circ) : "";
     }
-    main.innerHTML = aide('Un facteur pathogène se propage d’un canal à un canal de sa famille (les canaux qui le rééquilibrent). Lire cette propagation permet d’anticiper et de protéger le canal le plus menacé.') +
-      '<div class="bar">' + propBar() + scoreLine("propagation", "cas suivi sans erreur", "cas suivis sans erreur") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Un facteur pathogène se propage d’un canal à un canal de sa famille (les canaux qui le rééquilibrent). Lire cette propagation permet d’anticiper et de protéger le canal le plus menacé.') + propBar() + scoreLine("propagation", "cas suivi sans erreur", "cas suivis sans erreur") + "</div>" +
       '<div class="lay"><svg class="clock" viewBox="20 20 300 300" role="img" aria-label="Horloge chinoise des douze canaux">' + g + "</svg><div>" +
       '<p class="q">' + Q[G.step] + "</p>" +
       '<div class="act">' + (G.shown ? (G.done ? "" : '<button type="button" class="tool" id="gNext">Continuer</button>') : '<button type="button" class="tool" id="gVal">Valider</button><button type="button" class="tool" id="gClr">Effacer</button>') +
       '<button type="button" class="tool" id="gNew">' + (G.done ? "Nouvelle propagation" : "Autre cas") + "</button></div>" +
       (G.msg ? '<div class="res">' + G.msg + "</div>" : "") + end + "</div></div>" + rappel();
-    main.querySelectorAll(".cnode").forEach(n => n.addEventListener("click", () => { if(G.shown) return; const c = n.dataset.c; G.pick.has(c) ? G.pick.delete(c) : G.pick.add(c); renderPropagation(); }));
+    main.querySelectorAll(".cnode").forEach(n => n.addEventListener("click", () => {
+      if(G.shown) return;
+      const c = n.dataset.c, illNow = G.step === 1 ? [X] : G.step === 2 ? [X, Y] : [X, Y, Z];
+      if(G.pick.has(c) || G.bad.has(c) || (G.step !== 3 && illNow.includes(c))) return;
+      if(propAnswer().includes(c)){ G.pick.add(c); stepFx(true, '.cnode[data-c="' + c + '"]'); } else { G.bad.add(c); stepFx(false); }
+      renderPropagation();
+    }));
     on("gClr", () => { G.pick.clear(); renderPropagation(); });
     on("gNew", () => { newPropagation(); renderPropagation(); });
-    on("gNext", () => { G.step++; G.pick = new Set(); G.shown = null; G.msg = ""; renderPropagation(); });
+    on("gNext", () => { G.step++; G.pick = new Set(); G.bad = new Set(); G.shown = null; G.msg = ""; renderPropagation(); });
     on("gVal", () => {
       // cliquer sur un canal déjà atteint n'est pas une erreur (sauf à l'étape des transmetteurs, où ce sont eux la réponse)
       const ill = G.step === 1 ? [X] : G.step === 2 ? [X, Y] : [X, Y, Z];
-      const ans = propAnswer(), mine = [...G.pick].filter(c => G.step === 3 || !ill.includes(c)), ok = sameSet(mine, ans);
+      const ans = propAnswer(), ok = !G.bad.size;
       if(!ok) G.fails++;
-      const miss = ans.filter(c => !G.pick.has(c)), extra = mine.filter(c => !ans.includes(c));
+      const miss = [], extra = [...G.bad];
       let why = "";
       if(G.step === 1) why = ans.map(c => chip(c) + " (syst. " + links(X, c).join(", ") + ")").join(" · ");
       if(G.step === 2) why = "famille de " + chip(X) + " : " + chips(family(X).filter(c => c !== Y)) + " ; famille de " + chip(Y) + " : " + chips(family(Y).filter(c => c !== X)) + ".";
       if(G.step === 3) why = chip(X) + " (canal d’entrée) et " + chip(Y) + " reçoivent le facteur pathogène et le transmettent.";
       if(G.step === 4) why = "Le canal relié à la fois à " + chip(X) + " et à " + chip(Z) + " : " + ans.map(c => chip(c) + " (syst. " + links(X, c).join(", ") + " avec " + X + ", " + links(Z, c).join(", ") + " avec " + Z + ")").join(" ou ") + ".";
-      G.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Pas tout à fait.</span> ' + (miss.length ? "Manque : " + chips(miss) + ". " : "") + (extra.length ? "En trop : " + chips(extra) + ". " : "")) + '<br><span class="sm">' + why + "</span>";
+      G.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Trouvé, avec des erreurs en chemin.</span> ' + (extra.length ? "En trop : " + chips(extra) + ". " : "")) + '<br><span class="sm">' + why + "</span>";
       G.shown = ans;
       if(G.step === 4){ G.done = true; record("propagation", G.fails === 0); }
       renderPropagation();
@@ -581,65 +710,88 @@
   }
 
   // ================= 4. Grille des familles =================
-  // de plus en plus de cases vides : 4 au niveau 1, toutes (60) au dernier ; une grille parfaite fait passer au niveau suivant
-  const LEVELS = [4, 5, 6, 8, 10, 12, 15, 18, 22, 26, 30, 35, 40, 46, 52, 60];
-  const R = {lvl:0};
-  try{ R.lvl = Math.min(LEVELS.length - 1, Math.max(0, +JSON.parse(localStorage.getItem(KEY + "_gridlvl") || "0") || 0)); }catch(e){}
-  const saveLvl = () => { try{ localStorage.setItem(KEY + "_gridlvl", JSON.stringify(R.lvl)); }catch(e){} };
-  const lvlTxt = i => "Niveau " + (i + 1) + " · " + (LEVELS[i] === 60 ? "toutes les cases vides" : LEVELS[i] + " cases vides");
+  // une ligne à remplir à la fois, le reste du tableau masqué (pas de déduction depuis les lignes suivantes, moins
+  // d'informations à lire d'un coup) ; une ligne validée reste affichée et la suivante s'ajoute dessous, jusqu'aux
+  // 12 lignes. Le curseur règle le nombre de cases vides par ligne, de 1 à 5 ; le niveau ne monte pas tout seul.
+  const LEVELS = [1, 2, 3, 4, 5];
+  const R = {lvl:1};
+  try{ const v = JSON.parse(localStorage.getItem(KEY + "_gridblanks") || "1"); R.lvl = Math.min(LEVELS.length - 1, Math.max(0, +v || 0)); }catch(e){}
+  const saveLvl = () => { try{ localStorage.setItem(KEY + "_gridblanks", JSON.stringify(R.lvl)); }catch(e){} };
+  const lvlTxt = i => "Niveau " + (i + 1) + " · " + (LEVELS[i] === 5 ? "toute la ligne vide" : LEVELS[i] + (LEVELS[i] > 1 ? " cases vides par ligne" : " case vide par ligne"));
   function newGrille(){
-    R.round = ++ROUND;
-    const all = []; ORD.forEach(c => [1, 2, 3, 4, 5].forEach(n => all.push(c + "|" + n)));
-    R.gl = R.lvl; R.blank = new Set(shuffle(all).slice(0, LEVELS[R.lvl])); R.fill = {}; R.done = false; R.msg = "";
-    R.sel = [...all].find(k => R.blank.has(k));
+    // les canaux les moins maîtrisés d'abord (maîtrise par canal), puis au hasard
+    R.queue = shuffle(ORD.slice()).sort((a, b) => masteryOf(a) - masteryOf(b));
+    R.pos = 0; R.rows = []; R.end = false;
+    newLigne();
   }
-  function renderGrille(){
-    const keys = []; ORD.forEach(c => [1, 2, 3, 4, 5].forEach(n => keys.push(c + "|" + n)));
-    const rows = ORD.map(c => "<tr><td>" + chip(c) + ' <span class="sm">' + esc(NAMES[c].split(" — ")[0]) + "</span></td>" + [1, 2, 3, 4, 5].map(n => {
-      const k = c + "|" + n, ans = mate(c, n);
-      if(!R.blank.has(k)) return "<td>" + chip(ans) + "</td>";
-      const f = R.fill[k];
-      // corrections bien visibles : case juste encadrée en vert, case fausse encadrée en rouge avec la réponse barrée puis la bonne
-      if(R.done) return f === ans ? '<td class="res-ok"><span>✓ ' + chip(ans) + "</span></td>"
+  function newLigne(){
+    R.round = ++ROUND;
+    R.c = R.queue[R.pos];
+    R.blank = new Set(shuffle([1, 2, 3, 4, 5]).slice(0, LEVELS[R.lvl]).map(n => R.c + "|" + n));
+    R.fill = {}; R.bad = {}; R.flash = null; R.done = false; R.msg = "";
+    R.sel = [1, 2, 3, 4, 5].map(n => R.c + "|" + n).find(k => R.blank.has(k));
+  }
+  function gridRow(c, blank, fill, state, bad){
+    bad = bad || {};
+    return "<tr><td>" + chip(c) + ' <span class="sm">' + esc(NAMES[c].split(" — ")[0]) + "</span></td>" + [1, 2, 3, 4, 5].map(n => {
+      const k = c + "|" + n, ans = mate(c, n), f = fill[k];
+      if(!blank.has(k)) return "<td>" + chip(ans) + "</td>";
+      // lignes déjà faites : la case juste en vert, la case fausse en rouge avec la bonne réponse
+      if(state === "past") return !bad[k] ? '<td class="was-ok"><span>' + chip(ans) + "</span></td>" : '<td class="was-no"><span><s>' + esc(bad[k]) + "</s> " + chip(ans) + "</span></td>";
+      // case trouvée : verte tout de suite ; mauvaise réponse : la case clignote en rouge et reste à trouver
+      if(f === ans) return '<td class="res-ok" data-k="' + k + '"><span>✓ ' + chip(ans) + "</span></td>";
+      if(R.flash && R.flash.k === k && state !== "done") return '<td class="blank sel flashno" data-k="' + k + '"><span><s>' + esc(R.flash.c) + "</s></span></td>";
+      if(state === "done") return f === ans ? '<td class="res-ok"><span>✓ ' + chip(ans) + "</span></td>"
         : '<td class="res-no"><span>' + (f ? "<s>" + esc(f) + "</s>" : "✗") + " → " + chip(ans) + "</span></td>";
       return '<td class="blank' + (R.sel === k ? " sel" : "") + '" data-k="' + k + '"><span' + (f ? ' style="color:' + ink(f) + '"' : "") + ">" + (f ? esc(f) : "&nbsp;") + "</span></td>";
-    }).join("") + "</tr>").join("");
-    main.innerHTML = aide('Le tableau récapitulatif du rééquilibrage des canaux : pour chaque canal, le canal qui le rééquilibre dans chacun des cinq systèmes. Clique sur une case vide, puis sur un canal.') +
-      // choix du niveau avec un curseur, de facile (4 cases vides) à difficile (toute la grille)
-      '<div class="bar"><span class="lvlpick"><span class="sm">facile</span>' +
-      '<input type="range" id="rLvl" min="0" max="' + (LEVELS.length - 1) + '" step="1" value="' + R.gl + '" aria-label="Niveau">' +
-      '<span class="sm">difficile</span></span><b id="rLvlTxt">' + lvlTxt(R.gl) + "</b>" +
-      scoreLine("grille", "grille parfaite", "grilles parfaites") + "</div>" +
-      '<div class="famwrap"><table class="fam"><tr><th>Canal</th>' + [1, 2, 3, 4, 5].map(n => '<th title="' + esc(SYSNAME[n]) + '">' + n + "</th>").join("") + "</tr>" + rows + "</table></div>" +
-      (R.done ? "" : palette()) +
-      '<div class="act">' + (R.done ? "" : '<button type="button" class="tool" id="rVal">Valider</button>') + '<button type="button" class="tool" id="rNew">' + (R.done ? "Grille suivante" : "Autre grille") + "</button></div>" +
+    }).join("") + "</tr>";
+  }
+  function renderGrille(){
+    const c = R.c, keys = [1, 2, 3, 4, 5].map(n => c + "|" + n);
+    const perfectRows = R.rows.filter(r => r.ok).length;
+    main.innerHTML = '<div class="bar">' + aide('Le tableau récapitulatif du rééquilibrage des canaux, une ligne à la fois : pour le canal affiché, le canal qui le rééquilibre dans chacun des cinq systèmes. Clique sur une case vide, puis sur un canal. La ligne suivante s’ajoute dessous, jusqu’à remplir les 12 lignes. Le curseur règle le nombre de cases vides par ligne.') + '<span class="lvlpick"><span class="sm">facile</span>' +
+      '<input type="range" id="rLvl" min="0" max="' + (LEVELS.length - 1) + '" step="1" value="' + R.lvl + '" aria-label="Niveau">' +
+      '<span class="sm">difficile</span></span><b id="rLvlTxt">' + lvlTxt(R.lvl) + "</b>" +
+      scoreLine("grille", "ligne parfaite", "lignes parfaites") + "</div>" +
+      '<div class="famwrap"><table class="fam famone"><tr><th>Canal</th>' + [1, 2, 3, 4, 5].map(n => '<th title="' + esc(SYSNAME[n]) + '">' + n + "</th>").join("") + "</tr>" +
+      R.rows.map(r => gridRow(r.c, r.blank, r.fill, "past", r.bad)).join("") +
+      (R.end ? "" : gridRow(c, R.blank, R.fill, R.done ? "done" : "", R.bad)) + "</table></div>" +
+      (R.done || R.end ? "" : palette()) +
       (R.msg ? '<div class="res">' + R.msg + "</div>" : "") +
+      (R.end ? '<div class="res">Grille terminée : ' + perfectRows + (perfectRows > 1 ? " lignes parfaites" : " ligne parfaite") + " sur " + R.rows.length + ".</div>" : "") +
+      '<div class="act">' + (R.done || R.end ? "" : '<button type="button" class="tool" id="rVal">Valider</button>') + '<button type="button" class="tool" id="rNew">Nouvelle grille</button></div>' +
       '<p class="sm">Systèmes : ' + [1, 2, 3, 4, 5].map(n => "<b>" + n + "</b> " + esc(SYSNAME[n])).join(" · ") + "</p>";
-    const goLvl = i => { R.lvl = Math.max(0, Math.min(LEVELS.length - 1, i)); saveLvl(); newGrille(); renderGrille(); };
     const slider = document.getElementById("rLvl");
     slider.addEventListener("input", e => { document.getElementById("rLvlTxt").textContent = lvlTxt(+e.target.value); });
-    slider.addEventListener("change", e => goLvl(+e.target.value));
+    slider.addEventListener("change", e => { R.lvl = +e.target.value; saveLvl(); if(!R.end && !R.done){ newLigne(); } renderGrille(); });
     main.querySelectorAll("td.blank").forEach(td => td.addEventListener("click", () => { R.sel = td.dataset.k; renderGrille(); }));
-    bindPalette(c => {
-      if(R.done || !R.sel) return;
-      R.fill[R.sel] = c;
+    bindPalette(x => {
+      if(R.done || R.end || !R.sel) return;
+      const ans = mate(c, +R.sel.split("|")[1]);
+      if(x !== ans){ if(!R.bad[R.sel]) R.bad[R.sel] = x; R.flash = {k:R.sel, c:x}; stepFx(false); renderGrille(); return; }
+      R.fill[R.sel] = x; R.flash = null; stepFx(true, 'td[data-k="' + R.sel + '"] span');
       const i = keys.indexOf(R.sel), nx = keys.slice(i + 1).concat(keys.slice(0, i)).find(k => R.blank.has(k) && !R.fill[k]);
       if(nx) R.sel = nx;
       renderGrille();
     });
     on("rNew", () => { newGrille(); renderGrille(); });
     on("rVal", () => {
-      const ks = [...R.blank], good = ks.filter(k => { const [c, n] = k.split("|"); return R.fill[k] === mate(c, +n); }).length;
-      const perfect = good === ks.length, up = perfect && R.lvl < LEVELS.length - 1;
-      R.done = true; record("grille", perfect);
-      const wrong = ks.filter(k => { const [c, n] = k.split("|"); return R.fill[k] !== mate(c, +n); });
-      R.msg = (perfect ? '<span class="ok">' + praise() + "</span> " : "") + good + " case" + (good > 1 ? "s" : "") + " juste" + (good > 1 ? "s" : "") + " sur " + ks.length + "." +
-        (wrong.length ? '<br><span class="no">À revoir :</span> ' + wrong.map(k => { const [c, n] = k.split("|"); return chip(c) + " système " + n + " → " + chip(mate(c, +n)) + (R.fill[k] ? ' <span class="sm">(pas ' + esc(R.fill[k]) + ")</span>" : ""); }).join(" · ") : "") +
-        (up ? "<br>Niveau suivant : " + LEVELS[R.lvl + 1] + " cases vides." : perfect ? "<br>Tu as rempli toute la grille !" : "<br>Une grille parfaite fait passer au niveau suivant.");
-      if(up){ R.lvl++; saveLvl(); }
+      const ks = [...R.blank], wrong = ks.filter(k => R.bad[k]);
+      const perfect = !wrong.length, round = R.round;
+      R.done = true; record("grille", perfect); mastery([c], perfect);
+      R.msg = perfect ? '<span class="ok">' + praise() + "</span>" : '<span class="no">À revoir :</span> ' +
+        wrong.map(k => { const n = +k.split("|")[1]; return "système " + n + " → " + chip(mate(c, n)) + ' <span class="sm">(pas ' + esc(R.bad[k]) + ")</span>"; }).join(" · ");
       renderGrille();
+      // passage automatique à la ligne suivante, ajoutée sous les lignes déjà faites (un peu plus de temps pour lire une correction)
+      setTimeout(() => {
+        if(R.round !== round || !R.done) return;
+        R.rows.push({c, blank:R.blank, fill:R.fill, bad:R.bad, ok:perfect});
+        if(R.pos >= R.queue.length - 1){ R.end = true; R.done = false; R.msg = ""; }
+        else { R.pos++; newLigne(); }
+        if(mode === "grille") renderGrille();
+      }, perfect ? 1000 : 2200);
     });
-    if(!R.done) auto("rVal", [...R.blank].every(k => R.fill[k]), R.round + JSON.stringify(R.fill));
+    if(!R.done && !R.end) auto("rVal", [...R.blank].every(k => R.fill[k] === mate(c, +k.split("|")[1])), R.round + JSON.stringify(R.fill));
   }
 
   // ================= 5. Quel circuit ? =================
@@ -656,7 +808,7 @@
   const Q5 = {};
   function newQuel(){
     const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv", "statique"]);
-    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null});
+    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null, errs:0});
     if(t === "indications" || t === "actions"){
       const c = rnd(CIRC), pool = t === "indications" ? shuffle(c.indications) : shuffle(c.actions.slice(1).filter(x => !GENERIC.test(x)));
       let k = Math.min(t === "indications" ? 2 : 3, pool.length), lines = pool.slice(0, k);
@@ -684,32 +836,39 @@
       q = "Ce circuit respecte-t-il l’équilibre statique ?";
       body = gridSvg(Q5.c.grid, {noPol:!Q5.done}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
     }
-    main.innerHTML = aide('Les actions et indications des circuits, les astuces de Dr Tán et l’équilibre statique.') +
-      '<div class="bar">' + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Les actions et indications des circuits, les astuces de Dr Tán et l’équilibre statique.') + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
       '<div style="max-width:720px"><p class="q">' + q + "</p>" + body +
       '<div class="act">' + (!Q5.done && (t === "indications" || t === "actions" || t === "astuceInv") ? '<button type="button" class="tool" id="qVal">Valider</button>' : "") +
       '<button type="button" class="tool" id="qNext">' + (Q5.done ? "Question suivante" : "Autre question") + "</button></div>" +
       (Q5.msg ? '<div class="res">' + Q5.msg + "</div>" : "") + "</div>" + rappel();
-    on("qNext", () => { newQuel(); renderQuel(); });
-    bindPalette(c => { if(Q5.done) return; Q5.pick.has(c) ? Q5.pick.delete(c) : Q5.pick.add(c); renderQuel(); });
+    on("qNext", () => nextRound("quel", newQuel));
+    bindHist("quel");
+    bindPalette(c => {
+      if(Q5.done || Q5.pick.has(c) || (Q5.mark && Q5.mark[c])) return;
+      // un canal est juste s'il appartient encore à une réponse possible avec les canaux déjà trouvés
+      const sets = t === "astuceInv" ? Q5.a.pairs : CIRC.filter(o => Q5.lines.every(l => o[t].includes(l))).map(o => o.grid);
+      const okc = sets.some(g => [...Q5.pick, c].every(x => g.includes(x)));
+      Q5.mark = Q5.mark || {};
+      if(okc){ Q5.pick.add(c); Q5.mark[c] = "ok"; stepFx(true, '.pc[data-c="' + c + '"]'); } else { Q5.mark[c] = "no"; Q5.errs = (Q5.errs || 0) + 1; stepFx(false); }
+      renderQuel();
+    });
     // marque les canaux : ceux de la bonne réponse en vert, les choix en trop en rouge
     const markPick = ans => { Q5.mark = {}; ans.forEach(c => Q5.mark[c] = "ok"); Q5.pick.forEach(c => { if(!ans.includes(c)) Q5.mark[c] = "no"; }); };
     const finish = (ok, msg) => { Q5.done = true; record("quel", ok); Q5.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Non.</span> ') + msg; renderQuel(); };
     on("qVal", () => {
       const mine = [...Q5.pick];
       if(t === "astuceInv"){
-        const ok = Q5.a.pairs.some(p => sameSet(p, mine));
+        const ok = Q5.a.pairs.some(p => sameSet(p, mine)) && !Q5.errs;
         markPick(Q5.a.pairs.find(p => sameSet(p, mine)) || Q5.a.pairs[0]);
         finish(ok, "Les circuits incluant " + Q5.a.pairs.map(p => chips(p).replace(", ", " et ")).join(", et ceux incluant ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + ".");
         return;
       }
       const fits = CIRC.filter(o => Q5.lines.every(l => o[t].includes(l)));
-      const ok = fits.some(o => sameSet(o.grid, mine));
+      const found = fits.some(o => sameSet(o.grid, mine)), ok = found && !Q5.errs;
       const right = fits.find(o => sameSet(o.grid, mine)) || fits[0];
       markPick(right.grid);
-      finish(ok, "");
-      // mauvaise réponse : ta réponse et la bonne côte à côte
-      Q5.msg += ok ? circuitCard(right) : compareHtml(mine, right, t, Q5.lines);
+      finish(ok, ok ? "" : "Trouvé, avec " + Q5.errs + " canal" + (Q5.errs > 1 ? "aux" : "") + " faux en chemin.");
+      Q5.msg += found ? circuitCard(right) : compareHtml(mine, right, t, Q5.lines);
       renderQuel();
     });
     main.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
@@ -744,7 +903,7 @@
       sol[x] = (hand ? "b" : "j") + (hand === yang ? side : other);   // main yáng et pied yīn d'un côté, main yīn et pied yáng de l'autre
     });
     const given = rnd(c.grid);
-    Object.assign(M, {round:++ROUND, c, sol, given, place:{[sol[given]]:given}, sel:c.grid.find(x => x !== given), done:false, msg:""});
+    Object.assign(M, {round:++ROUND, c, sol, given, place:{[sol[given]]:given}, sel:c.grid.find(x => x !== given), done:false, msg:"", errs:0, flash:null});
   }
   function renderMembres(){
     const placed = Object.values(M.place);
@@ -752,36 +911,38 @@
     let g = '<g fill="none" stroke="currentColor" stroke-opacity=".7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">' +
       '<circle cx="130" cy="66" r="20"/><path d="M130 86 L130 196 M130 116 L80 100 M130 116 L180 100 M130 196 L98 260 M130 196 L162 260"/></g>';
     Object.entries(LIMBPOS).forEach(([k, [x, y]]) => {
-      const c = M.place[k], fixed = c === M.given, mark = M.done && c !== M.given ? (M.sol[c] === k ? "#1a8a3a" : "#c0392b") : null;
+      const fl = M.flash && M.flash.k === k ? M.flash.c : null, c = fl || M.place[k], fixed = c === M.given;
+      const mark = fl ? "#c0392b" : c && c !== M.given ? "#1a8a3a" : null;
       g += '<g class="limb" data-k="' + k + '"><rect x="' + x + '" y="' + y + '" width="64" height="32" rx="16" fill="var(--page-bg)" stroke="' + (mark || (c ? ink(c) : "currentColor")) + '" stroke-width="' + (mark ? 2.4 : 1.6) + '"' + (c ? "" : ' stroke-dasharray="4 4"') + "/>" +
         '<text x="' + (x + 32) + '" y="' + (y + 21) + '" text-anchor="middle" class="glbl" style="fill:' + (c ? ink(c) : "currentColor") + '">' + (c ? esc(c) : "?") + "</text>" +
         '<text x="' + (x + 32) + '" y="' + (k[0] === "b" ? y - 7 : y + 46) + '" text-anchor="middle" class="limblbl">' + LIMBS[k] + "</text><title>" + LIMBS[k] + "</title></g>";
     });
-    main.innerHTML = aide('Les canaux du circuit se répartissent sur les quatre membres : canaux de main sur les bras, canaux de pied sur les jambes. Læ patient·e est vu·e de face : sa droite est à ta gauche.') +
-      '<div class="bar">' + scoreLine("membres", "circuit bien placé", "circuits bien placés") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Les canaux du circuit se répartissent sur les quatre membres : canaux de main sur les bras, canaux de pied sur les jambes. Læ patient·e est vu·e de face : sa droite est à ta gauche.') + histNav("membres") + scoreLine("membres", "circuit bien placé", "circuits bien placés") + "</div>" +
       '<div class="lay"><svg class="body" viewBox="0 0 260 330" role="img" aria-label="Les quatre membres">' + g + "</svg><div>" +
       '<p class="lbltop">Circuit ' + esc(M.c.title) + '</p><div style="max-width:260px">' + gridSvg(M.c.grid, {edges:true}) + "</div>" +
       '<p class="q">' + chip(M.given) + " est piqué sur " + onLimb(M.sol[M.given]) + ". Où piquer les trois autres canaux ?</p>" +
-      (M.done ? "" : '<p class="sm">Clique sur un canal, puis sur un membre.</p>' + palette({only:M.c.grid.filter(x => x !== M.given), on:new Set(M.sel ? [M.sel] : [])})) +
+      (M.done ? "" : '<p class="sm">Clique sur un canal, puis sur un membre.</p>' + palette({only:M.c.grid.filter(x => x !== M.given && !Object.values(M.place).includes(x)), on:new Set(M.sel ? [M.sel] : [])})) +
       '<div class="act">' + (M.done ? "" : '<button type="button" class="tool" id="mVal">Valider</button>') + '<button type="button" class="tool" id="mNext">' + (M.done ? "Circuit suivant" : "Autre circuit") + "</button></div>" +
       (M.msg ? '<div class="res">' + M.msg + "</div>" : "") + "</div></div>" + rappel();
     bindPalette(c => { if(!M.done) { M.sel = c; renderMembres(); } });
     main.querySelectorAll(".limb").forEach(n => n.addEventListener("click", () => {
       if(M.done || !M.sel) return;
-      const k = n.dataset.k; if(M.place[k] === M.given) return;
-      Object.keys(M.place).forEach(x => { if(M.place[x] === M.sel) delete M.place[x]; });
-      M.place[k] = M.sel;
+      const k = n.dataset.k; if(M.place[k]) return;
+      // bon membre : le canal s'y fixe en vert ; mauvais membre : il clignote en rouge et reste à placer
+      if(M.sol[M.sel] !== k){ M.errs++; M.flash = {k, c:M.sel}; stepFx(false); renderMembres(); setTimeout(() => { if(M.flash && M.flash.k === k){ M.flash = null; renderMembres(); } }, 900); return; }
+      M.flash = null; M.place[k] = M.sel; stepFx(true, '.limb[data-k="' + k + '"]');
       M.sel = M.c.grid.find(x => x !== M.given && !Object.values(M.place).includes(x)) || null;
       renderMembres();
     }));
-    on("mNext", () => { newMembres(); renderMembres(); });
+    on("mNext", () => nextRound("membres", newMembres));
+    bindHist("membres");
     on("mVal", () => {
       const todo = M.c.grid.filter(x => x !== M.given);
       if(todo.some(x => !Object.values(M.place).includes(x))){ M.msg = '<span class="no">Place les trois canaux.</span>'; renderMembres(); return; }
-      const ok = todo.every(x => M.place[M.sol[x]] === x);
-      M.done = true; record("membres", ok);
+      const ok = todo.every(x => M.place[M.sol[x]] === x) && !M.errs;
+      M.done = true; record("membres", ok); mastery(M.c.grid, ok);
       const yang = M.c.grid.filter(x => !YIN.has(x)), yin = M.c.grid.filter(x => YIN.has(x));
-      M.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Non :</span> ' + todo.map(x => chip(x) + " → " + LIMBS[M.sol[x]]).join(", ") + ". ") +
+      M.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Placé, avec ' + M.errs + " erreur" + (M.errs > 1 ? "s" : "") + " en chemin.</span> ") +
         '<br><span class="sm">Les mêmes polarités se répondent en diagonale : les canaux yáng ' + chips(yang).replace(", ", " et ") + " sur " + onLimb(M.sol[yang.find(x => HAND.has(x))]) + " et " + onLimb(M.sol[yang.find(x => !HAND.has(x))]) +
         ", les canaux yīn " + chips(yin).replace(", ", " et ") + " sur " + onLimb(M.sol[yin.find(x => HAND.has(x))]) + " et " + onLimb(M.sol[yin.find(x => !HAND.has(x))]) + ". Exemple du cours : shào yáng en haut à droite et en bas à gauche, jué yīn en haut à gauche et en bas à droite.</span>";
       renderMembres();
@@ -815,6 +976,7 @@
     d[3]();
   }
   show(mode);
+  drawMastery();
 })();
 </script>
 </body>

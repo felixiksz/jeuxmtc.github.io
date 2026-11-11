@@ -25,8 +25,8 @@
     return points.map(item => item.point).slice().sort().join(",");
   }
 
-  // réponse vérifiée par le jeu : 4 propositions au lieu de « Réponse » + auto-évaluation (en test sur les appareils admin)
-  const GAMI = (() => { try{ return localStorage.getItem("mtc_admin") === "1" || /[?&]admin=1/.test(location.search); }catch(e){ return false; } })();
+  // réponse vérifiée par le jeu : 4 propositions au lieu de « Réponse » + auto-évaluation
+  const GAMI = true;
   (function(){
     if(!GAMI || document.getElementById("mtcQuizGamiStyle")) return;
     const st = document.createElement("style"); st.id = "mtcQuizGamiStyle";

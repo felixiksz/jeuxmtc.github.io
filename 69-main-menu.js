@@ -13,7 +13,7 @@
 
   const TAB_KEY = "mtc_main_menu_tab_v1";
   // numéro de version du jeu : majeur.mineur (le premier chiffre change pour une refonte, le second pour des ajouts)
-  const MTC_VERSION = "2.2";
+  const MTC_VERSION = "2.3";
   window.MTC_VERSION = MTC_VERSION;
   // soutiens du projet : soutiens.js, modifiable en mode admin (Réglages → Soutiens), publié sur le dépôt
   const supporters = () => (Array.isArray(window.MTC_SUPPORTERS) ? window.MTC_SUPPORTERS : []).map(s => String(s).trim()).filter(Boolean);
@@ -181,15 +181,15 @@
       suivi: [
         ["Statistiques", "Réussites, temps, évolution.", () => call("toggleStatsPanel")],
         ["Panier", "Les " + what + " mis" + (pharma ? "es" : "") + " de côté pour les revoir.", () => call("toggleReviewBasketPanel")],
-        // collection (en test, appareils admin) : collection.js
-        admin && window.mtcOpenCollection && ["Collection", (pharma ? "Les substances" : "Les points") + " trouvé" + (pharma ? "es" : "s") + " dans les groupes, " + (pharma ? "classe par classe." : "canal par canal."), () => window.mtcOpenCollection()],
+        // collection : collection.js
+        window.mtcOpenCollection && ["Collection", (pharma ? "Les substances" : "Les points") + " trouvé" + (pharma ? "es" : "s") + " dans les groupes, " + (pharma ? "classe par classe." : "canal par canal."), () => window.mtcOpenCollection()],
         ["Série", "Les jours de jeu d’affilée, rappel quotidien : " + reminderState() + ".", () => { clickId("mtcDailyReminderButton"); render(); }, null, null, true]
       ],
       reglages: [
         ["Affichage", "Thèmes de couleurs, son, prononciation.", openSettings],
         ["Aide", "Les tutoriels de chaque écran.", () => setTimeout(() => call("startTour"), 30)],
         // récompenses des bonnes réponses (celebrate.js) : un clic change le réglage sans fermer le menu
-        admin && ["Sons et vibration", "À chaque réponse : un son doux, une petite vibration du téléphone.", null, null,
+        ["Sons et vibration", "À chaque réponse : un son doux, une petite vibration du téléphone.", null, null,
           [["mtc_fx_sound", "Sons"], ["mtc_fx_vibrate", "Vibration"]].map(([key, label]) => {
             const on = fxOn(key), fn = () => { try{ localStorage.setItem(key, on ? "0" : "1"); }catch(e){} if(!on && key === "mtc_fx_sound" && window.mtcPlayFx) window.mtcPlayFx("good"); };
             fn.stay = true;
@@ -398,11 +398,13 @@
       ["reviewBasketButton", "Panier", svg('<path d="M3.5 9h17l-1.8 10.2a1.5 1.5 0 0 1-1.5 1.3H6.8a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M8 9l3-5.5M16 9l-3-5.5"/>')],
       ["comparisonButton", "Comparer A | B", svg('<rect x="3" y="5" width="7.5" height="14" rx="1.5"/><rect x="13.5" y="5" width="7.5" height="14" rx="1.5"/>')]
     ];
+    // collection (collection.js) : un petit atlas de pastilles, certaines allumées
+    if(window.mtcOpenCollection) ICONS.push(["__collection", "Collection", svg('<circle cx="5.5" cy="6" r="2.2" fill="currentColor"/><circle cx="12" cy="6" r="2.2"/><circle cx="18.5" cy="6" r="2.2" fill="currentColor"/><circle cx="5.5" cy="12.5" r="2.2"/><circle cx="12" cy="12.5" r="2.2" fill="currentColor"/><circle cx="18.5" cy="12.5" r="2.2"/><circle cx="5.5" cy="19" r="2.2" fill="currentColor"/><circle cx="12" cy="19" r="2.2"/><circle cx="18.5" cy="19" r="2.2"/>')]);
     const box = document.createElement("nav");
     box.id = "mtcBottomIcons";
     box.setAttribute("aria-label", "Outils de révision");
     box.innerHTML = ICONS.map(([id, label, icon]) => '<button type="button" data-for="' + id + '" title="' + label + '" aria-label="' + label + '">' + icon + "</button>").join("");
-    box.addEventListener("click", e => { const b = e.target.closest("[data-for]"); if(b) clickId(b.dataset.for); });
+    box.addEventListener("click", e => { const b = e.target.closest("[data-for]"); if(!b) return; if(b.dataset.for === "__collection") window.mtcOpenCollection(); else clickId(b.dataset.for); });
     document.body.appendChild(box);
   }
   // mot cherché surligné en fluo dans la fiche ouverte (sans tenir compte des accents ni des majuscules)

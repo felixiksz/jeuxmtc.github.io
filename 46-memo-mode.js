@@ -25,8 +25,8 @@
     observer:null
   };
 
-  // récompenses et niveaux (en test sur les appareils admin)
-  const GAMI = (() => { try{ return localStorage.getItem("mtc_admin") === "1" || /[?&]admin=1/.test(location.search); }catch(e){ return false; } })();
+  // récompenses et niveaux
+  const GAMI = true;
   // niveaux au curseur : 4, 8, 12, 16 paires, puis 16 paires sans couleurs d'aide ; 5 erreurs possibles
   const MEMO_LEVELS = [{n:4, label:"4 paires"}, {n:8, label:"8 paires"}, {n:12, label:"12 paires"}, {n:16, label:"16 paires"}, {n:16, label:"16 paires, sans couleurs d’aide", noEasy:true}];
   const MEMO_MAX_ERRORS = 5;

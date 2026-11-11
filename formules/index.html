@@ -93,7 +93,7 @@
 </style>
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script>try{if(localStorage.getItem("mtc_admin")==="1"||/[?&]admin=1/.test(location.search))document.write('<script src="../celebrate.js?v=20261111-o"><\/script>')}catch(e){}</script>
+<script src="../celebrate.js?v=20261112-a"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
 <body>
@@ -289,8 +289,8 @@
 
   // ---- jeu : la substance qui manque ----
   const GAME = {cat:"", mode:"qcm", showRole:true, showDose:true, score:0, total:0, streak:0, q:null};
-  // défi (en test sur les appareils admin) : après 5 bonnes réponses d'affilée, un cas clinique difficile
-  const DEFI_ON = (() => { try{ return localStorage.getItem("mtc_admin") === "1" || /[?&]admin=1/.test(location.search); }catch(e){ return false; } })();
+  // défi : après 5 bonnes réponses d'affilée, un cas clinique difficile
+  const DEFI_ON = true;
   try{ Object.assign(GAME, JSON.parse(localStorage.getItem("mtc_formules_game_v1") || "{}"), {q:null}); }catch(e){}
   const saveGame = () => { try{ localStorage.setItem("mtc_formules_game_v1", JSON.stringify({cat:GAME.cat, mode:GAME.mode, showRole:GAME.showRole, showDose:GAME.showDose})); }catch(e){} };
   const rnd = a => a[Math.floor(Math.random() * a.length)];

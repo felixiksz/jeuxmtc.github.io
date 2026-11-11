@@ -1,5 +1,13 @@
 /* Jeu « Équilibrer » : styles partagés par equilibrer/index.html et le module Réseaux (circuits/index.html) */
-  .balbar{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:.88rem; margin:0 0 12px; }
+  .balbar{ display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; font-size:.88rem; margin:0 0 12px; }
+  .balbar details.aide{ margin:0; }
+  .balbar details.aide[open]{ flex:1 1 100%; }   /* explications ouvertes : sur toute la largeur, les commandes passent dessous */
+  .balsysgrp{ display:inline-flex; gap:3px; }
+  .balsysgrp .balsysbtn{ width:26px; height:26px; }
+  .ballvl input[type="range"]{ flex:1 1 120px; max-width:300px; accent-color:var(--mtc-accent, var(--accent)); }
+  .balsol{ display:block; width:100%; text-align:left; font:inherit; color:inherit; background:none; border:0; border-left:3px solid transparent; padding:3px 0 3px 8px; margin:2px 0; cursor:pointer; }
+  .balsol:hover{ border-left-color:var(--hair, #ddd); }
+  .balsol.on{ border-left-color:var(--shadow-color); background:color-mix(in srgb, var(--shadow-color) 10%, transparent); }
   .balsysbtn{ font:inherit; font-weight:800; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--text-color); background:transparent; color:var(--text-color); cursor:pointer; padding:0; }
   .balsysbtn.on{ background:var(--text-color); color:var(--page-bg); }
   .balbar label{ display:inline-flex; gap:5px; align-items:center; cursor:pointer; }

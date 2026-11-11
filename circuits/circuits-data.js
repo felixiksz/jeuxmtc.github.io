@@ -1,6 +1,7 @@
 // Circuits thérapeutiques de Dr Tán, repris du cours « Les circuits thérapeutiques » (École Zhōng Lì, version du 27/10/2021).
 // grid : [haut gauche, haut droite, bas gauche, bas droite] comme dans le cours (main en haut, pied en bas).
 // autre : circuits qui ne reposent que sur l'équilibre dynamique (chapitre 13).
+// Indications et actions : base des circuits d’Assistant-MTC (acupuncture/circuits/circuits.json), enrichie des notes personnelles (circuits_perso.json).
 window.MTC_CIRCUITS = [
  {
   "title": "Tài yīn / yáng míng",
@@ -17,15 +18,16 @@ window.MTC_CIRCUITS = [
    "favorise la respiration, la digestion et le transit",
    "favorise la formation et la circulation du qì (wèi qì, yíng qì, zōng qì)",
    "métabolise l’humidité et la sécheresse, favorise la circulation et l’élimination par les mictions et la transpiration des liquides (jīn yè)",
-   "calme le shén (ajout possible du shǒu shào yīn (canal du cœur))",
+   "calme le shén (ajout possible Rn + V + C ensemble)",
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "fatigue, asthme, toux, souffle court, rhinite, sinusites, bronchites, amygdalite, angine, rhume, troubles de la transpiration…",
-   "dermatoses, herpès labial…",
-   "distension abdominale, diarrhée chronique, constipation, douleur abdominale, faiblesse de l'estomac, faiblesse de digestion, ulcère de l’estomac, gastrite, colique, allergie alimentaire, œdèmes…",
-   "diabète, troubles de la thyroïde, troubles du cou…",
-   "fibromyalgie, faiblesse des membres…"
+   "fatigue, troubles de la transpiration, œdèmes, troubles de la thyroïde, troubles du cou, fibromyalgie, faiblesse des membres",
+   "troubles psycho-émotionnels, agoraphobie",
+   "amenorrhée",
+   "asthme, toux, souffle court, rhinite, sinusites, bronchites, amygdalite, angine, rhume, grippe, allergies, faiblesse immunitaire",
+   "dermatoses, herpès labial",
+   "distension abdominale, diarrhée chronique, constipation, douleur abdominale, faiblesse de l'estomac, faiblesse de digestion, ulcère de l’estomac, gastrite, colique, allergie alimentaire, diabète"
   ]
  },
  {
@@ -64,7 +66,7 @@ window.MTC_CIRCUITS = [
   "actions": [
    "régularise le rythme et la circulation du qì, calme les douleurs",
    "régularise la respiration et wèi qì",
-   "régularise la couche tài yáng",
+   "régularise le niveau tài yáng",
    "relâche le bois (mù) et renforce la terre (tǔ), via le feu (huǒ)",
    "métabolise le froid et le vent",
    "favorise la circulation et l’élimination par les mictions et la transpiration des liquides (jīn yè)",
@@ -197,9 +199,29 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "stress, anxiété, agitation, sensation d’être perdu, difficulté de mémorisation et de concentration, soupirs fréquents…",
-   "anémie, petit appétit, fatigue, troubles digestifs, fatigue après les repas, constipation…",
-   "céphalée, tension de la nuque et des épaules, épilepsie, maladie de Parkinson…"
+   "fatigue, soupirs fréquents…",
+   "stress",
+   "anxiété",
+   "agitation",
+   "sensation d’être perdu",
+   "difficulté de mémorisation",
+   "difficulté de concentration",
+   "pleures sans raison",
+   "sauts d'humeur",
+   "SPM marqués",
+   "anémie",
+   "petit appétit",
+   "manque d'appétit",
+   "troubles digestifs",
+   "diabète avec soif",
+   "fatigue après les repas",
+   "constipation (par vide de sang)",
+   "muscles tendus par vide de sang, tension de la nuque et des épaules",
+   "épilepsie, maladie de Parkinson…",
+   "endométriose par vide de sang, troubles hormonaux féminins",
+   "céphalée",
+   "POULS fin (et superficiel), surtout au loge du C",
+   "LANGUE pale et gonflé (pointe rouge possible)"
   ]
  },
  {
@@ -211,7 +233,7 @@ window.MTC_CIRCUITS = [
    "Rn"
   ],
   "actions": [
-   "régularise les couches shào yīn et tài yáng",
+   "régularise les niveaux shào yīn et tài yáng",
    "harmonise la relation feu (huǒ)/ eau (shuǐ), cœur / reins, soulage la douleur lombaire",
    "régularise le jīng et le sang (xuè)",
    "nourrit le cœur, calme les palpitations, clarifie la chaleur vide",
