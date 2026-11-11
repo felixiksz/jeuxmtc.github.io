@@ -281,3 +281,8 @@ html body #supportCoffeeButton.support-blooddrop-moving{ z-index:9700 !important
 html body #supportCoffeeButton:not(.support-blooddrop-moving){ z-index:9050 !important; }
 /* menu ouvert : la goutte (et son texte) restent derrière l'écran du menu, même en mouvement */
 html body.mtc-menu-open #supportCoffeeButton, html body.mtc-menu-open #mtcSupportLabel{ z-index:9050 !important; }
+
+/* panneaux fermés (rangés sous le bord de l'écran) : pas d'ombre, sinon elle dépasse en bas et s'ajoute à celle du panneau ouvert */
+html body .advanced-search-panel:not(.open), html body .review-basket-panel:not(.open), html body .comparison-panel:not(.open), html body .stats-panel:not(.open){ box-shadow:none !important; }
+/* barre du haut : autant de place sous les boutons qu'au-dessus */
+html body.mtc-menu-ui .topbar{ padding-bottom:12px !important; }

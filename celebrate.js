@@ -131,7 +131,7 @@
     ".mtc-goalbar{ position:absolute; left:0; right:0; bottom:0; height:3px; pointer-events:none; z-index:2; background:rgba(26,138,58,.12); }" +
     ".mtc-goalbar i{ display:block; height:100%; width:0; background:#1a8a3a; transition:width 1s cubic-bezier(.2,.8,.2,1); }" +
     ".mtc-goalbar.full i{ background:#1a8a3a; box-shadow:0 0 6px rgba(26,138,58,.6); }" +
-    ".mtc-goalbar b{ position:absolute; right:10px; bottom:6px; font:700 .7rem 'Archivo', sans-serif; letter-spacing:.06em; color:#1a8a3a; opacity:0; transition:opacity .4s; white-space:nowrap; }" +
+    ".mtc-goalbar b{ position:absolute; right:10px; top:7px; font:700 .7rem 'Archivo', sans-serif; letter-spacing:.06em; color:#1a8a3a; opacity:0; transition:opacity .4s; white-space:nowrap; background:var(--page-bg, #fcfcfa); padding:1px 6px; border-radius:3px; }" +
     ".mtc-goalbar.show b{ opacity:1; }" +
     "@keyframes mtcStreak{ 0%{ opacity:0; transform:translate(-50%, -40%); } 15%{ opacity:1; transform:translate(-50%, -50%); } 70%{ opacity:1; } 100%{ opacity:0; transform:translate(-50%, -62%); } }";
   let glow = null, word = null, streak = 0, recordShown = false;
