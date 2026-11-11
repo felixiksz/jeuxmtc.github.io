@@ -127,9 +127,11 @@
     ".mtc-bounce{ animation:mtcBounce .55s cubic-bezier(.3,1.6,.5,1); }" +
     "g.mtc-bounce, svg .mtc-bounce{ transform-box:fill-box; transform-origin:center; }" +
     "@keyframes mtcBounce{ 0%{ transform:scale(1); } 45%{ transform:scale(1.22); } 100%{ transform:scale(1); } }" +
-    ".mtc-grain{ position:fixed; inset:0; pointer-events:none; z-index:2147482999; mix-blend-mode:overlay; opacity:.18; background-size:180px 180px; }" +
+    ".mtc-grain{ position:fixed; inset:0; pointer-events:none; z-index:2147482999; mix-blend-mode:overlay; opacity:.18; background-size:180px 180px;" +
+    " -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, transparent 78%, #000 100%); mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, transparent 78%, #000 100%); }" +
     ".mtc-goalbar{ position:absolute; left:0; right:0; bottom:0; height:3px; pointer-events:none; z-index:2; background:rgba(26,138,58,.12); }" +
     ".mtc-goalbar i{ display:block; height:100%; width:0; background:#1a8a3a; transition:width 1s cubic-bezier(.2,.8,.2,1); }" +
+    ".mtc-goalbar.top{ position:fixed; top:0; bottom:auto; z-index:9800; }" +
     ".mtc-goalbar.full i{ background:#1a8a3a; box-shadow:0 0 6px rgba(26,138,58,.6); }" +
     ".mtc-goalbar b{ position:absolute; right:10px; top:7px; font:700 .7rem 'Archivo', sans-serif; letter-spacing:.06em; color:#1a8a3a; opacity:0; transition:opacity .4s; white-space:nowrap; background:var(--page-bg, #fcfcfa); padding:1px 6px; border-radius:3px; }" +
     ".mtc-goalbar.show b{ opacity:1; }" +
@@ -152,11 +154,12 @@
     try{
       ensure();
       if(!goalEl || !goalEl.isConnected){
-        const host = document.querySelector("body > header") || document.querySelector(".topbar");
-        if(!host) return;
-        if(getComputedStyle(host).position === "static") host.style.position = "relative";
+        const host = document.querySelector(".topbar") || document.querySelector("body > header");
         goalEl = document.createElement("div"); goalEl.className = "mtc-goalbar"; goalEl.innerHTML = "<i></i><b></b>";
-        host.appendChild(goalEl);
+        if(host && host.getBoundingClientRect().height < 150 && !document.getElementById("netToggle")){
+          if(getComputedStyle(host).position === "static") host.style.position = "relative";
+          host.appendChild(goalEl);
+        }else{ goalEl.classList.add("top"); document.body.appendChild(goalEl); }
       }
       const n = dayCount(false), w = Math.min(100, n / GOAL * 100);
       goalEl.title = "Objectif du jour : " + Math.min(n, GOAL) + " / " + GOAL + " bonnes réponses, tous jeux confondus";

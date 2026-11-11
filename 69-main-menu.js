@@ -181,7 +181,6 @@
       suivi: [
         ["Statistiques", "Réussites, temps, évolution.", () => call("toggleStatsPanel")],
         ["Panier", "Les " + what + " mis" + (pharma ? "es" : "") + " de côté pour les revoir.", () => call("toggleReviewBasketPanel")],
-        !pharma && ["Maîtrise", "Le niveau atteint sur chaque point.", openMastery],
         // collection (en test, appareils admin) : collection.js
         admin && window.mtcOpenCollection && ["Collection", (pharma ? "Les substances" : "Les points") + " trouvé" + (pharma ? "es" : "s") + " dans les groupes, " + (pharma ? "classe par classe." : "canal par canal."), () => window.mtcOpenCollection()],
         ["Série", "Les jours de jeu d’affilée, rappel quotidien : " + reminderState() + ".", () => { clickId("mtcDailyReminderButton"); render(); }, null, null, true]
