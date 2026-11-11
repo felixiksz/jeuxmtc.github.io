@@ -197,10 +197,10 @@ body.mtc-menu-ui .practice-row .mode-switch{ display:none !important; }
 html body.mtc-menu-ui .practice-row .practice-difficulty-end{ font-family:'Archivo', sans-serif; font-size:12px !important; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
 /* bouton son (mode audio) à la taille des autres icônes */
 html body.mtc-menu-ui #mtcAudioModeToggle{ font-size:18px !important; width:1.6em; min-width:1.6em; height:1.6em; margin:0 !important; position:relative; }
-/* lecture des noms : éteinte = pâle et barrée ; allumée = pleine, soulignée comme « Auto » */
+/* lecture des noms : éteinte = pâle et barrée ; allumée = pleine */
 html body.mtc-menu-ui #mtcAudioModeToggle:not(.active){ opacity:.3 !important; }
 html body.mtc-menu-ui #mtcAudioModeToggle:not(.active)::after{ content:""; position:absolute; left:12%; right:12%; top:50%; border-top:2px solid currentColor; transform:rotate(-40deg); }
-html body.mtc-menu-ui #mtcAudioModeToggle.active{ opacity:1 !important; box-shadow:inset 0 -2px 0 var(--shadow-color) !important; }
+html body.mtc-menu-ui #mtcAudioModeToggle.active{ opacity:1 !important; box-shadow:none !important; }
 @media (max-width:760px){
   /* téléphone : son, Auto / Manuel, curseur et cadenas sur une seule ligne */
   html body.mtc-menu-ui .practice-row{ flex-wrap:wrap; gap:8px 10px !important; }
