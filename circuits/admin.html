@@ -23,6 +23,8 @@
   .src{ color:var(--muted); font-size:.88rem; margin:0 0 12px; max-width:760px; }
   .bar{ display:flex; flex-wrap:wrap; gap:6px 14px; align-items:center; font-size:.88rem; margin:0 0 12px; }
   .bar label{ display:inline-flex; gap:5px; align-items:center; cursor:pointer; }
+  /* le « ? » sur la même ligne que les réglages du jeu ; ouvert, l'explication prend toute la largeur */
+  .bar > details.aide{ margin:0; } .bar > details.aide[open]{ flex:1 1 100%; }
   .bar select{ font:inherit; padding:2px 6px; }
   .score{ margin-left:auto; font-weight:800; }
   .lay{ display:grid; grid-template-columns:minmax(240px, 380px) minmax(0, 1fr); gap:10px 28px; align-items:start; }
@@ -123,7 +125,7 @@
 <link href="../equilibrer/equilibrer-next.css?v=20261111-a" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script src="../celebrate.js?v=20261111-h"></script>
+<script src="../celebrate.js?v=20261111-i"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 <script src="circuits-data.js?v=20261107-a"></script>
 <script src="../equilibrer/equilibrer-game-next.js?v=20261111-a"></script>
@@ -428,8 +430,7 @@
         '<div class="act">' + (F.sysRes ? "" : '<button type="button" class="tool" id="fSys">Valider</button>') + '<button type="button" class="tool" id="fNext">' + (viewingPast("fermer") ? "Revenir au circuit en cours" : "Circuit suivant") + "</button></div>" +
         (F.sysRes ? '<div class="res">' + F.sysRes + "</div>" + circuitCard(F.c) : "");
     }
-    main.innerHTML = aide('Un circuit : deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal a une entrée et une sortie : il est relié à ses deux voisins par un des cinq systèmes.') +
-      '<div class="bar">' + histNav("fermer") + '<label><input type="checkbox" id="fTwo"' + (F.two ? " checked" : "") + "> deux canaux à trouver</label>" + scoreLine("fermer", "circuit fermé du premier coup", "circuits fermés du premier coup") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Un circuit : deux canaux de main en haut, deux canaux de pied en bas, un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale. Chaque canal a une entrée et une sortie : il est relié à ses deux voisins par un des cinq systèmes.') + histNav("fermer") + '<label><input type="checkbox" id="fTwo"' + (F.two ? " checked" : "") + "> deux canaux à trouver</label>" + scoreLine("fermer", "circuit fermé du premier coup", "circuits fermés du premier coup") + "</div>" +
       '<div class="lay"><div>' + gridSvg(F.cells, {open:placing ? F.hide : [], sel:placing ? F.sel : null, sys:!!F.sysRes, marks:F.marks,
         edgeOk:F.sysRes ? Object.fromEntries(edges.map(([i, j]) => [i + "-" + j, sameSet(F.sys[i + "-" + j] || [], links(F.cells[i], F.cells[j]))])) : null}) + "</div><div>" + right +
       (placing && F.msg ? '<div class="res">' + F.msg + "</div>" : "") + "</div></div>" + rappel();
@@ -546,8 +547,7 @@
     if(P.step === "circuit" || P.step === "interroger") left = gridSvg(P.cells, {open:P.step === "circuit" ? P.hide : [], sel:P.step === "circuit" ? P.sel : null, sys:P.step === "interroger", marks:P.marks});
     const done = P.done || P.asked;
     if(P.lvlRes && P.step !== "niveau") right = '<span class="verdict ' + (P.lvlRes.ok ? "ok" : "no") + '">Niveau ' + P.lvlRes.n + (P.lvlRes.ok ? " ✓" : " ✗ → niveau " + P.level) + "</span>" + right;
-    main.innerHTML = aide('Læ patient·e énonce ses trois plaintes principales, de la plus importante à la moins importante. Elles désignent les canaux atteints, le niveau d’atteinte, puis le circuit thérapeutique.') +
-      '<div class="bar">' + scoreLine("plaintes", "cas réussi du premier coup", "cas réussis du premier coup") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Læ patient·e énonce ses trois plaintes principales, de la plus importante à la moins importante. Elles désignent les canaux atteints, le niveau d’atteinte, puis le circuit thérapeutique.') + scoreLine("plaintes", "cas réussi du premier coup", "cas réussis du premier coup") + "</div>" +
       '<div class="lay"><div>' + head + left + "</div><div>" + right + (P.msg ? '<div class="res">' + P.msg + "</div>" : "") +
       '<div class="act"><button type="button" class="tool" id="pNext">' + (done ? "Cas suivant" : "Autre cas") + "</button></div></div></div>" + rappel();
     on("pNext", () => { newPlaintes(); renderPlaintes(); });
@@ -668,8 +668,7 @@
       const circ = W.map(w => findCircuit([X, Y, Z, w])).find(Boolean);
       end = circ ? '<div class="card"><p>' + chips([X, Y, Z]) + " et " + chip(circ.grid.find(c => ![X, Y, Z].includes(c))) + " forment un circuit fermé : il bloque la propagation et élimine le facteur pathogène.</p></div>" + circuitCard(circ) : "";
     }
-    main.innerHTML = aide('Un facteur pathogène se propage d’un canal à un canal de sa famille (les canaux qui le rééquilibrent). Lire cette propagation permet d’anticiper et de protéger le canal le plus menacé.') +
-      '<div class="bar">' + propBar() + scoreLine("propagation", "cas suivi sans erreur", "cas suivis sans erreur") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Un facteur pathogène se propage d’un canal à un canal de sa famille (les canaux qui le rééquilibrent). Lire cette propagation permet d’anticiper et de protéger le canal le plus menacé.') + propBar() + scoreLine("propagation", "cas suivi sans erreur", "cas suivis sans erreur") + "</div>" +
       '<div class="lay"><svg class="clock" viewBox="20 20 300 300" role="img" aria-label="Horloge chinoise des douze canaux">' + g + "</svg><div>" +
       '<p class="q">' + Q[G.step] + "</p>" +
       '<div class="act">' + (G.shown ? (G.done ? "" : '<button type="button" class="tool" id="gNext">Continuer</button>') : '<button type="button" class="tool" id="gVal">Valider</button><button type="button" class="tool" id="gClr">Effacer</button>') +
@@ -747,8 +746,7 @@
   function renderGrille(){
     const c = R.c, keys = [1, 2, 3, 4, 5].map(n => c + "|" + n);
     const perfectRows = R.rows.filter(r => r.ok).length;
-    main.innerHTML = aide('Le tableau récapitulatif du rééquilibrage des canaux, une ligne à la fois : pour le canal affiché, le canal qui le rééquilibre dans chacun des cinq systèmes. Clique sur une case vide, puis sur un canal. La ligne suivante s’ajoute dessous, jusqu’à remplir les 12 lignes. Le curseur règle le nombre de cases vides par ligne.') +
-      '<div class="bar"><span class="lvlpick"><span class="sm">facile</span>' +
+    main.innerHTML = '<div class="bar">' + aide('Le tableau récapitulatif du rééquilibrage des canaux, une ligne à la fois : pour le canal affiché, le canal qui le rééquilibre dans chacun des cinq systèmes. Clique sur une case vide, puis sur un canal. La ligne suivante s’ajoute dessous, jusqu’à remplir les 12 lignes. Le curseur règle le nombre de cases vides par ligne.') + '<span class="lvlpick"><span class="sm">facile</span>' +
       '<input type="range" id="rLvl" min="0" max="' + (LEVELS.length - 1) + '" step="1" value="' + R.lvl + '" aria-label="Niveau">' +
       '<span class="sm">difficile</span></span><b id="rLvlTxt">' + lvlTxt(R.lvl) + "</b>" +
       scoreLine("grille", "ligne parfaite", "lignes parfaites") + "</div>" +
@@ -835,8 +833,7 @@
       q = "Ce circuit respecte-t-il l’équilibre statique ?";
       body = gridSvg(Q5.c.grid, {noPol:!Q5.done}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
     }
-    main.innerHTML = aide('Les actions et indications des circuits, les astuces de Dr Tán et l’équilibre statique.') +
-      '<div class="bar">' + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Les actions et indications des circuits, les astuces de Dr Tán et l’équilibre statique.') + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
       '<div style="max-width:720px"><p class="q">' + q + "</p>" + body +
       '<div class="act">' + (!Q5.done && (t === "indications" || t === "actions" || t === "astuceInv") ? '<button type="button" class="tool" id="qVal">Valider</button>' : "") +
       '<button type="button" class="tool" id="qNext">' + (Q5.done ? "Question suivante" : "Autre question") + "</button></div>" +
@@ -917,8 +914,7 @@
         '<text x="' + (x + 32) + '" y="' + (y + 21) + '" text-anchor="middle" class="glbl" style="fill:' + (c ? ink(c) : "currentColor") + '">' + (c ? esc(c) : "?") + "</text>" +
         '<text x="' + (x + 32) + '" y="' + (k[0] === "b" ? y - 7 : y + 46) + '" text-anchor="middle" class="limblbl">' + LIMBS[k] + "</text><title>" + LIMBS[k] + "</title></g>";
     });
-    main.innerHTML = aide('Les canaux du circuit se répartissent sur les quatre membres : canaux de main sur les bras, canaux de pied sur les jambes. Læ patient·e est vu·e de face : sa droite est à ta gauche.') +
-      '<div class="bar">' + histNav("membres") + scoreLine("membres", "circuit bien placé", "circuits bien placés") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Les canaux du circuit se répartissent sur les quatre membres : canaux de main sur les bras, canaux de pied sur les jambes. Læ patient·e est vu·e de face : sa droite est à ta gauche.') + histNav("membres") + scoreLine("membres", "circuit bien placé", "circuits bien placés") + "</div>" +
       '<div class="lay"><svg class="body" viewBox="0 0 260 330" role="img" aria-label="Les quatre membres">' + g + "</svg><div>" +
       '<p class="lbltop">Circuit ' + esc(M.c.title) + '</p><div style="max-width:260px">' + gridSvg(M.c.grid, {edges:true}) + "</div>" +
       '<p class="q">' + chip(M.given) + " est piqué sur " + onLimb(M.sol[M.given]) + ". Où piquer les trois autres canaux ?</p>" +

@@ -32,12 +32,18 @@
   const pick = a => a[Math.floor(Math.random() * a.length)];
   function audio(){
     if(!ac){
-      ac = new (window.AudioContext || window.webkitAudioContext)();
-      out = ac.createGain(); out.gain.value = .9; out.connect(ac.destination);
-      rev = ac.createConvolver();
-      const len = Math.floor(ac.sampleRate * 1.1), buf = ac.createBuffer(2, len, ac.sampleRate);
-      for(let c = 0; c < 2; c++){ const d = buf.getChannelData(c); for(let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4); }
-      rev.buffer = buf; const wet = ac.createGain(); wet.gain.value = .25; rev.connect(wet); wet.connect(out);
+      // téléphone : tampon audio plus grand (pas de craquements), volume général plus bas et limiteur (pas de saturation),
+      // écho léger fait d'un simple retard (la réverbération par convolution coûtait trop au processeur)
+      const AC = window.AudioContext || window.webkitAudioContext;
+      try{ ac = new AC({latencyHint:"playback"}); }catch(e){ ac = new AC(); }
+      const lim = ac.createDynamicsCompressor();
+      lim.threshold.value = -14; lim.knee.value = 8; lim.ratio.value = 12; lim.attack.value = .003; lim.release.value = .2;
+      lim.connect(ac.destination);
+      out = ac.createGain(); out.gain.value = .5; out.connect(lim);
+      rev = ac.createDelay(1); rev.delayTime.value = .13;
+      const fb = ac.createGain(), wet = ac.createGain(), tone = ac.createBiquadFilter();
+      fb.gain.value = .28; wet.gain.value = .22; tone.type = "lowpass"; tone.frequency.value = 2400;
+      rev.connect(tone); tone.connect(fb); fb.connect(rev); tone.connect(wet); wet.connect(out);
     }
     if(ac.state === "suspended") ac.resume();
     return ac;
@@ -49,7 +55,7 @@
       const s = a.createOscillator(), g = a.createGain();
       s.type = o.type && freq === f ? o.type : "sine"; s.frequency.setValueAtTime(freq, t);
       if(o.glide) s.frequency.exponentialRampToValueAtTime(freq * Math.pow(2, o.glide / 12), t + d * .8);
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .005);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .01);
       g.gain.exponentialRampToValueAtTime(v * .35, t + Math.min(.12, d * .4)); g.gain.exponentialRampToValueAtTime(.0005, t + d);
       s.connect(g); g.connect(bus); s.start(t); s.stop(t + d + .05);
     };
