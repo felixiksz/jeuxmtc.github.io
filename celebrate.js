@@ -194,9 +194,15 @@
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => drawGoal(false)); else drawGoal(false);
   const replay = (el, cls) => { el.classList.remove("go", "big"); void el.offsetWidth; el.classList.add(cls); };
   function say(html){ word.innerHTML = html; replay(word, "go"); }
-  window.mtcCelebrate = function(force){
+  // opts.count === false : lueur, son et vibration seulement (ne compte ni dans la série ni dans l'objectif du jour)
+  window.mtcCelebrate = function(force, opts){
     try{
       ensure();
+      if(opts && opts.count === false){
+        replay(glow, force >= 2 ? "big" : "go"); play(force >= 2 ? "serie" : "good");
+        if(navigator.vibrate && pref("mtc_fx_vibrate")) navigator.vibrate(force >= 2 ? [25, 70, 25] : 20);
+        return;
+      }
       streak++;
       let strong = force >= 2, fx = "good";
       const b = best();
