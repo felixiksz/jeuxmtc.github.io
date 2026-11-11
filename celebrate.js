@@ -124,6 +124,10 @@
     " text-shadow:0 0 18px rgba(255,255,255,.9), 0 0 2px rgba(255,255,255,.9); }" +
     ".mtc-streak small{ display:block; font:700 .72rem 'Archivo', sans-serif; letter-spacing:.12em; text-transform:uppercase; font-style:normal; margin-top:4px; }" +
     ".mtc-streak.go{ animation:mtcStreak 2.4s ease-out forwards; }" +
+    ".mtc-bounce{ animation:mtcBounce .55s cubic-bezier(.3,1.6,.5,1); }" +
+    "g.mtc-bounce, svg .mtc-bounce{ transform-box:fill-box; transform-origin:center; }" +
+    "@keyframes mtcBounce{ 0%{ transform:scale(1); } 45%{ transform:scale(1.22); } 100%{ transform:scale(1); } }" +
+    ".mtc-grain{ position:fixed; inset:0; pointer-events:none; z-index:2147482999; mix-blend-mode:overlay; opacity:.18; background-size:180px 180px; }" +
     ".mtc-goalbar{ position:absolute; left:0; right:0; bottom:0; height:3px; pointer-events:none; z-index:2; background:rgba(26,138,58,.12); }" +
     ".mtc-goalbar i{ display:block; height:100%; width:0; background:#1a8a3a; transition:width 1s cubic-bezier(.2,.8,.2,1); }" +
     ".mtc-goalbar.full i{ background:#1a8a3a; box-shadow:0 0 6px rgba(26,138,58,.6); }" +
@@ -163,6 +167,27 @@
     }catch(e){}
   }
   window.mtcDrawGoal = drawGoal;
+  // bonne réponse : l'élément trouvé rebondit (case, système, canal, membre, groupe…)
+  window.mtcBounce = function(el){
+    try{ ensure(); if(!el) return; el.classList.remove("mtc-bounce"); void el.getBoundingClientRect(); el.classList.add("mtc-bounce");
+      setTimeout(() => el.classList.remove("mtc-bounce"), 600); }catch(e){}
+  };
+  // grain de papier photo, très léger, sur les ombres et les halos (mélange « overlay » : le blanc reste blanc, le noir reste noir)
+  function addGrain(){
+    try{
+      const low = (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+      if(low || document.querySelector(".mtc-grain") || !document.body) return;
+      ensure();
+      const c = document.createElement("canvas"); c.width = c.height = 180;
+      const x = c.getContext("2d"), d = x.createImageData(180, 180);
+      for(let i = 0; i < d.data.length; i += 4){ const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+      x.putImageData(d, 0, 0);
+      const g = document.createElement("div"); g.className = "mtc-grain"; g.setAttribute("aria-hidden", "true");
+      g.style.backgroundImage = "url(" + c.toDataURL() + ")";
+      document.body.appendChild(g);
+    }catch(e){}
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", addGrain); else addGrain();
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => drawGoal(false)); else drawGoal(false);
   const replay = (el, cls) => { el.classList.remove("go", "big"); void el.offsetWidth; el.classList.add(cls); };
   function say(html){ word.innerHTML = html; replay(word, "go"); }
@@ -198,7 +223,7 @@
       const wrapped = function(group){
         const by = group && group._solvedBy;
         const res = orig.apply(this, arguments);
-        if(by === "points" || by === "final") window.mtcCelebrate(1);
+        if(by === "points" || by === "final"){ window.mtcCelebrate(1); const rows = document.querySelectorAll(".solved-row"); window.mtcBounce(rows[rows.length - 1]); }
         return res;
       };
       wrapped.__mtcGlow = true;

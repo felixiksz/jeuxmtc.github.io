@@ -125,10 +125,10 @@
 <link href="../equilibrer/equilibrer-next.css?v=20261111-a" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script src="../celebrate.js?v=20261111-k"></script>
+<script src="../celebrate.js?v=20261111-l"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 <script src="circuits-data.js?v=20261107-a"></script>
-<script src="../equilibrer/equilibrer-game-next.js?v=20261111-a"></script>
+<script src="../equilibrer/equilibrer-game-next.js?v=20261111-b"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
@@ -157,6 +157,7 @@
   // en diagonale (équilibre statique), chaque canal relié à ses deux voisins par un des cinq systèmes (équilibre
   // dynamique). Ces règles redonnent exactement les 12 circuits du cours, ni plus ni moins.
   const main = document.getElementById("main"), modesEl = document.getElementById("modes");
+  new MutationObserver(() => { if(!BOUNCE) return; const el = main.querySelector(BOUNCE); BOUNCE = null; if(el && window.mtcBounce) window.mtcBounce(el); }).observe(main, {childList:true, subtree:true});
   // explications du jeu rangées derrière un « ? » (ouvert ou fermé : le choix reste d'un jeu à l'autre)
   const aide = html => '<details class="aide"' + (window.mtcAideOpen ? " open" : "") + '><summary title="Explications" aria-label="Explications">?</summary><p class="src">' + html + "</p></details>";
   main.addEventListener("toggle", e => { if(e.target.classList && e.target.classList.contains("aide")) window.mtcAideOpen = e.target.open; }, true);
@@ -356,7 +357,9 @@
   }
   let ROUND = 0;
   // chaque bonne étape : petit son tout de suite ; chaque erreur : son d'erreur (la série repart de zéro)
-  const stepFx = ok => { if(ok){ if(window.mtcPlayFx) window.mtcPlayFx("good"); } else if(window.mtcMiss) window.mtcMiss(); };
+  // la bonne réponse trouvée rebondit (sélecteur de l'élément, retrouvé après le nouvel affichage)
+  let BOUNCE = null;
+  const stepFx = (ok, sel) => { if(ok){ BOUNCE = sel || null; if(window.mtcPlayFx) window.mtcPlayFx("good"); } else if(window.mtcMiss) window.mtcMiss(); };
 
   // ---------- revenir aux parties précédentes (Fermer le circuit, Quel circuit ?, Quatre membres) ----------
   // flèches ‹ › dans la barre, ou glisser vers la droite (partie précédente) / vers la gauche (partie suivante)
@@ -462,7 +465,7 @@
       const k = b.dataset.k, n = +b.dataset.n, [i, j] = k.split("-").map(Number), ans = links(F.cells[i], F.cells[j]);
       if(!F.wrong) F.wrong = {};
       // bon système : petit son de réussite tout de suite (la félicitation et la lueur viennent à la fin)
-      if(ans.includes(n)){ const l = F.sys[k] || (F.sys[k] = []); if(!l.includes(n)){ l.push(n); if(window.mtcPlayFx) window.mtcPlayFx("good"); } }
+      if(ans.includes(n)){ const l = F.sys[k] || (F.sys[k] = []); if(!l.includes(n)){ l.push(n); stepFx(true, '.sysb[data-k="' + k + '"][data-n="' + n + '"]'); } }
       else { const w = F.wrong[k] || (F.wrong[k] = []); if(!w.includes(n)){ w.push(n); if(window.mtcMiss) window.mtcMiss(); } }
       renderFermer();
     }));
@@ -564,7 +567,7 @@
       if(P.done || P.pick.has(c) || (P.mk && P.mk[c])) return;
       const ans = P.step === "famille" ? [P.A].concat(family(P.A)) : [P.A, P.B];
       P.mk = P.mk || {};
-      if(ans.includes(c)){ P.pick.add(c); P.mk[c] = "ok"; stepFx(true); }
+      if(ans.includes(c)){ P.pick.add(c); P.mk[c] = "ok"; stepFx(true, '.pc[data-c="' + c + '"]'); }
       else { P.mk[c] = "no"; P.stepErr = true; stepFx(false); }
       renderPlaintes();
     });
@@ -678,7 +681,7 @@
       if(G.shown) return;
       const c = n.dataset.c, illNow = G.step === 1 ? [X] : G.step === 2 ? [X, Y] : [X, Y, Z];
       if(G.pick.has(c) || G.bad.has(c) || (G.step !== 3 && illNow.includes(c))) return;
-      if(propAnswer().includes(c)){ G.pick.add(c); stepFx(true); } else { G.bad.add(c); stepFx(false); }
+      if(propAnswer().includes(c)){ G.pick.add(c); stepFx(true, '.cnode[data-c="' + c + '"]'); } else { G.bad.add(c); stepFx(false); }
       renderPropagation();
     }));
     on("gClr", () => { G.pick.clear(); renderPropagation(); });
@@ -736,7 +739,7 @@
       // lignes déjà faites : la case juste en vert, la case fausse en rouge avec la bonne réponse
       if(state === "past") return !bad[k] ? '<td class="was-ok"><span>' + chip(ans) + "</span></td>" : '<td class="was-no"><span><s>' + esc(bad[k]) + "</s> " + chip(ans) + "</span></td>";
       // case trouvée : verte tout de suite ; mauvaise réponse : la case clignote en rouge et reste à trouver
-      if(f === ans) return '<td class="res-ok"><span>✓ ' + chip(ans) + "</span></td>";
+      if(f === ans) return '<td class="res-ok" data-k="' + k + '"><span>✓ ' + chip(ans) + "</span></td>";
       if(R.flash && R.flash.k === k && state !== "done") return '<td class="blank sel flashno" data-k="' + k + '"><span><s>' + esc(R.flash.c) + "</s></span></td>";
       if(state === "done") return f === ans ? '<td class="res-ok"><span>✓ ' + chip(ans) + "</span></td>"
         : '<td class="res-no"><span>' + (f ? "<s>" + esc(f) + "</s>" : "✗") + " → " + chip(ans) + "</span></td>";
@@ -766,7 +769,7 @@
       if(R.done || R.end || !R.sel) return;
       const ans = mate(c, +R.sel.split("|")[1]);
       if(x !== ans){ if(!R.bad[R.sel]) R.bad[R.sel] = x; R.flash = {k:R.sel, c:x}; stepFx(false); renderGrille(); return; }
-      R.fill[R.sel] = x; R.flash = null; stepFx(true);
+      R.fill[R.sel] = x; R.flash = null; stepFx(true, 'td[data-k="' + R.sel + '"] span');
       const i = keys.indexOf(R.sel), nx = keys.slice(i + 1).concat(keys.slice(0, i)).find(k => R.blank.has(k) && !R.fill[k]);
       if(nx) R.sel = nx;
       renderGrille();
@@ -846,7 +849,7 @@
       const sets = t === "astuceInv" ? Q5.a.pairs : CIRC.filter(o => Q5.lines.every(l => o[t].includes(l))).map(o => o.grid);
       const okc = sets.some(g => [...Q5.pick, c].every(x => g.includes(x)));
       Q5.mark = Q5.mark || {};
-      if(okc){ Q5.pick.add(c); Q5.mark[c] = "ok"; stepFx(true); } else { Q5.mark[c] = "no"; Q5.errs = (Q5.errs || 0) + 1; stepFx(false); }
+      if(okc){ Q5.pick.add(c); Q5.mark[c] = "ok"; stepFx(true, '.pc[data-c="' + c + '"]'); } else { Q5.mark[c] = "no"; Q5.errs = (Q5.errs || 0) + 1; stepFx(false); }
       renderQuel();
     });
     // marque les canaux : ceux de la bonne réponse en vert, les choix en trop en rouge
@@ -927,7 +930,7 @@
       const k = n.dataset.k; if(M.place[k]) return;
       // bon membre : le canal s'y fixe en vert ; mauvais membre : il clignote en rouge et reste à placer
       if(M.sol[M.sel] !== k){ M.errs++; M.flash = {k, c:M.sel}; stepFx(false); renderMembres(); setTimeout(() => { if(M.flash && M.flash.k === k){ M.flash = null; renderMembres(); } }, 900); return; }
-      M.flash = null; M.place[k] = M.sel; stepFx(true);
+      M.flash = null; M.place[k] = M.sel; stepFx(true, '.limb[data-k="' + k + '"]');
       M.sel = M.c.grid.find(x => x !== M.given && !Object.values(M.place).includes(x)) || null;
       renderMembres();
     }));

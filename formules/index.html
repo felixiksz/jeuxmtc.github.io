@@ -68,6 +68,7 @@
   .free input{ flex:1; min-width:200px; font:inherit; padding:7px 10px; border-radius:10px; border:1px solid #ccd; }
   .verdict{ margin-top:10px; font-weight:800; }
   .verdict.ok{ color:var(--ok); } .verdict.ko{ color:var(--bad); }
+  .defi{ margin:12px 0; padding:10px 12px; border-left:3px solid var(--ok); line-height:1.6; } .defi .tool{ margin-left:6px; }
   .mini{ margin-top:8px; font-size:.85rem; background:#fafaff; border:1px solid #eee; border-radius:10px; padding:8px 10px; }
   .mini b{ font-weight:800; }
   .hint{ margin-top:10px; font-size:.88rem; }
@@ -92,7 +93,7 @@
 </style>
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script>try{if(localStorage.getItem("mtc_admin")==="1"||/[?&]admin=1/.test(location.search))document.write('<script src="../celebrate.js?v=20261111-k"><\/script>')}catch(e){}</script>
+<script>try{if(localStorage.getItem("mtc_admin")==="1"||/[?&]admin=1/.test(location.search))document.write('<script src="../celebrate.js?v=20261111-l"><\/script>')}catch(e){}</script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
 <body>
@@ -288,6 +289,8 @@
 
   // ---- jeu : la substance qui manque ----
   const GAME = {cat:"", mode:"qcm", showRole:true, showDose:true, score:0, total:0, streak:0, q:null};
+  // défi (en test sur les appareils admin) : après 5 bonnes réponses d'affilée, un cas clinique difficile
+  const DEFI_ON = (() => { try{ return localStorage.getItem("mtc_admin") === "1" || /[?&]admin=1/.test(location.search); }catch(e){ return false; } })();
   try{ Object.assign(GAME, JSON.parse(localStorage.getItem("mtc_formules_game_v1") || "{}"), {q:null}); }catch(e){}
   const saveGame = () => { try{ localStorage.setItem("mtc_formules_game_v1", JSON.stringify({cat:GAME.cat, mode:GAME.mode, showRole:GAME.showRole, showDose:GAME.showDose})); }catch(e){} };
   const rnd = a => a[Math.floor(Math.random() * a.length)];
@@ -316,7 +319,7 @@
     const q = GAME.q;
     if(q.answered) return;
     q.answered = ok ? "ok" : "ko"; q.picked = picked;
-    GAME.total++; if(ok){ GAME.score++; GAME.streak++; if(window.mtcCelebrate) window.mtcCelebrate(1); } else { GAME.streak = 0; if(window.mtcMiss) window.mtcMiss(); }
+    GAME.total++; if(ok){ GAME.score++; GAME.streak++; if(window.mtcCelebrate) window.mtcCelebrate(1); if(DEFI_ON && GAME.streak % 5 === 0) GAME.defi = true; } else { GAME.streak = 0; if(window.mtcMiss) window.mtcMiss(); }
     if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
     renderGame();
   }
@@ -348,6 +351,7 @@
       body += '<div class="verdict ' + q.answered + '">' + (q.answered === "ok" ? "✔ Oui : " : "✘ Non, c’était ") + esc(ans.name) + (ans.hanzi ? " " + esc(ans.hanzi) : "") + "</div>" +
         (h ? '<div class="mini"><b>' + esc(h.pinyin) + "</b> " + esc(h.hanzi || "") + " — " + esc(h.nom || "") + "<br>Nature : " + esc(h.nature || "—") + " · Saveur : " + esc(h.saveur || "—") + " · Tropisme : " + esc(h.tropisme || "—") + "<br>Classe : " + esc(h.classe || "—") + "</div>" : "") +
         '<div class="hint"><button type="button" class="tool on" id="gNext">Suivante ⏎</button> <button type="button" class="tool" id="gSee">Voir la fiche de la formule</button></div>';
+      if(GAME.defi) body += '<div class="defi"><b>Défi débloqué</b> · ' + GAME.streak + ' bonnes réponses d’affilée.<br>Un cas clinique difficile t’attend : quatre formules proches, sans indice, points doublés. <button type="button" class="tool on" id="gDefi">Relever le défi</button></div>';
     }
     main.innerHTML = bar + body + "</div>";
     bindBar();
@@ -358,6 +362,7 @@
     on("gHint", () => { q.hint = true; renderGame(); });
     on("gSkip", () => { GAME.total++; GAME.streak = 0; newQuestion(); renderGame(); });
     on("gNext", () => { newQuestion(); renderGame(); });
+    on("gDefi", () => { GAME.defi = false; CASE.hardNext = true; setView("case"); if(CASE.c && !CASE.hard) newCase(); });
     on("gSee", () => { current = f.id; setView("browse"); });
     const nx = document.getElementById("gNext"); if(nx) nx.focus();
   }
@@ -661,21 +666,23 @@
   try{ CASE.speed = localStorage.getItem("mtc_formules_case_speed") || "normal"; }catch(e){}
   const SPEED = {lent:95, normal:62, rapide:30};
   function newCase(){
+    CASE.hard = !!CASE.hardNext; CASE.hardNext = false;
     const pool = shuffle(FORMS.filter(f => !GAME.cat || f._catId === GAME.cat));
     let c = null;
     for(const f of pool){ if(CASE.c && pool.length > 1 && f.id === CASE.c.f.id) continue; c = buildCase(f); if(c) break; }
     if(CASE.typing){ clearTimeout(CASE.typing); CASE.typing = null; }
     CASE.c = c; CASE.asked = 0; CASE.said = new Set(); CASE.lineN = 0; CASE.told = false; CASE.topicAsked = {}; CASE.done = {}; CASE.answered = null; CASE.log = []; CASE.typing = null;
     if(!c) return;
-    // deux autres formules, de préférence de la même catégorie
+    // deux autres formules (trois pour un défi), de préférence de la même catégorie
     const same = shuffle(FORMS.filter(f => f.id !== c.f.id && f._catId === c.f._catId));
     const other = shuffle(FORMS.filter(f => f.id !== c.f.id && f._catId !== c.f._catId));
-    CASE.choices = shuffle([c.f].concat(same.concat(other).slice(0, 2)));
+    CASE.choices = shuffle([c.f].concat(same.concat(other).slice(0, CASE.hard ? 3 : 2)));
     const othersKeys = new Set(CASE.choices.filter(f => f.id !== c.f.id).flatMap(f => f._items.flatMap(i => i.keys)));
     const ORDER = {shi:0, zuo:1, chen:2, jun:3};
     CASE.tips = shuffle(c.f._items.filter(i => i.keys.length && !i.keys.some(k => othersKeys.has(k))))
       .sort((a, b) => (ORDER[a.role] ?? 1) - (ORDER[b.role] ?? 1));
     CASE.tipN = 0;
+    if(CASE.hard){ CASE.tips = []; say("narr", "Défi : un cas difficile. Quatre formules proches, sans indice, points doublés."); }
     say("narr", "Un·e patient·e entre et s’assoit.");
     say("vous", "Bonjour, qu’est-ce qui vous amène ?");
     sayNext();
@@ -759,10 +766,13 @@
     skipTyping();
     const ok = f.id === CASE.c.f.id;
     CASE.answered = ok ? "ok" : "ko"; CASE.picked = f;
-    if(ok && window.mtcCelebrate) window.mtcCelebrate(1); else if(!ok && window.mtcMiss) window.mtcMiss();
+    if(ok && window.mtcCelebrate) window.mtcCelebrate(CASE.hard ? 2 : 1); else if(!ok && window.mtcMiss) window.mtcMiss();
     CASE.total++;
     if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
-    if(ok) CASE.score += Math.max(3, 10 - Math.max(0, CASE.asked - 2));
+    if(ok) CASE.score += Math.max(3, 10 - Math.max(0, CASE.asked - 2)) * (CASE.hard ? 2 : 1);
+    // 5 cas réussis d'affilée : le suivant est un défi
+    CASE.streak = ok ? (CASE.streak || 0) + 1 : 0;
+    if(DEFI_ON && ok && !CASE.hard && CASE.streak % 5 === 0) CASE.hardNext = true;
     renderCase();
   }
   function renderCase(){
@@ -784,7 +794,7 @@
       '<button type="button" class="tool" data-ask="pouls"' + dis("pouls") + ">Prendre le pouls</button>" +
       (c.obs.length ? '<button type="button" class="tool" data-ask="obs"' + dis("obs") + ">Observer</button>" : "") +
       (c.palp.length ? '<button type="button" class="tool" data-ask="palp"' + dis("palp") + ">Palper l’abdomen</button>" : "") +
-      '<button type="button" class="tool" data-ask="astuce"' + (CASE.answered || busy || CASE.tipN >= CASE.tips.length ? " disabled" : "") + ' title="Une substance de la bonne formule, absente des deux autres propositions">Une substance de la formule' + (CASE.tips.length ? " (" + (CASE.tips.length - CASE.tipN) + ")" : "") + "</button>" +
+      (CASE.hard ? "" : '<button type="button" class="tool" data-ask="astuce"' + (CASE.answered || busy || CASE.tipN >= CASE.tips.length ? " disabled" : "") + ' title="Une substance de la bonne formule, absente des deux autres propositions">Une substance de la formule' + (CASE.tips.length ? " (" + (CASE.tips.length - CASE.tipN) + ")" : "") + "</button>") +
       '<span class="srcinfo">informations demandées : ' + CASE.asked + "</span></div>" +
       '<div class="asks topics"><span class="lbl">Questions :</span>' + TOPICS.filter(q => !q.femme || c.femme).map(q => {
         const asked = CASE.topicAsked[q.id], left = topicLeft(q.id).length;
@@ -796,7 +806,8 @@
       return '<button type="button" data-pick="' + i + '" class="' + cls + '"' + (CASE.answered ? " disabled" : "") + ">" + esc(fname(f)) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + '<br><small style="font-weight:400">' + esc(f.nom_fr || "") + "</small></button>";
     }).join("") + "</div></div>";
     if(CASE.answered){
-      decide += '<div class="reveal"><div class="verdict ' + CASE.answered + '">' + (CASE.answered === "ok" ? "✔ Bonne formule" + " (+" + Math.max(3, 10 - Math.max(0, CASE.asked - 2)) + " pts)" : "✘ Ce cas relevait de " + esc(fname(c.f))) + "</div>" +
+      decide += '<div class="reveal"><div class="verdict ' + CASE.answered + '">' + (CASE.answered === "ok" ? (CASE.hard ? "✔ Défi réussi" : "✔ Bonne formule") + " (+" + Math.max(3, 10 - Math.max(0, CASE.asked - 2)) * (CASE.hard ? 2 : 1) + " pts)" : "✘ Ce cas relevait de " + esc(fname(c.f))) + "</div>" +
+        (CASE.hardNext ? '<p class="defi"><b>Défi débloqué</b> · ' + CASE.streak + " cas réussis d’affilée : le prochain cas est difficile.</p>" : "") +
         (c.label ? "<p><b>Syndrome :</b> " + esc(c.label) + "</p>" : "") +
         '<p class="txt"><b>Tableau clinique complet</b>\n' + esc([["Symptômes", c.spoken], ["Langue", c.langue], ["Pouls", c.pouls], ["Observation", c.obs], ["Palpation", c.palp]]
           .filter(([, l]) => l.length).map(([n, l]) => n + " : " + l.join(", ") + ".").join("\n")) + "</p>" +

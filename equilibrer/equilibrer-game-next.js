@@ -139,8 +139,10 @@ window.mtcEquilibrer = function(main){
       if(B.done || ((c === "RM" || c === "DM") && !B.on.has(1))) return;
       const covered = () => B.aff.filter(a => [...B.pick].some(b => links(b, a).length)).length, before = covered();
       B.pick.has(c) ? B.pick.delete(c) : B.pick.add(c);
-      if(covered() > before && window.mtcPlayFx) window.mtcPlayFx("good");
+      const gained = covered() > before;
+      if(gained && window.mtcPlayFx) window.mtcPlayFx("good");
       render();
+      if(gained && window.mtcBounce) window.mtcBounce(main.querySelector('.balnode[data-c="' + c + '"]'));
     }));
     main.querySelectorAll(".balsysbtn").forEach(b => b.addEventListener("click", () => {
       const n = +b.dataset.n;
