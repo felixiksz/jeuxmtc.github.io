@@ -133,6 +133,12 @@
   details.more{ margin:6px 0; font-size:.88rem; }
   details.more summary{ cursor:pointer; font-weight:700; }
   details.more ul{ margin:4px 0; padding-left:18px; }
+  /* Circuit ou pas ? : le schéma se glisse du pouce, à droite pour oui, à gauche pour non */
+  .xswipe{ position:relative; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
+  .xswipe::after{ position:absolute; top:10px; padding:2px 12px; border-radius:999px; border:2px solid currentColor; font:800 1rem 'Archivo', sans-serif; opacity:0; transition:opacity .15s; pointer-events:none; }
+  .xswipe[data-sw="oui"]::after{ content:"Oui"; left:10px; color:#1a8a3a; opacity:1; transform:rotate(-10deg); }
+  .xswipe[data-sw="non"]::after{ content:"Non"; right:10px; color:#c0392b; opacity:1; transform:rotate(10deg); }
+  .xhint{ margin:4px 0 0; }
 </style>
 <link href="../equilibrer/equilibrer.css?v=20261112-a" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
@@ -1075,6 +1081,7 @@
   function newX(){ Object.assign(X, {round:++ROUND, n:0, good:0, t0:0, list:[], cur:xGrid(), ans:null, msg:"", end:false}); }
   const X_LBL = ANNEXES ? {statique:"Statique et dynamique", dynamique:"Dynamique seulement", non:"Pas un circuit"} : {statique:"Oui", non:"Non"};
   const X_KINDS = ANNEXES ? ["statique", "dynamique", "non"] : ["statique", "non"];
+  const TACTILE = window.matchMedia && window.matchMedia("(pointer:coarse)").matches;
   function xWhy(q){
     const g = q.g, c = findCircuit(g);
     if(q.kind === "statique") return "Circuit " + esc(c ? c.title : "") + " : un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale, et chaque canal relié à ses deux voisins.";
@@ -1094,6 +1101,7 @@
         '<div class="act"><button type="button" class="tool" id="xNew">Nouvelle série</button></div>'
       : '<div class="lay"><div>' + gridSvg(q.g, done ? {} : {edges:false, noPol:true}) + '</div><div><p class="q">Ces quatre canaux forment-ils un circuit ?</p><div class="opts">' +
         X_KINDS.map(k => '<button type="button" class="tool opt xopt' + (done ? (k === q.kind ? " good" : k === X.ans ? " bad" : "") : "") + '" data-k="' + k + '"' + (done ? " disabled" : "") + ">" + X_LBL[k] + "</button>").join("") + "</div>" +
+        (!ANNEXES && !done && TACTILE ? '<p class="sm xhint">Glisse le schéma du pouce : vers la droite pour oui, vers la gauche pour non.</p>' : "") +
         (X.msg ? '<div class="res">' + X.msg + "</div>" : "") + "</div></div>") + rappel();
     const ch = document.getElementById("xChrono");
     ch.addEventListener("change", () => { X.chrono = ch.checked; try{ localStorage.setItem(KEY + "_xchrono", X.chrono ? "1" : "0"); }catch(e){} renderX(); });
@@ -1122,6 +1130,30 @@
         renderX();
       }, ok ? 1300 : 3200);
     }));
+    // réponse du pouce : le schéma suit le doigt et part du côté choisi (droite oui, gauche non)
+    const card = !ANNEXES && !done && !X.end ? main.querySelector(".lay > div") : null;
+    if(card){
+      card.classList.add("xswipe");
+      let x0 = null, dx = 0;
+      card.addEventListener("pointerdown", e => { if(e.pointerType === "mouse") return; x0 = e.clientX; dx = 0; card.style.transition = "none"; try{ card.setPointerCapture(e.pointerId); }catch(er){} });
+      card.addEventListener("pointermove", e => {
+        if(x0 == null) return;
+        dx = e.clientX - x0;
+        card.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 25) + "deg)";
+        card.dataset.sw = dx > 40 ? "oui" : dx < -40 ? "non" : "";
+      });
+      const fin = () => {
+        if(x0 == null) return;
+        x0 = null; card.style.transition = "transform .22s ease-out";
+        if(Math.abs(dx) > 80){
+          const k = dx > 0 ? "statique" : "non";
+          card.style.transform = "translateX(" + (dx > 0 ? 1 : -1) * window.innerWidth + "px) rotate(" + (dx > 0 ? 18 : -18) + "deg)";
+          setTimeout(() => { const b = main.querySelector('.xopt[data-k="' + k + '"]'); if(b) b.click(); }, 180);
+        } else { card.style.transform = ""; card.dataset.sw = ""; }
+      };
+      card.addEventListener("pointerup", fin);
+      card.addEventListener("pointercancel", () => { x0 = null; card.style.transition = "transform .22s ease-out"; card.style.transform = ""; card.dataset.sw = ""; });
+    }
     // chrono qui défile pendant la série
     clearInterval(X.tick);
     if(X.chrono && X.t0 && !X.end) X.tick = setInterval(() => { const el = document.getElementById("xTime"); if(el && mode === "circuitoupas") el.textContent = Math.round((Date.now() - X.t0) / 1000) + " s"; else clearInterval(X.tick); }, 500);
