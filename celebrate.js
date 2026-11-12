@@ -105,6 +105,8 @@
       // même son déclenché plusieurs fois coup sur coup : on ne le rejoue pas
       if(set === lastKind && now - lastAt < 400) return;
       lastKind = set; lastAt = now;
+      // fin approximative du son : la lecture du nom du point (point-caption.js) attend qu'il soit fini
+      window.mtcFxEndsAt = now + ({good:550, miss:650, big:1300, finale:2300}[set] || 800);
       if(bus){ const old = bus; old.gain.setTargetAtTime(0, a.currentTime, .03); setTimeout(() => { try{ old.disconnect(); }catch(e){} }, 400); }
       bus = a.createGain(); bus.gain.value = 1; bus.connect(out); bus.connect(rev);
       pick(SOUNDS[set])(BASE[set] + KEY);

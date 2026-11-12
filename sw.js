@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "v2.3-20261112-p";
+const MTC_OFFLINE_VERSION = "v2.3-20261112-q";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -52,6 +52,8 @@ const CORE_ASSETS = [
   "37-fixed-detail-close-zone.css",
   "38-tutorial-user-texts.js",
   "39-mobile-game-audio-fix.js",
+  "point-caption.js",
+  "audio-fr/liste.js",
   "40-comparison-loading-history.css",
   "40-comparison-loading-history.js",
   "41-force-comparison-history-fix.js",

@@ -188,6 +188,19 @@
       reglages: [
         ["Affichage", "Thèmes de couleurs, son, prononciation.", openSettings],
         ["Aide", "Les tutoriels de chaque écran.", () => setTimeout(() => call("startTour"), 30)],
+        // jeu principal : le dernier point choisi affiché quelques secondes, et son nom français lu en mode audio (point-caption.js)
+        ["Nom du point choisi", "Dans la grille : le code, le pinyin et le nom français du dernier point choisi, quelques secondes. En mode audio : entendre le nom chinois, le nom français, ou les deux.", null, null,
+          (() => {
+            const cap = fxOn("mtc_point_caption"), capFn = () => { try{ localStorage.setItem("mtc_point_caption", cap ? "0" : "1"); }catch(e){} };
+            capFn.stay = true;
+            let voice = "both"; try{ voice = localStorage.getItem("mtc_point_voice") || "both"; }catch(e){}
+            const voices = [["zh", "Chinois"], ["fr", "Français"], ["both", "Les deux"]].map(([v, label]) => {
+              const fn = () => { try{ localStorage.setItem("mtc_point_voice", v); }catch(e){} };
+              fn.stay = true;
+              return [label + (voice === v ? " ✓" : ""), fn];
+            });
+            return [["Affichage : " + (cap ? "oui" : "non"), capFn]].concat(voices);
+          })()],
         // guide d'installation en raccourci (install-guide.js)
         window.mtcOpenInstallGuide && ["Sur l’écran d’accueil", window.mtcIsInstalled && window.mtcIsInstalled() ? "Le jeu est installé sur cet appareil." : "Ajouter le jeu en raccourci, comme une application : le guide pour ton téléphone ou ton ordinateur.", () => window.mtcOpenInstallGuide()],
         // récompenses des bonnes réponses (celebrate.js) : un clic change le réglage sans fermer le menu
