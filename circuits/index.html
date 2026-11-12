@@ -192,7 +192,9 @@
   const COLOR = {E:"#d9a400", Rt:"#d9a400", VB:"#2f9a3c", F:"#2f9a3c", C:"#e0261b", IG:"#e0261b", EC:"#e0261b", TF:"#e0261b", V:"#1f5fd6", Rn:"#1f5fd6"};
   const ink = c => COLOR[c] || "var(--text-color)";   // métal (P, GI) : couleur des lettres du thème
   const HAND = new Set(["P", "GI", "C", "IG", "EC", "TF"]), YIN = new Set(["P", "Rt", "C", "Rn", "EC", "F"]);
-  const CIRC = window.MTC_CIRCUITS || [], BASE = CIRC.filter(c => !c.autre);
+  // les 3 circuits annexes du cours (équilibre dynamique seulement, chapitre 13) : pas dans le jeu pour l'instant (true pour les remettre)
+  const ANNEXES = false;
+  const TOUS = window.MTC_CIRCUITS || [], CIRC = ANNEXES ? TOUS : TOUS.filter(c => !c.autre), BASE = CIRC.filter(c => !c.autre);
   const links = (a, b) => a === b ? [] : [1, 2, 3, 4, 5].filter(n => SYS[n].some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
   const mate = (c, n) => { const p = SYS[n].find(pr => pr.includes(c)); return p[0] === c ? p[1] : p[0]; };
   const family = c => ORD.filter(x => links(c, x).length);
@@ -336,7 +338,7 @@
     const own = findCircuit(mine);
     const col = (label, cls, grid, c) => '<div class="cmpcol"><span class="verdict ' + cls + '">' + label + '</span><div class="cmpgrid">' + gridSvg(grid, {}) + "</div>" +
       (c ? '<p class="cmpt">' + esc(c.title) + '</p><ul class="cmpl">' + (c[field] || []).map(x => "<li" + (lines.includes(x) ? ' class="hit"' : "") + ">" + esc(x) + "</li>").join("") + "</ul>"
-        : '<p class="sm">Ces quatre canaux ne forment pas un circuit du cours.</p>') + "</div>";
+        : '<p class="sm">' + (TOUS.some(o => sameSet(o.grid, mine)) ? "Ces quatre canaux forment un des circuits annexes du cours, qui ne sont pas encore dans le jeu." : "Ces quatre canaux ne forment pas un circuit du cours.") + "</p>") + "</div>";
     return '<div class="compare">' + col("Ta réponse", "no", own ? own.grid : arrange(mine), own) + col("Bonne réponse", "ok", right.grid, right) + "</div>";
   }
   const circuitCard = (c, opt) => '<div class="card"><p><b>Circuit ' + esc(c.title) + "</b> · " + gridTxt(c.grid) + (c.autre ? ' <span class="sm">(équilibre dynamique seulement)</span>' : "") + "</p>" +
@@ -834,7 +836,8 @@
   const Q5 = {};
   function newQuel(){
     const avecMots = CIRC.filter(c => motsSurs(c).length >= 3);
-    const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv", "statique"].concat(avecMots.length ? ["mots", "mots"] : []));
+    // « statique ou dynamique seulement ? » n'a de sens qu'avec les circuits annexes
+    const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv"].concat(ANNEXES ? ["statique"] : [], avecMots.length ? ["mots", "mots"] : []));
     Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null, errs:0, hints:0, hintMsgs:[], out:new Set(), showPol:false, shown:new Set(), kwDone:false, countDone:false});
     if(t === "mots"){
       const c = rnd(avecMots);
@@ -926,7 +929,7 @@
       q = "Ce circuit respecte-t-il l’équilibre statique ?";
       body = gridSvg(Q5.c.grid, {noPol:!(Q5.done || Q5.showPol)}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
     }
-    main.innerHTML = '<div class="bar">' + aide('Les actions, indications et mots-clés des circuits, les astuces de Dr Tán et l’équilibre statique.') + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Les actions, indications et mots-clés des circuits, les astuces de Dr Tán' + (ANNEXES ? ' et l’équilibre statique.' : '.')) + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
       '<div style="max-width:720px"><p class="q">' + q + "</p>" + body +
       (Q5.hintMsgs.length ? '<div class="card">' + Q5.hintMsgs.map(m => "<p><b>Astuce</b> · " + m + "</p>").join("") + (Q5.done ? "" : '<p class="sm">Avec astuce, la réponse ne compte pas comme bonne réponse.</p>') + "</div>" : "") +
       '<div class="act">' + (!Q5.done && (t === "indications" || t === "actions" || t === "mots") ? '<button type="button" class="tool" id="qVal">Valider</button>' : "") +
@@ -1059,7 +1062,7 @@
     const h = L(a, b) && L(c, d), v = L(a, c) && L(b, d), dg = L(a, d) && L(b, c); return (h && dg) || (v && dg) || (h && v); };
   function xGrid(){
     const r = Math.random();
-    if(r < .4) return {g:rnd(BASE).grid.slice(), kind:"statique"};
+    if(r < (ANNEXES ? .4 : .5)) return {g:rnd(BASE).grid.slice(), kind:"statique"};
     const autres = CIRC.filter(c => c.autre);
     if(r < .62 && autres.length) return {g:rnd(autres).grid.slice(), kind:"dynamique"};
     const hands = ORD.filter(c => HAND.has(c)), feet = ORD.filter(c => !HAND.has(c));
@@ -1070,7 +1073,8 @@
     return {g:rnd(BASE).grid.slice(), kind:"statique"};
   }
   function newX(){ Object.assign(X, {round:++ROUND, n:0, good:0, t0:0, list:[], cur:xGrid(), ans:null, msg:"", end:false}); }
-  const X_LBL = {statique:"Statique et dynamique", dynamique:"Dynamique seulement", non:"Pas un circuit"};
+  const X_LBL = {statique:ANNEXES ? "Statique et dynamique" : "Circuit du cours", dynamique:"Dynamique seulement", non:"Pas un circuit"};
+  const X_KINDS = ANNEXES ? ["statique", "dynamique", "non"] : ["statique", "non"];
   function xWhy(q){
     const g = q.g, c = findCircuit(g);
     if(q.kind === "statique") return "Circuit " + esc(c ? c.title : "") + " : un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale, et chaque canal relié à ses deux voisins.";
@@ -1081,7 +1085,7 @@
   function renderX(){
     const q = X.cur, done = !!X.ans, best = xBest();
     const secs = X.t0 ? Math.round(((X.end ? X.tEnd : Date.now()) - X.t0) / 1000) : 0;
-    main.innerHTML = '<div class="bar">' + aide("Quatre canaux sont placés comme dans un circuit, main en haut, pied en bas, sans les traits ni les polarités. Est-ce un circuit statique et dynamique, un circuit dynamique seulement (chapitre 13), ou pas un circuit ? Série de 10 questions.") +
+    main.innerHTML = '<div class="bar">' + aide("Quatre canaux sont placés comme dans un circuit, main en haut, pied en bas, sans les traits ni les polarités. " + (ANNEXES ? "Est-ce un circuit statique et dynamique, un circuit dynamique seulement (chapitre 13), ou pas un circuit ?" : "Est-ce un circuit du cours, ou pas un circuit ?") + " Série de 10 questions.") +
       '<label><input type="checkbox" id="xChrono"' + (X.chrono ? " checked" : "") + "> chrono</label>" +
       '<span class="score">' + (best ? "record " + best.good + " / 10" + (best.secs ? " en " + best.secs + " s" : "") : "") + "</span></div>" +
       '<div class="xprog">' + Array.from({length:10}, (v, i) => '<i class="' + (i < X.list.length ? (X.list[i] ? "ok" : "no") : i === X.n ? "now" : "") + '"></i>').join("") +
@@ -1089,7 +1093,7 @@
       (X.end ? '<div class="res"><span class="ok">' + (X.good === 10 ? praise() : "Série terminée.") + "</span> " + X.good + " bonne" + (X.good > 1 ? "s" : "") + " réponse" + (X.good > 1 ? "s" : "") + " sur 10" + (X.chrono ? " en " + secs + " s" : "") + "." + (X.record ? ' <b>Nouveau record.</b>' : "") + "</div>" +
         '<div class="act"><button type="button" class="tool" id="xNew">Nouvelle série</button></div>'
       : '<div class="lay"><div>' + gridSvg(q.g, done ? {} : {edges:false, noPol:true}) + '</div><div><p class="q">Ces quatre canaux forment-ils un circuit ?</p><div class="opts">' +
-        ["statique", "dynamique", "non"].map(k => '<button type="button" class="tool opt xopt' + (done ? (k === q.kind ? " good" : k === X.ans ? " bad" : "") : "") + '" data-k="' + k + '"' + (done ? " disabled" : "") + ">" + X_LBL[k] + "</button>").join("") + "</div>" +
+        X_KINDS.map(k => '<button type="button" class="tool opt xopt' + (done ? (k === q.kind ? " good" : k === X.ans ? " bad" : "") : "") + '" data-k="' + k + '"' + (done ? " disabled" : "") + ">" + X_LBL[k] + "</button>").join("") + "</div>" +
         (X.msg ? '<div class="res">' + X.msg + "</div>" : "") + "</div></div>") + rappel();
     const ch = document.getElementById("xChrono");
     ch.addEventListener("change", () => { X.chrono = ch.checked; try{ localStorage.setItem(KEY + "_xchrono", X.chrono ? "1" : "0"); }catch(e){} renderX(); });
