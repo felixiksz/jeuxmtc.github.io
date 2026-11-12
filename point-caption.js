@@ -99,7 +99,8 @@
       const c = audioCtx(); if(!c) throw 0;
       try{ if(src) src.stop(); }catch(e){}
       src = c.createBufferSource(); src.buffer = buf;
-      const g = c.createGain(); g.gain.value = .7;   // même force que le nom chinois (fichiers chinois plus forts, joués à 0,42) src.connect(g); g.connect(c.destination); src.start();
+      // même force que le nom chinois (fichiers chinois plus forts, joués à 0,42)
+      const g = c.createGain(); g.gain.value = .7; src.connect(g); g.connect(c.destination); src.start();
     });
   }
   // nom français lu après le nom chinois : l'enregistrement s'il existe, sinon la synthèse vocale de l'appareil
