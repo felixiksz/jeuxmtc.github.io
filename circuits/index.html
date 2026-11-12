@@ -13,7 +13,7 @@
   .tool{ font:inherit; cursor:pointer; text-decoration:none; }
   .tool:disabled{ opacity:.4; cursor:default; }
   .tools{ display:flex; gap:4px; align-items:center; margin-left:auto; }
-  /* les six jeux en trois familles sous le titre */
+  /* les huit jeux en trois familles sous le titre */
   .modes{ flex-basis:100%; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0 22px; border-top:1px solid var(--hair, #ddd); padding-top:6px; }
   .mgt{ font-size:.64rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin:0 0 1px; }
   .mode{ display:block; font:inherit; font-weight:800; font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; background:none; border:0; padding:3px 0; color:var(--text-color); cursor:pointer; text-align:left; }
@@ -65,6 +65,13 @@
   .hbtn:disabled{ opacity:.25; cursor:default; }
   .sysb:disabled{ cursor:default; }
   .opts{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; margin:6px 0; }
+  /* Circuit ou pas ? : réponse juste en vert, fausse en rouge ; série de 10 en petits traits */
+  .xopt.good{ color:#1a8a3a !important; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px; }
+  .xopt.bad{ color:#c0392b !important; text-decoration:line-through; }
+  .xprog{ display:flex; align-items:center; gap:4px; max-width:420px; margin:0 0 12px; }
+  .xprog i{ flex:1; height:4px; border-radius:2px; background:color-mix(in srgb, var(--shadow-color) 18%, var(--page-bg)); }
+  .xprog i.ok{ background:#1a8a3a; } .xprog i.no{ background:#c0392b; } .xprog i.now{ background:color-mix(in srgb, var(--shadow-color) 55%, var(--page-bg)); }
+  .xprog .sm{ margin-left:8px; min-width:3em; text-align:right; }
   .opts .tool{ text-transform:none; font-size:.9rem; letter-spacing:0; font-weight:600; text-align:left; }
   .card{ border-left:2px solid var(--shadow-color); padding:2px 0 2px 12px; margin:6px 0 12px; font-family:"Libre Baskerville", Georgia, serif; font-size:.95rem; }
   .card p{ margin:4px 0; }
@@ -139,7 +146,7 @@
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261112-b"></script>
+<script src="../beta-modules.js?v=20261112-c"></script>
 </head>
 <body>
 <header>
@@ -995,16 +1002,148 @@
   // ================= navigation =================
   // Équilibrer : jeu partagé avec equilibrer/index.html (equilibrer/equilibrer-game.js)
   const EQ = window.mtcEquilibrer ? window.mtcEquilibrer(main) : null;
+  // ================= 7. Circuit ou pas ? =================
+  // quatre canaux en grille (main en haut, pied en bas), sans traits ni polarités : statique et dynamique, dynamique seulement,
+  // ou pas un circuit ? Série de 10, chrono facultatif, record. Les grilles « pas un circuit » ne se referment pas du tout.
+  const X = {chrono:true};
+  try{ X.chrono = localStorage.getItem(KEY + "_xchrono") !== "0"; }catch(e){}
+  const xBest = () => { try{ return JSON.parse(localStorage.getItem(KEY + "_xbest") || "null"); }catch(e){ return null; } };
+  const closes = g => { const L = (a, b) => links(a, b).length > 0, [a, b, c, d] = g;
+    const h = L(a, b) && L(c, d), v = L(a, c) && L(b, d), dg = L(a, d) && L(b, c); return (h && dg) || (v && dg) || (h && v); };
+  function xGrid(){
+    const r = Math.random();
+    if(r < .4) return {g:rnd(BASE).grid.slice(), kind:"statique"};
+    const autres = CIRC.filter(c => c.autre);
+    if(r < .62 && autres.length) return {g:rnd(autres).grid.slice(), kind:"dynamique"};
+    const hands = ORD.filter(c => HAND.has(c)), feet = ORD.filter(c => !HAND.has(c));
+    for(let t = 0; t < 300; t++){
+      const [a, b] = shuffle(hands), [c, d] = shuffle(feet), g = [a, b, c, d];
+      if(!closes(g) && !findCircuit(g)) return {g, kind:"non"};
+    }
+    return {g:rnd(BASE).grid.slice(), kind:"statique"};
+  }
+  function newX(){ Object.assign(X, {round:++ROUND, n:0, good:0, t0:0, list:[], cur:xGrid(), ans:null, msg:"", end:false}); }
+  const X_LBL = {statique:"Statique et dynamique", dynamique:"Dynamique seulement", non:"Pas un circuit"};
+  function xWhy(q){
+    const g = q.g, c = findCircuit(g);
+    if(q.kind === "statique") return "Circuit " + esc(c ? c.title : "") + " : un yīn et un yáng sur chaque ligne, les mêmes polarités en diagonale, et chaque canal relié à ses deux voisins.";
+    if(q.kind === "dynamique") return "Circuit " + esc(c ? c.title : "") + " : les canaux se referment, mais les polarités n’alternent pas (chapitre 13).";
+    const pairs = [[0, 1], [2, 3], [0, 2], [1, 3], [0, 3], [1, 2]].filter(([i, j]) => !links(g[i], g[j]).length).map(([i, j]) => chip(g[i]) + "–" + chip(g[j]));
+    return "Ces quatre canaux ne se referment pas : " + pairs.join(", ") + " ne sont reliés par aucun système.";
+  }
+  function renderX(){
+    const q = X.cur, done = !!X.ans, best = xBest();
+    const secs = X.t0 ? Math.round(((X.end ? X.tEnd : Date.now()) - X.t0) / 1000) : 0;
+    main.innerHTML = '<div class="bar">' + aide("Quatre canaux sont placés comme dans un circuit, main en haut, pied en bas, sans les traits ni les polarités. Est-ce un circuit statique et dynamique, un circuit dynamique seulement (chapitre 13), ou pas un circuit ? Série de 10 questions.") +
+      '<label><input type="checkbox" id="xChrono"' + (X.chrono ? " checked" : "") + "> chrono</label>" +
+      '<span class="score">' + (best ? "record " + best.good + " / 10" + (best.secs ? " en " + best.secs + " s" : "") : "") + "</span></div>" +
+      '<div class="xprog">' + Array.from({length:10}, (v, i) => '<i class="' + (i < X.list.length ? (X.list[i] ? "ok" : "no") : i === X.n ? "now" : "") + '"></i>').join("") +
+      (X.chrono ? '<span class="sm" id="xTime">' + secs + " s</span>" : "") + "</div>" +
+      (X.end ? '<div class="res"><span class="ok">' + (X.good === 10 ? praise() : "Série terminée.") + "</span> " + X.good + " bonne" + (X.good > 1 ? "s" : "") + " réponse" + (X.good > 1 ? "s" : "") + " sur 10" + (X.chrono ? " en " + secs + " s" : "") + "." + (X.record ? ' <b>Nouveau record.</b>' : "") + "</div>" +
+        '<div class="act"><button type="button" class="tool" id="xNew">Nouvelle série</button></div>'
+      : '<div class="lay"><div>' + gridSvg(q.g, done ? {} : {edges:false, noPol:true}) + '</div><div><p class="q">Ces quatre canaux forment-ils un circuit ?</p><div class="opts">' +
+        ["statique", "dynamique", "non"].map(k => '<button type="button" class="tool opt xopt' + (done ? (k === q.kind ? " good" : k === X.ans ? " bad" : "") : "") + '" data-k="' + k + '"' + (done ? " disabled" : "") + ">" + X_LBL[k] + "</button>").join("") + "</div>" +
+        (X.msg ? '<div class="res">' + X.msg + "</div>" : "") + "</div></div>") + rappel();
+    const ch = document.getElementById("xChrono");
+    ch.addEventListener("change", () => { X.chrono = ch.checked; try{ localStorage.setItem(KEY + "_xchrono", X.chrono ? "1" : "0"); }catch(e){} renderX(); });
+    on("xNew", () => { newX(); renderX(); });
+    main.querySelectorAll(".xopt").forEach(b => b.addEventListener("click", () => {
+      if(X.ans) return;
+      if(!X.t0) X.t0 = Date.now();
+      const ok = b.dataset.k === q.kind; X.ans = b.dataset.k;
+      X.list.push(ok); if(ok) X.good++;
+      stepFx(ok, ok ? '.xopt[data-k="' + q.kind + '"]' : null);
+      mastery(q.g, ok);
+      X.msg = (ok ? '<span class="ok">' + X_LBL[q.kind] + ".</span> " : '<span class="no">Non : ' + X_LBL[q.kind].toLowerCase() + ".</span> ") + xWhy(q);
+      renderX();
+      const round = X.round, n = X.n;
+      setTimeout(() => {
+        if(X.round !== round || X.n !== n || mode !== "circuitoupas") return;
+        X.n++; X.ans = null; X.msg = "";
+        if(X.n >= 10){
+          X.end = true; X.tEnd = Date.now(); record("circuitoupas", X.good === 10);
+          const secs = Math.round((X.tEnd - X.t0) / 1000), b = xBest();
+          X.record = !b || X.good > b.good || (X.good === b.good && X.chrono && b.secs && secs < b.secs);
+          if(X.record) try{ localStorage.setItem(KEY + "_xbest", JSON.stringify({good:X.good, secs:X.chrono ? secs : 0})); }catch(e){}
+        } else X.cur = xGrid();
+        renderX();
+      }, ok ? 1300 : 3200);
+    }));
+    // chrono qui défile pendant la série
+    clearInterval(X.tick);
+    if(X.chrono && X.t0 && !X.end) X.tick = setInterval(() => { const el = document.getElementById("xTime"); if(el && mode === "circuitoupas") el.textContent = Math.round((Date.now() - X.t0) / 1000) + " s"; else clearInterval(X.tick); }, 500);
+  }
+
+  // ================= 8. Le cas mystère =================
+  // un indice à la fois (indications, actions, un canal à sa place, le schéma) ; trouve le circuit avec le moins d'indices :
+  // 10 points avec le premier indice, -1 par indice de plus, -2 par mauvaise réponse (au moins 1 si trouvé)
+  const H8 = {};
+  function newCache(){
+    const c = rnd(CIRC);
+    const acts = c.actions.filter(x => !GENERIC.test(x));
+    const ind = shuffle(c.indications), act = shuffle(acts.length ? acts : c.actions);
+    const pos = shuffle([0, 1, 2, 3]);
+    const clues = [{t:"ind", v:ind[0]}, {t:"act", v:act[0]}];
+    if(ind[1]) clues.push({t:"ind", v:ind[1]});
+    clues.push({t:"canal", i:pos[0]});
+    clues.push({t:"schema"});
+    if(act[1]) clues.push({t:"act", v:act[1]});
+    clues.push({t:"canal", i:pos[1]});
+    Object.assign(H8, {round:++ROUND, c, clues, shown:1, pick:new Set(), wrong:0, done:false, found:false, msg:"", mark:{}});
+  }
+  const h8Points = () => Math.max(1, 10 - (H8.shown - 1) - 2 * H8.wrong);
+  function renderCache(){
+    const c = H8.c, cells = [0, 1, 2, 3].map(i => H8.done || H8.clues.slice(0, H8.shown).some(k => k.t === "canal" && k.i === i) ? c.grid[i] : null);
+    const clueHtml = H8.clues.slice(0, H8.shown).map((k, n) => "<p><b>" + (n + 1) + ".</b> " +
+      (k.t === "ind" ? "Indication : " + esc(k.v) : k.t === "act" ? "Action : " + esc(k.v) : k.t === "canal" ? "Un canal à sa place : " + chip(c.grid[k.i]) + " (" + (k.i < 2 ? "main" : "pied") + ")" :
+        c.autre ? "Schéma : équilibre dynamique seulement" : "Schéma : " + esc(SCHEMAS[schemaOf(c.grid)])) + "</p>").join("");
+    const more = H8.shown < H8.clues.length;
+    main.innerHTML = '<div class="bar">' + aide("Un circuit du cours est caché. Les indices arrivent un par un : indications, actions, un canal à sa place, le schéma. Clique sur les quatre canaux du circuit. Avec le premier indice seulement : 10 points ; chaque indice de plus coûte 1 point, chaque mauvaise réponse 2.") +
+      scoreLine("cache", "circuit trouvé", "circuits trouvés") + "</div>" +
+      '<div class="lay"><div>' + gridSvg(cells, {edges:!!H8.done, noPol:!H8.done}) + "</div><div>" +
+      '<p class="lbltop">Indices · ' + (H8.done ? (H8.found ? h8Points() + " point" + (h8Points() > 1 ? "s" : "") : "0 point") : "encore " + h8Points() + " point" + (h8Points() > 1 ? "s" : "") + " en jeu") + "</p>" +
+      '<div class="card">' + clueHtml + "</div>" +
+      (H8.done ? "" : '<p class="q">Quel est ce circuit ?</p>' + palette({on:H8.pick, mark:H8.mark})) +
+      '<div class="act">' + (!H8.done && more ? '<button type="button" class="tool" id="hMore">Un indice de plus</button>' : "") +
+      (!H8.done ? '<button type="button" class="tool" id="hGive">Voir la réponse</button>' : "") +
+      '<button type="button" class="tool" id="hNext">' + (H8.done ? "Circuit suivant" : "Autre circuit") + "</button></div>" +
+      (H8.msg ? '<div class="res">' + H8.msg + "</div>" : "") + (H8.done ? circuitCard(c) : "") + "</div></div>" + rappel();
+    on("hNext", () => { newCache(); renderCache(); });
+    on("hMore", () => { H8.shown++; renderCache(); });
+    on("hGive", () => { H8.done = true; record("cache", false); mastery(c.grid, false); H8.msg = '<span class="no">Réponse :</span> circuit ' + esc(c.title) + "."; stepFx(false); renderCache(); });
+    bindPalette(x => {
+      if(H8.done || H8.pick.has(x)) return;
+      H8.pick.add(x); H8.mark = {};
+      if(H8.pick.size < 4){ renderCache(); return; }
+      const mine = [...H8.pick];
+      if(sameSet(mine, c.grid)){
+        H8.done = true; H8.found = true; record("cache", true); mastery(c.grid, true);
+        mine.forEach(k => { H8.mark[k] = "ok"; });
+        H8.msg = '<span class="ok">' + praise() + "</span> Circuit " + esc(c.title) + ", trouvé avec " + H8.shown + " indice" + (H8.shown > 1 ? "s" : "") + " : " + h8Points() + " point" + (h8Points() > 1 ? "s" : "") + ".";
+      }else{
+        H8.wrong++; stepFx(false);
+        mine.forEach(k => { H8.mark[k] = c.grid.includes(k) ? "ok" : "no"; });
+        const nOk = mine.filter(k => c.grid.includes(k)).length;
+        H8.msg = '<span class="no">Pas encore :</span> ' + (nOk ? nOk + (nOk > 1 ? " canaux sur 4 sont" : " canal sur 4 est") + " dans le circuit (en vert)." : "aucun de ces canaux n’est dans le circuit.") + (more ? " Un indice de plus arrive." : "");
+        if(more) H8.shown++;
+        H8.pick = new Set();
+      }
+      renderCache();
+    });
+  }
+
   const MODES = [
     EQ && ["equilibrer", "Équilibrer", EQ.start, EQ.render],
     ["fermer", "Fermer le circuit", newFermer, renderFermer],
     ["plaintes", "Trois plaintes", newPlaintes, renderPlaintes],
     ["propagation", "Propagation", newPropagation, renderPropagation],
     ["grille", "Grille des familles", newGrille, renderGrille],
-    ["quel", "Quel circuit ?", newQuel, renderQuel]
+    ["quel", "Quel circuit ?", newQuel, renderQuel],
+    ["circuitoupas", "Circuit ou pas ?", newX, renderX],
+    ["cache", "Le cas mystère", newCache, renderCache]
   ].filter(Boolean);
   // trois familles, dans l'ordre des cours : les liens entre canaux, le circuit, la clinique
-  const GROUPS = [["Les liens", ["equilibrer", "grille"]], ["Le circuit", ["fermer", "quel"]], ["La clinique", ["plaintes", "propagation"]]];
+  const GROUPS = [["Les liens", ["equilibrer", "grille"]], ["Le circuit", ["fermer", "quel", "circuitoupas"]], ["La clinique", ["plaintes", "propagation", "cache"]]];
   const started = {};
   let mode = (MODES.find(m => "#" + m[0] === location.hash) || MODES[0])[0];
   function show(m){

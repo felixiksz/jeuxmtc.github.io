@@ -38,7 +38,7 @@
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
     circuits: [
-      {sel:"#modes", title:"「 ✦ RÉSEAUX ✦ 」", text:"Six jeux sur les six systèmes et les circuits thérapeutiques de Dr Tán, en trois familles : les liens entre canaux, le circuit, la clinique. Tout vient des cours « Les six systèmes des canaux unis », « Les circuits thérapeutiques » et « Méthode de l’équilibre global »."},
+      {sel:"#modes", title:"「 ✦ RÉSEAUX ✦ 」", text:"Huit jeux sur les six systèmes et les circuits thérapeutiques de Dr Tán, en trois familles : les liens entre canaux, le circuit, la clinique. Tout vient des cours « Les six systèmes des canaux unis », « Les circuits thérapeutiques » et « Méthode de l’équilibre global »."},
       {sel:() => tourMark(".bar, .balbar"), title:"Réglages du jeu", text:"Le « ? » explique le jeu. Le curseur règle la difficulté, de facile à difficile : le niveau ne monte jamais tout seul. À droite, ton score."},
       {sel:() => tourMark("#main svg.grid, #main svg.clock, #main svg.balclock, #main table.fam, #main svg.body"), title:"Le plateau", text:"Chaque bonne réponse s’allume en vert tout de suite, avec un petit son ; une erreur s’affiche en rouge. Les félicitations arrivent quand tout est trouvé."},
       {sel:() => tourMark("#main .palette"), title:"Répondre", text:"Clique sur un canal pour répondre. Quand plusieurs cases sont vides, clique d’abord sur la case, puis sur le canal."},
