@@ -619,7 +619,8 @@
     // ✦ selon les erreurs : aucune ✦✦✦, 1 ou 2 ✦✦, 3 ou 4 ✦
     const e = state.errors || 0, stars = GAMI ? (e === 0 ? "✦✦✦" : e <= 2 ? "✦✦" : "✦") : "";
     board.insertAdjacentHTML("beforebegin", '<div id="mtcMemoWin" class="game-over-title bravo-punch mtc-memo-win">BRAVO !' + (stars ? '<span class="mtc-memo-stars">' + stars + "</span>" : "") + "</div>");
-    if(GAMI && window.mtcCelebrate) window.mtcCelebrate(2);
+    if(GAMI && window.mtcFinale) window.mtcFinale("Mémo terminé", e === 0 ? "sans aucune erreur" : e + " erreur" + (e > 1 ? "s" : ""), {etoiles:stars});
+    else if(GAMI && window.mtcCelebrate) window.mtcCelebrate(2);
   }
   function updateScore(){
     const score = byId("mtcMemoScore");

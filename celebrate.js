@@ -12,6 +12,8 @@
    window.mtcCelebrate(force) : bonne réponse (force 2 = sans-faute plus intense).
    window.mtcMiss() : réponse fausse, la série repart de zéro.
    window.mtcAnnounce(titre, détail) : un mot discret au milieu de l'écran (paliers…).
+   window.mtcFinale(titre, détail, {etoiles}) : grande félicitation de fin (grille, série, cas, quiz) :
+     lueur forte, fanfare, le mot en grand et cinq pastilles aux couleurs des mouvements qui rebondissent.
    ============================================================ */
 (function(){
   "use strict";
@@ -71,6 +73,17 @@
       b => note(b, 0, .32, {glide:7, oct:1, vol:.16}),
       b => [7, 4, 12].forEach((x, j) => note(b + x, j * .07, .5, {type:"triangle", vol:.1}))
     ],
+    // fin de partie : petite fanfare qui monte, accord tenu, puis une pluie de notes aiguës (même tonalité que la session)
+    finale: [
+      b => { [0, 4, 7, 12].forEach((x, j) => note(b + x, j * .08, .22, {oct:1, vol:.12}));
+        [0, 4, 7, 12, 16].forEach(x => note(b + x, .36, 1.4, {oct:1, vol:.075}));
+        [24, 28, 31, 28, 31, 36].forEach((x, j) => note(b + x, .75 + j * .07, .3, {vol:.05})); },
+      b => { [0, 2, 4, 5, 7, 9, 11, 12].forEach((x, j) => note(b + x, j * .045, .16, {vol:.09, type:"triangle"}));
+        [[0, 4, 7], [5, 9, 12], [7, 11, 14], [12, 16, 19]].forEach((c, j) => c.forEach(x => note(b + x, .42 + j * .14, j === 3 ? 1.5 : .18, {oct:j === 3 ? 1 : 0, vol:j === 3 ? .085 : .07}))); },
+      b => { [7, 12, 16, 19].forEach((x, j) => note(b + x, j * .1, .5, {oct:1, vol:.1}));
+        [12, 16, 19, 24].forEach(x => note(b + x, .5, 1.6, {oct:1, vol:.07}));
+        [31, 36, 31, 36].forEach((x, j) => note(b + x, 1 + j * .09, .25, {vol:.045})); }
+    ],
     big: [
       b => { [0, 4, 7].forEach((x, j) => note(b + x, j * .07, .2, {oct:1, vol:.13})); [0, 4, 7, 12].forEach(x => note(b + x, .24, .9, {oct:1, vol:.09})); },
       b => { [0, 2, 4, 5, 7, 9, 11, 12].forEach((x, j) => note(b + x, j * .04, .18, {vol:.1, type:"triangle"})); [12, 16, 19].forEach(x => note(b + x, .36, .8, {oct:1, vol:.1})); },
@@ -83,12 +96,12 @@
       b => { note(b + 1, 0, .2, {vol:.15}); note(b - 6, .18, .6, {vol:.15, type:"triangle"}); }
     ]
   };
-  const BASE = {good:72, big:67, miss:60};
+  const BASE = {good:72, big:67, miss:60, finale:60};
   function play(kind){
     if(!pref("mtc_fx_sound")) return;
     try{
       const a = audio(), now = performance.now();
-      const set = kind === "good" || kind === "miss" ? kind : "big";   // série, palier, record, objectif : grande réussite
+      const set = kind === "good" || kind === "miss" || kind === "finale" ? kind : "big";   // série, palier, record, objectif : grande réussite
       // même son déclenché plusieurs fois coup sur coup : on ne le rejoue pas
       if(set === lastKind && now - lastAt < 400) return;
       lastKind = set; lastAt = now;
@@ -133,6 +146,17 @@
     "html.mtc-grainy #mtcOpeningGlow, html.mtc-grainy .mtc-shade{ -webkit-mask-image:var(--mtc-noise); mask-image:var(--mtc-noise); -webkit-mask-size:160px 160px; mask-size:160px 160px; }" +
     ".mtc-shade{ position:fixed; left:0; right:0; bottom:0; height:16px; pointer-events:none; z-index:9000; background:linear-gradient(to top, var(--shadow-color, #00f) 0%, transparent 100%); opacity:.75; }" +
     "body:has(.advanced-search-panel.open, .review-basket-panel.open, .comparison-panel.open, .stats-panel.open) .mtc-shade{ display:none; }" +
+    ".mtc-finale{ position:fixed; left:50%; top:40%; transform:translate(-50%, -50%); pointer-events:none; z-index:2147483002; opacity:0; text-align:center;" +
+    " color:#1a8a3a; font:italic 400 clamp(1.8rem, 7vw, 3rem) 'Libre Baskerville', Georgia, serif; white-space:nowrap; padding:18px 30px 16px; border-radius:20px;" +
+    " background:color-mix(in srgb, var(--page-bg, #fcfcfa) 92%, transparent); box-shadow:0 14px 36px -14px rgba(26,138,58,.55); }" +
+    ".mtc-finale small{ display:block; font:700 .8rem 'Archivo', sans-serif; letter-spacing:.12em; text-transform:uppercase; font-style:normal; margin-top:8px; white-space:normal; max-width:80vw; }" +
+    ".mtc-finale .st{ display:block; font-style:normal; letter-spacing:.25em; font-size:.55em; margin-top:6px; }" +
+    ".mtc-finale .dots{ display:flex; gap:10px; justify-content:center; margin-bottom:14px; }" +
+    ".mtc-finale .dots i{ width:16px; height:16px; border-radius:50%; display:block; transform:scale(0); }" +
+    ".mtc-finale.go{ animation:mtcFinale 3.6s ease-out forwards; }" +
+    ".mtc-finale.go .dots i{ animation:mtcDot .7s cubic-bezier(.3,1.7,.5,1) forwards; }" +
+    "@keyframes mtcFinale{ 0%{ opacity:0; transform:translate(-50%, -42%) scale(.92); } 10%{ opacity:1; transform:translate(-50%, -50%) scale(1); } 82%{ opacity:1; } 100%{ opacity:0; transform:translate(-50%, -56%); } }" +
+    "@keyframes mtcDot{ 0%{ transform:scale(0); } 60%{ transform:scale(1.35); } 100%{ transform:scale(1); } }" +
     ".mtc-goalbar{ position:absolute; left:0; right:0; bottom:0; height:3px; pointer-events:none; z-index:2; background:rgba(26,138,58,.12); }" +
     ".mtc-goalbar i{ display:block; height:100%; width:0; background:#1a8a3a; transition:width 1s cubic-bezier(.2,.8,.2,1); }" +
     ".mtc-goalbar.top{ position:fixed; top:0; bottom:auto; z-index:9800; }" +
@@ -231,6 +255,20 @@
     }catch(error){}
   };
   window.mtcMiss = function(){ streak = 0; recordShown = false; play("miss"); };
+  // grande félicitation de fin : les pastilles du bois, du feu, de la terre, du métal et de l'eau
+  let fin = null, finTimer = 0;
+  window.mtcFinale = function(title, detail, opts){
+    try{
+      ensure(); opts = opts || {};
+      if(!fin || !fin.isConnected){ fin = document.createElement("div"); fin.className = "mtc-finale"; fin.setAttribute("aria-live", "polite"); (document.body || document.documentElement).appendChild(fin); }
+      const cols = ["#2f9a3c", "#e0261b", "#d9a400", "#ffffff", "#111111"];
+      fin.innerHTML = '<span class="dots">' + cols.map((c, i) => '<i style="background:' + c + ";animation-delay:" + (i * .09) + "s" + (c === "#ffffff" ? ";box-shadow:inset 0 0 0 2px #271629" : "") + '"></i>').join("") + "</span>" +
+        title + (opts.etoiles ? '<span class="st">' + opts.etoiles + "</span>" : "") + (detail ? "<small>" + detail + "</small>" : "");
+      clearTimeout(finTimer);
+      finTimer = setTimeout(() => { replay(fin, "go"); replay(glow, "big"); play("finale");
+        if(navigator.vibrate && pref("mtc_fx_vibrate")) navigator.vibrate([30, 60, 30, 60, 60]); }, 280);
+    }catch(e){}
+  };
   window.mtcAnnounce = function(title, detail){ try{ ensure(); say(title + (detail ? "<small>" + detail + "</small>" : "")); replay(glow, "big"); play("palier"); }catch(e){} };
   window.mtcStreak = () => ({current:streak, best:best()});
 
@@ -241,7 +279,14 @@
       const wrapped = function(group){
         const by = group && group._solvedBy;
         const res = orig.apply(this, arguments);
-        if(by === "points" || by === "final"){ window.mtcCelebrate(1); const rows = document.querySelectorAll(".solved-row"); window.mtcBounce(rows[rows.length - 1]); }
+        if(by === "points" || by === "final"){
+          window.mtcCelebrate(1); const rows = document.querySelectorAll(".solved-row"); window.mtcBounce(rows[rows.length - 1]);
+          // les quatre catégories trouvées : grande félicitation
+          if(document.body.classList.contains("game-complete")){
+            const m = typeof mistakeCount !== "undefined" ? mistakeCount : 0;
+            window.mtcFinale("Grille résolue", m ? m + " erreur" + (m > 1 ? "s" : "") + " en chemin" : "sans aucune erreur", {etoiles:m === 0 ? "✦✦✦" : m <= 2 ? "✦✦" : "✦"});
+          }
+        }
         return res;
       };
       wrapped.__mtcGlow = true;

@@ -93,7 +93,7 @@
 </style>
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script src="../celebrate.js?v=20261112-b"></script>
+<script src="../celebrate.js?v=20261112-e"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 </head>
@@ -767,6 +767,7 @@
     skipTyping();
     const ok = f.id === CASE.c.f.id;
     CASE.answered = ok ? "ok" : "ko"; CASE.picked = f;
+    if(ok && window.mtcFinale) window.mtcFinale(CASE.hard ? "Défi réussi" : "Bonne formule", fname(CASE.c.f) + " · " + CASE.asked + " information" + (CASE.asked > 1 ? "s" : "") + " demandée" + (CASE.asked > 1 ? "s" : ""), {etoiles:CASE.asked <= 2 ? "✦✦✦" : CASE.asked <= 5 ? "✦✦" : "✦"});
     if(ok && window.mtcCelebrate) window.mtcCelebrate(CASE.hard ? 2 : 1); else if(!ok && window.mtcMiss) window.mtcMiss();
     CASE.total++;
     if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();

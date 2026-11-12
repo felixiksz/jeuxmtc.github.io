@@ -171,7 +171,7 @@ window.mtcEquilibrer = function(main){
       const others = opt.filter(s => s.slice().sort().join("|") !== mine);
       // solution minimale trouvée : juste une félicitation, et les autres solutions s'il y en a
       B.err = ""; B.view = -1;
-      if(B.pick.size === k){ B.head = '<span class="balok">' + praise() + "</span>"; B.solLbl = "Autres solutions possibles"; B.sols = others.slice(0, 8); }
+      if(B.pick.size === k){ if(window.mtcFinale) window.mtcFinale("Cas équilibré", "avec le minimum : " + k + (k > 1 ? " canaux" : " canal"), {etoiles:"✦✦✦"}); B.head = '<span class="balok">' + praise() + "</span>"; B.solLbl = "Autres solutions possibles"; B.sols = others.slice(0, 8); }
       else { B.head = "Tout est équilibré avec " + B.pick.size + " canaux ; le minimum est <b>" + k + "</b>."; B.solLbl = "Solutions minimales" + (opt.length > 1 ? " (" + opt.length + ")" : ""); B.sols = opt.slice(0, 8); }
       render();
     });

@@ -573,6 +573,12 @@
     if(question.result && window.mtcBounce) window.mtcBounce(content().querySelector(".mtc-quiz-choice.good"));
   }
   function renderCompletion(){
+    // grande félicitation : points trouvés du premier coup
+    if(GAMI && window.mtcFinale && state.finaleFor !== state.questions){
+      state.finaleFor = state.questions;
+      const first = state.questions.filter(q => !q.retryCount), ok = first.filter(q => q.result).length, n = first.length || 1;
+      window.mtcFinale("Quiz terminé", ok + " point" + (ok > 1 ? "s" : "") + " sur " + n + " du premier coup", {etoiles:ok === n ? "✦✦✦" : ok >= n * .7 ? "✦✦" : "✦"});
+    }
     content().innerHTML = headerHtml("Quiz terminé", state.questions.length + " points passés en revue.", 100) +
       '<div class="mtc-quiz-card mtc-quiz-done">' +
         '<p class="mtc-quiz-prompt">Quiz terminé !</p>' +

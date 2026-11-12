@@ -137,12 +137,12 @@
 <link href="../equilibrer/equilibrer.css?v=20261112-a" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script src="../celebrate.js?v=20261112-b"></script>
+<script src="../celebrate.js?v=20261112-e"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 <script src="circuits-data.js?v=20261112-c"></script>
 <script src="circuits-assistant-sync.js?v=20261112-a"></script>
-<script src="../equilibrer/equilibrer-game.js?v=20261112-a"></script>
+<script src="../equilibrer/equilibrer-game.js?v=20261112-b"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
@@ -487,6 +487,7 @@
       // félicitations seulement à la fin, quand toutes les connexions sont trouvées
       const errs = Object.values(F.wrong || {}).reduce((a, w) => a + w.length, 0), perfect = !errs && F.fails === 0;
       record("fermer", perfect); mastery(F.c.grid, perfect);
+      if(window.mtcFinale) window.mtcFinale("Circuit fermé", F.c && F.c.title ? F.c.title : "", {etoiles:perfect ? "✦✦✦" : errs + F.fails <= 2 ? "✦✦" : "✦"});
       F.sysRes = '<span class="ok">' + praise() + "</span> Toutes les connexions sont trouvées." +
         (errs ? ' <span class="sm">' + errs + " système" + (errs > 1 ? "s" : "") + " faux en chemin.</span>" : "") +
         (F.fails ? ' <span class="sm">Circuit fermé après ' + F.fails + " essai" + (F.fails > 1 ? "s" : "") + " manqué" + (F.fails > 1 ? "s" : "") + ".</span>" : "");
@@ -608,6 +609,7 @@
         if(P.hide.some(i => !P.cells[i])){ P.msg = '<span class="no">Il reste une case vide.</span>'; renderPlaintes(); return; }
         if(gridOk(P.cells)){
           P.c = findCircuit(P.cells) || P.c; P.step = "interroger"; P.marks = {}; P.hide.forEach(i => P.marks[i] = "ok");
+          if(window.mtcFinale) window.mtcFinale("Cas résolu", "circuit " + (P.c ? P.c.title : ""), {etoiles:P.fails === 0 ? "✦✦✦" : P.fails === 1 ? "✦✦" : "✦"});
           record("plaintes", P.fails === 0);
           P.msg = '<span class="ok">' + praise() + "</span> " + (P.level === 3 ? "Le 4ᵉ canal transmet de " + chip(P.C) + " vers " + chip(P.A) + " : il est menacé, ou déjà atteint." : "Les deux autres canaux sont menacés, ou déjà atteints.");
         } else {
@@ -714,7 +716,8 @@
       if(G.step === 4) why = "Le canal relié à la fois à " + chip(X) + " et à " + chip(Z) + " : " + ans.map(c => chip(c) + " (syst. " + links(X, c).join(", ") + " avec " + X + ", " + links(Z, c).join(", ") + " avec " + Z + ")").join(" ou ") + ".";
       G.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Trouvé, avec des erreurs en chemin.</span> ' + (extra.length ? "En trop : " + chips(extra) + ". " : "")) + '<br><span class="sm">' + why + "</span>";
       G.shown = ans;
-      if(G.step === 4){ G.done = true; record("propagation", G.fails === 0); }
+      if(G.step === 4){ G.done = true; record("propagation", G.fails === 0);
+        if(window.mtcFinale) window.mtcFinale("Propagation suivie", G.fails ? G.fails + " étape" + (G.fails > 1 ? "s" : "") + " avec des erreurs" : "sans aucune erreur", {etoiles:G.fails === 0 ? "✦✦✦" : G.fails === 1 ? "✦✦" : "✦"}); }
       renderPropagation();
     });
     if(!G.shown){
@@ -800,7 +803,11 @@
       setTimeout(() => {
         if(R.round !== round || !R.done) return;
         R.rows.push({c, blank:R.blank, fill:R.fill, bad:R.bad, ok:perfect});
-        if(R.pos >= R.queue.length - 1){ R.end = true; R.done = false; R.msg = ""; }
+        if(R.pos >= R.queue.length - 1){
+          R.end = true; R.done = false; R.msg = "";
+          const pr = R.rows.filter(r => r.ok).length;
+          if(window.mtcFinale) window.mtcFinale("Grille terminée", pr + (pr > 1 ? " lignes parfaites" : " ligne parfaite") + " sur " + R.rows.length, {etoiles:pr === R.rows.length ? "✦✦✦" : pr >= R.rows.length * .7 ? "✦✦" : "✦"});
+        }
         else { R.pos++; newLigne(); }
         if(mode === "grille") renderGrille();
       }, perfect ? 1000 : 2200);
@@ -1062,6 +1069,7 @@
         X.n++; X.ans = null; X.msg = "";
         if(X.n >= 10){
           X.end = true; X.tEnd = Date.now(); record("circuitoupas", X.good === 10);
+          if(window.mtcFinale) window.mtcFinale("Série terminée", X.good + " bonne" + (X.good > 1 ? "s" : "") + " réponse" + (X.good > 1 ? "s" : "") + " sur 10", {etoiles:X.good === 10 ? "✦✦✦" : X.good >= 7 ? "✦✦" : "✦"});
           const secs = Math.round((X.tEnd - X.t0) / 1000), b = xBest();
           X.record = !b || X.good > b.good || (X.good === b.good && X.chrono && b.secs && secs < b.secs);
           if(X.record) try{ localStorage.setItem(KEY + "_xbest", JSON.stringify({good:X.good, secs:X.chrono ? secs : 0})); }catch(e){}
@@ -1125,6 +1133,7 @@
         H8.pick.add(x); H8.mark[x] = "ok";
         if(c.grid.every(k => H8.pick.has(k))){
           H8.done = true; H8.found = true; record("cache", true); mastery(c.grid, true);
+          if(window.mtcFinale) window.mtcFinale("Cas résolu", c.title + " · " + h8Points() + " point" + (h8Points() > 1 ? "s" : ""), {etoiles:h8Points() >= 8 ? "✦✦✦" : h8Points() >= 5 ? "✦✦" : "✦"});
           H8.msg = '<span class="ok">' + praise() + "</span> Circuit " + esc(c.title) + ", trouvé avec " + H8.shown + " indice" + (H8.shown > 1 ? "s" : "") + " : " + h8Points() + " point" + (h8Points() > 1 ? "s" : "") + ".";
         }else{
           H8.msg = '<span class="ok">' + rnd(BRAVO) + "</span> " + chip(x) + " est dans le circuit, " + (i < 2 ? "en haut (main)" : "en bas (pied)") + ".";
