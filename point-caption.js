@@ -84,24 +84,38 @@
   }
   // le téléphone ne laisse jouer le son qu'après un toucher : on réveille le lecteur à chaque toucher
   window.addEventListener("pointerdown", () => { const c = audioCtx(); if(c && c.state !== "running") c.resume().catch(() => {}); }, {capture:true, passive:true});
-  function loadFr(key){
-    if(!buffers.has(key)){
+  function load(url){
+    if(!buffers.has(url)){
       const c = audioCtx();
-      buffers.set(key, !c ? Promise.reject() : fetch("audio-fr/" + key + ".mp3").then(r => { if(!r.ok) throw 0; return r.arrayBuffer(); })
+      buffers.set(url, !c ? Promise.reject() : fetch(url).then(r => { if(!r.ok) throw 0; return r.arrayBuffer(); })
         .then(ab => new Promise((ok, ko) => c.decodeAudioData(ab, ok, ko))));
-      buffers.get(key).catch(() => buffers.delete(key));
+      buffers.get(url).catch(() => buffers.delete(url));
     }
-    return buffers.get(key);
+    return buffers.get(url);
   }
+  const frUrl = key => "audio-fr/" + key + ".mp3";
+  const loadFr = key => load(frUrl(key));
   let src = null;
-  function playRecorded(key){
-    return loadFr(key).then(buf => {
+  // joue un fichier ; la promesse rend sa durée (en secondes)
+  function playUrl(url, gain){
+    return load(url).then(buf => {
       const c = audioCtx(); if(!c) throw 0;
+      if(c.state !== "running") c.resume().catch(() => {});
       try{ if(src) src.stop(); }catch(e){}
       src = c.createBufferSource(); src.buffer = buf;
-      // même force que le nom chinois (fichiers chinois plus forts, joués à 0,42)
-      const g = c.createGain(); g.gain.value = .7; src.connect(g); g.connect(c.destination); src.start();
+      const g = c.createGain(); g.gain.value = gain; src.connect(g); g.connect(c.destination); src.start();
+      return buf.duration;
     });
+  }
+  // même force que le nom chinois (fichiers chinois plus forts, joués à 0,42)
+  const playRecorded = key => playUrl(frUrl(key), .7);
+  // fichier du nom chinois (le même que celui du jeu)
+  function zhUrl(hanzi){
+    try{
+      const c = window.mtcConfirmedAudioCandidatesForHanzi && window.mtcConfirmedAudioCandidatesForHanzi(norm(hanzi));
+      if(c && c.length) return "audio/" + String(c[0]).split("/").map(encodeURIComponent).join("/");
+    }catch(e){}
+    return null;
   }
   // nom français lu après le nom chinois : l'enregistrement s'il existe, sinon la synthèse vocale de l'appareil
   let sayTimer = 0;
@@ -134,18 +148,25 @@
     if(typeof orig !== "function" || orig.__mtcCaption) return;
     const w = function(hanzi){
       const args = arguments, self = this;
+      let voice = "both"; try{ voice = localStorage.getItem("mtc_point_voice") || "both"; }catch(e){}
+      const audio = typeof window.isMtcAudioModeEnabled === "function" && window.isMtcAudioModeEnabled();
+      // chargés tout de suite, pendant la félicitation
+      const zh = audio && voice !== "fr" ? zhUrl(hanzi) : null;
+      if(zh) load(zh).catch(() => {});
       // un court instant pour savoir si ce choix déclenche une félicitation : elle passe d'abord
       setTimeout(() => {
         const wait = Math.max(0, (window.mtcFxEndsAt || 0) - performance.now());
         setTimeout(() => {
           const info = find(hanzi);
           show(info);
-          let voice = "both"; try{ voice = localStorage.getItem("mtc_point_voice") || "both"; }catch(e){}
-          const audio = typeof window.isMtcAudioModeEnabled === "function" && window.isMtcAudioModeEnabled();
           // nom chinois (sauf si on ne veut que le français), puis nom français (sauf si on ne veut que le chinois)
-          let played = false;
-          if(voice !== "fr"){ try{ played = orig.apply(self, args); }catch(e){} }
-          if(audio && voice !== "zh" && info && info.fr) sayFrench(info.fr, played ? 1300 : 0);
+          const fr = audio && voice !== "zh" && info && info.fr ? info.fr : "";
+          const then = ms => { if(fr) sayFrench(fr, ms); };
+          if(voice === "fr" || !audio){ then(0); return; }
+          // Le nom chinois passe par le même lecteur que le français, réveillé à chaque toucher : joué après
+          // la félicitation, il n'est plus bloqué par le téléphone. Le lecteur du jeu reste en secours.
+          const fallback = () => { let p = false; try{ p = orig.apply(self, args); }catch(e){} then(p ? 1300 : 0); };
+          if(zh) playUrl(zh, .42).then(d => then(Math.round(d * 1000) + 250), fallback); else fallback();
         }, wait);
       }, 60);
       return true;
