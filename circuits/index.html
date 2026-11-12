@@ -1073,7 +1073,7 @@
     return {g:rnd(BASE).grid.slice(), kind:"statique"};
   }
   function newX(){ Object.assign(X, {round:++ROUND, n:0, good:0, t0:0, list:[], cur:xGrid(), ans:null, msg:"", end:false}); }
-  const X_LBL = {statique:ANNEXES ? "Statique et dynamique" : "Circuit du cours", dynamique:"Dynamique seulement", non:"Pas un circuit"};
+  const X_LBL = ANNEXES ? {statique:"Statique et dynamique", dynamique:"Dynamique seulement", non:"Pas un circuit"} : {statique:"Oui", non:"Non"};
   const X_KINDS = ANNEXES ? ["statique", "dynamique", "non"] : ["statique", "non"];
   function xWhy(q){
     const g = q.g, c = findCircuit(g);
@@ -1085,7 +1085,7 @@
   function renderX(){
     const q = X.cur, done = !!X.ans, best = xBest();
     const secs = X.t0 ? Math.round(((X.end ? X.tEnd : Date.now()) - X.t0) / 1000) : 0;
-    main.innerHTML = '<div class="bar">' + aide("Quatre canaux sont placés comme dans un circuit, main en haut, pied en bas, sans les traits ni les polarités. " + (ANNEXES ? "Est-ce un circuit statique et dynamique, un circuit dynamique seulement (chapitre 13), ou pas un circuit ?" : "Est-ce un circuit du cours, ou pas un circuit ?") + " Série de 10 questions.") +
+    main.innerHTML = '<div class="bar">' + aide("Quatre canaux sont placés comme dans un circuit, main en haut, pied en bas, sans les traits ni les polarités. " + (ANNEXES ? "Est-ce un circuit statique et dynamique, un circuit dynamique seulement (chapitre 13), ou pas un circuit ?" : "Est-ce un circuit du cours ? Oui ou non.") + " Série de 10 questions.") +
       '<label><input type="checkbox" id="xChrono"' + (X.chrono ? " checked" : "") + "> chrono</label>" +
       '<span class="score">' + (best ? "record " + best.good + " / 10" + (best.secs ? " en " + best.secs + " s" : "") : "") + "</span></div>" +
       '<div class="xprog">' + Array.from({length:10}, (v, i) => '<i class="' + (i < X.list.length ? (X.list[i] ? "ok" : "no") : i === X.n ? "now" : "") + '"></i>').join("") +
@@ -1105,7 +1105,8 @@
       X.list.push(ok); if(ok) X.good++;
       stepFx(ok, ok ? '.xopt[data-k="' + q.kind + '"]' : null);
       mastery(q.g, ok);
-      X.msg = (ok ? '<span class="ok">' + X_LBL[q.kind] + ".</span> " : '<span class="no">Non : ' + X_LBL[q.kind].toLowerCase() + ".</span> ") + xWhy(q);
+      X.msg = (!ANNEXES ? (ok ? '<span class="ok">Juste.</span> ' : '<span class="no">Faux.</span> ') :
+        ok ? '<span class="ok">' + X_LBL[q.kind] + ".</span> " : '<span class="no">Non : ' + X_LBL[q.kind].toLowerCase() + ".</span> ") + xWhy(q);
       renderX();
       const round = X.round, n = X.n;
       setTimeout(() => {
