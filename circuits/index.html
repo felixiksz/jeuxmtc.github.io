@@ -1076,7 +1076,8 @@
 
   // ================= 8. Le cas mystère =================
   // un indice à la fois (indications, actions, un canal à sa place, le schéma) ; trouve le circuit avec le moins d'indices :
-  // 10 points avec le premier indice, -1 par indice de plus, -2 par mauvaise réponse (au moins 1 si trouvé)
+  // chaque canal choisi est vérifié tout de suite : juste, il se place sur le schéma ; faux, il s'affiche en rouge.
+  // Un nouveau clic sur un canal choisi l'efface. 10 points avec le premier indice, -1 par indice de plus, -1 par canal faux (au moins 1)
   const H8 = {};
   function newCache(){
     const c = rnd(CIRC);
@@ -1091,14 +1092,15 @@
     clues.push({t:"canal", i:pos[1]});
     Object.assign(H8, {round:++ROUND, c, clues, shown:1, pick:new Set(), wrong:0, done:false, found:false, msg:"", mark:{}});
   }
-  const h8Points = () => Math.max(1, 10 - (H8.shown - 1) - 2 * H8.wrong);
+  const h8Points = () => Math.max(1, 10 - (H8.shown - 1) - H8.wrong);
   function renderCache(){
-    const c = H8.c, cells = [0, 1, 2, 3].map(i => H8.done || H8.clues.slice(0, H8.shown).some(k => k.t === "canal" && k.i === i) ? c.grid[i] : null);
+    // sur le schéma : les canaux donnés en indice et ceux que tu as trouvés, chacun à sa place
+    const c = H8.c, cells = [0, 1, 2, 3].map(i => H8.done || H8.pick.has(c.grid[i]) || H8.clues.slice(0, H8.shown).some(k => k.t === "canal" && k.i === i) ? c.grid[i] : null);
     const clueHtml = H8.clues.slice(0, H8.shown).map((k, n) => "<p><b>" + (n + 1) + ".</b> " +
       (k.t === "ind" ? "Indication : " + esc(k.v) : k.t === "act" ? "Action : " + esc(k.v) : k.t === "canal" ? "Un canal à sa place : " + chip(c.grid[k.i]) + " (" + (k.i < 2 ? "main" : "pied") + ")" :
         c.autre ? "Schéma : équilibre dynamique seulement" : "Schéma : " + esc(SCHEMAS[schemaOf(c.grid)])) + "</p>").join("");
     const more = H8.shown < H8.clues.length;
-    main.innerHTML = '<div class="bar">' + aide("Un circuit du cours est caché. Les indices arrivent un par un : indications, actions, un canal à sa place, le schéma. Clique sur les quatre canaux du circuit. Avec le premier indice seulement : 10 points ; chaque indice de plus coûte 1 point, chaque mauvaise réponse 2.") +
+    main.innerHTML = '<div class="bar">' + aide("Un circuit du cours est caché. Les indices arrivent un par un : indications, actions, un canal à sa place, le schéma. Clique sur les canaux du circuit : un canal juste se place tout de suite sur le schéma, un canal faux s’affiche en rouge. Un nouveau clic sur un canal rouge l’efface. Avec le premier indice seulement : 10 points ; chaque indice de plus et chaque canal faux coûtent 1 point.") +
       scoreLine("cache", "circuit trouvé", "circuits trouvés") + "</div>" +
       '<div class="lay"><div>' + gridSvg(cells, {edges:!!H8.done, noPol:!H8.done}) + "</div><div>" +
       '<p class="lbltop">Indices · ' + (H8.done ? (H8.found ? h8Points() + " point" + (h8Points() > 1 ? "s" : "") : "0 point") : "encore " + h8Points() + " point" + (h8Points() > 1 ? "s" : "") + " en jeu") + "</p>" +
@@ -1111,22 +1113,26 @@
     on("hNext", () => { newCache(); renderCache(); });
     on("hMore", () => { H8.shown++; renderCache(); });
     on("hGive", () => { H8.done = true; record("cache", false); mastery(c.grid, false); H8.msg = '<span class="no">Réponse :</span> circuit ' + esc(c.title) + "."; stepFx(false); renderCache(); });
+    const BRAVO = ["Oui !", "Bien vu !", "Exact !", "Bravo !", "Juste !"];
     bindPalette(x => {
-      if(H8.done || H8.pick.has(x)) return;
-      H8.pick.add(x); H8.mark = {};
-      if(H8.pick.size < 4){ renderCache(); return; }
-      const mine = [...H8.pick];
-      if(sameSet(mine, c.grid)){
-        H8.done = true; H8.found = true; record("cache", true); mastery(c.grid, true);
-        mine.forEach(k => { H8.mark[k] = "ok"; });
-        H8.msg = '<span class="ok">' + praise() + "</span> Circuit " + esc(c.title) + ", trouvé avec " + H8.shown + " indice" + (H8.shown > 1 ? "s" : "") + " : " + h8Points() + " point" + (h8Points() > 1 ? "s" : "") + ".";
+      if(H8.done) return;
+      // canal juste déjà placé : rien à faire ; canal faux (en rouge) : un nouveau clic efface le rouge
+      if(H8.pick.has(x)) return;
+      if(H8.mark[x] === "no"){ delete H8.mark[x]; H8.msg = ""; renderCache(); return; }
+      const i = c.grid.indexOf(x);
+      if(i >= 0){
+        // canal juste : il se place sur le schéma, petite félicitation
+        H8.pick.add(x); H8.mark[x] = "ok";
+        if(c.grid.every(k => H8.pick.has(k))){
+          H8.done = true; H8.found = true; record("cache", true); mastery(c.grid, true);
+          H8.msg = '<span class="ok">' + praise() + "</span> Circuit " + esc(c.title) + ", trouvé avec " + H8.shown + " indice" + (H8.shown > 1 ? "s" : "") + " : " + h8Points() + " point" + (h8Points() > 1 ? "s" : "") + ".";
+        }else{
+          H8.msg = '<span class="ok">' + rnd(BRAVO) + "</span> " + chip(x) + " est dans le circuit, " + (i < 2 ? "en haut (main)" : "en bas (pied)") + ".";
+          stepFx(true, '.gnode[data-i="' + i + '"]');
+        }
       }else{
-        H8.wrong++; stepFx(false);
-        mine.forEach(k => { H8.mark[k] = c.grid.includes(k) ? "ok" : "no"; });
-        const nOk = mine.filter(k => c.grid.includes(k)).length;
-        H8.msg = '<span class="no">Pas encore :</span> ' + (nOk ? nOk + (nOk > 1 ? " canaux sur 4 sont" : " canal sur 4 est") + " dans le circuit (en vert)." : "aucun de ces canaux n’est dans le circuit.") + (more ? " Un indice de plus arrive." : "");
-        if(more) H8.shown++;
-        H8.pick = new Set();
+        H8.mark[x] = "no"; H8.wrong++; stepFx(false);
+        H8.msg = '<span class="no">Non :</span> ' + chip(x) + " n’est pas dans ce circuit.";
       }
       renderCache();
     });
