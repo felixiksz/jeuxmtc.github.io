@@ -2,6 +2,7 @@
 // grid : [haut gauche, haut droite, bas gauche, bas droite] comme dans le cours (main en haut, pied en bas).
 // autre : circuits qui ne reposent que sur l'équilibre dynamique (chapitre 13).
 // Indications et actions : base des circuits d’Assistant-MTC (acupuncture/circuits/circuits.json), enrichie des notes personnelles (circuits_perso.json).
+// mots : mots-clés de l’usage le plus courant (mots_cles.json, ou ceux modifiés dans l’application).
 // Fichier réécrit automatiquement par circuits-assistant-sync.js quand Assistant-MTC change.
 window.MTC_CIRCUITS = [
  {
@@ -29,6 +30,12 @@ window.MTC_CIRCUITS = [
    "asthme, toux, souffle court, rhinite, sinusites, bronchites, amygdalite, angine, rhume, grippe, allergies, faiblesse immunitaire",
    "dermatoses, herpès labial",
    "distension abdominale, diarrhée chronique, constipation, douleur abdominale, faiblesse de l'estomac, faiblesse de digestion, ulcère de l’estomac, gastrite, colique, allergie alimentaire, diabète"
+  ],
+  "mots": [
+   "troubles digestifs (gastro, constipation, diarrhée, ballonnements, rééquilibrage de la flore)",
+   "problèmes dermatologiques",
+   "boost de l'immunité (allergie, nez…)",
+   "équilibre du microbiote"
   ]
  },
  {
@@ -55,6 +62,12 @@ window.MTC_CIRCUITS = [
    "fatigue, déséquilibres respiratoires et digestifs, allergies respiratoires, petit appétit, distension abdominale, diarrhée, faiblesse du système immunitaire, œdèmes…",
    "dépression, apathie, asthénie…",
    "trouble de tai yang avec implication du tai yin"
+  ],
+  "mots": [
+   "DLRS sur canal Tai Yang",
+   "froid-humidité Rt/P",
+   "troubles respiratoires ou digestifs",
+   "accumulation d'humidité sur Tai Yang (céphalée, nez, dos, sciatalgie)"
   ]
  },
  {
@@ -76,10 +89,19 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "troubles du nez, des yeux, des oreilles, de la tête, de la respiration…",
-   "troubles psycho-émotionnels, tristesse, colère, psychose dépressive diān, psychose maniaque kuáng…",
-   "troubles des mictions, des parties génitales, impuissance…",
+   "troubles du nez, des yeux, des oreilles, de la tête, migraine au repos..",
+   "troubles de la respiration, allergie, asthme, troubles du nez, mei he qi, syndrome de noyau de prune, obstruction de la gorge, allergies au changement de saison..",
+   "troubles psycho-émotionnels, tristesse, colère, psychose dépressive diān, psychose maniaque kuáng, irritabilité, fatigue, irritabilité et fatigue si faim, tension émotionnelle (pénitude plutot), sujet au burn-out hyperactifs, ils poussent jusqu'au bout puis tombent malade en vacances…",
+   "troubles des mictions",
+   "troubles des parties génitales, impuissance…",
    "douleur du dos, des lombes, de la nuque, de la scapula…"
+  ],
+  "mots": [
+   "réserve de Qi",
+   "DLRS sur trajet Tai Yang",
+   "DLRS augmentées par les émotions",
+   "stagnation de Qi",
+   "dorsalgie ou sciatalgie par stagnation"
   ]
  },
  {
@@ -101,8 +123,18 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "douleur lombaire…",
-   "colites, constipation, mictions fréquentes, incontinence urinaire, impuissance, stérilité"
+   "grande fatigue, allergies, vide de yang chronique, surmenage",
+   "lombalgie, je mange, j'ai mal au dos",
+   "colites, constipation",
+   "URINAIRE, EAU",
+   "mictions fréquentes, incontinence urinaire, visage gonflé, l'eau qui stagne en bas",
+   "GYNECO, ANDRO",
+   "impuissance, stérilité"
+  ],
+  "mots": [
+   "problèmes respiratoires",
+   "excrétion de liquides",
+   "favorise les liquides organiques, action sur le foyer inférieur (asthme, constipation, allergie, stérilité)"
   ]
  },
  {
@@ -125,9 +157,21 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "troubles de la digestion et de l’abdomen liés au stress, à l’anxiété, aux désordres émotionnels, constipation, syndrome du côlon irritable, colopathie fonctionnelle, perte de l’appétit, ulcère de l’estomac…",
-   "irritabilité, colère, stress, anxiété, oppression thoracique, douleur de la région thoracique latérale dysphorie du cœur, angoisses, syndrome méi hé qì…",
-   "hépatite, nausées, vomissements…"
+   "HTA, hypertension artérielle",
+   "troubles de la digestion et de l’abdomen liés au stress, à l’anxiété, aux désordres émotionnels, irritabilité, colère, stress, anxiété, insomnie avec réveil facile au bruit, névrose, agitation du vent, insécurité, overthinking, phobies, terreur, arrêt du tabac et d'autres addictions ou actions qui ne sont pas en accord avec soi",
+   "constipation, syndrome du côlon irritable, colopathie fonctionnelle, perte de l’appétit, ulcère de l’estomac, syndrome méi hé qì, hépatite, nausées, vomissements, maladie de Crohn, intestin irritable, IBS, collopathie…",
+   "oppression thoracique, douleur de la région thoracique latérale, dysphorie du cœur",
+   "allergies avec notion émotionnelle",
+   "endométriose plénitude, cystite interstitielle, vessie douloureuse (plancher pelvienne tres lié a jue yin)",
+   "zona (selon les zones d'apparition)"
+  ],
+  "mots": [
+   "ATTENTION, réseau très remuant psy",
+   "troubles émotionnels avec répercussions digestives",
+   "parties génitales et digestives / métabolisme",
+   "ado stressé",
+   "vent et sécheresse = dermatoses",
+   "drama queen"
   ]
  },
  {
@@ -153,9 +197,21 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "nervosité, peurs multiples, anxiété, palpitations…",
-   "douleur gastrique et/ ou intestinale, constipation…",
-   "obstruction nasale, maux de gorge fréquents, crainte de la chaleur, soif, transpiration excessive de la tête…"
+   "nervosité, peurs multiples, anxiété, palpitations, troubles psy…",
+   "douleur gastrique et/ ou intestinale, constipation, maladie cœliaque, remontées acides",
+   "obstruction nasale, maux de gorge fréquents",
+   "crainte de la chaleur, soif, transpiration excessive de la tête, thyroide, amygdale, végétation, corde vocale, palpitations",
+   "ulcères",
+   "GYNÉCO, ANDRO",
+   "troubles des organes génitaux, ménopause, bouffées de chaleur"
+  ],
+  "mots": [
+   "bande centrale",
+   "réserve eau-feu",
+   "troubles digestifs + palpitations + fatigue",
+   "problèmes génitaux, hormonaux avec chaleur",
+   "gêne thoracique",
+   "pathologies Yang Ming avec fatigue"
   ]
  },
  {
@@ -175,10 +231,21 @@ window.MTC_CIRCUITS = [
    "favorise le métabolisme des liquides (jīn yè), résout l’humidité",
    "favorise la production du sang (xuè) et sa circulation",
    "calme le shén",
-   "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
+   "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit",
+   "stimule TF pour faire revenir yuan qi a la rate"
   ],
   "indications": [
-   "troubles de la digestion, digestion difficile, lente, petit appétit, fatigue, reflux gastro-œsophagien, diarrhée, constipation, ulcère de l’estomac…"
+   "fatigue",
+   "troubles de la digestion, digestion difficile, lente, petit appétit, manque d'appétit,reflux gastro-œsophagien, diarrhée, constipation, ulcère de l’estomac, troubles digestifs qui affectent le cœur, oedeme",
+   "prise de poids a la ménopause par vide de yuan qi a la rate et estomac, oligoménorrhée, crampes menstruelles, dysménorrhée avec troubles digestifs"
+  ],
+  "mots": [
+   "obésité et troubles digestifs ménopause",
+   "régulation hormonale féminine",
+   "vide de rate → répercussion sur le cœur chez la femme",
+   "œdèmes et vide de sang",
+   "perturbation du cœur par déficience de rate avec humidité",
+   "EC traite C"
   ]
  },
  {
@@ -224,6 +291,12 @@ window.MTC_CIRCUITS = [
    "céphalée",
    "POULS fin (et superficiel), surtout au loge du C",
    "LANGUE pale et gonflé (pointe rouge possible)"
+  ],
+  "mots": [
+   "troubles digestifs YIN + troubles psy (stress, rumination)",
+   "vide de sang du cœur par vide de rate",
+   "montée de yang du foie",
+   "ménopause"
   ]
  },
  {
@@ -248,9 +321,22 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "troubles oculaires, céphalée occipitale, douleur de nuque, des épaules, du dos et de la colonne, ostéoporose…",
-   "palpitations, déséquilibres cardiaques, anémie, troubles de la mémoire, insomnie, acouphènes, syndrome des jambes sans repos…",
-   "stérilité, impuissance, aménorrhée, troubles de la ménopause, pollakiurie ou oligurie, énurésie, œdèmes, hématurie…"
+   "troubles oculaires par vide, troubles de la vision par vieillissement, céphalée occipitale, douleur de nuque, acouphènes",
+   "des épaules, du dos et de la colonne, ostéoporose, syndrome d'obstruction-bi vent-froid humidité: lombalgie, sciatique, faiblesse de la face postérieur",
+   "palpitations, déséquilibres cardiaques",
+   "anémie",
+   "troubles de la mémoire, insomnie",
+   "syndrome des jambes sans repos…",
+   "stérilité, impuissance, aménorrhée, troubles de la ménopause",
+   "syndromes urinaires par vide, pollakiurie ou oligurie, énurésie, œdèmes, hématurie…"
+  ],
+  "mots": [
+   "surménage",
+   "grande fatigue",
+   "douleurs stase de sang canal Tai Yang + signes de chaleur Shao Yin",
+   "signes sur le cœur",
+   "palpitations",
+   "accumulation d'humidité bas du corps"
   ]
  },
  {
@@ -269,9 +355,18 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "hypertension artérielle, palpitations, céphalée…",
-   "troubles psycho-émotionnels, stress, sursauts au moindre bruit, insomnie avec crainte de la chaleur, rêves abondants…",
-   "entérite, hépatite…"
+   "hypertension artérielle, HTA, palpitations, céphalée, chaleur dans le sang (avec ou sans humidité), Pouls rapide avec teint rouge, maladies auto-immunes",
+   "troubles psycho-émotionnels, stress, sursauts au moindre bruit, insomnie avec crainte de la chaleur, rêves abondants, agitation",
+   "entérite, hépatite…",
+   "zona (selon les zones d'apparition), érythèmes rouge vifs"
+  ],
+  "mots": [
+   "au feu les pompiers",
+   "feu, brulures, plénitude",
+   "associer le cœur au foie",
+   "problèmes génitaux, céphalées…",
+   "signes sur le cœur",
+   "calme le Shen et clarifie la chaleur"
   ]
  },
  {
@@ -292,9 +387,18 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "anxiété, anémie, troubles de la mémoire, palpitations, stress, anxiété, tension émotionnelle mais pas spécialement d’agitation, irritabilité, colère qui ne dure pas, pas de ressentiment, insomnie avec fatigue extrême, tourne sans arrêt dans le lit, dépression, démotivation par épuisement, pensées négatives, manque de confiance en soi…",
-   "stérilité, impuissance, frigidité, bouffées de chaleur…",
-   "douleur de nuque, céphalées, douleur lombaire, sciatalgie, coxalgie, douleur des genoux, troubles du système osseux…"
+   "anxiété, troubles de la mémoire, stress, anxiété, tension émotionnelle mais pas spécialement d’agitation, irritabilité, colère qui ne dure pas, pas de ressentiment, vit dans le passé, insomnie avec fatigue extrême, tourne sans arrêt dans le lit, dépression, démotivation par épuisement, pensées négatives, manque de confiance en soi, personne frileuse-raleuse, regard vide",
+   "anémie",
+   "palpitations, pouls profond, teint sombre",
+   "GYNÉCO, ANDRO",
+   "stérilité, impuissance, frigidité, bouffées de chaleur, ménopause",
+   "douleur de nuque, céphalées, douleur lombaire, sciatalgie, coxalgie, douleur des genoux, troubles du système osseux, troubles de mobilité, hanches, épaules, genoux, articulations, lombalgie nocturne, polyarthrite, sensation de marcher dans un marais avec des bottes de plomb, lourdeur"
+  ],
+  "mots": [
+   "personne frileuse-raleuse, BEN : déséquilibre Shao Yin",
+   "BIAO : signes Shao Yang + troubles émotionnels",
+   "type Shao Yang nerveux qui tient sur la fatigue",
+   "chaleur vide et plénitude"
   ]
  },
  {
@@ -315,10 +419,21 @@ window.MTC_CIRCUITS = [
    "favorise la circulation du qì et du sang (xuè) dans les canaux du circuit"
   ],
   "indications": [
-   "troubles psycho-émotionnels, irritabilité (souvent contenue), nervosité, agitation, tension émotionnelle, cyclothymie, troubles bipolaires, anxiété, insomnie avec difficulté d’endormissement, difficulté à se détendre, difficulté à lâcher-prise, besoin du respect des règles, besoin de tout contrôler, souhaite être parfait, rigidité physique et émotionnel, prise de décision rapide ou indécision, palpitations…",
-   "céphalée temporale, cervicalgie, coxalgie, oppression thoracique, douleur de la région thoracique latérale, névralgie intercostale…",
-   "hyperthyroïdie, épilepsie, maladie de Parkinson, lithiase biliaire…",
-   "troubles gynécologiques, dysménorrhée…"
+   "donne l'impression d’être exemplaire mais fond d'épuisement, veut briller par peur de pas être assez, troubles psycho-émotionnels, irritabilité (souvent contenue), nervosité, agitation, tension émotionnelle, cyclothymie, sauts d'humeur, troubles bipolaires, anxiété, insomnie avec difficulté d’endormissement, difficulté à se détendre, difficulté à lâcher-prise, besoin du respect des règles, control freak, besoin de tout contrôler, souhaite être parfait, rigidité physique et émotionnel, prise de décision rapide ou indécision, méticuleux-se, F5 a shi, psychorigide, dure avec soi, dure avec les autres",
+   "céphalée temporale, cervicalgie, coxalgie, douleur de la région thoracique latérale, névralgie intercostale, tension des trapezes, épaule relevé, carré des lombes douleureux…",
+   "troubles gynécologiques, dysménorrhée…",
+   "oppression thoracique, troubles région latérale, palpitations, quand assis penché d'un coté, hyperthyroïdie, épilepsie, maladie de Parkinson, fibromyalgie, lithiase biliaire…"
+  ],
+  "mots": [
+   "wonder woman",
+   "veut briller par peur de pas être assez",
+   "blocage ou émotions +++",
+   "ados stressés",
+   "chaleur (Yang Ming organe)",
+   "problèmes génitaux",
+   "signes de chaleur autre que digestifs",
+   "stress → migraines",
+   "préparation pour compétition sportive anti-crampes"
   ]
  },
  {
@@ -346,7 +461,14 @@ window.MTC_CIRCUITS = [
    "céphalée, hépatite, jaunisse, stress, irritabilité, tension interne, rumination mentale…",
    "douleur et tension de l'épaule et de l'omoplate…"
   ],
-  "autre": true
+  "autre": true,
+  "mots": [
+   "le foie agresse la rate + trajet IG (stress → toux, gorge qui gratte, nuque)",
+   "alternance selles moulées / diarrhées",
+   "stagnation de Qi du foie",
+   "problèmes respiratoires + signes de la rate",
+   "douleurs trajet IG"
+  ]
  },
  {
   "title": "Jué yīn / gros intestin (dà cháng), reins (shèn)",
@@ -372,7 +494,11 @@ window.MTC_CIRCUITS = [
    "céphalée, palpitations, insomnie, stress",
    "douleur abdominale, constipation, douleur lombaire…"
   ],
-  "autre": true
+  "autre": true,
+  "mots": [
+   "signes Jué Yin avec déficience des reins",
+   "équilibre dynamique : EC · GI / E · Rn (+ F)"
+  ]
  },
  {
   "title": "Shào yīn / rate (pí), trois foyers (sān jiāo)",
@@ -396,6 +522,12 @@ window.MTC_CIRCUITS = [
    "douleur lombaire, œdèmes, impuissance, rétention d'eau, baisse de la libido, stérilité…",
    "petit appétit, diarrhée, distension abdominale, faiblesse de la digestion, fatigue, anémie, vertiges orthostatiques, anémie, bouffées de chaleur, transpiration nocturne, insomnie, réveil précoce, troubles de la mémoire, difficulté de concentration, acouphènes…"
   ],
-  "autre": true
+  "autre": true,
+  "mots": [
+   "dysharmonie cœur/reins",
+   "vide de sang ou vide de yin",
+   "blocage de la voie de l'eau",
+   "équilibre dynamique : C · TF / VB · Rt (+ Rn)"
+  ]
  }
 ];

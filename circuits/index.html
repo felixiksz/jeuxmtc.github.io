@@ -140,8 +140,8 @@
 <script src="../celebrate.js?v=20261112-f"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
-<script src="circuits-data.js?v=20261112-c"></script>
-<script src="circuits-assistant-sync.js?v=20261112-a"></script>
+<script src="circuits-data.js?v=20261112-d"></script>
+<script src="circuits-assistant-sync.js?v=20261112-b"></script>
 <script src="../equilibrer/equilibrer-game.js?v=20261112-b"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
@@ -335,11 +335,12 @@
   function compareHtml(mine, right, field, lines){
     const own = findCircuit(mine);
     const col = (label, cls, grid, c) => '<div class="cmpcol"><span class="verdict ' + cls + '">' + label + '</span><div class="cmpgrid">' + gridSvg(grid, {}) + "</div>" +
-      (c ? '<p class="cmpt">' + esc(c.title) + '</p><ul class="cmpl">' + c[field].map(x => "<li" + (lines.includes(x) ? ' class="hit"' : "") + ">" + esc(x) + "</li>").join("") + "</ul>"
+      (c ? '<p class="cmpt">' + esc(c.title) + '</p><ul class="cmpl">' + (c[field] || []).map(x => "<li" + (lines.includes(x) ? ' class="hit"' : "") + ">" + esc(x) + "</li>").join("") + "</ul>"
         : '<p class="sm">Ces quatre canaux ne forment pas un circuit du cours.</p>') + "</div>";
     return '<div class="compare">' + col("Ta réponse", "no", own ? own.grid : arrange(mine), own) + col("Bonne réponse", "ok", right.grid, right) + "</div>";
   }
   const circuitCard = (c, opt) => '<div class="card"><p><b>Circuit ' + esc(c.title) + "</b> · " + gridTxt(c.grid) + (c.autre ? ' <span class="sm">(équilibre dynamique seulement)</span>' : "") + "</p>" +
+    (c.mots && c.mots.length ? '<p class="sm">Mots-clés · ' + c.mots.map(esc).join(" · ") + "</p>" : "") +
     (opt && opt.ind === false ? "" : '<details class="more"' + (opt && opt.open ? " open" : "") + "><summary>Indications</summary><ul>" + c.indications.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul></details>") +
     '<details class="more"><summary>Actions</summary><ul>' + c.actions.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul></details></div>";
   // schéma de l'équilibre statique (Méthode de l'équilibre global, p. 25-26) : 1 horizontale + diagonale, 2 verticale + diagonale,
@@ -826,17 +827,35 @@
     {pairs:[["EC", "E"]], txt:"la bande centrale du corps"}
   ];
   const GENERIC = /^calme le shén$|dans les canaux du circuit$/;
+  // mots-clés des circuits (tes notes, Assistant-MTC) ; ceux qui nomment un canal donneraient la réponse : écartés des questions
+  const CANAL_RX = /(^|[^A-Za-zÀ-ÿ])(P|GI|E|Rt|C|IG|V|Rn|EC|TF|VB|F)(?=$|[^A-Za-zÀ-ÿ])/;
+  const motsSurs = c => (c && c.mots || []).filter(m => !CANAL_RX.test(m));
+  const pairTxt = p => chips(p).replace(", ", " et ");
   const Q5 = {};
   function newQuel(){
-    const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv", "statique"]);
-    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null, errs:0, hints:0, hintMsgs:[], out:new Set(), showPol:false, shown:new Set()});
-    if(t === "indications" || t === "actions"){
+    const avecMots = CIRC.filter(c => motsSurs(c).length >= 3);
+    const t = rnd(["indications", "indications", "actions", "actions", "astuce", "astuceInv", "statique"].concat(avecMots.length ? ["mots", "mots"] : []));
+    Object.assign(Q5, {round:++ROUND, t, pick:new Set(), done:false, msg:"", answer:null, mark:null, chosen:null, errs:0, hints:0, hintMsgs:[], out:new Set(), showPol:false, shown:new Set(), kwDone:false, countDone:false});
+    if(t === "mots"){
+      const c = rnd(avecMots);
+      Object.assign(Q5, {c, lines:shuffle(motsSurs(c)).slice(0, 2)});
+    } else if(t === "indications" || t === "actions"){
       const c = rnd(CIRC), pool = t === "indications" ? shuffle(c.indications) : shuffle(c.actions.slice(1).filter(x => !GENERIC.test(x)));
       let k = Math.min(t === "indications" ? 2 : 3, pool.length), lines = pool.slice(0, k);
       while(CIRC.some(o => o !== c && lines.every(l => o[t].includes(l))) && k < pool.length) lines = pool.slice(0, ++k);
       Object.assign(Q5, {c, lines});
     } else if(t === "astuce" || t === "astuceInv"){
       Q5.a = rnd(ASTUCES); Q5.pair = rnd(Q5.a.pairs); Q5.opts = shuffle(ASTUCES);
+      if(t === "astuceInv"){
+        // choix multiple : la bonne paire, deux paires d'autres astuces, et une paire qui partage un canal avec la bonne
+        const juste = p => Q5.a.pairs.some(q => sameSet(q, p)), dans = (l, p) => l.some(q => sameSet(q, p));
+        const opts = [Q5.pair];
+        shuffle(ASTUCES.filter(a => a !== Q5.a).flatMap(a => a.pairs)).forEach(p => { if(opts.length < 3 && !juste(p) && !dans(opts, p)) opts.push(p); });
+        const pres = shuffle(ORD.filter(c => !Q5.pair.includes(c)).flatMap(c => Q5.pair.map(x => [x, c])))
+          .filter(p => !juste(p) && !dans(opts, p) && !ASTUCES.some(a => dans(a.pairs, p)));
+        if(pres.length) opts.push(pres[0]);
+        Q5.popts = shuffle(opts);
+      }
     } else {
       Q5.c = Math.random() < .5 ? rnd(CIRC.filter(c => c.autre)) : rnd(BASE);
     }
@@ -850,14 +869,27 @@
       const i = rnd(faux); Q5.out.add(i);
       return "Une réponse fausse est écartée : « " + esc(Q5.opts[i].txt) + " ».";
     }
+    if(t === "astuceInv"){
+      const faux = Q5.popts.map((p, i) => i).filter(i => !Q5.a.pairs.some(q => sameSet(q, Q5.popts[i])) && !Q5.out.has(i));
+      if(faux.length < 2) return null;
+      const i = rnd(faux); Q5.out.add(i);
+      return "Une paire fausse est écartée : " + pairTxt(Q5.popts[i]) + ".";
+    }
+    // un mot-clé du circuit (tes notes) aide d'abord à le reconnaître
+    if(!Q5.kwDone && Q5.c && (t === "indications" || t === "actions" || t === "mots")){
+      Q5.kwDone = true;
+      const k = shuffle(motsSurs(Q5.c).filter(x => !Q5.lines.includes(x)))[0];
+      if(k) return "Mot-clé de ce circuit : « " + esc(k) + " ».";
+    }
     if(t === "statique"){
       if(Q5.showPol) return null;
       Q5.showPol = true;
       return "Les polarités sont affichées : y a-t-il un canal yīn et un canal yáng sur chaque ligne, et la même polarité en diagonale ?";
     }
-    const grids = t === "astuceInv" ? Q5.a.pairs : CIRC.filter(o => Q5.lines.every(l => o[t].includes(l))).map(o => o.grid);
+    const grids = CIRC.filter(o => Q5.lines.every(l => (o[t] || []).includes(l))).map(o => o.grid);
     const compat = grids.filter(g => [...Q5.pick].every(x => g.includes(x)));
-    if(Q5.hints === 1){
+    if(!Q5.countDone){
+      Q5.countDone = true;
       const n = grids.length, ys = [...new Set(grids.map(nYin))];
       return (t === "astuceInv" ? n + " association" + (n > 1 ? "s" : "") + " possible" + (n > 1 ? "s" : "") + " dans le cours" : n + " circuit" + (n > 1 ? "s" : "") + " du cours correspond" + (n > 1 ? "ent" : "")) + "." +
         (ys.length === 1 ? " Ce qui est cherché comprend " + ys[0] + (ys[0] > 1 ? " canaux" : " canal") + " yīn et " + (grids[0].length - ys[0]) + " yáng." : "");
@@ -876,30 +908,38 @@
     if(t === "indications" || t === "actions"){
       q = (t === "indications" ? "Quel circuit a ces indications ?" : "Quel circuit a ces actions ?") + " Clique sur ses quatre canaux.";
       body = '<div class="card">' + Q5.lines.map(l => "<p>" + (t === "indications" ? "➢ " : "– ") + esc(l) + "</p>").join("") + "</div>" + palette({on:Q5.pick, mark:Q5.mark});
+    } else if(t === "mots"){
+      q = "Quel circuit pour ces mots-clés ? Clique sur ses quatre canaux.";
+      body = '<div class="card">' + Q5.lines.map(l => "<p>« " + esc(l) + " »</p>").join("") + "</div>" + palette({on:Q5.pick, mark:Q5.mark});
     } else if(t === "astuce"){
       q = "Selon Dr Tán, les circuits incluant " + chips(Q5.pair).replace(", ", " et ") + " traitent :";
       body = '<div class="opts">' + Q5.opts.map((o, i) => '<button type="button" class="tool opt" data-i="' + i + '"' + (Q5.done || Q5.out.has(i) ? " disabled" : "") + (Q5.out.has(i) ? ' style="opacity:.35;text-decoration:line-through"' : "") + (Q5.done && Q5.chosen === i ? (o === Q5.a ? ' style="outline:2px solid #1a8a3a"' : ' style="outline:2px solid #c0392b"') : "") + ">" + esc(o.txt) + (Q5.done && o === Q5.a ? ' <span class="ok">✓</span>' : Q5.done && Q5.chosen === i ? ' <span class="no">✗</span>' : "") + "</button>").join("") + "</div>";
     } else if(t === "astuceInv"){
-      q = "Selon Dr Tán, quels canaux, réunis dans un circuit, traitent " + esc(Q5.a.txt) + " ? Clique sur les deux.";
-      body = palette({on:Q5.pick, mark:Q5.mark});
+      q = "Selon Dr Tán, les circuits incluant quels canaux traitent " + esc(Q5.a.txt) + " ?";
+      body = '<div class="opts">' + Q5.popts.map((p, i) => {
+        const ok = Q5.a.pairs.some(x => sameSet(x, p));
+        return '<button type="button" class="tool opt" data-i="' + i + '"' + (Q5.done || Q5.out.has(i) ? " disabled" : "") + (Q5.out.has(i) ? ' style="opacity:.35;text-decoration:line-through"' : "") +
+          (Q5.done && Q5.chosen === i ? (ok ? ' style="outline:2px solid #1a8a3a"' : ' style="outline:2px solid #c0392b"') : "") + ">" + pairTxt(p) +
+          (Q5.done && ok ? ' <span class="ok">✓</span>' : Q5.done && Q5.chosen === i ? ' <span class="no">✗</span>' : "") + "</button>";
+      }).join("") + "</div>";
     } else {
       q = "Ce circuit respecte-t-il l’équilibre statique ?";
       body = gridSvg(Q5.c.grid, {noPol:!(Q5.done || Q5.showPol)}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
     }
-    main.innerHTML = '<div class="bar">' + aide('Les actions et indications des circuits, les astuces de Dr Tán et l’équilibre statique.') + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Les actions, indications et mots-clés des circuits, les astuces de Dr Tán et l’équilibre statique.') + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
       '<div style="max-width:720px"><p class="q">' + q + "</p>" + body +
       (Q5.hintMsgs.length ? '<div class="card">' + Q5.hintMsgs.map(m => "<p><b>Astuce</b> · " + m + "</p>").join("") + (Q5.done ? "" : '<p class="sm">Avec astuce, la réponse ne compte pas comme bonne réponse.</p>') + "</div>" : "") +
-      '<div class="act">' + (!Q5.done && (t === "indications" || t === "actions" || t === "astuceInv") ? '<button type="button" class="tool" id="qVal">Valider</button>' : "") +
+      '<div class="act">' + (!Q5.done && (t === "indications" || t === "actions" || t === "mots") ? '<button type="button" class="tool" id="qVal">Valider</button>' : "") +
       (!Q5.done ? '<button type="button" class="tool" id="qHint" title="Un coup de pouce (la réponse ne comptera pas comme bonne réponse)">Astuce</button>' : "") +
       '<button type="button" class="tool" id="qNext">' + (Q5.done ? "Question suivante" : "Autre question") + "</button></div>" +
       (Q5.msg ? '<div class="res">' + Q5.msg + "</div>" : "") + "</div>" + rappel();
     on("qNext", () => nextRound("quel", newQuel));
-    on("qHint", () => { Q5.hints++; Q5.hintMsgs.push(quelAstuce() || (Q5.t === "astuce" || Q5.t === "statique" ? "Plus d’astuce possible." : "Plus d’astuce possible : à toi de retrouver les derniers canaux.")); renderQuel(); });
+    on("qHint", () => { Q5.hints++; Q5.hintMsgs.push(quelAstuce() || (Q5.t === "astuce" || Q5.t === "astuceInv" || Q5.t === "statique" ? "Plus d’astuce possible." : "Plus d’astuce possible : à toi de retrouver les derniers canaux.")); renderQuel(); });
     bindHist("quel");
     bindPalette(c => {
       if(Q5.done || Q5.pick.has(c) || (Q5.mark && Q5.mark[c])) return;
       // un canal est juste s'il appartient encore à une réponse possible avec les canaux déjà trouvés
-      const sets = t === "astuceInv" ? Q5.a.pairs : CIRC.filter(o => Q5.lines.every(l => o[t].includes(l))).map(o => o.grid);
+      const sets = CIRC.filter(o => Q5.lines.every(l => (o[t] || []).includes(l))).map(o => o.grid);
       const okc = sets.some(g => [...Q5.pick, c].every(x => g.includes(x)));
       Q5.mark = Q5.mark || {};
       if(okc){ Q5.pick.add(c); Q5.mark[c] = "ok"; stepFx(true, '.pc[data-c="' + c + '"]'); } else { Q5.mark[c] = "no"; Q5.errs = (Q5.errs || 0) + 1; stepFx(false); }
@@ -910,15 +950,7 @@
     const finish = (ok, msg, presque) => { Q5.done = true; const vrai = ok && !Q5.hints; record("quel", vrai); Q5.msg = (vrai ? '<span class="ok">' + praise() + "</span> " : ok ? '<span class="ok">Trouvé, avec astuce.</span> ' : presque ? '<span class="no">Presque.</span> ' : '<span class="no">Non.</span> ') + msg; renderQuel(); };
     on("qVal", () => {
       const mine = [...Q5.pick];
-      if(t === "astuceInv"){
-        const ok = Q5.a.pairs.some(p => sameSet(p, mine)) && !Q5.errs;
-        markPick(Q5.a.pairs.find(p => sameSet(p, mine)) || Q5.a.pairs[0]);
-        const autre = !ok && mine.length === 2 ? ASTUCES.find(a => a !== Q5.a && a.pairs.some(p => sameSet(p, mine))) : null;
-        finish(ok, "Les circuits incluant " + Q5.a.pairs.map(p => chips(p).replace(", ", " et ")).join(", et ceux incluant ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + "." +
-          (autre ? "<br>Ta paire " + chips(mine).replace(", ", " et ") + " correspond à autre chose : ces circuits traitent " + esc(autre.txt) + (autre.note ? " (" + esc(autre.note) + ")" : "") + "." : ""));
-        return;
-      }
-      const fits = CIRC.filter(o => Q5.lines.every(l => o[t].includes(l)));
+      const fits = CIRC.filter(o => Q5.lines.every(l => (o[t] || []).includes(l)));
       const found = fits.some(o => sameSet(o.grid, mine)), ok = found && !Q5.errs;
       const right = fits.find(o => sameSet(o.grid, mine)) || fits[0];
       markPick(right.grid);
@@ -927,6 +959,15 @@
       renderQuel();
     });
     main.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
+      if(t === "astuceInv"){
+        const p = Q5.popts[+b.dataset.i], ok = Q5.a.pairs.some(x => sameSet(x, p));
+        Q5.chosen = +b.dataset.i;
+        const autre = ok ? null : ASTUCES.find(a => a.pairs.some(x => sameSet(x, p)));
+        finish(ok, "Les circuits incluant " + Q5.a.pairs.map(pairTxt).join(", et ceux incluant ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + "." +
+          (autre ? "<br>Les circuits incluant " + pairTxt(p) + " traitent autre chose : " + esc(autre.txt) + (autre.note ? " (" + esc(autre.note) + ")" : "") + "." :
+           ok ? "" : "<br>Pour " + pairTxt(p) + ", Dr Tán ne donne pas d’astuce."));
+        return;
+      }
       const o = Q5.opts[+b.dataset.i], ok = o === Q5.a;
       Q5.chosen = +b.dataset.i;
       finish(ok, "Les circuits incluant " + chips(Q5.pair).replace(", ", " et ") + (Q5.a.note ? " (" + esc(Q5.a.note) + ")" : "") + " traitent " + esc(Q5.a.txt) + "." +
@@ -939,8 +980,7 @@
         "Dynamique seulement : " + nYin + " canaux yīn pour " + (4 - nYin) + " yáng, les polarités n’alternent pas. Ces circuits ouvrent de nouvelles perspectives de traitement (chapitre 13).");
       Q5.msg += circuitCard(Q5.c); renderQuel();
     }));
-    if(!Q5.done && (t === "indications" || t === "actions")) auto("qVal", Q5.pick.size >= 4, Q5.round + "|" + [...Q5.pick].sort());
-    if(!Q5.done && t === "astuceInv") auto("qVal", Q5.pick.size >= 2, Q5.round + "|" + [...Q5.pick].sort());
+    if(!Q5.done && (t === "indications" || t === "actions" || t === "mots")) auto("qVal", Q5.pick.size >= 4, Q5.round + "|" + [...Q5.pick].sort());
   }
 
   // ================= 6. Les quatre membres =================
