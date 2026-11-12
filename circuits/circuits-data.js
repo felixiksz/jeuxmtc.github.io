@@ -126,9 +126,7 @@ window.MTC_CIRCUITS = [
    "grande fatigue, allergies, vide de yang chronique, surmenage",
    "lombalgie, je mange, j'ai mal au dos",
    "colites, constipation",
-   "URINAIRE, EAU",
    "mictions fréquentes, incontinence urinaire, visage gonflé, l'eau qui stagne en bas",
-   "GYNECO, ANDRO",
    "impuissance, stérilité"
   ],
   "mots": [
@@ -202,7 +200,6 @@ window.MTC_CIRCUITS = [
    "obstruction nasale, maux de gorge fréquents",
    "crainte de la chaleur, soif, transpiration excessive de la tête, thyroide, amygdale, végétation, corde vocale, palpitations",
    "ulcères",
-   "GYNÉCO, ANDRO",
    "troubles des organes génitaux, ménopause, bouffées de chaleur"
   ],
   "mots": [
@@ -390,7 +387,6 @@ window.MTC_CIRCUITS = [
    "anxiété, troubles de la mémoire, stress, anxiété, tension émotionnelle mais pas spécialement d’agitation, irritabilité, colère qui ne dure pas, pas de ressentiment, vit dans le passé, insomnie avec fatigue extrême, tourne sans arrêt dans le lit, dépression, démotivation par épuisement, pensées négatives, manque de confiance en soi, personne frileuse-raleuse, regard vide",
    "anémie",
    "palpitations, pouls profond, teint sombre",
-   "GYNÉCO, ANDRO",
    "stérilité, impuissance, frigidité, bouffées de chaleur, ménopause",
    "douleur de nuque, céphalées, douleur lombaire, sciatalgie, coxalgie, douleur des genoux, troubles du système osseux, troubles de mobilité, hanches, épaules, genoux, articulations, lombalgie nocturne, polyarthrite, sensation de marcher dans un marais avec des bottes de plomb, lourdeur"
   ],

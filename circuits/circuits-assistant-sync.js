@@ -16,6 +16,8 @@
   const get = k => { try{ return localStorage.getItem(k) || ""; }catch(e){ return ""; } };
   const circuits = () => window.MTC_CIRCUITS || [];
   const key = g => (g || []).slice().sort().join(",");
+  // titres de paragraphe écrits en capitales dans tes notes (« GYNÉCO, ANDRO », « URINAIRE, EAU ») : ce ne sont pas des indications
+  const titre = s => /[A-ZÀ-Ý]/.test(s) && !/[a-zà-ÿ]/.test(s);
   // caractères chinois retirés, comme dans le reste du jeu : « tài yīn (太阴) » → « tài yīn »
   const clean = s => String(s || "").replace(/\s*\([㐀-鿿]+\)/g, "").replace(/\s+[㐀-鿿]+/g, "")
     .replace(/\s*\(\s*\)/g, "").replace(/\s+([,.)…])/g, "$1").trim().replace(/\.$/, "");
@@ -30,8 +32,8 @@
     circuits().forEach(g => {
       const a = by[key(g.grid)]; if(!a) return;
       const p = sur[a.id] || {};
-      const ind = (p.indications || a.indications || []).map(clean).filter(Boolean);
-      const act = (p.actions || a.actions || []).map(clean).filter(Boolean);
+      const ind = (p.indications || a.indications || []).map(clean).filter(x => x && !titre(x));
+      const act = (p.actions || a.actions || []).map(clean).filter(x => x && !titre(x));
       if(ind.length && JSON.stringify(ind) !== JSON.stringify(g.indications)){ g.indications = ind; changed = true; }
       if(act.length && JSON.stringify(act) !== JSON.stringify(g.actions)){ g.actions = act; changed = true; }
       const mc = (p.mots_cles || (mots && mots.circuits && mots.circuits[a.id]) || []).map(clean).filter(Boolean);
