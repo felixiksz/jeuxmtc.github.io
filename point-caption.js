@@ -99,7 +99,7 @@
       const c = audioCtx(); if(!c) throw 0;
       try{ if(src) src.stop(); }catch(e){}
       src = c.createBufferSource(); src.buffer = buf;
-      const g = c.createGain(); g.gain.value = .9; src.connect(g); g.connect(c.destination); src.start();
+      const g = c.createGain(); g.gain.value = .7;   // même force que le nom chinois (fichiers chinois plus forts, joués à 0,42) src.connect(g); g.connect(c.destination); src.start();
     });
   }
   // nom français lu après le nom chinois : l'enregistrement s'il existe, sinon la synthèse vocale de l'appareil
@@ -118,7 +118,7 @@
       if(!("speechSynthesis" in window)) return;
       try{
         const u = new SpeechSynthesisUtterance(said);
-        u.lang = "fr-FR"; u.rate = .95; u.pitch = .95; u.volume = .9;
+        u.lang = "fr-FR"; u.rate = .95; u.pitch = .95; u.volume = .6;
         // la voix la plus naturelle disponible sur l'appareil (voix neuronales, premium, Siri, Google), en français de France
         const score = x => (/natural|neural|premium|enhanced|amélioré|siri/i.test(x.name) ? 8 : 0) + (/online|google/i.test(x.name) ? 4 : 0) +
           (/^fr[-_]FR/i.test(x.lang) ? 2 : 0) + (/julie|denise|amélie|audrey|thomas/i.test(x.name) ? 1 : 0);
