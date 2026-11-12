@@ -203,7 +203,7 @@
         ["Corrections", "Les commentaires publics des modules bêta.", () => window.open(DISCUSSIONS_URL, "_blank", "noopener")],
         byId("mtcOfflineButton") && ["Hors connexion", "Préparer le jeu pour jouer sans internet.", () => clickId("mtcOfflineButton")],
         // mêmes montants que la goutte de sang (04-03-core-game.js : mtcSupportAmounts, mtcSupportAmountUrl)
-        ["Soutenir le projet", "Ce jeu est gratuit et sans publicité. Pour figurer parmi les mécènes, indique ton prénom ou alias dans la note PayPal.", null, null,
+        ["Soutenir le projet", "Ce jeu est gratuit et sans publicité. Je l’ai conçu dans un esprit d’entraide : la construction de la base de données m’a pris à elle seule plusieurs mois. Toute contribution est bienvenue et me permettra de nourrir mon sang pendant le développement d’autres outils similaires 🙏. Pour figurer parmi les mécènes, indique ton prénom ou alias dans la note PayPal.", null, null,
           (window.mtcSupportAmounts || [3, 5, 10]).concat([0]).map(v => [v ? v + " €" : "Montant libre", () => giveSupport(v)])]
       ]
     };
@@ -232,11 +232,26 @@
         (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>" +
       '<div class="mm-foot"><span class="mm-version">Connections MTC<i class="mm-star">✦</i>v' + MTC_VERSION + "</span>" + thanksHtml() + "</div>";
     menu.setAttribute("data-dom", pharma ? "pharma" : "acu");
+    portrait();
   }
   function domainSwitchHtml(){
     const pharma = isPharma();
     return '<span class="mtc-domain-switch"><button type="button" data-domain="acupuncture" class="' + (pharma ? "" : "on") + '">Acu</button>/' +
       '<button type="button" data-domain="pharmacology" class="' + (pharma ? "on" : "") + '">Pharma</button></span>';
+  }
+  // « Soutenir le projet » : mon portrait en trame de points, aux couleurs du thème (points du halo sur le fond) ;
+  // un petit rebond à l'ouverture du menu, il se penche au survol. Rien si l'image n'est pas là.
+  function portrait(){
+    menu.querySelectorAll(".mm-item").forEach(b => {
+      const n = b.querySelector(".mm-n");
+      if(!n || !/^Soutenir le projet/.test(n.textContent) || b.querySelector(".mm-portrait")) return;
+      const img = new Image();
+      img.onload = () => {
+        const p = document.createElement("span"); p.className = "mm-portrait"; p.setAttribute("aria-hidden", "true");
+        b.classList.add("mm-has-portrait"); b.insertBefore(p, b.firstChild);
+      };
+      img.src = "portrait-trame.png";
+    });
   }
   function open(which){
     if(which) tab = which;

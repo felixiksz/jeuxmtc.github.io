@@ -3709,7 +3709,7 @@ const SUPPORT_COFFEE_REMINDER_TITLE =
   "Me soutenir";
 
 const SUPPORT_COFFEE_REMINDER_TEXT =
-  "J'ai conçue ce jeu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de nourrir mon sang pendant le développement d'autres outils similaires.";
+  "J'ai conçu ce jeu dans un esprit d’entraide. Seule la construction de la base de données m'a pris plusieurs mois... Toute contribution est bienvenue ❤️‍🔥 et me permettra de nourrir mon sang pendant le développement d'autres outils similaires.";
 
 let supportBloodDropState = null;
 let supportBloodDropFrame = null;
