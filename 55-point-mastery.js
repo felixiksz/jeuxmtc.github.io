@@ -65,7 +65,8 @@
       record.correctStreak = (record.correctStreak || 0) + 1;
       record.intervalIndex = Math.min((record.intervalIndex ?? -1) + 1, REVIEW_INTERVALS_MS.length - 1);
     }
-    record.dueAt = new Date(Date.now() + REVIEW_INTERVALS_MS[record.intervalIndex]).toISOString();
+    // mauvaise réponse (ou « Je ne sais pas ») : le point entre tout de suite dans « À revoir »
+    record.dueAt = new Date(rating === "again" ? Date.now() : Date.now() + REVIEW_INTERVALS_MS[record.intervalIndex]).toISOString();
     saveRecord(point, record);
   }
 
