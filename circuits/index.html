@@ -13,7 +13,7 @@
   .tool{ font:inherit; cursor:pointer; text-decoration:none; }
   .tool:disabled{ opacity:.4; cursor:default; }
   .tools{ display:flex; gap:4px; align-items:center; margin-left:auto; }
-  /* les sept jeux en trois familles sous le titre */
+  /* les six jeux en trois familles sous le titre */
   .modes{ flex-basis:100%; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0 22px; border-top:1px solid var(--hair, #ddd); padding-top:6px; }
   .mgt{ font-size:.64rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin:0 0 1px; }
   .mode{ display:block; font:inherit; font-weight:800; font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; background:none; border:0; padding:3px 0; color:var(--text-color); cursor:pointer; text-align:left; }
@@ -139,7 +139,7 @@
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261112-a"></script>
+<script src="../beta-modules.js?v=20261112-b"></script>
 </head>
 <body>
 <header>
@@ -1001,11 +1001,10 @@
     ["plaintes", "Trois plaintes", newPlaintes, renderPlaintes],
     ["propagation", "Propagation", newPropagation, renderPropagation],
     ["grille", "Grille des familles", newGrille, renderGrille],
-    ["quel", "Quel circuit ?", newQuel, renderQuel],
-    ["membres", "Quatre membres", newMembres, renderMembres]
+    ["quel", "Quel circuit ?", newQuel, renderQuel]
   ].filter(Boolean);
   // trois familles, dans l'ordre des cours : les liens entre canaux, le circuit, la clinique
-  const GROUPS = [["Les liens", ["equilibrer", "grille"]], ["Le circuit", ["fermer", "quel", "membres"]], ["La clinique", ["plaintes", "propagation"]]];
+  const GROUPS = [["Les liens", ["equilibrer", "grille"]], ["Le circuit", ["fermer", "quel"]], ["La clinique", ["plaintes", "propagation"]]];
   const started = {};
   let mode = (MODES.find(m => "#" + m[0] === location.hash) || MODES[0])[0];
   function show(m){
