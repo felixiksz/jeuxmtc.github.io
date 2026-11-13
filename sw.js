@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "v2.3-20261113-a";
+const MTC_OFFLINE_VERSION = "v2.3-20261113-c";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -757,9 +757,17 @@ self.addEventListener("fetch", event => {
     // du réseau. Le cache ne sert que de repli hors connexion.
     // no-store pour la même raison que la navigation ci-dessus.
     const normalized = withoutSearch(request.url);
+    // Sons des noms (chinois et français) : un même nom de fichier garde toujours le même contenu. Cache d'abord,
+    // pour ne pas attendre le réseau à chaque clic (un nom lu avec 30 s de retard sur une connexion lente).
+    // Les lecteurs <audio> qui demandent un morceau de fichier (Range) passent par le réseau comme avant.
+    if(/\/audio(-fr)?\/[^/]+\.mp3$/.test(requestUrl.pathname) && !request.headers.has("range")){
+      const hit = await caches.match(normalized);
+      if(hit) return hit;
+    }
     try{
       const response = await fetch(request, {cache:"no-store"});
-      if(response && (response.ok || response.type === "opaque")){
+      // une réponse partielle (206) ne se range pas dans le cache : la ranger faisait échouer la requête
+      if(response && (response.status === 200 || response.type === "opaque")){
         const cache = await caches.open(MTC_CACHE_NAME);
         await cache.put(normalized, response.clone());
       }

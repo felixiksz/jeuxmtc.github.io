@@ -53,7 +53,7 @@
   }
   // Les mots chinois des noms français (lǐ, qì, shāng…) sont réécrits pour que la voix française les dise
   // à peu près comme en chinois, au lieu d'épeler « l » ou de lire « kui ».
-  const PY_FR = {li:"lie", qi:"tchi", shang:"chang", ding:"dingue", yin:"yine", yang:"yang", shou:"cheou", shao:"chao", fu:"fou", shu:"chou",
+  const PY_FR = {li:"lie", qi:"tchi", shang:"chang", ding:"dingue", yin:"yine", yang:"yang", shou:"cheou", shao:"chaho", fu:"fou", shu:"chou",
     xi:"si", luo:"louo", du:"dou", mai:"maï", po:"po", yi:"yi", hun:"houn", zhi:"dji", kunlun:"kouenlouenne", qiao:"tchiao", shen:"chenne",
     zu:"dzou", hua:"houa", tuo:"touo", bei:"beï"};
   const FR_WORDS = /^(où|à|là|déjà|voilà|çà)$/i;
@@ -119,15 +119,37 @@
   }
   // nom français lu après le nom chinois : l'enregistrement s'il existe, sinon la synthèse vocale de l'appareil
   let sayTimer = 0;
-  function sayFrench(text, delay){
+  // Un nom lu longtemps après le clic (son resté en attente du réseau) est pire que pas de nom du tout :
+  // au-delà de LATE ms de retard, ou si un autre point a été choisi entre-temps, le son est abandonné.
+  const LATE = 4000;
+  let turn = 0;
+  function sayFrench(text, delay, my){
     clearTimeout(sayTimer);
     if(!text) return;
     const said = frSay(text), key = frKey(said);
     const rec = (window.MTC_FR_AUDIO || "").indexOf(key) >= 0;
     if(rec) loadFr(key).catch(() => {});   // préchargé pendant le nom chinois
     sayTimer = setTimeout(() => {
-      if(rec) playRecorded(key).catch(() => speak(said)); else speak(said);
+      const due = performance.now(), fresh = () => my === turn && performance.now() - due < LATE;
+      if(rec) loadFr(key).then(() => { if(fresh()) return playRecorded(key); }).catch(() => { if(fresh()) speak(said); }); else speak(said);
     }, delay);
+  }
+  // Les sons de toute la grille sont chargés à l'avance (noms chinois et français), en mode audio : au clic, plus rien à attendre du réseau.
+  let preloaded = "";
+  function preloadGrid(voice){
+    try{
+      if(pharma() || !window.MTCQuizTest || !window.MTCQuizTest.currentGridPoints) return;
+      const pts = (window.MTCQuizTest.currentGridPoints() || []).map(x => String(x.point)), sig = pts.join(",") + "|" + voice;
+      if(!pts.length || sig === preloaded) return;
+      preloaded = sig;
+      const P = window.POINT_DETAILS || {}, list = (window.MTC_FR_AUDIO || "");
+      pts.forEach((id, i) => setTimeout(() => {
+        const d = P[id]; if(!d) return;
+        const zh = voice !== "fr" ? zhUrl(d.hanzi) : null;
+        if(zh) load(zh).catch(() => {});
+        if(voice !== "zh" && d.nom_francais){ const key = frKey(frSay(d.nom_francais)); if(list.indexOf(key) >= 0) loadFr(key).catch(() => {}); }
+      }, 300 + i * 120));
+    }catch(e){}
   }
   function speak(said){
       if(!("speechSynthesis" in window)) return;
@@ -150,9 +172,11 @@
       const args = arguments, self = this;
       let voice = "both"; try{ voice = localStorage.getItem("mtc_point_voice") || "both"; }catch(e){}
       const audio = typeof window.isMtcAudioModeEnabled === "function" && window.isMtcAudioModeEnabled();
+      const my = ++turn;
       // chargés tout de suite, pendant la félicitation
       const zh = audio && voice !== "fr" ? zhUrl(hanzi) : null;
       if(zh) load(zh).catch(() => {});
+      if(audio) preloadGrid(voice);
       // un court instant pour savoir si ce choix déclenche une félicitation : elle passe d'abord
       setTimeout(() => {
         const wait = Math.max(0, (window.mtcFxEndsAt || 0) - performance.now());
@@ -161,12 +185,13 @@
           show(info);
           // nom chinois (sauf si on ne veut que le français), puis nom français (sauf si on ne veut que le chinois)
           const fr = audio && voice !== "zh" && info && info.fr ? info.fr : "";
-          const then = ms => { if(fr) sayFrench(fr, ms); };
+          const then = ms => { if(fr) sayFrench(fr, ms, my); };
           if(voice === "fr" || !audio){ then(0); return; }
+          const due = performance.now(), fresh = () => my === turn && performance.now() - due < LATE;
           // Le nom chinois passe par le même lecteur que le français, réveillé à chaque toucher : joué après
           // la félicitation, il n'est plus bloqué par le téléphone. Le lecteur du jeu reste en secours.
-          const fallback = () => { let p = false; try{ p = orig.apply(self, args); }catch(e){} then(p ? 1300 : 0); };
-          if(zh) playUrl(zh, .42).then(d => then(Math.round(d * 1000) + 250), fallback); else fallback();
+          const fallback = () => { if(!fresh()) return; let p = false; try{ p = orig.apply(self, args); }catch(e){} then(p ? 1300 : 0); };
+          if(zh) load(zh).then(() => { if(fresh()) return playUrl(zh, .42).then(d => then(Math.round(d * 1000) + 250)); }, fallback); else fallback();
         }, wait);
       }, 60);
       return true;
