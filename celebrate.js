@@ -311,6 +311,18 @@
       w.__mtcGlow = true;
       window.mtcRecordMistake = w;
     }
+    // grille de pharmacopée : mêmes récompenses que la grille de points (classe trouvée, erreur, grille résolue).
+    // Le jeu appelle ces trois fonctions (27-25-pharma-stats-gameplay.js) ; on passe devant sans rien changer à ce qu'elles font.
+    const before = (name, fx) => {
+      const o = window[name];
+      if(typeof o !== "function" || o.__mtcGlow) return;
+      const w = function(){ try{ fx(); }catch(e){} return o.apply(this, arguments); };
+      w.__mtcGlow = true;
+      window[name] = w;
+    };
+    before("onPharmaClassSolved", () => { window.mtcCelebrate(1); setTimeout(() => { const rows = document.querySelectorAll(".solved-row"); window.mtcBounce(rows[rows.length - 1]); }, 0); });
+    before("onPharmaMistake", () => window.mtcMiss());
+    before("onPharmaGameWon", () => window.mtcFinale("Grille résolue", "toutes les classes trouvées", {}));
   }
   if(document.readyState === "complete") hookMainGame(); else window.addEventListener("load", hookMainGame);
 })();

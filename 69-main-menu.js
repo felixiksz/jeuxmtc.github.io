@@ -180,7 +180,10 @@
         byId("pharmaCardsButton") && ["Cartes mémo", "Cartes de révision à imprimer, recto verso.", () => clickId("pharmaCardsButton")],
         !pharma && (admin || isPublic("trajets")) && ["Trajets", "Le trajet de chaque canal, en texte et en plan.", () => module("trajets"), "b"],
         !pharma && (admin || isPublic("trajets")) && ["Plan des intersections", "Les points d’intersection de chaque canal et les canaux qui s’y croisent ; le plan en colonnes, avec les six systèmes de Dr Tán et les canaux distincts.", () => { window.location.href = "trajets/plan.html"; }, "b"],
-        pharma && (admin || isPublic("formules")) && ["Formules", "Les fiches des formules.", () => module("formules"), "b"]
+        pharma && (admin || isPublic("formules")) && ["Formules", "Les fiches des formules.", () => module("formules"), "b"],
+        // fonctions jusque-là cachées dans les modules, mises en avant dans le menu
+        !pharma && (admin || isPublic("trajets")) && ["Zones de correspondance", "Un lieu du corps, et tous les trajets qui y passent.", () => module("trajets", "lieux")],
+        !pharma && window.MTCQuizTest && ["À revoir", "Les points arrivés à échéance, en quiz.", () => window.MTCQuizTest.startDueReviewQuiz()]
       ],
       suivi: [
         ["Statistiques", "Réussites, temps, évolution.", () => call("toggleStatsPanel")],

@@ -231,6 +231,11 @@
   FORMS.forEach(f => { f._items = normalizeComposition(f); });
   // noms de formules toujours en majuscules (tons conservés : GUĪ PÍ TĀNG)
   const fname = f => String(f.pinyin || f.id).toLocaleUpperCase("fr-FR");
+  // Les catégories dans l'ordre du cours (01 à 21, d'après leur identifiant), les formules par ordre alphabétique dans chacune.
+  // Le nom affiché est allégé : « Prescriptions qui tonifient le Qi » → « Tonifient le qì ».
+  const catLabel = n => { const t = String(n || "").replace(/^(formules|pr[ée]scriptions)\s+qui\s+/i, "").replace(/\bQi\b/g, "qì").replace(/\bShen\b/g, "shén").replace(/\bSang\b/g, "sang"); return t.charAt(0).toLocaleUpperCase("fr-FR") + t.slice(1); };
+  FORMS.forEach(f => { f._cat = catLabel(f._cat); });
+  FORMS.sort((x, y) => String(x._catId).localeCompare(String(y._catId), "fr", {numeric:true}) || String(x.pinyin || x.id).localeCompare(String(y.pinyin || y.id), "fr", {sensitivity:"base"}));
   const CATS = [...new Map(FORMS.map(f => [f._catId, f._cat])).entries()];
   const allItems = FORMS.flatMap(f => f._items);
   const linked = allItems.filter(i => i.herb).length;
