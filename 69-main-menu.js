@@ -611,6 +611,21 @@
     }
     let icons = byId("mtcGameIcons");
     if(!icons){ icons = document.createElement("span"); icons.id = "mtcGameIcons"; row.appendChild(icons); }
+    // Coach / Libre, comme Auto / Manuel : sur la grille on joue librement ; « Coach » ouvre l'entraînement, à n'importe quel moment
+    // (un nouveau programme si celui du jour est déjà terminé) et le site s'ouvrira désormais dessus. Le choix est gardé (mtc_coach).
+    if(!byId("mtcCoachSwitch")){
+      const co = document.createElement("span");
+      co.id = "mtcCoachSwitch";
+      co.className = "mtc-domain-switch";
+      co.innerHTML = '<button type="button" data-coach="1" title="Le jeu te donne des sujets à réviser">Coach</button>/<button type="button" data-coach="0" class="on" title="Tu choisis toi-même ce que tu révises">Libre</button>';
+      co.addEventListener("click", e => {
+        const b = e.target.closest("[data-coach]");
+        if(!b || b.dataset.coach !== "1") return;
+        try{ localStorage.setItem("mtc_coach", "1"); sessionStorage.removeItem("mtc_entrainement_plus_tard"); }catch(error){}
+        window.location.href = "accueil/index.html?coach=1";
+      });
+      row.appendChild(co);
+    }
     const audio = byId("mtcAudioModeToggle"), lock = byId("gridLockIndicator");
     if(audio && row.firstChild !== audio) row.insertBefore(audio, row.firstChild);
     if(lock && lock.parentElement !== icons) icons.appendChild(lock);

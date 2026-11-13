@@ -50,9 +50,10 @@
   .step.fait > svg, .step.fait .tx, .step.fait .k{ opacity:.42; } .step.fait .k:has(svg){ opacity:1; } .step.encours .k, .step.encours .p{ color:var(--mtc-accent); }
   .again{ margin-left:18px; color:var(--tint); cursor:pointer; background:none; border:0; padding:0; }
   .later{ display:block; margin:10px 0 0; }
-  /* mode coach : le choix est gardé sur l'appareil (mtc_coach) */
-  .coach{ margin:34px 0 0; padding:14px 0 0; border:0; border-top:1px solid var(--faint); } .coach legend{ padding:0; float:left; width:100%; margin-bottom:8px; }
-  .coach label{ display:flex; align-items:center; gap:9px; padding:4px 0; clear:both; cursor:pointer; } .coach input{ accent-color:var(--mtc-accent); width:16px; height:16px; margin:0; flex:none; }
+  /* Coach / Libre : le même interrupteur que sur la grille (comme Auto / Manuel) ; le choix est gardé sur l'appareil (mtc_coach) */
+  .mode{ display:inline-flex; align-items:baseline; gap:5px; white-space:nowrap; }
+  .mode button{ background:none; border:0; padding:0; color:var(--text-color); cursor:pointer; }
+  .mode button.on{ text-decoration:underline; text-decoration-color:var(--shadow-color); text-decoration-thickness:2px; text-underline-offset:5px; }
   svg .l{ fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
   svg .d{ stroke-dasharray:3 3.4; }
   svg .a{ stroke:var(--mtc-accent); } svg .af{ fill:var(--mtc-accent); stroke:var(--mtc-accent); }
@@ -76,7 +77,7 @@
 </head>
 <body>
 <main>
-  <div class="top"><span class="sc">Connections MTC</span><a class="sc t" href="../index.html#ouvrir-menu"><svg viewBox="0 0 12 10" width="12" height="10" style="margin-right:6px" aria-hidden="true"><path class="l" d="M1 1.5H11M1 5H11M1 8.5H11"/></svg>Menu</a></div>
+  <div class="top"><span class="sc">Connections MTC</span><span class="mode" id="mode"><button type="button" class="sc on" data-coach="1" title="Le jeu te donne des sujets à réviser">Coach</button><span class="sc t">/</span><button type="button" class="sc" data-coach="0" title="Tu choisis toi-même ce que tu révises">Libre</button></span><a class="sc t" href="../index.html#ouvrir-menu"><svg viewBox="0 0 12 10" width="12" height="10" style="margin-right:6px" aria-hidden="true"><path class="l" d="M1 1.5H11M1 5H11M1 8.5H11"/></svg>Menu</a></div>
 
   <span class="sc t" id="goalTxt">Aujourd’hui</span>
   <div class="goalbar"><i id="goalBar"></i></div>
@@ -86,10 +87,7 @@
   <div id="seance"></div>
   <a class="sc go" id="go" href="entrainement.html">Commencer →</a><button type="button" class="sc again" id="again" hidden>Refaire</button>
   <a class="sc t later" id="later" href="../index.html">Plus tard, aller à la grille</a>
-  <fieldset class="coach"><legend class="sc t">Mode coach</legend>
-    <label><input type="radio" name="coach" value="1"> oui : un entraînement à l’ouverture, chaque jour</label>
-    <label><input type="radio" name="coach" value="0"> non : ouvrir sur la grille</label>
-  </fieldset>
+
 
 
 
@@ -183,8 +181,9 @@
     if(c.name && seen >= 2 && err > 0 && (!w || err / seen > w.r)) w = {r:err / seen, name:String(c.name)}; }); return w; };
   // Le programme du coach : quatre sujets (les points, les canaux, les circuits, la pharmacopée), un jeu par sujet. D'un jour à l'autre,
   // le jeu de chaque sujet change et l'ordre des sujets tourne. Jamais le nom d'une catégorie ou d'une classe : ce serait donner une réponse.
-  function build(){
-    const jour = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5), tour = (list, k) => list[(jour + (k || 0)) % list.length];
+  function build(extra){
+    // extra : programme supplémentaire du même jour (le coach rappelé après la fin de l'entraînement) : d'autres jeux, un autre ordre
+    const jour = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5) + (extra || 0) * 5, tour = (list, k) => list[(jour + (k || 0)) % list.length];
     const A = "acupuncture", P = "pharmacology", G = "../index.html", C = "../circuits/index.html", F = "../formules/index.html";
     // les points arrivés à échéance au Quiz
     let due = 0;
@@ -206,10 +205,15 @@
       {v:"cas", t:"Cas clinique", w:"une consultation", u:F + "#cas", q:1}];
     const sujets = [tour(points), tour(canaux), tour(circuits), tour(pharma)], k = jour % 4;
     const steps = sujets.slice(k).concat(sujets.slice(0, k));
-    return {d:today, ver:VER, steps, i:0, n:steps.map(() => 0), fin:false};
+    return {d:today, ver:VER, extra:extra || 0, steps, i:0, n:steps.map(() => 0), fin:false};
   }
   let T = read(KEY);
   if(!T || T.d !== today || T.ver !== VER || !Array.isArray(T.steps)){ T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} }
+  // le coach demandé depuis la grille (bouton « Coach ») alors que l'entraînement du jour est fini : un nouveau programme
+  if(/[?&]coach=1/.test(location.search)){
+    if(T.fin){ T = build((T.extra || 0) + 1); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} }
+    try{ history.replaceState(null, "", location.pathname); }catch(e){}
+  }
   const CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path class="l a" d="M2 6.5L5 9.5L10.5 2.5"/></svg>';
   function drawTraining(){
     const begun = T.fin || T.i > 0 || T.n.some(x => x > 0);
@@ -225,10 +229,10 @@
     if(again) again.hidden = !begun;
   }
   drawTraining();
-  // mode coach : oui (par défaut) ou non ; « non » ouvre la grille, et le site s'y ouvrira désormais
-  const coachOn = () => { try{ return localStorage.getItem("mtc_coach") !== "0"; }catch(e){ return true; } };
-  document.querySelectorAll('input[name="coach"]').forEach(r => { r.checked = (r.value === "1") === coachOn();
-    r.addEventListener("change", () => { try{ localStorage.setItem("mtc_coach", r.value); }catch(e){} if(r.value === "0") location.href = "../index.html"; }); });
+  // Coach / Libre : cette page est le mode coach ; « Libre » ouvre la grille, et le site s'y ouvrira désormais
+  try{ localStorage.setItem("mtc_coach", "1"); }catch(e){}
+  document.getElementById("mode").addEventListener("click", e => { const b = e.target.closest("[data-coach]"); if(!b || b.dataset.coach !== "0") return;
+    try{ localStorage.setItem("mtc_coach", "0"); }catch(er){} location.href = "../index.html"; });
   // « Refaire » sert aux essais : réservé au mode admin
   try{ if(localStorage.getItem("mtc_admin") !== "1") document.getElementById("again").remove(); }catch(e){}
   // « Plus tard » : la grille s'ouvre sans l'entraînement, jusqu'à la prochaine ouverture du site
