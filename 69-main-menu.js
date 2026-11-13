@@ -156,16 +156,16 @@
   function items(){
     const pharma = isPharma(), admin = isAdmin();
     const what = pharma ? "substances" : "points";
-    // nouvel accueil (accueil/) : en test, mode admin seulement
-    const NOUVEL_ACCUEIL = ["Entraînement du jour", "Le nouvel accueil, en test : visible en mode admin seulement.", () => module("accueil")];
+    // mode coach : le programme du jour (accueil/)
+    const NOUVEL_ACCUEIL = ["Entraînement du jour", "Le programme du coach : quatre sujets, différents chaque jour.", () => module("accueil")];
     const I = {
       jouer: pharma ? [
-        admin && NOUVEL_ACCUEIL,
+        NOUVEL_ACCUEIL,
         ["Grille", "Le jeu principal, version pharmacopée.", () => {}],
         (admin || isPublic("formules")) && ["Substance manquante", "Retrouver la substance cachée d’une formule.", () => module("formules", "jeu"), "b"],
         (admin || isPublic("formules")) && ["Cas clinique", "Faire un diagnostic de pharmacopée.", () => module("formules", "cas"), "b"]
       ] : [
-        admin && NOUVEL_ACCUEIL,
+        NOUVEL_ACCUEIL,
         ["Grille", "Le jeu principal : retrouver les groupes de quatre points.", () => {}],
         window.MTCQuizTest && ["Quiz", "Questions à choix sur les points.", () => window.MTCQuizTest.open()],
         // série Réseaux (bêta) : elle contient Équilibrer ; tant qu'elle n'est pas ouverte, les joueur·ses gardent Équilibrer seul
@@ -211,6 +211,9 @@
         // guide d'installation en raccourci (install-guide.js)
         window.mtcOpenInstallGuide && ["Sur l’écran d’accueil", window.mtcIsInstalled && window.mtcIsInstalled() ? "Le jeu est installé sur cet appareil." : "Ajouter le jeu en raccourci, comme une application : le guide pour ton téléphone ou ton ordinateur.", () => window.mtcOpenInstallGuide()],
         // récompenses des bonnes réponses (celebrate.js) : un clic change le réglage sans fermer le menu
+        // mode coach : le site s'ouvre sur l'entraînement du jour ; désactivé, il s'ouvre sur la grille. Le choix est gardé sur l'appareil.
+        ["Mode coach", "À l’ouverture, un entraînement varié chaque jour, sur des sujets différents. Désactivé : le site s’ouvre sur la grille.", null, null,
+          (() => { const on = fxOn("mtc_coach"), fn = () => { try{ localStorage.setItem("mtc_coach", on ? "0" : "1"); }catch(e){} }; fn.stay = true; return [["Mode coach : " + (on ? "oui" : "non"), fn]]; })()],
         ["Sons et vibration", "À chaque réponse : un son doux, une petite vibration du téléphone.", null, null,
           [["mtc_fx_sound", "Sons"], ["mtc_fx_vibrate", "Vibration"]].map(([key, label]) => {
             const on = fxOn(key), fn = () => { try{ localStorage.setItem(key, on ? "0" : "1"); }catch(e){} if(!on && key === "mtc_fx_sound" && window.mtcPlayFx) window.mtcPlayFx("good"); };
@@ -293,6 +296,14 @@
     if(menu) menu.classList.remove("open");
     document.body.classList.remove("mtc-menu-open");
   }
+  // Menu ouvert depuis la page d'entraînement (accueil/, lien #ouvrir-menu) : le fermer sans rien choisir ramène à cette page,
+  // qui remplace la grille tant que le mode coach est actif.
+  let fromTraining = false;
+  function backToTraining(){
+    if(!fromTraining) return;
+    fromTraining = false;
+    if(fxOn("mtc_coach")) window.location.replace("accueil/index.html");
+  }
   // sur ordinateur : passer sur un grand mot affiche sa liste, sans cliquer (court délai pour ignorer un simple passage)
   let hoverTimer = 0;
   const canHover = () => window.matchMedia && window.matchMedia("(hover:hover) and (min-width:761px)").matches;
@@ -312,7 +323,7 @@
   }
   function onMenuClick(e){
     const t = e.target;
-    if(t.closest("#mtcMenuClose")){ close(); return; }
+    if(t.closest("#mtcMenuClose")){ close(); backToTraining(); return; }
     const d = t.closest("[data-domain]");
     if(d){ setDomain(d.dataset.domain); return; }
     const en = t.closest(".mm-entry");
@@ -322,8 +333,9 @@
     const it = (current[row.dataset.k] || [])[+row.dataset.i];
     if(!it) return;
     const sub = t.closest(".mm-sub");
-    if(it[4]){ if(sub){ const fn = it[4][+sub.dataset.sub][1]; if(fn.stay){ fn(); render(); } else { close(); fn(); } } return; }
+    if(it[4]){ if(sub){ const fn = it[4][+sub.dataset.sub][1]; if(fn.stay){ fn(); render(); } else { fromTraining = false; close(); fn(); } } return; }
     if(!it[2]) return;
+    fromTraining = false;
     if(!it[5]) close();   // « Série » : l'interrupteur du rappel laisse le menu ouvert
     it[2]();
   }
@@ -687,7 +699,7 @@
     window.addEventListener("storage", e => { if(e.key === "mtc_daily_streak_v1") paintStreak(); });
     new MutationObserver(() => { paintTopSwitch(); if(menu && menu.classList.contains("open")) render(); })
       .observe(document.documentElement, {attributes:true, attributeFilter:["data-study-domain"]});
-    document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")) close(); });
+    document.addEventListener("keydown", e => { if(e.key === "Escape" && menu && menu.classList.contains("open")){ close(); backToTraining(); } });
     arrangeControls();
     watchSearchFocus();
     bottomIcons();
@@ -706,9 +718,9 @@
     const m = /^#ouvrir-([a-z]+)$/.exec(location.hash);
     if(!m) return;
     const action = {memo:() => call("openCheatsheetPanel"), recherche:() => call("toggleAdvancedSearchPanel"), comparer:() => call("toggleComparisonPanel"), cartes:() => clickId("pharmaCardsButton"),
-      stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }, menu:() => open(), revoir:() => { if(window.MTCQuizTest) window.MTCQuizTest.startDueReviewQuiz(); }}[m[1]];
+      stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }, menu:() => { fromTraining = true; open(); }, revoir:() => { if(window.MTCQuizTest) window.MTCQuizTest.startDueReviewQuiz(); }}[m[1]];
     try{ history.replaceState(null, "", location.pathname + location.search); }catch(error){}
-    if(action) setTimeout(action, 700);
+    if(action) setTimeout(action, m[1] === "menu" ? 0 : 700);
   }
   if(document.readyState === "complete") openFromHash(); else window.addEventListener("load", openFromHash);
   window.addEventListener("hashchange", openFromHash);

@@ -8,7 +8,7 @@
 <title>Entraînement du jour</title>
 <link href="../fonts/fonts.css?v=20261006-a" rel="stylesheet">
 <style>
-  /* EN TEST, mode admin seulement : l'enchaînement de l'entraînement du jour (voir accueil/index.html).
+  /* Mode coach : l'enchaînement de l'entraînement du jour (voir accueil/index.html).
      Un bandeau fin reste au-dessus du jeu : étape en cours, traits qui se remplissent avec les bonnes réponses
      (le compteur de l'objectif du jour, celebrate.js), et la suite proposée quand l'étape est faite. Le jeu n'est
      jamais coupé : c'est la joueuse qui clique sur « Suite ». Ici le jeu est dans un cadre ; dans le vrai site,
@@ -44,7 +44,7 @@
 </head>
 <body>
 <div class="band"><div class="in">
-  <div class="row"><a class="sc" id="back" href="index.html" aria-label="Retour à l’accueil">←</a><span class="sc now" id="now"></span><button type="button" class="sc go" id="suite">Passer →</button></div>
+  <div class="row"><a class="sc" id="back" href="index.html" aria-label="Retour à l’accueil">←</a><span class="sc now" id="now"></span><button type="button" class="sc go" id="suite">Étape suivante →</button></div>
   <p class="what" id="what"></p>
   <div class="segs" id="segs"></div>
 </div></div>
@@ -56,22 +56,15 @@
   <a class="sc more" href="../index.html">Aller à la grille →</a>
 </div></div>
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script src="../beta-config.js?v=20261108-a"></script>
-<script src="../beta-gate.js?v=20261110-a"></script>
 <script>
 (function(){
   "use strict";
-  // accès : admins seulement tant que le module n'est pas ouvert dans beta-config.js
-  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"accueil", title:"Entraînement du jour"})){
-    if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
-    throw new Error("accueil : accès réservé");
-  }
   const KEY = "mtc_entrainement_v1", DOMAIN = "mtcStudyDomainChoice";
   const read = k => { try{ return JSON.parse(localStorage.getItem(k) || "null"); }catch(e){ return null; } };
   const d = new Date(), today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
   const T = read(KEY);
   // le programme est calculé par l'accueil ; sans programme du jour, on y retourne
-  if(!T || T.d !== today || T.ver !== 2 || !Array.isArray(T.steps)){ location.replace("index.html"); return; }
+  if(!T || T.d !== today || T.ver !== 3 || !Array.isArray(T.steps)){ location.replace("index.html"); return; }
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} };
   const $ = id => document.getElementById(id), frame = $("jeu"), suite = $("suite");
   // bonnes réponses d'aujourd'hui sur cet appareil : le compteur que tous les jeux font avancer
@@ -86,7 +79,7 @@
     if(!s) return;
     $("now").textContent = "Entraînement · " + (T.i + 1) + " sur " + T.steps.length;
     $("what").innerHTML = esc(s.t) + ' <span class="t">· ' + esc(s.w) + "</span>";
-    suite.textContent = ok ? (lastStep ? "Terminer →" : "Suite : " + T.steps[T.i + 1].t + " →") : lastStep ? "Terminer →" : "Passer →";
+    suite.textContent = ok ? (lastStep ? "Terminer →" : "Suite : " + T.steps[T.i + 1].t + " →") : lastStep ? "Terminer →" : "Étape suivante →";
     suite.classList.toggle("ready", ok);
   }
   function open(i){

@@ -4,10 +4,12 @@
 <head>
 <meta charset="utf-8"/>
 <script>
-/* En test (mode admin seulement) : le site s'ouvre sur l'entraînement du jour (accueil/) tant qu'il n'est pas terminé, puis sur la grille.
-   Pas de redirection dans le cadre de l'entraînement, ni avec un lien direct (#ouvrir-…), ni après « Plus tard, aller à la grille ». */
+/* Mode coach : le site s'ouvre sur l'entraînement du jour (accueil/) tant qu'il n'est pas terminé, puis sur la grille.
+   Pas de redirection : mode coach désactivé (mtc_coach = "0", choix gardé sur l'appareil), dans le cadre de l'entraînement, avec un lien
+   direct (#ouvrir-…) ou un paramètre (?admin=1, ?grille…), après « Plus tard, aller à la grille », ni pour les robots des moteurs de recherche. */
 try{
-  if(localStorage.getItem("mtc_admin") === "1" && window.top === window && !location.hash && !/[?&]grille\b/.test(location.search) && !sessionStorage.getItem("mtc_entrainement_plus_tard")){
+  if(localStorage.getItem("mtc_coach") !== "0" && window.top === window && !location.hash && !location.search && !sessionStorage.getItem("mtc_entrainement_plus_tard") &&
+     !/bot|crawl|spider|slurp|lighthouse|headless|preview/i.test(navigator.userAgent)){
     var t = JSON.parse(localStorage.getItem("mtc_entrainement_v1") || "null"), d = new Date(), today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     if(!(t && t.d === today && t.fin)) location.replace("accueil/index.html");
   }
@@ -412,6 +414,6 @@ try{
 <script src="beta-gate.js?v=20261110-a"></script>
 <script src="68-contributor-notes.js?v=20261110-a"></script>
 <script src="soutiens.js?v=20261007-a"></script>
-<script src="69-main-menu.js?v=20261113-e"></script>
+<script src="69-main-menu.js?v=20261113-f"></script>
 </body>
 </html>

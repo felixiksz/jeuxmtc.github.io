@@ -8,7 +8,7 @@
 <title>Entraînement du jour</title>
 <link href="../fonts/fonts.css?v=20261006-a" rel="stylesheet">
 <style>
-  /* Nouvel accueil, EN TEST : mode admin seulement (beta-gate, module « accueil » absent de beta-config.js).
+  /* Mode coach : la page d'ouverture du site, pour tout le monde.
      La page sur laquelle le site s'ouvre tant que l'entraînement du jour n'est pas terminé (redirection au début de index.html) :
      le programme du jour, rien d'autre. Le menu reste celui de la grille.
      Objectif du jour, série et entraînement : calculés sur les chiffres de l'appareil.
@@ -50,6 +50,9 @@
   .step.fait > svg, .step.fait .tx, .step.fait .k{ opacity:.42; } .step.fait .k:has(svg){ opacity:1; } .step.encours .k, .step.encours .p{ color:var(--mtc-accent); }
   .again{ margin-left:18px; color:var(--tint); cursor:pointer; background:none; border:0; padding:0; }
   .later{ display:block; margin:10px 0 0; }
+  /* mode coach : le choix est gardé sur l'appareil (mtc_coach) */
+  .coach{ margin:34px 0 0; padding:14px 0 0; border:0; border-top:1px solid var(--faint); } .coach legend{ padding:0; float:left; width:100%; margin-bottom:8px; }
+  .coach label{ display:flex; align-items:center; gap:9px; padding:4px 0; clear:both; cursor:pointer; } .coach input{ accent-color:var(--mtc-accent); width:16px; height:16px; margin:0; flex:none; }
   svg .l{ fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
   svg .d{ stroke-dasharray:3 3.4; }
   svg .a{ stroke:var(--mtc-accent); } svg .af{ fill:var(--mtc-accent); stroke:var(--mtc-accent); }
@@ -79,14 +82,17 @@
   <div class="goalbar"><i id="goalBar"></i></div>
 
   <h1>Entraînement du jour</h1>
-  <p class="lead" id="lead">Dix minutes sur ce que tu connais le moins.</p>
+  <p class="lead" id="lead">Dix minutes, quatre sujets. Le programme change chaque jour.</p>
   <div id="seance"></div>
   <a class="sc go" id="go" href="entrainement.html">Commencer →</a><button type="button" class="sc again" id="again" hidden>Refaire</button>
   <a class="sc t later" id="later" href="../index.html">Plus tard, aller à la grille</a>
+  <fieldset class="coach"><legend class="sc t">Mode coach</legend>
+    <label><input type="radio" name="coach" value="1"> oui : un entraînement à l’ouverture, chaque jour</label>
+    <label><input type="radio" name="coach" value="0"> non : ouvrir sur la grille</label>
+  </fieldset>
 
 
 
-  <p class="note" id="note">En test : en mode admin, le site s’ouvre sur cette page tant que l’entraînement du jour n’est pas terminé.</p>
 </main>
 <footer><div><span class="sc" id="serie">Série</span>
   <span class="tools">
@@ -97,15 +103,8 @@
   </div></footer>
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../trajets/trajets-jiaohui.js?v=20261005-dist"></script>
-<script src="../beta-config.js?v=20261108-a"></script>
-<script src="../beta-gate.js?v=20261110-a"></script>
 <script>
 (function(){
-  // accès : admins seulement tant que le module n'est pas ouvert dans beta-config.js
-  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"accueil", title:"Entraînement du jour"})){
-    if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
-    throw new Error("accueil : accès réservé");
-  }
   // ---------- vignettes : le plateau de chaque jeu, en traits fins ----------
   const svg = inner => '<svg viewBox="0 0 64 64" aria-hidden="true">' + inner + "</svg>";
   const c = (x, y, r, cls) => '<circle class="l ' + (cls || "") + '" cx="' + x + '" cy="' + y + '" r="' + r + '"/>';
@@ -178,28 +177,35 @@
   document.getElementById("serie").textContent = "Série " + n + (n > 1 ? " jours" : " jour");
 
   // ---------- l'entraînement du jour : quatre étapes, vingt bonnes réponses (l'objectif du jour) ----------
-  const KEY = "mtc_entrainement_v1", VER = 2;   // VER : un programme enregistré avec une ancienne forme est recalculé
+  const KEY = "mtc_entrainement_v1", VER = 3;   // VER : un programme enregistré avec une ancienne forme est recalculé
   // la plus ratée d'une liste de catégories ou de classes déjà vues
   const worst = o => { let w = null; Object.values(o || {}).forEach(c => { const seen = Number(c.seen) || 0, err = Number(c.errors) || 0;
     if(c.name && seen >= 2 && err > 0 && (!w || err / seen > w.r)) w = {r:err / seen, name:String(c.name)}; }); return w; };
+  // Le programme du coach : quatre sujets (les points, les canaux, les circuits, la pharmacopée), un jeu par sujet. D'un jour à l'autre,
+  // le jeu de chaque sujet change et l'ordre des sujets tourne. Jamais le nom d'une catégorie ou d'une classe : ce serait donner une réponse.
   function build(){
-    const steps = [];
-    // 1. une grille d'acupuncture. Jamais le nom d'une catégorie ou d'une classe ici : ce serait donner une réponse de la grille.
-    steps.push({v:"grille", t:"Grille", w:"une grille de points", u:"../index.html", dom:"acupuncture", q:4});
-    // 2. le Quiz : les points arrivés à échéance, sinon ceux de la grille
+    const jour = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5), tour = (list, k) => list[(jour + (k || 0)) % list.length];
+    const A = "acupuncture", P = "pharmacology", G = "../index.html", C = "../circuits/index.html", F = "../formules/index.html";
+    // les points arrivés à échéance au Quiz
     let due = 0;
     try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k.indexOf("mtc_quiz_mastery_") === 0){ const r = read(k); if(r && r.dueAt && new Date(r.dueAt).getTime() <= Date.now()) due++; } } }catch(e){}
-    steps.push({v:"quiz", t:"Quiz", w:due >= 6 ? due + " points à revoir" : "les points de la grille", u:"../index.html", dom:"acupuncture", init:due >= 6 ? "due" : "quiz", q:6});
-    // 3. Correspondance, sur la ligne du canal le moins maîtrisé (anneaux des Réseaux)
+    // la ligne de Correspondance : le canal le moins maîtrisé (anneaux des Réseaux), sinon une ligne différente chaque jour
     const J = window.MTC_TRAJETS_JIAOHUI || {}, cnt = {};
     Object.entries(J).forEach(([code, v]) => { const own = code.split(" ")[0]; if([...new Set((v.canaux || []).concat(v.certains || []))].some(c => c !== own)) cnt[own] = (cnt[own] || 0) + 1; });
-    const lines = ["P", "GI", "E", "Rt", "C", "IG", "V", "Rn", "EC", "TF", "VB", "F"].filter(c => cnt[c] >= 3), ms = read("mtc_circuits_mastery_v1") || {};
+    const lines = ["GI", "E", "Rt", "IG", "V", "TF", "VB"].filter(c => cnt[c] >= 3), ms = read("mtc_circuits_mastery_v1") || {};
     let weak = null; lines.forEach(c => { const m = ms[c]; if(m && m.n >= 1 && (!weak || m.v < weak.v)) weak = {c, v:Number(m.v) || 0}; });
-    const line = weak ? weak.c : lines[d.getDate() % lines.length];
-    steps.push({v:"metro", t:"Correspondance", w:"ligne " + line, u:"../trajets/correspondance.html?ligne=" + line, q:5});
-    // 4. la pharmacopée : une grille si elle a déjà été jouée, sinon des formules
-    const wp = worst((read("mtc_pharma_stats_v1") || {}).classes);
-    steps.push(wp ? {v:"grillePh", t:"Grille", w:"une grille de substances", u:"../index.html", dom:"pharmacology", q:5} : {v:"manquante", t:"Substance manquante", w:"cinq formules", u:"../formules/index.html#jeu", q:5});
+    const line = weak ? weak.c : tour(lines);
+    const points = [{v:"grille", t:"Grille", w:"une grille de points", u:G, dom:A, q:4},
+      {v:"quiz", t:"Quiz", w:due >= 6 ? due + " points à revoir" : "les points de la grille", u:G, dom:A, init:due >= 6 ? "due" : "quiz", q:6}];
+    const canaux = [{v:"metro", t:"Correspondance", w:"ligne " + line, u:"../trajets/correspondance.html?ligne=" + line, q:5},
+      {v:"equilibrer", t:"Équilibrer", w:"les six systèmes", u:C + "#equilibrer", q:3}, {v:"familles", t:"Grille des familles", w:"les familles de canaux", u:C + "#grille", q:4}];
+    const circuits = [{v:"oupas", t:"Circuit ou pas ?", w:"oui ou non", u:C + "#circuitoupas", q:5}, {v:"fermer", t:"Fermer le circuit", w:"compléter un circuit", u:C + "#fermer", q:3},
+      {v:"quel", t:"Quel circuit ?", w:"reconnaître un circuit", u:C + "#quel", q:5}, {v:"plaintes", t:"Trois plaintes", w:"trois plaintes, un circuit", u:C + "#plaintes", q:3},
+      {v:"propagation", t:"Propagation", w:"suivre la propagation", u:C + "#propagation", q:3}, {v:"cache", t:"Le cas mystère", w:"un cas à résoudre", u:C + "#cache", q:2}];
+    const pharma = [{v:"grillePh", t:"Grille", w:"une grille de substances", u:G, dom:P, q:4}, {v:"manquante", t:"Substance manquante", w:"cinq formules", u:F + "#jeu", q:5},
+      {v:"cas", t:"Cas clinique", w:"une consultation", u:F + "#cas", q:1}];
+    const sujets = [tour(points), tour(canaux), tour(circuits), tour(pharma)], k = jour % 4;
+    const steps = sujets.slice(k).concat(sujets.slice(0, k));
     return {d:today, ver:VER, steps, i:0, n:steps.map(() => 0), fin:false};
   }
   let T = read(KEY);
@@ -214,15 +220,21 @@
     // entraînement terminé : la grille reprend sa place
     go.textContent = T.fin ? "Aller à la grille →" : begun ? "Continuer →" : "Commencer →";
     go.setAttribute("href", T.fin ? "../index.html" : "entrainement.html");
-    document.getElementById("lead").textContent = T.fin ? "Terminé pour aujourd’hui." : "Dix minutes sur ce que tu connais le moins.";
+    document.getElementById("lead").textContent = T.fin ? "Terminé pour aujourd’hui." : "Dix minutes, quatre sujets. Le programme change chaque jour.";
     document.getElementById("later").hidden = T.fin;
-    again.hidden = !begun;
+    if(again) again.hidden = !begun;
   }
   drawTraining();
+  // mode coach : oui (par défaut) ou non ; « non » ouvre la grille, et le site s'y ouvrira désormais
+  const coachOn = () => { try{ return localStorage.getItem("mtc_coach") !== "0"; }catch(e){ return true; } };
+  document.querySelectorAll('input[name="coach"]').forEach(r => { r.checked = (r.value === "1") === coachOn();
+    r.addEventListener("change", () => { try{ localStorage.setItem("mtc_coach", r.value); }catch(e){} if(r.value === "0") location.href = "../index.html"; }); });
+  // « Refaire » sert aux essais : réservé au mode admin
+  try{ if(localStorage.getItem("mtc_admin") !== "1") document.getElementById("again").remove(); }catch(e){}
   // « Plus tard » : la grille s'ouvre sans l'entraînement, jusqu'à la prochaine ouverture du site
   document.getElementById("later").addEventListener("click", () => { try{ sessionStorage.setItem("mtc_entrainement_plus_tard", "1"); }catch(e){} });
   // (test) repartir de zéro, avec un programme recalculé
-  document.getElementById("again").addEventListener("click", () => { T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} drawTraining(); });
+  if(document.getElementById("again")) document.getElementById("again").addEventListener("click", () => { T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} drawTraining(); });
   // retour depuis un jeu (page gardée en mémoire par le navigateur) : relire l'état
   window.addEventListener("pageshow", e => { if(e.persisted){ const t = read(KEY); if(t && t.d === today){ T = t; drawTraining(); } } });
 })();
