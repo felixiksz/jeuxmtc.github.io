@@ -347,7 +347,7 @@
   }
   async function loadTrajetsData(){
     // ?v= : un fichier de données modifié ne doit pas rester servi par le cache du navigateur
-    const V = "?v=20261005-dist";
+    const V = "?v=20261113-a";
     if(await loadScript("trajets-data.js" + V)){
       await loadScript("trajets-places-rx.js" + V);
       await loadScript("trajets-complements.js" + V);
@@ -1769,7 +1769,7 @@
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     const small = window.innerWidth < 760;
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
-    main.innerHTML = "<h2>Plan des intersections" + (RT ? "" : ITINERAIRE ? ' <button type="button" class="tool" id="rtStartBtn">Jouer : Itinéraire</button>' : ' <a class="tool" id="jeuCorr" href="correspondance.html">Jouer : Correspondance</a>') + "</h2>" +
+    main.innerHTML = "<h2>Plan des intersections" + (RT ? "" : ITINERAIRE ? ' <button type="button" class="tool" id="rtStartBtn">Jouer : Itinéraire</button>' : ' <a class="tool" id="jeuCorr" href="correspondance.html">Jouer : Correspondance</a> <a class="tool" href="plan.html">Plan par canal</a>') + "</h2>" +
       (RT ? rtPanel() : "") + '<div class="nethl"' + (RT ? ' style="display:none"' : "") + '>Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label><label><input type="checkbox" data-hl="dist"' + (NET_HL.dist ? " checked" : "") + '> canaux distincts</label>' +
       '<label class="nettan"><input type="checkbox" id="tanOn"' + (NET_TAN.on ? " checked" : "") + '> six systèmes (Dr Tán) :</label> <select id="tanSys" aria-label="Système">' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select> <span id="tanInfo" class="nettaninfo"></span></div>' +
       '<div class="nethl netplain"' + (RT ? ' style="display:none"' : "") + '><label><input type="checkbox" id="tanPlain"' + (NET_TAN.plain ? " checked" : "") + '> points sans correspondance</label><span class="nethlkey">tous les points de chaque canal</span></div>' +
@@ -2248,6 +2248,7 @@
 
   document.getElementById("netToggle").addEventListener("click", () => { if(view === "network") show(lastCanal || (data[0] && data[0].code)); else showNetwork(); });
   if(location.hash === "#reseau") showNetwork();
+  else if(location.hash === "#lieux"){ show(data[0] && data[0].code); openIndex(); }   // lien direct vers l'index des zones de correspondance
   else if(location.hash === "#equilibrer") location.replace("../equilibrer/index.html");   // le jeu Équilibrer a sa propre page
   else if(location.hash === "#itineraire"){ if(ITINERAIRE){ showNetwork(); rtStart(); } else location.replace("correspondance.html"); }
   else show(location.hash.slice(1) || (data[0] && data[0].code));

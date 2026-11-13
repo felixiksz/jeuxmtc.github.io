@@ -179,7 +179,7 @@
         ["Comparer A | B", "Plusieurs " + what + " côte à côte.", () => call("toggleComparisonPanel")],
         byId("pharmaCardsButton") && ["Cartes mémo", "Cartes de révision à imprimer, recto verso.", () => clickId("pharmaCardsButton")],
         !pharma && (admin || isPublic("trajets")) && ["Trajets", "Le trajet de chaque canal, en texte et en plan.", () => module("trajets"), "b"],
-        !pharma && (admin || isPublic("trajets")) && ["Plan des intersections", "Les points d’intersection, les six systèmes de Dr Tán et les canaux distincts.", () => module("trajets", "reseau"), "b"],
+        !pharma && (admin || isPublic("trajets")) && ["Plan des intersections", "Les points d’intersection de chaque canal et les canaux qui s’y croisent ; le plan en colonnes, avec les six systèmes de Dr Tán et les canaux distincts.", () => { window.location.href = "trajets/plan.html"; }, "b"],
         pharma && (admin || isPublic("formules")) && ["Formules", "Les fiches des formules.", () => module("formules"), "b"]
       ],
       suivi: [
@@ -703,7 +703,7 @@
     const m = /^#ouvrir-([a-z]+)$/.exec(location.hash);
     if(!m) return;
     const action = {memo:() => call("openCheatsheetPanel"), recherche:() => call("toggleAdvancedSearchPanel"), comparer:() => call("toggleComparisonPanel"), cartes:() => clickId("pharmaCardsButton"),
-      stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }}[m[1]];
+      stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }, revoir:() => { if(window.MTCQuizTest) window.MTCQuizTest.startDueReviewQuiz(); }}[m[1]];
     try{ history.replaceState(null, "", location.pathname + location.search); }catch(error){}
     if(action) setTimeout(action, 700);
   }

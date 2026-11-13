@@ -77,7 +77,7 @@
   <a href="../index.html#ouvrir-comparer" target="_top" title="Comparer A | B" aria-label="Comparer"><svg viewBox="0 0 24 24"><rect class="l" x="3.5" y="4.5" width="7" height="15" rx="1.5"/><rect class="l" x="13.5" y="4.5" width="7" height="15" rx="1.5"/></svg></a>
 </span></div></footer>
 <script src="../modules-theme.js?v=20261005-a"></script>
-<script src="trajets-jiaohui.js?v=20261005-dist"></script>
+<script src="trajets-jiaohui.js?v=20261113-a"></script>
 <script src="../celebrate.js?v=20261112-f"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
@@ -141,6 +141,9 @@
       const good = shuffle(sts.filter(s => s.others.includes(b))).slice(0, 2), bad = shuffle(sts.filter(s => !s.others.includes(b))).slice(0, 5 - good.length);
       if(!bad.length) continue;
       const list = good.concat(bad).sort((x, y) => x.n - y.n);
+      // La bonne station tombait trop souvent à un bout de la ligne (beaucoup de canaux se croisent à leurs premiers ou à leurs
+      // derniers points) : ces trajets-là ne sont gardés qu'une fois sur trois, pour que le bout de la ligne ne soit pas la réponse à deviner.
+      if(t < 280 && ((list[list.length - 1].others.includes(b) && Math.random() > .32) || (list[0].others.includes(b) && Math.random() > .25))) continue;
       R = {a, b, list, veh:rnd(VEH), tried:new Set(), done:false, errs:0};
       S.used.add(a + ">" + b);
       break;
