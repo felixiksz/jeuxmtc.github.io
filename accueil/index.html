@@ -50,6 +50,13 @@
   .step.fait > svg, .step.fait .tx, .step.fait .k{ opacity:.42; } .step.fait .k:has(svg){ opacity:1; } .step.encours .k, .step.encours .p{ color:var(--mtc-accent); }
   .again{ margin-left:18px; color:var(--tint); cursor:pointer; background:none; border:0; padding:0; }
   .later{ display:block; margin:10px 0 0; }
+  /* les questions du coach : une réponse par ligne, comme les étapes du programme */
+  .step.ch{ grid-template-columns:minmax(0, 1fr) auto; width:100%; background:none; border:0; border-top:1px solid var(--faint); border-bottom:1px solid var(--faint); margin-top:-1px;
+    font:inherit; color:inherit; text-align:left; cursor:pointer; padding:13px 0; }
+  .step.ch:hover .p{ color:var(--mtc-accent); }
+  .back, .encore{ display:block; margin:16px 0 0; background:none; border:0; padding:0; cursor:pointer; }
+  .encore{ margin-top:10px; color:var(--mtc-accent); }
+  [hidden]{ display:none !important; }
   /* Coach / Libre : le même interrupteur que sur la grille (comme Auto / Manuel) ; le choix est gardé sur l'appareil (mtc_coach) */
   .mode{ display:inline-flex; align-items:baseline; gap:5px; white-space:nowrap; }
   .mode button{ background:none; border:0; padding:0; color:var(--text-color); cursor:pointer; }
@@ -82,11 +89,15 @@
   <span class="sc t" id="goalTxt">Aujourd’hui</span>
   <div class="goalbar"><i id="goalBar"></i></div>
 
-  <h1>Entraînement du jour</h1>
+  <h1 id="titre">Entraînement du jour</h1>
   <p class="lead" id="lead">Dix minutes, quatre sujets. Le programme change chaque jour.</p>
   <div id="seance"></div>
-  <a class="sc go" id="go" href="entrainement.html">Commencer →</a><button type="button" class="sc again" id="again" hidden>Refaire</button>
-  <a class="sc t later" id="later" href="../index.html">Plus tard, aller à la grille</a>
+  <div id="actions">
+    <a class="sc go" id="go" href="entrainement.html">Commencer →</a><button type="button" class="sc again" id="again" hidden>Refaire</button>
+    <a class="sc t later" id="later" href="../index.html">Plus tard, aller à la grille</a>
+    <button type="button" class="sc encore" id="encore" hidden>Continuer avec le coach →</button>
+  </div>
+  <p class="note" id="note">Le coach (non IA) compose le programme d’après tes réponses et tes résultats.</p>
 
 
 
@@ -179,11 +190,9 @@
   // la plus ratée d'une liste de catégories ou de classes déjà vues
   const worst = o => { let w = null; Object.values(o || {}).forEach(c => { const seen = Number(c.seen) || 0, err = Number(c.errors) || 0;
     if(c.name && seen >= 2 && err > 0 && (!w || err / seen > w.r)) w = {r:err / seen, name:String(c.name)}; }); return w; };
-  // Le programme du coach : quatre sujets (les points, les canaux, les circuits, la pharmacopée), un jeu par sujet. D'un jour à l'autre,
-  // le jeu de chaque sujet change et l'ordre des sujets tourne. Jamais le nom d'une catégorie ou d'une classe : ce serait donner une réponse.
-  function build(extra){
-    // extra : programme supplémentaire du même jour (le coach rappelé après la fin de l'entraînement) : d'autres jeux, un autre ordre
-    const jour = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5) + (extra || 0) * 5, tour = (list, k) => list[(jour + (k || 0)) % list.length];
+  // ---------- les jeux que le coach peut proposer ----------
+  const numJour = extra => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5) + (extra || 0) * 5;
+  function catalogue(jour){
     const A = "acupuncture", P = "pharmacology", G = "../index.html", C = "../circuits/index.html", F = "../formules/index.html";
     // les points arrivés à échéance au Quiz
     let due = 0;
@@ -193,54 +202,142 @@
     Object.entries(J).forEach(([code, v]) => { const own = code.split(" ")[0]; if([...new Set((v.canaux || []).concat(v.certains || []))].some(c => c !== own)) cnt[own] = (cnt[own] || 0) + 1; });
     const lines = ["GI", "E", "Rt", "IG", "V", "TF", "VB"].filter(c => cnt[c] >= 3), ms = read("mtc_circuits_mastery_v1") || {};
     let weak = null; lines.forEach(c => { const m = ms[c]; if(m && m.n >= 1 && (!weak || m.v < weak.v)) weak = {c, v:Number(m.v) || 0}; });
-    const line = weak ? weak.c : tour(lines);
-    const points = [{v:"grille", t:"Grille", w:"une grille de points", u:G, dom:A, q:4},
-      {v:"quiz", t:"Quiz", w:due >= 6 ? due + " points à revoir" : "les points de la grille", u:G, dom:A, init:due >= 6 ? "due" : "quiz", q:6}];
-    const canaux = [{v:"metro", t:"Correspondance", w:"ligne " + line, u:"../trajets/correspondance.html?ligne=" + line, q:5},
-      {v:"equilibrer", t:"Équilibrer", w:"les six systèmes", u:C + "#equilibrer", q:3}, {v:"familles", t:"Grille des familles", w:"les familles de canaux", u:C + "#grille", q:4}];
-    const circuits = [{v:"oupas", t:"Circuit ou pas ?", w:"oui ou non", u:C + "#circuitoupas", q:5}, {v:"fermer", t:"Fermer le circuit", w:"compléter un circuit", u:C + "#fermer", q:3},
-      {v:"quel", t:"Quel circuit ?", w:"reconnaître un circuit", u:C + "#quel", q:5}, {v:"plaintes", t:"Trois plaintes", w:"trois plaintes, un circuit", u:C + "#plaintes", q:3},
-      {v:"propagation", t:"Propagation", w:"suivre la propagation", u:C + "#propagation", q:3}, {v:"cache", t:"Le cas mystère", w:"un cas à résoudre", u:C + "#cache", q:2}];
-    const pharma = [{v:"grillePh", t:"Grille", w:"une grille de substances", u:G, dom:P, q:4}, {v:"manquante", t:"Substance manquante", w:"cinq formules", u:F + "#jeu", q:5},
-      {v:"cas", t:"Cas clinique", w:"une consultation", u:F + "#cas", q:1}];
-    const sujets = [tour(points), tour(canaux), tour(circuits), tour(pharma)], k = jour % 4;
-    const steps = sujets.slice(k).concat(sujets.slice(0, k));
-    return {d:today, ver:VER, extra:extra || 0, steps, i:0, n:steps.map(() => 0), fin:false};
+    const line = weak ? weak.c : lines[jour % lines.length];
+    // Jamais le nom d'une catégorie ou d'une classe dans ces libellés : ce serait donner une réponse.
+    return {due, jeux:{
+      grille:{v:"grille", t:"Grille", w:"une grille de points", u:G, dom:A, q:4},
+      quiz:{v:"quiz", t:"Quiz", w:due >= 6 ? due + " points à revoir" : "les points de la grille", u:G, dom:A, init:due >= 6 ? "due" : "quiz", q:6},
+      revoir:{v:"quiz", t:"Quiz", w:due + (due > 1 ? " points à revoir" : " point à revoir"), u:G, dom:A, init:"due", q:Math.max(1, Math.min(6, due))},
+      metro:{v:"metro", t:"Correspondance", w:"ligne " + line, u:"../trajets/correspondance.html?ligne=" + line, q:5},
+      equilibrer:{v:"equilibrer", t:"Équilibrer", w:"les six systèmes", u:C + "#equilibrer", q:3},
+      familles:{v:"familles", t:"Grille des familles", w:"les familles de canaux", u:C + "#grille", q:4},
+      oupas:{v:"oupas", t:"Circuit ou pas ?", w:"oui ou non", u:C + "#circuitoupas", q:5},
+      fermer:{v:"fermer", t:"Fermer le circuit", w:"compléter un circuit", u:C + "#fermer", q:3},
+      quel:{v:"quel", t:"Quel circuit ?", w:"reconnaître un circuit", u:C + "#quel", q:5},
+      plaintes:{v:"plaintes", t:"Trois plaintes", w:"trois plaintes, un circuit", u:C + "#plaintes", q:3},
+      propagation:{v:"propagation", t:"Propagation", w:"suivre la propagation", u:C + "#propagation", q:3},
+      cache:{v:"cache", t:"Le cas mystère", w:"un cas à résoudre", u:C + "#cache", q:2},
+      grillePh:{v:"grillePh", t:"Grille", w:"une grille de substances", u:G, dom:P, q:4},
+      manquante:{v:"manquante", t:"Substance manquante", w:"des formules à compléter", u:F + "#jeu", q:5},
+      cas:{v:"cas", t:"Cas clinique", w:"une consultation", u:F + "#cas", q:1}}};
   }
+  const programme = (steps, extra, choix) => ({d:today, ver:VER, extra:extra || 0, choix:choix || "", steps, i:0, n:steps.map(() => 0), fin:false});
+  // Le programme du jour : quatre sujets (les points, les canaux, les circuits, la pharmacopée), un jeu par sujet. D'un jour à l'autre,
+  // le jeu de chaque sujet change et l'ordre des sujets tourne.
+  function varie(extra){
+    const jour = numJour(extra), K = catalogue(jour).jeux, tour = list => list[jour % list.length];
+    const sujets = [tour([K.grille, K.quiz]), tour([K.metro, K.equilibrer, K.familles]), tour([K.oupas, K.fermer, K.quel, K.plaintes, K.propagation, K.cache]), tour([K.grillePh, K.manquante, K.cas])], k = jour % 4;
+    return sujets.slice(k).concat(sujets.slice(0, k));
+  }
+  const build = extra => programme(varie(extra), extra);
+
+  // ---------- après l'entraînement du jour : le coach demande ce qu'on veut réviser ----------
+  // Un arbre de questions : chaque réponse mène à une autre question, ou à des jeux. Les réponses du jour font le programme.
+  const TOUT = "Un peu de tout";
+  const arbre = due => ({q:"Que veux-tu réviser ?", c:[
+    {t:"L’acupuncture", q:"Quoi, en acupuncture ?", c:[
+      {t:"Les points", q:"Comment veux-tu les revoir ?", c:[
+        {t:"Retrouver des groupes de points", w:"Grille", jeux:["grille"]},
+        {t:"Répondre à des questions", w:"Quiz", jeux:["quiz"]},
+        due > 0 && {t:"Revoir mes erreurs", w:due + (due > 1 ? " points à revoir" : " point à revoir"), jeux:["revoir"]},
+        {t:TOUT, jeux:["grille", "quiz"]}]},
+      {t:"Les canaux", q:"Quoi, sur les canaux ?", c:[
+        {t:"Où ils se croisent", w:"Correspondance", jeux:["metro"]},
+        {t:"Les six systèmes", w:"Équilibrer", jeux:["equilibrer"]},
+        {t:"Les familles de canaux", w:"Grille des familles", jeux:["familles"]},
+        {t:TOUT, jeux:["metro", "equilibrer", "familles"]}]},
+      {t:"Les circuits", q:"Quoi, sur les circuits ?", c:[
+        {t:"Les reconnaître", w:"Circuit ou pas ?, Quel circuit ?", jeux:["oupas", "quel"]},
+        {t:"Les construire", w:"Fermer le circuit", jeux:["fermer"]},
+        {t:"Raisonner sur un cas", w:"Trois plaintes, Propagation, Le cas mystère", jeux:["plaintes", "propagation", "cache"]},
+        {t:TOUT, jeux:["oupas", "fermer", "plaintes", "quel"]}]},
+      {t:TOUT, jeux:["grille", "metro", "oupas", "quiz"]}]},
+    {t:"La pharmacopée", q:"Quoi, en pharmacopée ?", c:[
+      {t:"Les substances", w:"Grille", jeux:["grillePh"]},
+      {t:"Les formules", w:"Substance manquante", jeux:["manquante"]},
+      {t:"Un cas clinique", w:"Cas clinique", jeux:["cas"]},
+      {t:TOUT, jeux:["grillePh", "manquante", "cas"]}]},
+    {t:TOUT, w:"le coach choisit", jeux:null}]});
+  // dernière question : le temps. Il fixe le nombre d'étapes ; avec peu de jeux, chaque étape dure plus longtemps.
+  const TEMPS = {q:"Combien de temps ?", c:[{t:"Cinq minutes", L:2}, {t:"Dix minutes", L:4}, {t:"Vingt minutes", L:8}]};
+  function surMesure(feuille, L, extra){
+    const jour = numJour(extra), K = catalogue(jour).jeux;
+    let list = feuille.jeux ? feuille.jeux.map(id => K[id]).filter(Boolean) : varie(extra);
+    const r = jour % list.length; list = list.slice(r).concat(list.slice(0, r));     // l'ordre change d'un jour à l'autre
+    if(list.length > L) list = list.slice(0, L);
+    const fois = Math.max(1, Math.min(4, Math.round(L / list.length)));   // au plus quatre fois la durée normale d'un jeu
+    return list.map(g => Object.assign({}, g, {q:g.q * fois}));
+  }
+
   let T = read(KEY);
   if(!T || T.d !== today || T.ver !== VER || !Array.isArray(T.steps)){ T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} }
-  // le coach demandé depuis la grille (bouton « Coach ») alors que l'entraînement du jour est fini : un nouveau programme
-  if(/[?&]coach=1/.test(location.search)){
-    if(T.fin){ T = build((T.extra || 0) + 1); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} }
-    try{ history.replaceState(null, "", location.pathname); }catch(e){}
-  }
+  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} };
+  const $ = id => document.getElementById(id), esc = t => String(t).replace(/[&<>]/g, "");
   const CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path class="l a" d="M2 6.5L5 9.5L10.5 2.5"/></svg>';
+  let Q = null;   // questions en cours : {chemin:[réponses], noeud, feuille}
   function drawTraining(){
     const begun = T.fin || T.i > 0 || T.n.some(x => x > 0);
-    document.getElementById("seance").innerHTML = T.steps.map((st, i) => { const plein = T.n[i] >= st.q, fait = plein || T.fin || i < T.i, cur = !fait && begun && i === T.i;
+    $("titre").textContent = T.choix ? "Ton programme" : "Entraînement du jour";
+    $("seance").innerHTML = T.steps.map((st, i) => { const plein = T.n[i] >= st.q, fait = plein || T.fin || i < T.i, cur = !fait && begun && i === T.i;
       return '<a class="step' + (fait ? " fait" : cur ? " encours" : "") + '" href="entrainement.html#' + (i + 1) + '"><span class="k">' + (plein ? CHECK : i + 1) + "</span>" + V[st.v] +
-        '<span class="tx"><span class="n">' + st.t + '</span><span class="w">' + String(st.w).replace(/[&<>]/g, "") + '</span></span><span class="sc t p">' + (!plein && T.n[i] ? T.n[i] + " sur " + st.q : "") + "</span></a>"; }).join("");
-    const go = document.getElementById("go"), again = document.getElementById("again");
-    // entraînement terminé : la grille reprend sa place
+        '<span class="tx"><span class="n">' + st.t + '</span><span class="w">' + esc(st.w) + '</span></span><span class="sc t p">' + (!plein && T.n[i] ? T.n[i] + " sur " + st.q : "") + "</span></a>"; }).join("");
+    const go = $("go"), again = $("again");
+    // entraînement terminé : la grille reprend sa place, ou le coach continue en demandant ce qu'on veut réviser
     go.textContent = T.fin ? "Aller à la grille →" : begun ? "Continuer →" : "Commencer →";
     go.setAttribute("href", T.fin ? "../index.html" : "entrainement.html");
-    document.getElementById("lead").textContent = T.fin ? "Terminé pour aujourd’hui." : "Dix minutes, quatre sujets. Le programme change chaque jour.";
-    document.getElementById("later").hidden = T.fin;
+    $("lead").textContent = T.fin ? "Terminé." + (T.choix ? "" : " C’était l’entraînement du jour.") : T.choix || "Dix minutes, quatre sujets. Le programme change chaque jour.";
+    $("later").hidden = T.fin;
+    $("encore").hidden = !T.fin;
+    $("actions").hidden = false;
     if(again) again.hidden = !begun;
   }
+  function drawQ(){
+    const n = Q.noeud;
+    $("titre").textContent = n.q;
+    $("lead").textContent = Q.chemin.length ? Q.chemin.join(" › ") : "Tes réponses font le programme.";
+    $("seance").innerHTML = n.c.filter(Boolean).map((c, i) => '<button type="button" class="step ch" data-ch="' + i + '"><span class="tx"><span class="n">' + esc(c.t) + "</span>" + (c.w ? '<span class="w">' + esc(c.w) + "</span>" : "") +
+      '</span><span class="sc t p">→</span></button>').join("") + '<button type="button" class="sc t back" data-back="1">← ' + (Q.pile.length ? "Question précédente" : "Annuler") + "</button>";
+    $("actions").hidden = true;
+  }
+  function ask(){ Q = {chemin:[], pile:[], noeud:arbre(catalogue(numJour()).due), feuille:null}; drawQ(); window.scrollTo(0, 0); }
+  $("seance").addEventListener("click", e => {
+    if(!Q) return;
+    const b = e.target.closest("[data-ch], [data-back]");
+    if(!b) return;
+    if(b.dataset.back){
+      if(!Q.pile.length){ Q = null; drawTraining(); return; }
+      Q.noeud = Q.pile.pop(); Q.chemin.pop(); Q.feuille = null; drawQ(); return;
+    }
+    const c = Q.noeud.c.filter(Boolean)[+b.dataset.ch];
+    if(Q.noeud === TEMPS){
+      // toutes les réponses sont là : le programme sur mesure
+      const extra = (T.extra || 0) + 1;
+      T = programme(surMesure(Q.feuille, c.L, extra), extra, Q.chemin.concat(c.t.toLowerCase()).join(" › "));
+      save(); Q = null; drawTraining(); return;
+    }
+    Q.pile.push(Q.noeud); Q.chemin.push(c.t);
+    if(c.c){ Q.noeud = c; } else { Q.feuille = c; Q.noeud = TEMPS; }
+    drawQ();
+  });
+  $("encore").addEventListener("click", ask);
   drawTraining();
+  // le coach demandé depuis la grille (bouton « Coach ») alors que le programme est fini : il demande ce qu'on veut réviser
+  if(/[?&]coach=1/.test(location.search)){
+    if(T.fin) ask();
+    try{ history.replaceState(null, "", location.pathname); }catch(e){}
+  }
   // Coach / Libre : cette page est le mode coach ; « Libre » ouvre la grille, et le site s'y ouvrira désormais
   try{ localStorage.setItem("mtc_coach", "1"); }catch(e){}
-  document.getElementById("mode").addEventListener("click", e => { const b = e.target.closest("[data-coach]"); if(!b || b.dataset.coach !== "0") return;
+  $("mode").addEventListener("click", e => { const b = e.target.closest("[data-coach]"); if(!b || b.dataset.coach !== "0") return;
     try{ localStorage.setItem("mtc_coach", "0"); }catch(er){} location.href = "../index.html"; });
   // « Refaire » sert aux essais : réservé au mode admin
-  try{ if(localStorage.getItem("mtc_admin") !== "1") document.getElementById("again").remove(); }catch(e){}
+  try{ if(localStorage.getItem("mtc_admin") !== "1") $("again").remove(); }catch(e){}
   // « Plus tard » : la grille s'ouvre sans l'entraînement, jusqu'à la prochaine ouverture du site
-  document.getElementById("later").addEventListener("click", () => { try{ sessionStorage.setItem("mtc_entrainement_plus_tard", "1"); }catch(e){} });
-  // (test) repartir de zéro, avec un programme recalculé
-  if(document.getElementById("again")) document.getElementById("again").addEventListener("click", () => { T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} drawTraining(); });
+  $("later").addEventListener("click", () => { try{ sessionStorage.setItem("mtc_entrainement_plus_tard", "1"); }catch(e){} });
+  // (test) repartir de zéro, avec le programme du jour
+  if($("again")) $("again").addEventListener("click", () => { T = build(); save(); Q = null; drawTraining(); });
   // retour depuis un jeu (page gardée en mémoire par le navigateur) : relire l'état
-  window.addEventListener("pageshow", e => { if(e.persisted){ const t = read(KEY); if(t && t.d === today){ T = t; drawTraining(); } } });
+  window.addEventListener("pageshow", e => { if(e.persisted){ const t = read(KEY); if(t && t.d === today){ T = t; if(!Q) drawTraining(); } } });
 })();
 </script>
 </body>
