@@ -52,6 +52,14 @@
     const d = await open(), s = d.transaction(store).objectStore(store);
     return Promise.all(keys.map(k => reqp(s.get(k))));
   }
+  async function deleteMany(store, keys){
+    const d = await open();
+    for(let i = 0; i < keys.length; i += 400){
+      const tx = d.transaction(store, "readwrite"), s = tx.objectStore(store);
+      keys.slice(i, i + 400).forEach(k => s.delete(k));
+      await done(tx);
+    }
+  }
   async function removePack(packId){
     const d = await open();
     for(const store of ["decks", "notes", "cards", "media"]){
@@ -96,5 +104,5 @@
     urls.set(k, u); return u;
   }
 
-  root.MTCAnkiStore = {open, putMany, getAll, get, getMany, removePack, savePack, packs, progressOf, saveProgress, mediaUrl, DAYS};
+  root.MTCAnkiStore = {open, putMany, getAll, get, getMany, deleteMany, removePack, savePack, packs, progressOf, saveProgress, mediaUrl, DAYS};
 })(window);

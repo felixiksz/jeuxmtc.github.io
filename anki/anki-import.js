@@ -39,7 +39,7 @@
     const n = model.fields.map(f => f.toLowerCase().trim()), has = x => n.includes(x), name = model.name.toLowerCase();
     if(n.some(f => /^qtype/.test(f)) && has("answers")) return "mc10";
     if(has("question") && has("a") && has("b") && has("answers")) return "mc";
-    if(has("question") && has("items") && /match|ikkz/.test(name)) return "match";
+    if(has("items") && (has("question") || /match|ikkz|pair|associ/.test(name))) return "match";
     if(model.cloze || /cloze|trous/.test(name)) return "cloze";
     return "basic";
   }
@@ -95,8 +95,11 @@
       notes[id] = {id:guid, mid:+mid, type:m.type, model:m.name, fields:f, tags:String(tags || "").trim()};
     });
     const cards = [], used = new Set();
-    all("select id, nid, did, odid, ord from cards").forEach(([id, nid, did, odid, ord]) => {
+    const clozeSeen = new Set();
+    all("select id, nid, did, odid, ord from cards order by ord").forEach(([id, nid, did, odid, ord]) => {
       const n = notes[nid]; if(!n) return;
+      // texte à trous : Anki fait une carte par numéro de trou ; ici tous les trous sont posés sur une seule carte, chacun se dévoile à part
+      if(n.type === "cloze"){ if(clozeSeen.has(nid)) return; clozeSeen.add(nid); }
       const d = odid ? odid : did, key = n.id + ":" + ord;
       if(used.has(key)) return; used.add(key);
       cards.push({id:key, nid:n.id, deck:String(d), ord});

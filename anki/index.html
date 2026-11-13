@@ -53,11 +53,13 @@
   .snd{ width:30px; height:30px; border:1px solid var(--text-color); border-radius:50%; font-size:.7rem; line-height:1; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; margin:0 3px; }
   .cz-blank{ color:var(--mtc-accent); font-weight:800; } .cz-hl{ color:var(--good); font-weight:800; }
   .opts{ display:flex; flex-direction:column; gap:8px; } .opt{ display:flex; align-items:flex-start; gap:12px; padding:11px 12px; border:1px solid var(--faint); border-radius:10px; cursor:pointer; transition:border-color .15s, background .15s; }
-  .opt .tag{ flex:none; width:24px; height:24px; border:1.6px solid var(--text-color); border-radius:50%; font:800 .66rem/22px 'Archivo', sans-serif; text-align:center; } .opt .txt{ flex:1; min-width:0; }
+  .opt .tag{ flex:none; width:20px; height:20px; margin-top:2px; border:1.6px solid var(--text-color); border-radius:50%; position:relative; } .opt.multi .tag{ border-radius:5px; }
+  .opt.multi.on .tag::after, .opt.multi.good .tag::after{ content:""; position:absolute; left:5px; top:1px; width:5px; height:10px; border:solid var(--page-bg); border-width:0 2px 2px 0; transform:rotate(45deg); }
+  .opt:not(.multi).on .tag::after{ content:""; position:absolute; inset:3px; border-radius:50%; background:var(--page-bg); } .opt .txt{ flex:1; min-width:0; }
   .opt.on{ border-color:var(--mtc-accent); background:color-mix(in srgb, var(--mtc-accent) 8%, var(--page-bg)); } .opt.on .tag{ background:var(--mtc-accent); border-color:var(--mtc-accent); color:var(--page-bg); }
   .opt.good{ border-color:var(--good); background:color-mix(in srgb, var(--good) 10%, var(--page-bg)); } .opt.bad{ border-color:var(--bad); background:color-mix(in srgb, var(--bad) 9%, var(--page-bg)); }
   .opt.missed{ border-style:dashed; } .opt.neutral{ opacity:.6; } .opt .verdict{ font-weight:800; color:var(--tint); }
-  .opt.kp{ cursor:default; flex-wrap:wrap; } .opt .yn{ display:flex; gap:8px; margin-left:36px; width:100%; } .opt .yn button{ padding:7px 18px; border:1px solid var(--text-color); border-radius:999px; font:800 .66rem 'Archivo', sans-serif; text-transform:uppercase; letter-spacing:.08em; }
+  .opt.kp{ cursor:default; flex-wrap:wrap; } .opt .yn{ display:flex; gap:8px; width:100%; } .opt .yn button{ padding:7px 18px; border:1px solid var(--text-color); border-radius:999px; font:800 .66rem 'Archivo', sans-serif; text-transform:uppercase; letter-spacing:.08em; }
   .opt .yn button.on{ background:var(--text-color); color:var(--page-bg); }
   .pairs{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; } .prow{ display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:center; padding:9px 10px; border:1px solid var(--faint); border-radius:10px; }
   .prow.act{ border-color:var(--mtc-accent); } .prow.good{ border-color:var(--good); background:color-mix(in srgb, var(--good) 10%, var(--page-bg)); } .prow.bad{ border-color:var(--bad); background:color-mix(in srgb, var(--bad) 9%, var(--page-bg)); }
@@ -83,9 +85,9 @@
 <script src="vendor/fflate.js"></script>
 <script src="vendor/fzstd.js"></script>
 <script src="vendor/sql-wasm.js"></script>
-<script src="anki-import.js?v=20261114-a"></script>
-<script src="anki-store.js?v=20261114-a"></script>
-<script src="anki-cards.js?v=20261114-a"></script>
-<script src="anki-app.js?v=20261114-a"></script>
+<script src="anki-import.js?v=20261113-b"></script>
+<script src="anki-store.js?v=20261113-b"></script>
+<script src="anki-cards.js?v=20261113-b"></script>
+<script src="anki-app.js?v=20261113-b"></script>
 </body>
 </html>

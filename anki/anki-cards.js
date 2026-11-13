@@ -105,16 +105,36 @@
   function cloze(zone, note, card, H){
     const L = lower(note.fields), ctx = H.ctx, keys = Object.keys(L);
     const tk = keys.find(k => /\{\{c\d+::/.test(L[k])) || firstOf(L, ["content", "text", "texte"]) || keys[0];
-    const n = card.ord + 1, src = tk ? String(L[tk]) : "";
-    const render = reveal => src.replace(CLOZE, (m, k, a, hint) => +k === n ? (reveal ? '<span class="cz-hl">' + a + "</span>" : '<span class="cz-blank">[' + (hint ? esc(hint.replace(/<[^>]*>/g, "")) : "…") + "]</span>") : a);
-    const q = el("div", "q"); q.appendChild(html(render(false), ctx)); zone.appendChild(q);
+    // Tous les trous du texte sont cachés en même temps ; toucher un trou le dévoile (les trous du même numéro ensemble).
+    const parts = [], marked = (tk ? String(L[tk]) : "").replace(CLOZE, (m, k, a, hint) => { parts.push({n:+k, a, hint:hint ? hint.replace(/<[^>]*>/g, "").trim() : ""}); return "" + (parts.length - 1) + ""; });
+    const q = el("div", "q"), body = html(marked, ctx); q.appendChild(body); zone.appendChild(q);
+    const spans = [];
+    const tw = document.createTreeWalker(body, NodeFilter.SHOW_TEXT), hit = [];
+    while(tw.nextNode()) if(/\d+/.test(tw.currentNode.nodeValue)) hit.push(tw.currentNode);
+    hit.forEach(t => {
+      const frag = document.createDocumentFragment();
+      t.nodeValue.split(/(\d+)/).forEach(p => { const m = /^(\d+)$/.exec(p);
+        if(!m){ if(p) frag.appendChild(document.createTextNode(p)); return; }
+        const part = parts[+m[1]], s = el("span", "cz-blank", esc("[" + (part.hint || "…") + "]"));
+        s.setAttribute("role", "button"); s.tabIndex = 0; s.title = "Toucher pour dévoiler";
+        spans.push({s, part}); s.addEventListener("click", () => reveal(part.n)); s.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); reveal(part.n); } });
+        frag.appendChild(s); });
+      t.parentNode.replaceChild(frag, t);
+    });
+    const shown = new Set(), numbers = [...new Set(parts.map(p => p.n))];
     const ans = el("div", "ans"); ans.hidden = true; zone.appendChild(ans);
-    H.bar([{t:"Afficher la réponse", cls:"main", on:() => {
-      q.replaceChildren(html(render(true), ctx));
+    function reveal(n){
+      if(shown.has(n)) return; shown.add(n);
+      spans.forEach(x => { if(x.part.n !== n) return; x.s.className = "cz-hl"; x.s.removeAttribute("role"); x.s.removeAttribute("tabindex"); x.s.removeAttribute("title"); x.s.replaceChildren(...html(x.part.a, ctx).childNodes); });
+      if(shown.size >= numbers.length) finish(); else bar();
+    }
+    function bar(){ const left = numbers.length - shown.size; H.bar([{t:numbers.length > 1 && shown.size === 0 ? "Tout dévoiler" : left > 1 ? "Dévoiler les " + left + " trous" : "Dévoiler le dernier trou", cls:"main", on:() => numbers.forEach(reveal)}]); }
+    function finish(){
       keys.forEach(k => { if(k !== tk && !/^cloze99$/.test(k) && !empty(L[k])){ const lab = k.replace(/_/g, " "); ans.appendChild(block(lab.charAt(0).toUpperCase() + lab.slice(1), html(L[k], ctx))); } });
       ans.hidden = !ans.childNodes.length; H.autoplay(zone);
       H.bar([{t:"À revoir", cls:"no", on:() => H.finish(false)}, {t:"Je savais", cls:"ok", on:() => H.finish(true)}]);
-    }}]);
+    }
+    if(!numbers.length){ H.bar([{t:"Afficher la réponse", cls:"main", on:finish}]); } else bar();
   }
 
   // ---------- 3 et 4. choix multiples ----------
@@ -125,8 +145,8 @@
     const list = el("div", "opts"); zone.appendChild(list);
     const state = o.opts.map(() => null);   // null, true (coché / vrai) ou false (faux, en kprim)
     const rows = o.opts.map((opt, i) => {
-      const r = el("div", "opt" + (o.mode === "kprim" ? " kp" : ""));
-      const tag = el("span", "tag", o.letters ? o.letters[i].toUpperCase() : String(i + 1)); r.appendChild(tag);
+      const r = el("div", "opt" + (o.mode === "kprim" ? " kp" : o.mode === "multi" ? " multi" : ""));   // case ronde : un seul choix ; case carrée : plusieurs choix
+      if(o.mode !== "kprim") r.appendChild(el("span", "tag"));   // pas de lettre ni de numéro : une case ronde qui se remplit à la sélection
       r.appendChild(el("div", "txt")).appendChild(html(opt.html, ctx));
       if(o.mode === "kprim"){
         const yn = el("span", "yn"); [["Vrai", true], ["Faux", false]].forEach(([t, v]) => { const b = el("button", "", t); b.type = "button"; b.addEventListener("click", () => { if(done) return; state[i] = v; paint(); }); b.dataset.v = String(v); yn.appendChild(b); });
@@ -134,7 +154,7 @@
       }else{
         r.setAttribute("role", "button"); r.tabIndex = 0;
         const tap = () => { if(done) return; if(o.mode === "single") state.fill(null); state[i] = state[i] ? null : true; paint(); };
-        r.addEventListener("click", tap); r.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); tap(); } });
+        r.addEventListener("click", () => { tap(); r.blur(); }); r.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); tap(); } });
       }
       list.appendChild(r); return r;
     });
@@ -184,11 +204,28 @@
   }
 
   // ---------- 5. paires ----------
-  const splitPairs = items => String(items || "").split(/<br\s*\/?>|<\/div>|<\/p>|\n/i).map(l => l.replace(/<\/?(div|p)[^>]*>/gi, "")).map(l => { const i = l.indexOf("::"); return i < 0 ? null : [l.slice(0, i), l.slice(i + 2)]; }).filter(p => p && p[0].trim() && p[1].trim());
+  // Lignes d'un champ : on coupe aux <br>, aux blocs (div, p, li, tableaux, titres) et aux retours à la ligne.
+  const lines = s => String(s || "").replace(/<br[^>]*>|<\/?(?:div|p|li|ul|ol|tr|table|tbody|thead|blockquote|h[1-6])\b[^>]*>/gi, "\n").split(/\r?\n|\u2028/);
+  const plain = s => String(s).replace(/<[^>]*>/g, "").replace(/&nbsp;|\u00a0/g, " ").trim();
+  // une ligne « gauche::droite » (les trous {{c1::…}} d'un texte à trous n'en sont pas)
+  const pairOf = l => { if(/\{\{c\d+::/.test(l)) return null; const i = l.indexOf("::"); if(i < 0) return null; const a = l.slice(0, i), b = l.slice(i + 2); return plain(a) && plain(b) ? [a, b] : null; };
+  const splitPairs = text => lines(text).map(pairOf).filter(Boolean);
+  const pairLines = text => lines(text).filter(l => pairOf(l)).length;
+  // le champ qui contient les paires, et le reste du texte (la consigne)
+  function pairsOf(L){
+    const keys = Object.keys(L).filter(k => !empty(L[k]));
+    const best = (L.items != null && pairLines(L.items) >= 1) ? "items" : keys.sort((a, b) => pairLines(L[b]) - pairLines(L[a]))[0];
+    if(!best || !pairLines(L[best])) return null;
+    const rest = lines(L[best]).filter(l => !pairOf(l) && plain(l)).join("<br>");
+    const intro = ["question", "front", "recto"].filter(k => k !== best).map(k => L[k]).find(x => x && !empty(x));   // la consigne peut être dans un autre champ
+    const question = [intro, rest].filter(x => x && !empty(x)).join("<br>");
+    return {pairs:splitPairs(L[best]), question, note:L.note};
+  }
   function match(zone, note, card, H){
-    const L = lower(note.fields), ctx = H.ctx, pairs = splitPairs(L.items);
-    if(pairs.length < 2){ return basic(zone, note, card, H, {front:(L.question ? L.question + "<br>" : "") + (pairs[0] ? pairs[0][0] : L.items || ""), back:pairs[0] ? pairs[0][1] : ""}); }
-    zone.appendChild(el("div", "q")).appendChild(html(L.question || "Associe chaque élément.", ctx));
+    const L = lower(note.fields), ctx = H.ctx, P = pairsOf(L) || {pairs:[], question:L.question || "", note:L.note}, pairs = P.pairs;
+    if(pairs.length < 2){ return basic(zone, note, card, H, {front:(P.question ? P.question + "<br>" : "") + (pairs[0] ? pairs[0][0] : L.items || ""), back:pairs[0] ? pairs[0][1] : ""}); }
+    L.note = P.note;
+    zone.appendChild(el("div", "q")).appendChild(html(P.question || "Associe chaque élément.", ctx));
     const rowsEl = el("div", "pairs"), pool = el("div", "pool"); zone.appendChild(rowsEl); zone.appendChild(pool);
     const key = s => textOf(s, ctx).toLowerCase();
     const order = pairs.map((p, i) => i).sort(() => Math.random() - .5);   // l'ordre des réponses est mélangé
@@ -219,7 +256,12 @@
   }
 
   const TYPES = {basic, cloze, mc, mc10, match};
-  function mount(zone, note, card, H){ (TYPES[note.type] || basic)(zone, note, card, H); }
+  // Un recto / verso dont un champ contient plusieurs lignes « gauche::droite » est une carte de paires : le type de note n'est pas toujours reconnu.
+  function typeOf(note){
+    if(note.type === "basic"){ const L = lower(note.fields); if(Object.keys(L).some(k => pairLines(L[k]) >= 2)) return "match"; }
+    return note.type;
+  }
+  function mount(zone, note, card, H){ (TYPES[typeOf(note)] || basic)(zone, note, card, H); }
   const mediaNames = note => { const set = new Set(); Object.values(note.fields).forEach(v => { String(v).replace(/(?:src)\s*=\s*["']([^"']+)["']/gi, (m, a) => { set.add(a); return m; }).replace(/\[sound:([^\]]+)\]/g, (m, a) => { set.add(a); return m; }); }); return [...set]; };
 
   root.MTCAnkiCards = {mount, html, mediaNames, splitPairs, TYPES};

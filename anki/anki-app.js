@@ -113,6 +113,16 @@
     }
     return gone;
   }
+  // Texte à trous : une seule carte par note (tous les trous d'un coup). Les paquets importés avant ce changement ont une carte par
+  // numéro de trou : on garde la première et on supprime les autres, une seule fois.
+  async function migrateCloze(){
+    if(pref("mtc_anki_mig_cloze", "") === "1") return;
+    const notes = await S.getAll("notes"), cards = await S.getAll("cards");
+    const cl = new Set(notes.filter(n => n.type === "cloze").map(n => n.id)), seen = new Set(), drop = [];
+    cards.sort((a, b) => a.ord - b.ord).forEach(c => { if(!cl.has(c.nid)) return; if(seen.has(c.nid)) drop.push(c.id); else seen.add(c.nid); });
+    if(drop.length){ await S.deleteMany("cards", drop); await reconcile(); }
+    setPref("mtc_anki_mig_cloze", "1");
+  }
   $("file").addEventListener("change", async e => {
     const files = [...e.target.files]; e.target.value = ""; if(!files.length) return;
     let msg = "";
@@ -174,5 +184,16 @@
   async function start2(){ await load(); await start(); }
 
   window.addEventListener("pagehide", () => { if(AUDIO) try{ AUDIO.pause(); }catch(e){} });
-  S.open().then(home).catch(err => { app.innerHTML = '<p class="err">Le stockage de cet appareil n’est pas disponible (navigation privée ?) : ' + esc(err && err.message || err) + "</p>"; });
+  // Espace : l'action principale de la barre du bas (afficher, valider, « Je savais », suivant), comme dans Anki.
+  document.addEventListener("keydown", e => {
+    if(e.key !== " " || e.repeat || e.defaultPrevented || !SES) return;
+    const t = e.target;
+    if(t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+    if(t && t.matches && t.matches(":focus-visible") && /^(BUTTON|A)$/.test(t.tagName)) return;   // au clavier, un bouton sélectionné garde son action
+    const b = [...barIn.querySelectorAll("button")].filter(x => !x.disabled).pop();
+    e.preventDefault(); if(b) b.click();
+  });
+  // un bouton touché à la souris ou au doigt ne garde pas le focus (l'espace doit avancer, pas le rappuyer)
+  app.addEventListener("click", e => { const b = e.target.closest("button, [role=button]"); if(b && b.blur) b.blur(); });
+  S.open().then(migrateCloze).then(home).catch(err => { app.innerHTML = '<p class="err">Le stockage de cet appareil n’est pas disponible (navigation privée ?) : ' + esc(err && err.message || err) + "</p>"; });
 })();
