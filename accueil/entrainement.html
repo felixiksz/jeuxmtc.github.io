@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FCFCFA">
+<meta name="robots" content="noindex, nofollow">
+<title>Entraînement du jour</title>
+<link href="../fonts/fonts.css?v=20261006-a" rel="stylesheet">
+<style>
+  /* EN TEST, mode admin seulement : l'enchaînement de l'entraînement du jour (voir accueil/index.html).
+     Un bandeau fin reste au-dessus du jeu : étape en cours, traits qui se remplissent avec les bonnes réponses
+     (le compteur de l'objectif du jour, celebrate.js), et la suite proposée quand l'étape est faite. Le jeu n'est
+     jamais coupé : c'est la joueuse qui clique sur « Suite ». Ici le jeu est dans un cadre ; dans le vrai site,
+     le bandeau serait ajouté à chaque page de jeu. */
+  :root{ --page-bg:#FCFCFA; --text-color:#271629; --shadow-color:#0000FF; --mtc-accent:#0000FF;
+    --tint:color-mix(in srgb, var(--text-color) 58%, var(--page-bg)); --faint:color-mix(in srgb, var(--text-color) 16%, var(--page-bg)); }
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; }
+  body{ margin:0; background:var(--page-bg); color:var(--text-color); font:400 15px/1.4 'Archivo', sans-serif; -webkit-font-smoothing:antialiased; display:flex; flex-direction:column; height:100dvh; }
+  .sc{ font:800 .68rem/1.3 'Archivo', sans-serif; letter-spacing:.09em; text-transform:uppercase; }
+  .t{ color:var(--tint); } a{ color:inherit; text-decoration:none; }
+  .band{ flex:none; border-bottom:1px solid var(--text-color); }
+  .band .in{ max-width:560px; margin:0 auto; padding:10px 20px 9px; }
+  .row{ display:flex; align-items:baseline; gap:12px; }
+  .now{ flex:1; min-width:0; }
+  .what{ margin:5px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:.9rem; }
+  .go{ flex:none; color:var(--tint); cursor:pointer; background:none; border:0; padding:0; transition:letter-spacing .25s, color .3s; } .go:hover{ letter-spacing:.14em; }
+  .go.ready{ color:var(--mtc-accent); animation:nudge 1.6s ease-in-out 2; } @keyframes nudge{ 50%{ transform:translateX(4px); } }
+  .segs{ display:flex; gap:4px; margin-top:8px; }
+  .segs span{ display:block; height:3px; background:var(--faint); } .segs i{ display:block; height:3px; width:0; background:var(--mtc-accent); transition:width .6s cubic-bezier(.2,.8,.2,1); }
+  .segs span.cur{ background:color-mix(in srgb, var(--text-color) 34%, var(--page-bg)); }
+  iframe{ flex:1; width:100%; border:0; display:block; background:var(--page-bg); }
+  /* fin de l'entraînement */
+  #fin{ display:none; flex:1; overflow:auto; } .done iframe{ display:none; } .done #fin{ display:block; }
+  #fin .in{ max-width:560px; margin:0 auto; padding:34px 20px 60px; }
+  h1{ font:400 1.7rem/1.15 'Libre Baskerville', Georgia, serif; margin:0 0 6px; }
+  .lead{ margin:0 0 22px; color:var(--tint); }
+  ul{ list-style:none; margin:0 0 22px; padding:0; } li{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid var(--faint); } li:last-child{ border-bottom:1px solid var(--faint); }
+  li .w{ color:var(--tint); } li .sc{ flex:none; white-space:nowrap; padding-top:3px; }
+  .more{ display:inline-block; color:var(--mtc-accent); transition:letter-spacing .25s; } .more:hover{ letter-spacing:.14em; }
+  @media (prefers-reduced-motion:reduce){ .go.ready{ animation:none; } }
+</style>
+</head>
+<body>
+<div class="band"><div class="in">
+  <div class="row"><a class="sc" id="back" href="index.html" aria-label="Retour à l’accueil">←</a><span class="sc now" id="now"></span><button type="button" class="sc go" id="suite">Passer →</button></div>
+  <p class="what" id="what"></p>
+  <div class="segs" id="segs"></div>
+</div></div>
+<iframe id="jeu" title="Jeu de l’étape en cours"></iframe>
+<div id="fin"><div class="in">
+  <h1>Entraînement terminé</h1>
+  <p class="lead" id="finLead"></p>
+  <ul id="finList"></ul>
+  <a class="sc more" href="index.html">Retour à l’accueil →</a>
+</div></div>
+<script src="../modules-theme.js?v=20261005-a"></script>
+<script src="../beta-config.js?v=20261108-a"></script>
+<script src="../beta-gate.js?v=20261110-a"></script>
+<script>
+(function(){
+  "use strict";
+  // accès : admins seulement tant que le module n'est pas ouvert dans beta-config.js
+  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"accueil", title:"Entraînement du jour"})){
+    if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
+    throw new Error("accueil : accès réservé");
+  }
+  const KEY = "mtc_entrainement_v1", DOMAIN = "mtcStudyDomainChoice";
+  const read = k => { try{ return JSON.parse(localStorage.getItem(k) || "null"); }catch(e){ return null; } };
+  const d = new Date(), today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  const T = read(KEY);
+  // le programme est calculé par l'accueil ; sans programme du jour, on y retourne
+  if(!T || T.d !== today || !Array.isArray(T.steps)){ location.replace("index.html"); return; }
+  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} };
+  const $ = id => document.getElementById(id), frame = $("jeu"), suite = $("suite");
+  // bonnes réponses d'aujourd'hui sur cet appareil : le compteur que tous les jeux font avancer
+  const count = () => { const o = read("mtc_daily_goal_v1"); return o && o.d === today ? Number(o.n) || 0 : 0; };
+  let last = count();
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[ch]));
+  const total = T.steps.reduce((n, s) => n + s.q, 0);
+
+  function paint(){
+    const s = T.steps[T.i], ok = s && T.n[T.i] >= s.q, lastStep = T.i >= T.steps.length - 1;
+    $("segs").innerHTML = T.steps.map((st, i) => '<span class="' + (i === T.i ? "cur" : "") + '" style="flex:' + st.q + '"><i style="width:' + Math.min(100, Math.round((T.n[i] || 0) / st.q * 100)) + '%"></i></span>').join("");
+    if(!s) return;
+    $("now").textContent = "Entraînement · " + (T.i + 1) + " sur " + T.steps.length;
+    $("what").innerHTML = esc(s.t) + ' <span class="t">· ' + esc(s.w) + "</span>";
+    suite.textContent = ok ? (lastStep ? "Terminer →" : "Suite : " + T.steps[T.i + 1].t + " →") : lastStep ? "Terminer →" : "Passer →";
+    suite.classList.toggle("ready", ok);
+  }
+  function open(i){
+    T.i = i; save();
+    if(i >= T.steps.length) return finish();
+    const s = T.steps[i];
+    // la grille s'ouvre sur la bonne matière
+    if(s.dom){ if(T.dom === undefined) T.dom = localStorage.getItem(DOMAIN); try{ localStorage.setItem(DOMAIN, s.dom); }catch(e){} save(); }
+    last = count();
+    frame.onload = () => {
+      // le Quiz s'ouvre tout seul, sur les points à revoir quand il y en a assez
+      if(s.init === "quiz" || s.init === "due") setTimeout(() => { try{ const Q = frame.contentWindow.MTCQuizTest; if(Q) (s.init === "due" ? Q.startDueReviewQuiz : Q.open)(); }catch(e){} }, 900);
+    };
+    frame.src = s.u;
+    paint();
+  }
+  function restoreDomain(){ if(T.dom !== undefined){ try{ if(T.dom) localStorage.setItem(DOMAIN, T.dom); else localStorage.removeItem(DOMAIN); }catch(e){} delete T.dom; save(); } }
+  function finish(){
+    T.fin = true; save(); restoreDomain();
+    document.body.classList.add("done"); frame.src = "about:blank";
+    const got = T.steps.reduce((a, st, i) => a + Math.min(T.n[i] || 0, st.q), 0), s = read("mtc_daily_streak_v1"), n = s && Number(s.count) || 0;
+    $("now").textContent = "Entraînement du jour"; $("what").style.display = "none"; suite.style.visibility = "hidden";
+    $("finLead").textContent = got + (got > 1 ? " bonnes réponses" : " bonne réponse") + " sur " + total + (n ? " · série de " + n + (n > 1 ? " jours" : " jour") : "") + ".";
+    $("finList").innerHTML = T.steps.map((st, i) => "<li><span>" + esc(st.t) + ' <span class="w">· ' + esc(st.w) + '</span></span><span class="sc t">' + Math.min(T.n[i] || 0, st.q) + " sur " + st.q + "</span></li>").join("");
+    paint();
+  }
+  // les bonnes réponses données dans le jeu remplissent l'étape en cours
+  function sync(){
+    if(T.fin) return;
+    const c = count();
+    if(c > last){ T.n[T.i] = (T.n[T.i] || 0) + (c - last); last = c; save(); paint(); }
+    else if(c < last) last = c;
+  }
+  window.addEventListener("storage", e => { if(e.key === "mtc_daily_goal_v1") sync(); });
+  setInterval(sync, 800);
+  suite.addEventListener("click", () => open(T.i + 1));
+  $("back").addEventListener("click", restoreDomain);
+  window.addEventListener("pagehide", restoreDomain);
+
+  // #3 : aller droit à une étape (clic sur une vignette de l'accueil)
+  const h = parseInt(location.hash.slice(1), 10);
+  if(h >= 1 && h <= T.steps.length){ T.fin = false; open(h - 1); }
+  else if(T.fin) finish();
+  else open(Math.min(T.i || 0, T.steps.length - 1));
+})();
+</script>
+</body>
+</html>

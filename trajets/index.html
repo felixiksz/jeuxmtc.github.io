@@ -312,7 +312,7 @@
 <script src="../beta-config.js?v=20261108-a"></script>
 <script src="../beta-gate.js?v=20261110-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261112-c"></script>
+<script src="../beta-modules.js?v=20261113-a"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -1459,6 +1459,8 @@
   // 3 : + vaisseaux luò et canaux distincts (passerelles). Options : trajet imposé par une zone, défi chronométré (5 missions).
   const MV6 = new Set(["CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"]);
   const RT_LEVELS = {1:"lignes principales", 2:"+ merveilleux vaisseaux", 3:"+ luò et canaux distincts"};
+  // l'Itinéraire est retiré de l'interface pour l'instant : le jeu du module est « Correspondance » (correspondance.html)
+  const ITINERAIRE = false;
   let RT = null;
   let RT_OPT = {level:1, zone:false, chrono:false, perfect:0, played:0};
   try{ Object.assign(RT_OPT, JSON.parse(localStorage.getItem("mtc_trajets_route") || "{}")); }catch(e){}
@@ -1767,7 +1769,7 @@
       '<span class="nettools"><button type="button" class="linkish" data-net="all">tout afficher</button> · <button type="button" class="linkish" data-net="none">tout masquer</button></span></div>';
     const small = window.innerWidth < 760;
     const width = lastX + 160, height = ry(stations.length - 1) + 70;
-    main.innerHTML = "<h2>Plan des intersections" + (RT ? "" : ' <button type="button" class="tool" id="rtStartBtn">Jouer : Itinéraire</button>') + "</h2>" +
+    main.innerHTML = "<h2>Plan des intersections" + (RT ? "" : ITINERAIRE ? ' <button type="button" class="tool" id="rtStartBtn">Jouer : Itinéraire</button>' : ' <a class="tool" id="jeuCorr" href="correspondance.html">Jouer : Correspondance</a>') + "</h2>" +
       (RT ? rtPanel() : "") + '<div class="nethl"' + (RT ? ' style="display:none"' : "") + '>Surbrillance : <label><input type="checkbox" data-hl="mv"' + (NET_HL.mv ? " checked" : "") + '> merveilleux vaisseaux</label><label><input type="checkbox" data-hl="luo"' + (NET_HL.luo ? " checked" : "") + '> vaisseaux luò</label><label><input type="checkbox" data-hl="dist"' + (NET_HL.dist ? " checked" : "") + '> canaux distincts</label>' +
       '<label class="nettan"><input type="checkbox" id="tanOn"' + (NET_TAN.on ? " checked" : "") + '> six systèmes (Dr Tán) :</label> <select id="tanSys" aria-label="Système">' + Object.keys(TAN_SYSTEMS).map(n => '<option value="' + n + '"' + (String(NET_TAN.sys) === n ? " selected" : "") + ">Système " + n + "</option>").join("") + '<option value="all"' + (NET_TAN.sys === "all" ? " selected" : "") + '>Systèmes 1 à 5</option></select> <span id="tanInfo" class="nettaninfo"></span></div>' +
       '<div class="nethl netplain"' + (RT ? ' style="display:none"' : "") + '><label><input type="checkbox" id="tanPlain"' + (NET_TAN.plain ? " checked" : "") + '> points sans correspondance</label><span class="nethlkey">tous les points de chaque canal</span></div>' +
@@ -2247,7 +2249,7 @@
   document.getElementById("netToggle").addEventListener("click", () => { if(view === "network") show(lastCanal || (data[0] && data[0].code)); else showNetwork(); });
   if(location.hash === "#reseau") showNetwork();
   else if(location.hash === "#equilibrer") location.replace("../equilibrer/index.html");   // le jeu Équilibrer a sa propre page
-  else if(location.hash === "#itineraire"){ showNetwork(); rtStart(); }
+  else if(location.hash === "#itineraire"){ if(ITINERAIRE){ showNetwork(); rtStart(); } else location.replace("correspondance.html"); }
   else show(location.hash.slice(1) || (data[0] && data[0].code));
   // lien direct vers une liste de correspondances : index.html?lieu=yeux
   const lieu = new URLSearchParams(location.search).get("lieu");

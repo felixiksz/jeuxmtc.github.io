@@ -156,18 +156,22 @@
   function items(){
     const pharma = isPharma(), admin = isAdmin();
     const what = pharma ? "substances" : "points";
+    // nouvel accueil (accueil/) : en test, mode admin seulement
+    const NOUVEL_ACCUEIL = ["Entraînement du jour", "Le nouvel accueil, en test : visible en mode admin seulement.", () => module("accueil")];
     const I = {
       jouer: pharma ? [
+        admin && NOUVEL_ACCUEIL,
         ["Grille", "Le jeu principal, version pharmacopée.", () => {}],
         (admin || isPublic("formules")) && ["Substance manquante", "Retrouver la substance cachée d’une formule.", () => module("formules", "jeu"), "b"],
         (admin || isPublic("formules")) && ["Cas clinique", "Faire un diagnostic de pharmacopée.", () => module("formules", "cas"), "b"]
       ] : [
+        admin && NOUVEL_ACCUEIL,
         ["Grille", "Le jeu principal : retrouver les groupes de quatre points.", () => {}],
         window.MTCQuizTest && ["Quiz", "Questions à choix sur les points.", () => window.MTCQuizTest.open()],
         // série Réseaux (bêta) : elle contient Équilibrer ; tant qu'elle n'est pas ouverte, les joueur·ses gardent Équilibrer seul
         (admin || isPublic("circuits")) ? ["「 ✦ RÉSEAUX ✦ 」", "Les six systèmes et les circuits de Dr Tán : équilibrer, fermer un circuit, trois plaintes, propagation, familles, quatre membres.", () => module("circuits"), "b"]
           : ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("equilibrer"), "b"],
-        (admin || isPublic("trajets")) && ["Itinéraire", "Relier deux points par le plan des intersections.", () => module("trajets", "itineraire"), "b"]
+        (admin || isPublic("trajets")) && ["Correspondance", "Un métro arrêté par des travaux : trouver la station où il peut changer de canal.", () => { window.location.href = "trajets/correspondance.html"; }, "b"]
       ],
       reviser: [
         ["Mémo", pharma ? "Toutes les substances, rangées par catégorie." : "Tous les points, rangés par catégorie.", () => call("openCheatsheetPanel")],
@@ -694,4 +698,15 @@
   }
   window.mtcOpenMainMenu = open;
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+  // lien direct depuis une autre page (barre d'outils des modules, accueil) : index.html#ouvrir-recherche, -memo, -comparer…
+  function openFromHash(){
+    const m = /^#ouvrir-([a-z]+)$/.exec(location.hash);
+    if(!m) return;
+    const action = {memo:() => call("openCheatsheetPanel"), recherche:() => call("toggleAdvancedSearchPanel"), comparer:() => call("toggleComparisonPanel"), cartes:() => clickId("pharmaCardsButton"),
+      stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }}[m[1]];
+    try{ history.replaceState(null, "", location.pathname + location.search); }catch(error){}
+    if(action) setTimeout(action, 700);
+  }
+  if(document.readyState === "complete") openFromHash(); else window.addEventListener("load", openFromHash);
+  window.addEventListener("hashchange", openFromHash);
 })();
