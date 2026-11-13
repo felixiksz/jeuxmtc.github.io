@@ -53,7 +53,7 @@
   <h1>Entraînement terminé</h1>
   <p class="lead" id="finLead"></p>
   <ul id="finList"></ul>
-  <a class="sc more" href="index.html">Retour à l’accueil →</a>
+  <a class="sc more" href="../index.html">Aller à la grille →</a>
 </div></div>
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
@@ -97,11 +97,23 @@
     if(s.dom){ if(T.dom === undefined) T.dom = localStorage.getItem(DOMAIN); try{ localStorage.setItem(DOMAIN, s.dom); }catch(e){} save(); }
     last = count();
     frame.onload = () => {
+      alleger();
       // le Quiz s'ouvre tout seul, sur les points à revoir quand il y en a assez
       if(s.init === "quiz" || s.init === "due") setTimeout(() => { try{ const Q = frame.contentWindow.MTCQuizTest; if(Q) (s.init === "due" ? Q.startDueReviewQuiz : Q.open)(); }catch(e){} }, 900);
     };
     frame.src = s.u;
     paint();
+  }
+  // Pendant l'entraînement, l'écran du jeu est allégé (ses choix du 13/11/2026 sur la maquette). Restent : le plateau, le son,
+  // Auto / Manuel, le cadenas, le sous-titre du point, les vies, l'astuce, et recherche / panier / comparer. Sont cachés : le menu,
+  // Nouvelle partie, Acu / Pharma, le curseur de difficulté, « À revoir », le trait d'objectif, la série, la collection, soutien et message.
+  const CACHE = "#mtcMenuButton, .topbar-main-buttons, .mtc-domain-switch:not(#mtcAutoManual), #practiceDifficultySliderWrap, #mtcDueReviewButton, .mtc-goalbar, #mtcStreakCorner, " +
+    '#mtcBottomIcons [data-for="__collection"], #supportCoffeeButton, #mtcSupportLabel, #suggestionMailButton, ' +
+    // pages de module (Correspondance, Formules, Réseaux) : retour à l'accueil, record, corrections et aide
+    "a.home, #back, #rec, #corrBtn, #tourBtn";
+  function alleger(){
+    try{ const d = frame.contentDocument; if(!d || !d.head || d.getElementById("mtcEntrainementCss")) return;
+      const st = d.createElement("style"); st.id = "mtcEntrainementCss"; st.textContent = CACHE + "{ display:none !important; }"; d.head.appendChild(st); }catch(e){}
   }
   function restoreDomain(){ if(T.dom !== undefined){ try{ if(T.dom) localStorage.setItem(DOMAIN, T.dom); else localStorage.removeItem(DOMAIN); }catch(e){} delete T.dom; save(); } }
   function finish(){

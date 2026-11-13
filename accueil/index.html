@@ -9,7 +9,8 @@
 <link href="../fonts/fonts.css?v=20261006-a" rel="stylesheet">
 <style>
   /* Nouvel accueil, EN TEST : mode admin seulement (beta-gate, module « accueil » absent de beta-config.js).
-     L'entraînement du jour, puis tous les jeux et tous les outils de révision, chacun avec la vignette de son écran.
+     La page sur laquelle le site s'ouvre tant que l'entraînement du jour n'est pas terminé (redirection au début de index.html) :
+     le programme du jour, rien d'autre. Le menu reste celui de la grille.
      Objectif du jour, série et entraînement : calculés sur les chiffres de l'appareil.
      L'entraînement se joue dans entrainement.html (bandeau au-dessus du jeu). */
   :root{ --page-bg:#FCFCFA; --text-color:#271629; --shadow-color:#0000FF; --mtc-accent:#0000FF;
@@ -48,6 +49,7 @@
   /* étape faite : cochée et estompée ; étape en cours : numéro en bleu */
   .step.fait > svg, .step.fait .tx, .step.fait .k{ opacity:.42; } .step.fait .k:has(svg){ opacity:1; } .step.encours .k, .step.encours .p{ color:var(--mtc-accent); }
   .again{ margin-left:18px; color:var(--tint); cursor:pointer; background:none; border:0; padding:0; }
+  .later{ display:block; margin:10px 0 0; }
   svg .l{ fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
   svg .d{ stroke-dasharray:3 3.4; }
   svg .a{ stroke:var(--mtc-accent); } svg .af{ fill:var(--mtc-accent); stroke:var(--mtc-accent); }
@@ -71,37 +73,20 @@
 </head>
 <body>
 <main>
-  <div class="top"><span class="sc">Connections MTC</span><a class="sc t" href="../index.html"><svg viewBox="0 0 12 10" width="12" height="10" style="margin-right:6px" aria-hidden="true"><path class="l" d="M1 1.5H11M1 5H11M1 8.5H11"/></svg>Menu</a></div>
+  <div class="top"><span class="sc">Connections MTC</span><a class="sc t" href="../index.html#ouvrir-menu"><svg viewBox="0 0 12 10" width="12" height="10" style="margin-right:6px" aria-hidden="true"><path class="l" d="M1 1.5H11M1 5H11M1 8.5H11"/></svg>Menu</a></div>
 
   <span class="sc t" id="goalTxt">Aujourd’hui</span>
   <div class="goalbar"><i id="goalBar"></i></div>
 
   <h1>Entraînement du jour</h1>
-  <p class="lead">Dix minutes sur ce que tu connais le moins.</p>
+  <p class="lead" id="lead">Dix minutes sur ce que tu connais le moins.</p>
   <div id="seance"></div>
   <a class="sc go" id="go" href="entrainement.html">Commencer →</a><button type="button" class="sc again" id="again" hidden>Refaire</button>
-
-  <h2>Acupuncture</h2>
-  <span class="sc t sub">Jeux · les points</span>
-  <div class="tiles" id="points"></div>
-  <span class="sc t sub">Jeux · les canaux</span>
-  <div class="tiles" id="canaux"></div>
-  <span class="sc t sub">Jeux · les circuits</span>
-  <div class="tiles" id="circuits"></div>
-  <span class="sc t sub outils">Outils de révision</span>
-  <div class="tiles" id="outilsAcu"></div>
-
-  <h2>Pharmacopée</h2>
-  <span class="sc t sub">Jeux</span>
-  <div class="tiles" id="pharma"></div>
-  <span class="sc t sub outils">Outils de révision</span>
-  <div class="tiles" id="outilsPh"></div>
-
-  <h2>Suivi</h2>
-  <div class="tiles s4" id="suivi" style="margin-top:18px"></div>
+  <a class="sc t later" id="later" href="../index.html">Plus tard, aller à la grille</a>
 
 
-  <p class="note" id="note">En test : cette page n’est visible qu’en mode admin.</p>
+
+  <p class="note" id="note">En test : en mode admin, le site s’ouvre sur cette page tant que l’entraînement du jour n’est pas terminé.</p>
 </main>
 <footer><div><span class="sc" id="serie">Série</span>
   <span class="tools">
@@ -109,7 +94,7 @@
     <a href="../index.html#ouvrir-panier" title="Panier" aria-label="Panier"><svg viewBox="0 0 24 24"><path class="l" d="M4 9H20L18.3 19.5H5.7Z"/><path class="l" d="M8.5 9L11 3.5M15.5 9L13 3.5"/></svg></a>
     <a href="../index.html#ouvrir-comparer" title="Comparer A | B" aria-label="Comparer"><svg viewBox="0 0 24 24"><rect class="l" x="3.5" y="4.5" width="7" height="15" rx="1.5"/><rect class="l" x="13.5" y="4.5" width="7" height="15" rx="1.5"/></svg></a>
   </span>
-  <a class="sc t" href="../index.html">La grille</a></div></footer>
+  </div></footer>
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../trajets/trajets-jiaohui.js?v=20261005-dist"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
@@ -181,20 +166,6 @@
   };
   const tile = g => '<a class="tile" href="' + g[2] + '"' + (g[5] ? ' data-dom="' + g[5] + '"' : "") + ">" + (g[4] ? '<span class="k">' + g[4] + "</span>" : "") + V[g[0]] + '<span class="n">' + g[1] + "</span>" + (g[3] ? '<span class="w">' + g[3] + "</span>" : "") + "</a>";
   const fill = (id, list) => { document.getElementById(id).innerHTML = list.map(tile).join(""); };
-  const A = "acupuncture", P = "pharmacology", G = "../index.html";
-  fill("points", [["grille", "Grille", G, "", "", A], ["quiz", "Quiz", G + "#ouvrir-quiz", "", "", A]]);
-  fill("canaux", [["equilibrer", "Équilibrer", "../equilibrer/index.html"], ["metro", "Correspondance", "../trajets/correspondance.html"], ["familles", "Grille des familles", "../circuits/index.html#grille"]]);
-  fill("circuits", [["fermer", "Fermer le circuit", "../circuits/index.html#fermer"], ["quel", "Quel circuit ?", "../circuits/index.html#quel"], ["oupas", "Circuit ou pas ?", "../circuits/index.html#circuitoupas"],
-    ["plaintes", "Trois plaintes", "../circuits/index.html#plaintes"], ["propagation", "Propagation", "../circuits/index.html#propagation"], ["cache", "Le cas mystère", "../circuits/index.html#cache"]]);
-  fill("pharma", [["grillePh", "Grille", G, "", "", P], ["manquante", "Substance manquante", "../formules/index.html#jeu"], ["cas", "Cas clinique", "../formules/index.html#cas"]]);
-  // les outils de révision du menu, tous : ce ne sont pas des jeux, on s'en sert comme d'un lexique
-  fill("outilsAcu", [["tableau", "Mémo", G + "#ouvrir-memo", "par catégorie", "", A], ["recherche", "Recherche", G + "#ouvrir-recherche", "points, intersections", "", A], ["comparer", "Comparer A | B", G + "#ouvrir-comparer", "côte à côte", "", A],
-    ["memo", "Cartes mémo", G + "#ouvrir-cartes", "à imprimer", "", A], ["trajets", "Trajets", "../trajets/index.html", "texte et plan"], ["plan", "Plan des intersections", "../trajets/index.html#reseau", "six systèmes, canaux distincts"]]);
-  fill("outilsPh", [["tableau", "Mémo", G + "#ouvrir-memo", "par catégorie", "", P], ["recherche", "Recherche", G + "#ouvrir-recherche", "nom, nature, saveur, tropisme", "", P], ["comparer", "Comparer A | B", G + "#ouvrir-comparer", "côte à côte", "", P],
-    ["memo", "Cartes mémo", G + "#ouvrir-cartes", "à imprimer", "", P], ["formules", "Formules", "../formules/index.html", "les fiches"]]);
-  fill("suivi", [["stats", "Statistiques", G + "#ouvrir-stats"], ["panier", "Panier", G + "#ouvrir-panier"], ["collection", "Collection", G + "#ouvrir-collection"], ["jours", "Série", G + "#ouvrir-stats"]]);
-  // un jeu ou un outil de la grille s'ouvre sur la bonne matière
-  document.addEventListener("click", e => { const a = e.target.closest && e.target.closest("a[data-dom]"); if(a){ try{ localStorage.setItem("mtcStudyDomainChoice", a.dataset.dom); }catch(er){} } });
 
   // ---------- vrais chiffres : objectif du jour et série ----------
   const read = k => { try{ return JSON.parse(localStorage.getItem(k) || "null"); }catch(e){ return null; } };
@@ -240,11 +211,16 @@
       return '<a class="step' + (fait ? " fait" : cur ? " encours" : "") + '" href="entrainement.html#' + (i + 1) + '"><span class="k">' + (plein ? CHECK : i + 1) + "</span>" + V[st.v] +
         '<span class="tx"><span class="n">' + st.t + '</span><span class="w">' + String(st.w).replace(/[&<>]/g, "") + '</span></span><span class="sc t p">' + (!plein && T.n[i] ? T.n[i] + " sur " + st.q : "") + "</span></a>"; }).join("");
     const go = document.getElementById("go"), again = document.getElementById("again");
-    go.textContent = T.fin ? "Terminé pour aujourd’hui" : begun ? "Continuer →" : "Commencer →";
-    go.style.color = T.fin ? "var(--tint)" : ""; go.style.pointerEvents = T.fin ? "none" : "";
+    // entraînement terminé : la grille reprend sa place
+    go.textContent = T.fin ? "Aller à la grille →" : begun ? "Continuer →" : "Commencer →";
+    go.setAttribute("href", T.fin ? "../index.html" : "entrainement.html");
+    document.getElementById("lead").textContent = T.fin ? "Terminé pour aujourd’hui." : "Dix minutes sur ce que tu connais le moins.";
+    document.getElementById("later").hidden = T.fin;
     again.hidden = !begun;
   }
   drawTraining();
+  // « Plus tard » : la grille s'ouvre sans l'entraînement, jusqu'à la prochaine ouverture du site
+  document.getElementById("later").addEventListener("click", () => { try{ sessionStorage.setItem("mtc_entrainement_plus_tard", "1"); }catch(e){} });
   // (test) repartir de zéro, avec un programme recalculé
   document.getElementById("again").addEventListener("click", () => { T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} drawTraining(); });
   // retour depuis un jeu (page gardée en mémoire par le navigateur) : relire l'état

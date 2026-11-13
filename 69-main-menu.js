@@ -706,7 +706,7 @@
     const m = /^#ouvrir-([a-z]+)$/.exec(location.hash);
     if(!m) return;
     const action = {memo:() => call("openCheatsheetPanel"), recherche:() => call("toggleAdvancedSearchPanel"), comparer:() => call("toggleComparisonPanel"), cartes:() => clickId("pharmaCardsButton"),
-      stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }, revoir:() => { if(window.MTCQuizTest) window.MTCQuizTest.startDueReviewQuiz(); }}[m[1]];
+      stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }, menu:() => open(), revoir:() => { if(window.MTCQuizTest) window.MTCQuizTest.startDueReviewQuiz(); }}[m[1]];
     try{ history.replaceState(null, "", location.pathname + location.search); }catch(error){}
     if(action) setTimeout(action, 700);
   }
