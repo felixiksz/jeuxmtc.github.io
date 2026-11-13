@@ -178,6 +178,8 @@
         ["Recherche", pharma ? "Substances par nom, nature, saveur, tropisme." : "Points, points d’intersection, huit merveilleux vaisseaux.", () => call("toggleAdvancedSearchPanel")],
         ["Comparer A | B", "Plusieurs " + what + " côte à côte.", () => call("toggleComparisonPanel")],
         byId("pharmaCardsButton") && ["Cartes mémo", "Cartes de révision à imprimer, recto verso.", () => clickId("pharmaCardsButton")],
+        // paquets Anki importés dans le jeu (module anki/) : admin seulement tant que « anki » n'est pas ouvert dans beta-config.js
+        (admin || isPublic("anki")) && ["Cartes Anki", "Tes paquets Anki, importés et révisés dans le jeu.", () => { window.location.href = "anki/index.html"; }, "b"],
         !pharma && (admin || isPublic("trajets")) && ["Trajets", "Le trajet de chaque canal, en texte et en plan.", () => module("trajets"), "b"],
         !pharma && (admin || isPublic("trajets")) && ["Plan des intersections", "Les points d’intersection de chaque canal et les canaux qui s’y croisent ; le plan en colonnes, avec les six systèmes de Dr Tán et les canaux distincts.", () => { window.location.href = "trajets/plan.html"; }, "b"],
         pharma && (admin || isPublic("formules")) && ["Formules", "Les fiches des formules.", () => module("formules"), "b"],

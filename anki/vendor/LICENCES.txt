@@ -1,0 +1,4 @@
+Bibliothèques tierces utilisées par le module Cartes Anki (copies exactes des paquets npm, non modifiées) :
+- sql.js 1.12.0 (SQLite compilé en WebAssembly) — licence MIT — https://github.com/sql-js/sql.js
+- fflate 0.8.2 (décompression zip) — licence MIT — https://github.com/101arrowz/fflate
+- fzstd 0.1.1 (décompression Zstandard) — licence MIT — https://github.com/101arrowz/fzstd

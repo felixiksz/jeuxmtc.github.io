@@ -39,7 +39,16 @@
   ul{ list-style:none; margin:0 0 22px; padding:0; } li{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid var(--faint); } li:last-child{ border-bottom:1px solid var(--faint); }
   li .w{ color:var(--tint); } li .sc{ flex:none; white-space:nowrap; padding-top:3px; }
   .more{ display:inline-block; color:var(--mtc-accent); transition:letter-spacing .25s; } .more:hover{ letter-spacing:.14em; }
-  @media (prefers-reduced-motion:reduce){ .go.ready{ animation:none; } }
+  /* Sur téléphone, le bouton pour avancer est en bas, sous le pouce : toucher la barre, ou la glisser vers la gauche.
+     Le geste est limité à cette barre : les jeux utilisent déjà le glissement dans leur propre zone (Circuit ou pas ?, flèches des Réseaux). */
+  #bas{ display:none; flex:none; border-top:1px solid var(--text-color); background:var(--page-bg); touch-action:pan-y; user-select:none; -webkit-user-select:none; }
+  #bas .in{ max-width:560px; margin:0 auto; padding:0 20px env(safe-area-inset-bottom); display:flex; align-items:stretch; will-change:transform; }
+  #bas .hint{ display:flex; align-items:center; padding-right:14px; }
+  #bas button{ flex:1; text-align:right; padding:19px 0 18px; font-size:.74rem; }
+  #bas.drag .in{ transition:none; } #bas .in{ transition:transform .2s ease-out, opacity .2s; }
+  @media (pointer:coarse), (max-width:760px){ #bas{ display:block; } .band .go{ display:none; } }
+  .done #bas{ display:none !important; }
+  @media (prefers-reduced-motion:reduce){ .go.ready{ animation:none; } #bas .in{ transition:none; } }
 </style>
 </head>
 <body>
@@ -49,6 +58,7 @@
   <div class="segs" id="segs"></div>
 </div></div>
 <iframe id="jeu" title="Jeu de l’étape en cours"></iframe>
+<div id="bas"><div class="in"><span class="sc t hint" aria-hidden="true">← glisse</span><button type="button" class="sc go" id="suite2">Étape suivante →</button></div></div>
 <div id="fin"><div class="in">
   <h1>Entraînement terminé</h1>
   <p class="lead" id="finLead"></p>
@@ -67,7 +77,7 @@
   // le programme est calculé par l'accueil ; sans programme du jour, on y retourne
   if(!T || T.d !== today || T.ver !== 3 || !Array.isArray(T.steps)){ location.replace("index.html"); return; }
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} };
-  const $ = id => document.getElementById(id), frame = $("jeu"), suite = $("suite");
+  const $ = id => document.getElementById(id), frame = $("jeu"), suite = $("suite"), suite2 = $("suite2");
   // bonnes réponses d'aujourd'hui sur cet appareil : le compteur que tous les jeux font avancer
   const count = () => { const o = read("mtc_daily_goal_v1"); return o && o.d === today ? Number(o.n) || 0 : 0; };
   let last = count();
@@ -82,6 +92,7 @@
     $("what").innerHTML = esc(s.t) + ' <span class="t">· ' + esc(s.w) + "</span>";
     suite.textContent = ok ? (lastStep ? "Terminer →" : "Suite : " + T.steps[T.i + 1].t + " →") : lastStep ? "Terminer →" : "Étape suivante →";
     suite.classList.toggle("ready", ok);
+    suite2.textContent = suite.textContent; suite2.classList.toggle("ready", ok);
   }
   function open(i){
     T.i = i; save();
@@ -129,6 +140,24 @@
   window.addEventListener("storage", e => { if(e.key === "mtc_daily_goal_v1") sync(); });
   setInterval(sync, 800);
   suite.addEventListener("click", () => open(T.i + 1));
+  // barre du bas (téléphone) : un toucher ou un glissement vers la gauche passe à l'étape suivante
+  const bas = $("bas"), inner = bas.querySelector(".in");
+  let x0 = null, dx = 0, raw = 0, lastGo = 0;
+  const avance = () => { if(Date.now() - lastGo < 700) return; lastGo = Date.now(); open(T.i + 1); };
+  bas.addEventListener("pointerdown", e => { x0 = e.clientX; dx = 0; raw = 0; bas.classList.add("drag"); try{ bas.setPointerCapture(e.pointerId); }catch(er){} });
+  bas.addEventListener("pointermove", e => {
+    if(x0 == null) return;
+    raw = e.clientX - x0; dx = Math.min(0, raw);
+    inner.style.transform = "translateX(" + dx + "px)"; inner.style.opacity = String(1 + dx / 400);
+  });
+  const fin = () => {
+    if(x0 == null) return;
+    const mv = dx, tap = Math.abs(raw) < 10; x0 = null; bas.classList.remove("drag"); inner.style.transform = ""; inner.style.opacity = "";
+    if(mv < -60 || tap) avance();   // glissement vers la gauche, ou simple toucher (un glissement vers la droite ne fait rien)
+  };
+  bas.addEventListener("pointerup", fin);
+  bas.addEventListener("pointercancel", () => { x0 = null; bas.classList.remove("drag"); inner.style.transform = ""; inner.style.opacity = ""; });
+  bas.addEventListener("click", e => { if(e.detail === 0) avance(); });   // clavier
   $("back").addEventListener("click", restoreDomain);
   window.addEventListener("pagehide", restoreDomain);
 
