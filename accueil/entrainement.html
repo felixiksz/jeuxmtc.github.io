@@ -71,7 +71,7 @@
   const d = new Date(), today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
   const T = read(KEY);
   // le programme est calculé par l'accueil ; sans programme du jour, on y retourne
-  if(!T || T.d !== today || !Array.isArray(T.steps)){ location.replace("index.html"); return; }
+  if(!T || T.d !== today || T.ver !== 2 || !Array.isArray(T.steps)){ location.replace("index.html"); return; }
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} };
   const $ = id => document.getElementById(id), frame = $("jeu"), suite = $("suite");
   // bonnes réponses d'aujourd'hui sur cet appareil : le compteur que tous les jeux font avancer

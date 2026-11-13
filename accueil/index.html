@@ -207,15 +207,14 @@
   document.getElementById("serie").textContent = "Série " + n + (n > 1 ? " jours" : " jour");
 
   // ---------- l'entraînement du jour : quatre étapes, vingt bonnes réponses (l'objectif du jour) ----------
-  const KEY = "mtc_entrainement_v1";
+  const KEY = "mtc_entrainement_v1", VER = 2;   // VER : un programme enregistré avec une ancienne forme est recalculé
   // la plus ratée d'une liste de catégories ou de classes déjà vues
   const worst = o => { let w = null; Object.values(o || {}).forEach(c => { const seen = Number(c.seen) || 0, err = Number(c.errors) || 0;
     if(c.name && seen >= 2 && err > 0 && (!w || err / seen > w.r)) w = {r:err / seen, name:String(c.name)}; }); return w; };
   function build(){
     const steps = [];
-    // 1. une grille d'acupuncture, sur la catégorie où il y a eu le plus d'erreurs
-    const wc = worst((read("connections_mtc_stats_v1") || {}).categories);
-    steps.push({v:"grille", t:"Grille", w:wc ? wc.name : "une grille de points", u:"../index.html", dom:"acupuncture", q:4});
+    // 1. une grille d'acupuncture. Jamais le nom d'une catégorie ou d'une classe ici : ce serait donner une réponse de la grille.
+    steps.push({v:"grille", t:"Grille", w:"une grille de points", u:"../index.html", dom:"acupuncture", q:4});
     // 2. le Quiz : les points arrivés à échéance, sinon ceux de la grille
     let due = 0;
     try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k.indexOf("mtc_quiz_mastery_") === 0){ const r = read(k); if(r && r.dueAt && new Date(r.dueAt).getTime() <= Date.now()) due++; } } }catch(e){}
@@ -227,13 +226,13 @@
     let weak = null; lines.forEach(c => { const m = ms[c]; if(m && m.n >= 1 && (!weak || m.v < weak.v)) weak = {c, v:Number(m.v) || 0}; });
     const line = weak ? weak.c : lines[d.getDate() % lines.length];
     steps.push({v:"metro", t:"Correspondance", w:"ligne " + line, u:"../trajets/correspondance.html?ligne=" + line, q:5});
-    // 4. la pharmacopée : la classe la plus ratée en grille, sinon des formules
+    // 4. la pharmacopée : une grille si elle a déjà été jouée, sinon des formules
     const wp = worst((read("mtc_pharma_stats_v1") || {}).classes);
-    steps.push(wp ? {v:"grillePh", t:"Grille", w:wp.name, u:"../index.html", dom:"pharmacology", q:5} : {v:"manquante", t:"Substance manquante", w:"cinq formules", u:"../formules/index.html#jeu", q:5});
-    return {d:today, steps, i:0, n:steps.map(() => 0), fin:false};
+    steps.push(wp ? {v:"grillePh", t:"Grille", w:"une grille de substances", u:"../index.html", dom:"pharmacology", q:5} : {v:"manquante", t:"Substance manquante", w:"cinq formules", u:"../formules/index.html#jeu", q:5});
+    return {d:today, ver:VER, steps, i:0, n:steps.map(() => 0), fin:false};
   }
   let T = read(KEY);
-  if(!T || T.d !== today || !Array.isArray(T.steps)){ T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} }
+  if(!T || T.d !== today || T.ver !== VER || !Array.isArray(T.steps)){ T = build(); try{ localStorage.setItem(KEY, JSON.stringify(T)); }catch(e){} }
   const CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path class="l a" d="M2 6.5L5 9.5L10.5 2.5"/></svg>';
   function drawTraining(){
     const begun = T.fin || T.i > 0 || T.n.some(x => x > 0);
