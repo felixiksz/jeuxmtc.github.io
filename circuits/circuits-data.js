@@ -1,5 +1,5 @@
-// Circuits thérapeutiques de Dr Tán, repris du cours « Les circuits thérapeutiques » (École Zhōng Lì, version du 27/10/2021).
-// grid : [haut gauche, haut droite, bas gauche, bas droite] comme dans le cours (main en haut, pied en bas).
+// Circuits thérapeutiques de Dr Tán.
+// grid : [haut gauche, haut droite, bas gauche, bas droite] (main en haut, pied en bas).
 // autre : circuits qui ne reposent que sur l'équilibre dynamique (chapitre 13).
 // Indications et actions : base des circuits d’Assistant-MTC (acupuncture/circuits/circuits.json), enrichie des notes personnelles (circuits_perso.json).
 // mots : mots-clés de l’usage le plus courant (mots_cles.json, ou ceux modifiés dans l’application).

@@ -1,9 +1,9 @@
-/* Compléments d'après l'illustration : lieux que montre l'image du cours mais que le texte
+/* Compléments d'après l'illustration : lieux que montre l'image mais que le texte
    du trajet ne cite pas. Chacun est « à valider » jusqu'à validation
    (ou le refuse) dans la page (mode ✎ Modifier). Champs :
    - canal, section : trajet concerné ; branche : extrait du texte de la branche ;
    - lieu : identifiant du lieu ajouté ; avant / apres : lieu de la branche à côté duquel l'insérer ;
-   - page : page du cours où se trouve l'illustration ; note : ce que montre l'image. */
+   - page : page où se trouve l'illustration ; note : ce que montre l'image. */
 window.MTC_TRAJETS_COMPLEMENTS = [
  {"id":"RM-vert-DM1", "canal":"RM", "section":"principal", "branche":"branche vertébrale", "avant":"colonne", "lieu":"pt:DM 1", "page":9, "statut":"à valider",
   "note":"Sur l'image de la branche vertébrale, le trajet passe par RM 1 puis DM 1 et la pointe du coccyx avant de monter dans la colonne."},
@@ -32,7 +32,7 @@ window.MTC_TRAJETS_COMPLEMENTS = [
  {"id":"F-princ-EC1", "canal":"F", "section":"principal", "branche":"Une branche se détache du foie", "avant":"o-poumon", "lieu":"pt:EC 1", "page":7, "statut":"à valider",
   "note":"EC 1 est nommé sur l'image, sur la branche qui monte du foie au poumon (point d'intersection du foie selon le tableau)."},
  {"id":"CM-F3", "canal":"CM", "section":"vaisseau", "branche":"cinquième branche", "apres":"pt:E 42", "lieu":"pt:F 3", "statut":"validé",
-  "source":"tradition taoïste", "note":"Selon les taoïstes, F 3 (tài chōng) fait partie de la 5e branche du chōng mài ; non cité dans le texte du cours."},
+  "source":"tradition taoïste", "note":"Selon les taoïstes, F 3 (tài chōng) fait partie de la 5e branche du chōng mài ."},
  {"id":"GI-tend-VB13", "canal":"GI", "section":"tendineux", "branche":"passe par la tempe", "apres":"tempe", "lieu":"pt:VB 13", "page":14, "statut":"validé",
   "note":"VB 13 est nommé sur l'image, là où la branche enveloppe la tête."},
  {"id":"E-tend-E12", "canal":"E", "section":"tendineux", "branche":"fosse sus-claviculaire", "apres":"sus-clav", "lieu":"pt:E 12", "page":16, "statut":"validé",

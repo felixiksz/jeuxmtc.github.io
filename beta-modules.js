@@ -11,13 +11,13 @@
 
   const TOURS = {
     trajets: [
-      {sel:"nav", title:"Les canaux", text:"Choisis un canal régulier ou un merveilleux vaisseau. Sa fiche s’ouvre : le texte du cours, son illustration et un plan façon métro, trajet par trajet (principal, luò, distinct, tendineux…)."},
+      {sel:"nav", title:"Les canaux", text:"Choisis un canal régulier ou un merveilleux vaisseau. Sa fiche s’ouvre : le texte, son illustration et un plan façon métro, trajet par trajet (principal, luò, distinct, tendineux…)."},
       {sel:() => isSmall() ? "#typeToggle" : "#typeFilter", title:"Types de trajets", text:"Coche les trajets à afficher : branches externes ou internes du canal principal, luò, distinct, tendineux, merveilleux vaisseaux.\nLe choix s’applique aux plans, au réseau global et aux correspondances."},
-      {sel:"main section .plan, main section", title:"Texte, image et plan", text:"Pour chaque trajet : le texte du cours, l’illustration et le plan.\nClique sur une station du plan : le texte défile jusqu’à sa mention, surlignée. Survole une station : les autres canaux qui passent par là s’affichent."},
+      {sel:"main section .plan, main section", title:"Texte, image et plan", text:"Pour chaque trajet : le texte, l’illustration et le plan.\nClique sur une station du plan : le texte défile jusqu’à sa mention, surlignée. Survole une station : les autres canaux qui passent par là s’affichent."},
       {sel:".verifybtn", title:"Vérifier un trajet", text:"Tu as comparé un trajet au cours et à son illustration, et il est juste ? Clique sur « Vérifier » à côté de son titre, puis réagis avec 👍 dans le fil qui s’ouvre. Chaque 👍 compte comme une vérification publique : « vérifié par N » s’affiche à côté du trajet."},
       {sel:"#allPlaces", title:"Correspondances", text:"L’index de tous les lieux et de tous les points. Clique sur un lieu pour voir tous les trajets qui y passent, regroupés par famille de zones."},
       {sel:"#netToggle", title:"Plan des intersections", text:"Le plan des points d’intersection, façon carte de métro : une colonne par canal, de la tête aux pieds, et les points où les canaux se rejoignent."},
-      {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction sur le canal affiché (ou le plan des intersections). Les commentaires sont publics : indique si possible ta source (page du cours, livre)."},
+      {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction sur le canal affiché (ou le plan des intersections). Les commentaires sont publics : indique si possible ta source (livre, article)."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment. Bonne exploration !"}
     ],
     reseau: [
@@ -38,7 +38,7 @@
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
     circuits: [
-      {sel:"#modes", title:"「 ✦ RÉSEAUX ✦ 」", text:"Huit jeux sur les six systèmes et les circuits thérapeutiques de Dr Tán, en trois familles : les liens entre canaux, le circuit, la clinique. Tout vient des cours « Les six systèmes des canaux unis », « Les circuits thérapeutiques » et « Méthode de l’équilibre global »."},
+      {sel:"#modes", title:"「 ✦ RÉSEAUX ✦ 」", text:"Huit jeux sur les six systèmes et les circuits thérapeutiques de Dr Tán, en trois familles : les liens entre canaux, le circuit, la clinique."},
       {sel:() => tourMark(".bar, .balbar"), title:"Réglages du jeu", text:"Le « ? » explique le jeu. Le curseur règle la difficulté, de facile à difficile : le niveau ne monte jamais tout seul. À droite, ton score."},
       {sel:() => tourMark("#main svg.grid, #main svg.clock, #main svg.balclock, #main table.fam, #main svg.body"), title:"Le plateau", text:"Chaque bonne réponse s’allume en vert tout de suite, avec un petit son ; une erreur s’affiche en rouge. Les félicitations arrivent quand tout est trouvé."},
       {sel:() => tourMark("#main .palette"), title:"Répondre", text:"Clique sur un canal pour répondre. Quand plusieurs cases sont vides, clique d’abord sur la case, puis sur le canal."},
@@ -46,7 +46,7 @@
       {sel:() => tourMark("#main .hnav"), title:"Revenir en arrière", text:"Les flèches ‹ › font revoir les parties précédentes. Sur téléphone, glisse vers la droite pour revenir, vers la gauche pour avancer."},
       {sel:"#mastery", title:"Maîtrise des canaux", text:"Chaque anneau se remplit quand tu réussis avec ce canal et se vide un peu à chaque erreur. Les canaux les moins remplis reviennent plus souvent. Les deux canaux d’une famille pleins : palier."},
       {sel:".mtc-goalbar", title:"Objectif du jour", text:"Le fin trait vert de la barre du haut se remplit à chaque bonne réponse, tous jeux confondus : 20 par jour. Les sons et la vibration se règlent dans Menu → Réglages."},
-      {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source (page du cours)."},
+      {sel:"#corrBtn", title:"Corrections", text:"Tu repères une erreur ? Ouvre ce panneau pour laisser un commentaire de correction. Les commentaires sont publics : indique si possible ta source (livre, article)."},
       {sel:"#tourBtn", title:"Revoir les explications", text:"Ce bouton relance ce tutoriel à tout moment."}
     ],
     jeu: [

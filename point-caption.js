@@ -82,8 +82,10 @@
     if(!ctx){ const AC = window.AudioContext || window.webkitAudioContext; if(AC){ try{ ctx = new AC(); }catch(e){} } }
     return ctx;
   }
-  // le téléphone ne laisse jouer le son qu'après un toucher : on réveille le lecteur à chaque toucher
-  window.addEventListener("pointerdown", () => { const c = audioCtx(); if(c && c.state !== "running") c.resume().catch(() => {}); }, {capture:true, passive:true});
+  // le téléphone ne laisse jouer le son qu'après un toucher : on réveille le lecteur à chaque toucher. Sur téléphone, c'est la fin du
+  // toucher (pointerup, touchend, click) qui compte comme un geste de l'utilisateur, pas son début (pointerdown).
+  const wake = () => { const c = audioCtx(); if(c && c.state !== "running") c.resume().catch(() => {}); };
+  ["pointerdown", "pointerup", "touchend", "click", "keydown"].forEach(t => window.addEventListener(t, wake, {capture:true, passive:true}));
   function load(url){
     if(!buffers.has(url)){
       const c = audioCtx();
@@ -100,11 +102,17 @@
   function playUrl(url, gain){
     return load(url).then(buf => {
       const c = audioCtx(); if(!c) throw 0;
-      if(c.state !== "running") c.resume().catch(() => {});
-      try{ if(src) src.stop(); }catch(e){}
-      src = c.createBufferSource(); src.buffer = buf;
-      const g = c.createGain(); g.gain.value = gain; src.connect(g); g.connect(c.destination); src.start();
-      return buf.duration;
+      const go = () => {
+        try{ if(src) src.stop(); }catch(e){}
+        src = c.createBufferSource(); src.buffer = buf;
+        const g = c.createGain(); g.gain.value = gain; src.connect(g); g.connect(c.destination); src.start();
+        return buf.duration;
+      };
+      if(c.state === "running") return go();
+      // Lecteur encore endormi par le téléphone : lancer le son maintenant le ferait partir au PROCHAIN toucher, des secondes plus
+      // tard. On le réveille un court instant ; s'il dort toujours, on renonce (le lecteur du jeu ou la synthèse prennent le relais).
+      return Promise.race([c.resume().catch(() => {}).then(() => c.state), new Promise(r => setTimeout(() => r(c.state), 300))])
+        .then(() => { if(c.state !== "running") throw 0; return go(); });
     });
   }
   // même force que le nom chinois (fichiers chinois plus forts, joués à 0,42)
@@ -191,7 +199,7 @@
           // Le nom chinois passe par le même lecteur que le français, réveillé à chaque toucher : joué après
           // la félicitation, il n'est plus bloqué par le téléphone. Le lecteur du jeu reste en secours.
           const fallback = () => { if(!fresh()) return; let p = false; try{ p = orig.apply(self, args); }catch(e){} then(p ? 1300 : 0); };
-          if(zh) load(zh).then(() => { if(fresh()) return playUrl(zh, .42).then(d => then(Math.round(d * 1000) + 250)); }, fallback); else fallback();
+          if(zh) load(zh).then(() => { if(fresh()) return playUrl(zh, .42).then(d => then(Math.round(d * 1000) + 250)); }).catch(fallback); else fallback();
         }, wait);
       }, 60);
       return true;

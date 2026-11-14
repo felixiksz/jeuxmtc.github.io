@@ -146,13 +146,13 @@
 <script src="../celebrate.js?v=20261112-f"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
-<script src="circuits-data.js?v=20261112-e"></script>
+<script src="circuits-data.js?v=20261114-a"></script>
 <script src="circuits-assistant-sync.js?v=20261112-c"></script>
 <script src="../equilibrer/equilibrer-game.js?v=20261112-b"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
-<script src="../beta-gate.js?v=20261110-a"></script>
+<script src="../beta-gate.js?v=20261114-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261113-a"></script>
+<script src="../beta-modules.js?v=20261114-a"></script>
 </head>
 <body>
 <header>
@@ -172,10 +172,9 @@
   window.mtcBetaModule("circuits");
 (function(){
   "use strict";
-  // Jeux sur les circuits thérapeutiques de Dr Tán (cours « Les circuits thérapeutiques » et « Méthode de l'équilibre
-  // global »). Un circuit = 2 canaux de main (en haut) et 2 de pied (en bas), un yīn et un yáng par ligne, mêmes polarités
+  // Jeux sur les circuits thérapeutiques de Dr Tán. Un circuit = 2 canaux de main (en haut) et 2 de pied (en bas), un yīn et un yáng par ligne, mêmes polarités
   // en diagonale (équilibre statique), chaque canal relié à ses deux voisins par un des cinq systèmes (équilibre
-  // dynamique). Ces règles redonnent exactement les 12 circuits du cours, ni plus ni moins.
+  // dynamique). Ces règles redonnent exactement les 12 circuits, ni plus ni moins.
   const main = document.getElementById("main"), modesEl = document.getElementById("modes");
   new MutationObserver(() => { if(!BOUNCE) return; const el = main.querySelector(BOUNCE); BOUNCE = null; if(el && window.mtcBounce) window.mtcBounce(el); }).observe(main, {childList:true, subtree:true});
   // explications du jeu rangées derrière un « ? » (ouvert ou fermé : le choix reste d'un jeu à l'autre)
@@ -198,7 +197,7 @@
   const COLOR = {E:"#d9a400", Rt:"#d9a400", VB:"#2f9a3c", F:"#2f9a3c", C:"#e0261b", IG:"#e0261b", EC:"#e0261b", TF:"#e0261b", V:"#1f5fd6", Rn:"#1f5fd6"};
   const ink = c => COLOR[c] || "var(--text-color)";   // métal (P, GI) : couleur des lettres du thème
   const HAND = new Set(["P", "GI", "C", "IG", "EC", "TF"]), YIN = new Set(["P", "Rt", "C", "Rn", "EC", "F"]);
-  // les 3 circuits annexes du cours (équilibre dynamique seulement, chapitre 13) : pas dans le jeu pour l'instant (true pour les remettre)
+  // les 3 circuits annexes (équilibre dynamique seulement, chapitre 13) : pas dans le jeu pour l'instant (true pour les remettre)
   const ANNEXES = false;
   const TOUS = window.MTC_CIRCUITS || [], CIRC = ANNEXES ? TOUS : TOUS.filter(c => !c.autre), BASE = CIRC.filter(c => !c.autre);
   const links = (a, b) => a === b ? [] : [1, 2, 3, 4, 5].filter(n => SYS[n].some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
@@ -215,7 +214,7 @@
   // félicitation : appelée seulement pour une bonne réponse, elle allume aussi la lueur verte (celebrate.js)
   const praise = () => { if(window.mtcCelebrate) window.mtcCelebrate(1); return PRAISE[Math.floor(Math.random() * PRAISE.length)]; };
 
-  // règles du cours sur une grille [haut gauche, haut droite, bas gauche, bas droite]
+  // règles sur une grille [haut gauche, haut droite, bas gauche, bas droite]
   function gridOk(cells){
     if(cells.some(c => !c) || new Set(cells).size < 4) return false;
     const [tl, tr, bl, br] = cells;
@@ -298,7 +297,7 @@
   function gridSvg(cells, o){
     o = o || {};
     let g = '<text x="2" y="56" class="rowlbl">MAIN</text><text x="2" y="172" class="rowlbl">PIED</text>';
-    // liens toujours tracés, comme dans les schémas du cours ; pas vers une case que la personne est en train de remplir (ce serait la réponse)
+    // liens toujours tracés, comme dans les schémas ; pas vers une case que la personne est en train de remplir (ce serait la réponse)
     if(o.edges !== false) for(let i = 0; i < 4; i++) for(let j = i + 1; j < 4; j++){
       const a = cells[i], b = cells[j]; if(!a || !b || (o.open && (o.open.includes(i) || o.open.includes(j)))) continue;
       const l = links(a, b); if(!l.length) continue;
@@ -344,7 +343,7 @@
     const own = findCircuit(mine);
     const col = (label, cls, grid, c) => '<div class="cmpcol"><span class="verdict ' + cls + '">' + label + '</span><div class="cmpgrid">' + gridSvg(grid, {}) + "</div>" +
       (c ? '<p class="cmpt">' + esc(c.title) + '</p><ul class="cmpl">' + (c[field] || []).map(x => "<li" + (lines.includes(x) ? ' class="hit"' : "") + ">" + esc(x) + "</li>").join("") + "</ul>"
-        : '<p class="sm">' + (TOUS.some(o => sameSet(o.grid, mine)) ? "Ces quatre canaux forment un des circuits annexes du cours, qui ne sont pas encore dans le jeu." : "Ces quatre canaux ne forment pas un circuit du cours.") + "</p>") + "</div>";
+        : '<p class="sm">' + (TOUS.some(o => sameSet(o.grid, mine)) ? "Ces quatre canaux forment un des circuits annexes, qui ne sont pas encore dans le jeu." : "Ces quatre canaux ne forment pas un circuit.") + "</p>") + "</div>";
     return '<div class="compare">' + col("Ta réponse", "no", own ? own.grid : arrange(mine), own) + col("Bonne réponse", "ok", right.grid, right) + "</div>";
   }
   const circuitCard = (c, opt) => '<div class="card"><p><b>Circuit ' + esc(c.title) + "</b> · " + gridTxt(c.grid) + (c.autre ? ' <span class="sm">(équilibre dynamique seulement)</span>' : "") + "</p>" +
@@ -359,7 +358,7 @@
     return h && v && dg ? 4 : h && dg ? 1 : v && dg ? 2 : h && v ? 3 : 0;
   }
   const SCHEMAS = {1:"Schéma 1 · horizontale et diagonale", 2:"Schéma 2 · verticale et diagonale", 3:"Schéma 3 · horizontale et verticale", 0:"Autres circuits · équilibre dynamique seulement"};
-  const rappel = () => '<details class="rappel"><summary>Rappel : les circuits du cours</summary>' +
+  const rappel = () => '<details class="rappel"><summary>Rappel : les circuits</summary>' +
     '<div style="margin-top:8px">' + aide("Main en haut, pied en bas. Plein : yīn ; cerclé : yáng. Les traits relient les canaux qui se rééquilibrent.") + "</div>" +
     [1, 2, 3, 0].map(k => {
       const list = CIRC.filter(c => (c.autre ? 0 : schemaOf(c.grid)) === k);
@@ -507,7 +506,7 @@
   }
 
   // ================= 2. Les trois plaintes =================
-  // exemples de plaintes donnés par le cours (Méthode de l'équilibre global, p. 5 et 34 à 37)
+  // exemples de plaintes
   const EX = {VB:"migraine sur shào yáng", C:"palpitations", TF:"alternance de chaud et de froid", F:"irritabilité", Rt:"troubles digestifs", P:"essoufflement"};
   const P = {};
   function neighbours(c, x){ return c.grid.filter(y => y !== x && links(x, y).length); }
@@ -900,7 +899,7 @@
     if(!Q5.countDone){
       Q5.countDone = true;
       const n = grids.length, ys = [...new Set(grids.map(nYin))];
-      return (t === "astuceInv" ? n + " association" + (n > 1 ? "s" : "") + " possible" + (n > 1 ? "s" : "") + " dans le cours" : n + " circuit" + (n > 1 ? "s" : "") + " du cours correspond" + (n > 1 ? "ent" : "")) + "." +
+      return (t === "astuceInv" ? n + " association" + (n > 1 ? "s" : "") + " possible" + (n > 1 ? "s" : "") : n + " circuit" + (n > 1 ? "s" : "") + " correspond" + (n > 1 ? "ent" : "")) + "." +
         (ys.length === 1 ? " Ce qui est cherché comprend " + ys[0] + (ys[0] > 1 ? " canaux" : " canal") + " yīn et " + (grids[0].length - ys[0]) + " yáng." : "");
     }
     const dejaDonne = Q5.shown;
@@ -1049,7 +1048,7 @@
       const yang = M.c.grid.filter(x => !YIN.has(x)), yin = M.c.grid.filter(x => YIN.has(x));
       M.msg = (ok ? '<span class="ok">' + praise() + "</span> " : '<span class="no">Placé, avec ' + M.errs + " erreur" + (M.errs > 1 ? "s" : "") + " en chemin.</span> ") +
         '<br><span class="sm">Les mêmes polarités se répondent en diagonale : les canaux yáng ' + chips(yang).replace(", ", " et ") + " sur " + onLimb(M.sol[yang.find(x => HAND.has(x))]) + " et " + onLimb(M.sol[yang.find(x => !HAND.has(x))]) +
-        ", les canaux yīn " + chips(yin).replace(", ", " et ") + " sur " + onLimb(M.sol[yin.find(x => HAND.has(x))]) + " et " + onLimb(M.sol[yin.find(x => !HAND.has(x))]) + ". Exemple du cours : shào yáng en haut à droite et en bas à gauche, jué yīn en haut à gauche et en bas à droite.</span>";
+        ", les canaux yīn " + chips(yin).replace(", ", " et ") + " sur " + onLimb(M.sol[yin.find(x => HAND.has(x))]) + " et " + onLimb(M.sol[yin.find(x => !HAND.has(x))]) + ". Exemple : shào yáng en haut à droite et en bas à gauche, jué yīn en haut à gauche et en bas à droite.</span>";
       renderMembres();
     });
     if(!M.done) auto("mVal", M.c.grid.every(x => Object.values(M.place).includes(x)), M.round + JSON.stringify(M.place));
@@ -1092,7 +1091,7 @@
   function renderX(){
     const q = X.cur, done = !!X.ans, best = xBest();
     const secs = X.t0 ? Math.round(((X.end ? X.tEnd : Date.now()) - X.t0) / 1000) : 0;
-    main.innerHTML = '<div class="bar">' + aide("Quatre canaux sont placés comme dans un circuit, main en haut, pied en bas, sans les traits ni les polarités. " + (ANNEXES ? "Est-ce un circuit statique et dynamique, un circuit dynamique seulement (chapitre 13), ou pas un circuit ?" : "Est-ce un circuit du cours ? Oui ou non.") + " Série de 10 questions.") +
+    main.innerHTML = '<div class="bar">' + aide("Quatre canaux sont placés comme dans un circuit, main en haut, pied en bas, sans les traits ni les polarités. " + (ANNEXES ? "Est-ce un circuit statique et dynamique, un circuit dynamique seulement (chapitre 13), ou pas un circuit ?" : "Est-ce un circuit ? Oui ou non.") + " Série de 10 questions.") +
       '<label><input type="checkbox" id="xChrono"' + (X.chrono ? " checked" : "") + "> chrono</label>" +
       '<span class="score">' + (best ? "record " + best.good + " / 10" + (best.secs ? " en " + best.secs + " s" : "") : "") + "</span></div>" +
       '<div class="xprog">' + Array.from({length:10}, (v, i) => '<i class="' + (i < X.list.length ? (X.list[i] ? "ok" : "no") : i === X.n ? "now" : "") + '"></i>').join("") +
@@ -1185,7 +1184,7 @@
       (k.t === "ind" ? "Indication : " + esc(k.v) : k.t === "act" ? "Action : " + esc(k.v) : k.t === "canal" ? "Un canal à sa place : " + chip(c.grid[k.i]) + " (" + (k.i < 2 ? "main" : "pied") + ")" :
         c.autre ? "Schéma : équilibre dynamique seulement" : "Schéma : " + esc(SCHEMAS[schemaOf(c.grid)])) + "</p>").join("");
     const more = H8.shown < H8.clues.length;
-    main.innerHTML = '<div class="bar">' + aide("Un circuit du cours est caché. Les indices arrivent un par un : indications, actions, un canal à sa place, le schéma. Clique sur les canaux du circuit : un canal juste se place tout de suite sur le schéma, un canal faux s’affiche en rouge. Un nouveau clic sur un canal rouge l’efface. Avec le premier indice seulement : 10 points ; chaque indice de plus et chaque canal faux coûtent 1 point.") +
+    main.innerHTML = '<div class="bar">' + aide("Un circuit est caché. Les indices arrivent un par un : indications, actions, un canal à sa place, le schéma. Clique sur les canaux du circuit : un canal juste se place tout de suite sur le schéma, un canal faux s’affiche en rouge. Un nouveau clic sur un canal rouge l’efface. Avec le premier indice seulement : 10 points ; chaque indice de plus et chaque canal faux coûtent 1 point.") +
       scoreLine("cache", "circuit trouvé", "circuits trouvés") + "</div>" +
       '<div class="lay"><div>' + gridSvg(cells, {edges:!!H8.done, noPol:!H8.done}) + "</div><div>" +
       '<p class="lbltop">Indices · ' + (H8.done ? (H8.found ? h8Points() + " point" + (h8Points() > 1 ? "s" : "") : "0 point") : "encore " + h8Points() + " point" + (h8Points() > 1 ? "s" : "") + " en jeu") + "</p>" +
@@ -1234,7 +1233,7 @@
     ["circuitoupas", "Circuit ou pas ?", newX, renderX],
     ["cache", "Le cas mystère", newCache, renderCache]
   ].filter(Boolean);
-  // trois familles, dans l'ordre des cours : les liens entre canaux, le circuit, la clinique
+  // trois familles, dans l'ordre : les liens entre canaux, le circuit, la clinique
   const GROUPS = [["Les liens", ["equilibrer", "grille"]], ["Le circuit", ["fermer", "quel", "circuitoupas"]], ["La clinique", ["plaintes", "propagation", "cache"]]];
   const started = {};
   let mode = (MODES.find(m => "#" + m[0] === location.hash) || MODES[0])[0];

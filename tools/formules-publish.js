@@ -11,7 +11,9 @@ index.forEach(e => {
   try{ formules[e.id] = JSON.parse(fs.readFileSync(path.join(root, e.chemin), "utf8")); }
   catch(err){ console.error("manquant :", e.chemin); }
 });
+const N = require("./formules-nettoyage.js");
+const data = N.clean({publishedAt:new Date().toISOString(), index, formules}), bad = N.verifier(data);
+if(bad.length){ console.error(bad.length + " passage(s) à reprendre avant de publier :\n" + bad.join("\n")); process.exit(1); }
 const out = path.join(__dirname, "..", "formules", "formules-data.js");
-fs.writeFileSync(out, "/* Formules de l’Outil diagnostique, publiées pour le module Formules (bêta). Généré par tools/formules-publish.js. */\n" +
-  "window.MTC_FORMULES = " + JSON.stringify({publishedAt:new Date().toISOString(), index, formules}) + ";\n", "utf8");
+fs.writeFileSync(out, "window.MTC_FORMULES = " + JSON.stringify(data) + ";\n", "utf8");
 console.log(index.length, "formules →", out);

@@ -1,7 +1,6 @@
 /* Saignée (🩸) : indications et actions de saignée ajoutées aux fiches des points.
-   Sources : les notes de saignée d'emesepap (déplacées ici depuis ses notes), le cours
-   « Les applications modernes de la saignée » (École Zhōng Lì), et Henry McCann, Pricking the
-   Vessels: Bloodletting Therapy in Chinese Medicine (2014), indiqué « (McCann) ».
+   Source des lignes indiquées « (McCann) » : Henry McCann, Pricking the Vessels: Bloodletting
+   Therapy in Chinese Medicine (2014).
    Les lignes sont ajoutées à la fin des champs Indications et Actions, sans doublon, au chargement
    et après chaque synchronisation GitHub (59-github-sync.js). */
 window.MTC_SAIGNEE = {
@@ -166,7 +165,7 @@ window.MTC_SAIGNEE = {
   },
   "E40": {
    "indications": [
-    "🩸 Mucosités dans le cerveau et n'importe ou dans le cours, trachéite chronique, toux, troubles mentaux et émotionnels, troubles cardiaques, douleur à l’estomac…",
+    "🩸 Mucosités dans le cerveau et n'importe où dans le corps, trachéite chronique, toux, troubles mentaux et émotionnels, troubles cardiaques, douleur à l’estomac…",
     "🩸 Point à saigner d’emblée dès qu’il y a accumulation de mucosités et/ou stase de sang (autre nom : tán huì 痰回, la réunion des mucosités)",
     "🩸 Stagnation de qì et stase de sang généralisées, mucosités généralisées (avec E 38) (McCann)",
     "🩸 Zone du point Tung 77.14 sì huā wài (四花外) : migraine, douleur d’oreille, douleur de l’épaule ou du bras, sciatique, douleur du dessus ou de la plante du pied, hypertension, maladies cardiovasculaires, troubles digestifs, troubles psycho-émotionnels (McCann)"
@@ -811,7 +810,7 @@ window.MTC_SAIGNEE = {
    "Fibromes: Saignée sacrum + Rt 9 + zone ulnaire de l'annulaire"
   ],
   "E40": [
-   "Saignée: mucosités dans le cerveau et n'importe ou dans le cours, trachéite chronique, toux, troubles mentaux et émotionnels, troubles cardiaques, douleur\nà l’estomac…"
+   "Saignée: mucosités dans le cerveau et n'importe où dans le corps, trachéite chronique, toux, troubles mentaux et émotionnels, troubles cardiaques, douleur\nà l’estomac…"
   ],
   "IG1": [
    "Saignée: maladies du cœur, inversion trouble, douleur de la gorge, douleur et/ou gonflement du sein, chaleur dans la bouche, attaque de vent, céphalée."

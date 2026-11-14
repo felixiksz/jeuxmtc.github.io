@@ -33,7 +33,7 @@
   let loading = null;
   function loadNotes(){
     if(window.MTC_SHARED_NOTES || loading) return;
-    loading = new Promise(res => { const s = document.createElement("script"); s.src = "notes-admin.js?v=20261110-a"; s.onload = s.onerror = () => res(); document.head.appendChild(s); })
+    loading = new Promise(res => { const s = document.createElement("script"); s.src = "notes-admin.js?v=20261113-a"; s.onload = s.onerror = () => res(); document.head.appendChild(s); })
       .then(() => { mergeIntoAdmin(); refresh(); });
   }
   let loadingContrib = null;
@@ -121,7 +121,7 @@
 
   // notes partagées dans le champ d'origine de la fiche, dans la couleur de l'autrice
   const authorName = () => (window.MTC_SHARED_NOTES && window.MTC_SHARED_NOTES.author) || "emesepap, admin";
-  // (les associations des substances viennent du cours : pas des notes de l'autrice, donc pas en couleur)
+  // (les associations des substances ne sont pas des notes de l'autrice, donc pas en couleur)
   const PHARMA_FIELDS = {esprits:"esprit", notes:"notes", associations:"associations", formules:"formules", vs:"vs", syntheses:"synthese", precautions:"precaution",
     ingredients:"ingredients", recherches_modernes:"recherches_modernes", indications:"indications", contre_indications:"contre_indications", preparations:"preparation", synonymes:"synonymes"};
   const POINT_KEYS = {notes:"mtc_point_note_", associations:"mtc_point_associations_", esprits:"mtc_point_esprit_", vs:"mtc_point_vs_", precautions:"mtc_point_precaution_"};
@@ -139,7 +139,7 @@
     const S = window.MTC_SHARED_NOTES;
     if(!isAdmin() && S && S[domain] && S[domain][id]){
       const fields = Object.assign({}, S[domain][id]);
-      if(domain === "pharma") delete fields.associations;   // associations des substances : viennent du cours
+      if(domain === "pharma") delete fields.associations;   // associations des substances : fiche de la substance
       list.push({name:authorName().split(",")[0], color:authorColor(authorName()), fields});
     }
     const C = window.MTC_CONTRIBUTIONS;

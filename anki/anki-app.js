@@ -66,13 +66,13 @@
     const sel = selectedCards(), now = Date.now();
     const due = sel.filter(c => PROG[c.id] && PROG[c.id].due <= now).length, fresh = sel.filter(c => !PROG[c.id]).length, take = Math.min(LEN, due + fresh);
     const t = tree();
-    app.innerHTML = '<h1>Cartes Anki</h1><p class="lead">Tes paquets Anki, révisés dans le jeu. Les cartes restent sur cet appareil.</p>' +
-      '<label class="sc acc btn imp" for="file">Importer un paquet (.apkg) →</label><div class="msg" id="msg">' + MSG + "</div>" +
+    app.innerHTML = '<h1>Cartes Anki</h1><p class="lead">Tes paquets Anki, révisés dans le jeu. Ils ne sont jamais publiés' + (Y && Y.configured() ? " : ils suivent tes appareils par ton dépôt GitHub privé." : " ; ils restent sur cet appareil.") + "</p>" +
+      '<label class="sc acc btn imp" for="file">Importer un paquet (.apkg) →</label><div class="msg" id="msg">' + MSG + '</div><p class="help sync" id="sync"></p>' +
       (PACKS.length ? "" : '<p class="help"><b>Comment faire :</b> dans Anki, ouvre ton paquet, puis <b>Fichier ▸ Exporter</b>, format <b>Paquet Anki (*.apkg)</b>, en cochant <b>Inclure les médias</b>. Envoie ensuite le fichier sur ce téléphone et choisis-le ici. Les types de cartes reconnus : recto / verso, choix multiples (lettres, ou 1 et 0 sur 10 options), texte à trous, paires.</p>') +
       (PACKS.length ? "<h2>Mes paquets</h2>" + PACKS.map(p => '<div class="pack"><div><span>' + esc(p.name) + "</span><i>" + nb(p.cards) + " cartes · " + Object.keys(p.byType || {}).map(k => nb(p.byType[k]) + " " + (TYPE_NAME[k] || k)).join(", ") + '</i></div><button type="button" class="sc t" data-del="' + esc(p.id) + '">Supprimer</button></div>').join("") : "") +
       (PACKS.length ? '<h2>Que veux-tu réviser ?</h2><p class="lead" style="margin:0">Touche un paquet pour le choisir (ses sous-paquets sont compris), ▸ pour le déplier.</p><div class="tree">' + treeHtml(t, 0) + "</div>" +
         '<div class="len"><span class="sc t">Cartes</span>' + [10, 20, 50].map(n => '<button type="button" class="sc' + (LEN === n ? " on" : "") + '" data-len="' + n + '">' + n + "</button>").join("") + "</div>" : "");
-    MSG = "";   // le message d'importation ne s'affiche qu'une fois
+    MSG = ""; syncLine();   // le message d'importation ne s'affiche qu'une fois
     setBar(PACKS.length ? [{t:sel.length ? (take ? "Réviser · " + take + " carte" + (take > 1 ? "s" : "") + " →" : "Rien à réviser pour l’instant") : "Choisis un paquet", cls:"main", disabled:!take, on:start}] : null);
   }
   document.addEventListener("click", e => {
@@ -80,27 +80,51 @@
     if(b.dataset.open != null){ const k = b.dataset.open; OPEN.has(k) ? OPEN.delete(k) : OPEN.add(k); return home(); }
     if(b.dataset.sel != null){ const k = b.dataset.sel; SELECTED.has(k) ? SELECTED.delete(k) : SELECTED.add(k); return home(); }
     if(b.dataset.len){ LEN = +b.dataset.len; setPref("mtc_anki_len", LEN); return home(); }
-    if(b.dataset.del){ const p = PACKS.find(x => x.id === b.dataset.del); if(p && confirm("Supprimer « " + p.name + " » de cet appareil ? Ton paquet Anki d’origine n’est pas touché.")) S.removePack(p.id).then(() => { SELECTED.clear(); MSG = ""; home(); }); }
+    if(b.dataset.del){ const p = PACKS.find(x => x.id === b.dataset.del); if(p && confirm("Supprimer « " + p.name + " » de cet appareil ? Ton paquet Anki d’origine n’est pas touché.")) S.removePack(p.id).then(() => { if(Y) Y.markDeleted(p.id); SELECTED.clear(); MSG = ""; home(); syncSoon(1200); }); }
   });
+  document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-sync]"); if(b && Y){ Y.run(syncHooks); syncLine(); } });
 
   // ---------- importation ----------
   const hash = str => { let h = 0x811c9dc5; for(const ch of str){ h ^= ch.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return ("0000000" + h.toString(16)).slice(-8); };
+  // lit un fichier .apkg (octets) et l'enregistre ; sert à l'import manuel et aux paquets reçus des autres appareils (info.at : date d'origine)
+  async function ingest(buf, info, say){
+    const media = [], id = info.id;
+    const parsed = await I.parse(buf, {onStep:t => say && say(info.name + " : " + t + "…"), locateFile:n => "vendor/" + n,
+      onMedia:(name, data) => { media.push({id:id + "|" + name, packId:id, name, blob:new Blob([data], {type:I.mimeOf(name)})}); }});
+    if(!parsed.cards.length) throw new Error("ce paquet ne contient aucune carte.");
+    if(say) say("Enregistrement sur l’appareil…");
+    await S.removePack(id);   // un paquet déjà importé est remplacé (l'avancement des cartes est gardé)
+    await S.savePack(parsed, {id, name:info.name, size:info.size, at:info.at, file:info.file || new Blob([buf])}, media);
+    try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+    return parsed;
+  }
   async function importFile(f){
     const say = (t, cls) => { const m = $("msg"); if(m) m.innerHTML = '<span class="' + (cls || "t") + '">' + esc(t) + "</span>"; };
     try{
       say("Lecture de « " + f.name + " »…");
-      const buf = new Uint8Array(await f.arrayBuffer()), media = [];
-      const id = "p" + hash(f.name + "|" + f.size);
-      const parsed = await I.parse(buf, {onStep:t => say(f.name + " : " + t + "…"), locateFile:n => "vendor/" + n,
-        onMedia:(name, data) => { media.push({id:id + "|" + name, packId:id, name, blob:new Blob([data], {type:I.mimeOf(name)})}); }});
-      if(!parsed.cards.length) throw new Error("ce paquet ne contient aucune carte.");
-      say("Enregistrement sur l’appareil…");
-      await S.removePack(id);   // un paquet déjà importé est remplacé (l'avancement des cartes est gardé)
-      await S.savePack(parsed, {id, name:f.name.replace(/\.apkg$/i, ""), size:f.size}, media);
-      try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+      const parsed = await ingest(new Uint8Array(await f.arrayBuffer()), {id:"p" + hash(f.name + "|" + f.size), name:f.name.replace(/\.apkg$/i, ""), size:f.size, file:f}, say);
       return {ok:true, name:f.name, stats:parsed.stats};
     }catch(err){ console.error(err); return {ok:false, name:f.name, error:String(err && err.message || err)}; }
   }
+
+  // ---------- synchro entre appareils (anki-sync.js) ----------
+  const Y = window.MTCAnkiSync;
+  function syncLine(){
+    const el = $("sync"); if(!el) return;
+    if(!Y || !Y.configured()){ el.innerHTML = 'Pour retrouver tes paquets sur tes autres appareils, active la synchro GitHub dans les réglages du jeu (la même clé que pour tes notes). Sinon, les cartes restent sur cet appareil.'; return; }
+    const l = Y.last();
+    el.innerHTML = (Y.busy() ? "Synchronisation…" : l ? '<span class="' + (l.ok ? "t" : "err") + '">' + esc(l.text) + "</span>" : "Synchro GitHub active, pas encore lancée.") + (Y.busy() ? "" : ' <button type="button" class="sc t" data-sync="1">Synchroniser maintenant</button>');
+  }
+  const syncHooks = {
+    say:t => { const el = $("sync"); if(el) el.textContent = "Synchronisation : " + t + "…"; },
+    ingest:async (bytes, info) => { await ingest(bytes, info); },
+    dropPack:id => S.removePack(id),
+    done:async (res) => {
+      if(res && (res.down.length || res.removed.length || res.progress) && !SES){ await reconcile(); await home(); } else setTimeout(syncLine, 0);
+    }
+  };
+  if(Y) Y.hooks(syncHooks);
+  const syncSoon = d => { if(Y && Y.configured()) Y.schedule(d == null ? 2500 : d); };
   // Les cartes sont reconnues par leur identifiant Anki : si un nouveau paquet reprend les cartes d'un paquet déjà importé
   // (même export sous un autre nom, version mise à jour), l'ancien paquet est mis à jour, et supprimé s'il ne lui reste rien.
   async function reconcile(){
@@ -108,7 +132,7 @@
     const gone = [];
     for(const p of packs){
       const mine = cards.filter(c => c.packId === p.id);
-      if(!mine.length){ await S.removePack(p.id); gone.push(p.name); continue; }
+      if(!mine.length){ await S.removePack(p.id); if(Y) Y.markDeleted(p.id); gone.push(p.name); continue; }
       if(mine.length !== p.cards){ const by = {}; mine.forEach(c => { by[type[c.nid]] = (by[type[c.nid]] || 0) + 1; }); await S.putMany("packs", [Object.assign({}, p, {cards:mine.length, byType:by})]); }
     }
     return gone;
@@ -132,7 +156,7 @@
     }
     const gone = await reconcile();
     if(gone.length) msg += '<span class="t">Remplacé par le nouveau paquet (mêmes cartes) : ' + esc(gone.join(", ")) + "</span><br>";
-    MSG = msg; await home();
+    MSG = msg; await home(); syncSoon(1200);
   });
 
   // ---------- séance ----------
@@ -179,6 +203,7 @@
     app.innerHTML = '<h1>Séance terminée</h1><p class="sum"><b>' + got + "</b> sur " + seen + " carte" + (seen > 1 ? "s" : "") + " sues du premier coup.</p>" +
       '<p class="help">' + (seen - got ? (seen - got) + " carte" + (seen - got > 1 ? "s" : "") + " reviendront en tête de la prochaine séance. " : "") + "Les cartes sues reviennent dans 1 jour, puis 3, 7, 14 jours… selon tes réussites.</p>";
     setBar([{t:"Une autre séance", cls:"", on:() => { SES = null; start2(); }}, {t:"Mes paquets", cls:"main", on:stop}]);
+    syncSoon(1500);   // l'avancement de la séance part vers les autres appareils
     if(!early && seen === SES.list.length && got === seen && window.mtcFinale) window.mtcFinale("Séance parfaite", seen + " cartes sues", {etoiles:"✦✦✦"});
   }
   async function start2(){ await load(); await start(); }
@@ -195,5 +220,7 @@
   });
   // un bouton touché à la souris ou au doigt ne garde pas le focus (l'espace doit avancer, pas le rappuyer)
   app.addEventListener("click", e => { const b = e.target.closest("button, [role=button]"); if(b && b.blur) b.blur(); });
-  S.open().then(migrateCloze).then(home).catch(err => { app.innerHTML = '<p class="err">Le stockage de cet appareil n’est pas disponible (navigation privée ?) : ' + esc(err && err.message || err) + "</p>"; });
+  // en quittant la page, ce qui attend part tout de suite ; en y revenant, on reprend ce que les autres appareils ont fait
+  document.addEventListener("visibilitychange", () => { if(Y && Y.configured() && !SES) Y.run(syncHooks); });
+  S.open().then(migrateCloze).then(home).then(() => { if(Y && Y.configured()) Y.run(syncHooks); }).catch(err => { app.innerHTML = '<p class="err">Le stockage de cet appareil n’est pas disponible (navigation privée ?) : ' + esc(err && err.message || err) + "</p>"; });
 })();

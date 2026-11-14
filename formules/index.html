@@ -32,6 +32,7 @@
   h2{ font-size:1.35rem; margin:4px 0 2px; }
   .hz{ font-weight:400; color:#444; margin-left:6px; }
   .fr{ font-family:"Libre Baskerville", Georgia, serif; font-style:italic; color:#333; margin:0 0 4px; }
+  .syn{ margin:0 0 6px; font-size:.92rem; color:#555; }
   .cat{ font-family:"Tomorrow", "Archivo", sans-serif; font-size:.78rem; color:var(--muted); margin-bottom:12px; }
   h3{ font-size:.95rem; margin:18px 0 6px; color:var(--accent); }
   .txt{ font-family:"Libre Baskerville", Georgia, serif; font-size:.9rem; line-height:1.7; white-space:pre-line; margin:0; }
@@ -114,9 +115,9 @@
 <script src="../fiches-corrections.js"></script>
 <script src="../66-fiche-admin-edit.js?v=20261001-a"></script>
 <script src="../beta-config.js?v=20261108-a"></script>
-<script src="../beta-gate.js?v=20261110-a"></script>
+<script src="../beta-gate.js?v=20261114-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261113-a"></script>
+<script src="../beta-modules.js?v=20261114-a"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"formules", title:"Formules", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -130,8 +131,7 @@
   const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
   // ---- données : copie locale (tests) sinon dépôt GitHub PRIVÉ de l'Outil diagnostique ----
-  // Les formules viennent du cours : elles ne sont pas sur le site public. La page les lit dans le dépôt
-  // configuré dans la synchro GitHub du jeu (même navigateur, même clé), dossier formules/.
+  // La page lit les formules dans le dépôt configuré dans la synchro GitHub du jeu (même navigateur, même clé), dossier formules/.
   let source = "";
   function loadScript(src){
     return new Promise(resolve => {
@@ -231,7 +231,7 @@
   FORMS.forEach(f => { f._items = normalizeComposition(f); });
   // noms de formules toujours en majuscules (tons conservés : GUĪ PÍ TĀNG)
   const fname = f => String(f.pinyin || f.id).toLocaleUpperCase("fr-FR");
-  // Les catégories dans l'ordre du cours (01 à 21, d'après leur identifiant), les formules par ordre alphabétique dans chacune.
+  // Les catégories dans l'ordre (01 à 21, d'après leur identifiant), les formules par ordre alphabétique dans chacune.
   // Le nom affiché est allégé : « Prescriptions qui tonifient le Qi » → « Tonifient le qì ».
   const catLabel = n => { const t = String(n || "").replace(/^(formules|pr[ée]scriptions)\s+qui\s+/i, "").replace(/\bQi\b/g, "qì").replace(/\bShen\b/g, "shén").replace(/\bSang\b/g, "sang"); return t.charAt(0).toLocaleUpperCase("fr-FR") + t.slice(1); };
   FORMS.forEach(f => { f._cat = catLabel(f._cat); });
@@ -274,6 +274,25 @@
     }).join("\n").replace(/^\n+/, "");
   }
   const section = (title, text) => text ? "<h3>" + esc(title) + '</h3><p class="txt">' + esc(readable(text)) + "</p>" : "";
+  // Synthèse de ce que fait la formule : ses actions thérapeutiques, sans le pinyin ni les hanzi entre parenthèses, en une ligne.
+  // (Pour les rares formules sans actions : la première ligne de leur description.)
+  // Une ligne : la première action, puis les suivantes tant qu'elles sont courtes (les explications longues sont laissées de côté).
+  // Sans actions ni description dans les données, on donne les indications, introduites comme telles.
+  function synthese(f){
+    const net = t => String(t || "").replace(/\(\s*Description g[ée]n[ée]rale[^)]*\)/gi, "")
+      .replace(/\s*\([^()]*[\u3400-\u9fff][^()]*\)/g, "")
+      .replace(/\s*\n\s*[-•–]\s*/g, " · ").replace(/^\s*[-•–]\s*/, "").replace(/\s+[-–]\s+(?=[A-ZÉÈÀÂÔ])/g, " · ")
+      .replace(/\s+/g, " ").replace(/\.\s+(?=[A-ZÉÈÀÂÔ])/g, " · ").replace(/[.\s·]+$/, "").trim();
+    const cut = (t, max) => t.length <= max ? t : t.slice(0, max).replace(/\s+\S*$/, "") + "…";
+    const act = net(f.actions_therapeutiques) || net(f.description);
+    if(act){
+      const parts = act.split(" · "); let out = parts[0];
+      for(const p of parts.slice(1)){ if(p.length > 90 || (out + " · " + p).length > 200) break; out += " · " + p; }
+      return cut(out, 200);
+    }
+    const ind = net(f.indications_syndrome);
+    return ind ? "Indications : " + cut(ind, 150) : "";
+  }
   function renderBrowse(){
     const f = FORMS.find(x => x.id === current) || FORMS[0];
     main.innerHTML = '<select class="pick" id="pick">' + FORMS.map(x => '<option value="' + esc(x.id) + '"' + (x.id === f.id ? " selected" : "") + ">" + esc(fname(x)) + "</option>").join("") + "</select>" +
@@ -340,7 +359,7 @@
     if(!q){ main.innerHTML = bar + '<p class="msg">Pas de formule jouable dans cette catégorie.</p>'; bindBar(); return; }
     const f = q.f, ans = q.ans;
     let body = '<div class="qcard"><h2>' + esc(fname(f)) + (f.hanzi ? '<span class="hz">' + esc(f.hanzi) + "</span>" : "") + "</h2>" +
-      '<p class="fr">' + esc(f.nom_fr || "") + '</p><div class="cat">' + esc(f._cat || "") + "</div>" +
+      '<p class="fr">' + esc(f.nom_fr || "") + "</p>" + (synthese(f) ? '<p class="syn">' + esc(synthese(f)) + "</p>" : "") + '<div class="cat">' + esc(f._cat || "") + "</div>" +
       "<p><b>Quelle substance manque ?</b></p>" + compTable(f, q.k, q.answered);
     if(GAME.mode === "qcm"){
       body += '<div class="choices">' + q.choices.map((c, i) => {
@@ -351,7 +370,7 @@
       body += '<form class="free" id="gFree"><input id="gInput" list="gList" autocomplete="off" placeholder="Pinyin de la substance (les tons ne comptent pas)"' + (q.answered ? " disabled" : "") + '><button type="submit" class="tool"' + (q.answered ? " disabled" : "") + ">Valider</button></form>" +
         '<datalist id="gList">' + [...new Set(allItems.filter(i => i.hideable).map(i => i.name))].sort().map(n => '<option value="' + esc(n) + '">').join("") + "</datalist>";
     }
-    if(!q.answered) body += '<div class="hint">' + (q.hint ? "<b>Indice — actions de la formule :</b> " + esc(f.actions_therapeutiques || "—") : '<button type="button" class="tool" id="gHint">Indice</button> <button type="button" class="tool" id="gSkip">Passer</button>') + "</div>";
+    if(!q.answered) body += '<div class="hint">' + (q.hint ? "<b>Indice — indications de la formule :</b> " + esc(String(f.indications_syndrome || "—").replace(/\s+/g, " ").slice(0, 320)) : '<button type="button" class="tool" id="gHint">Indice</button> <button type="button" class="tool" id="gSkip">Passer</button>') + "</div>";
     else{
       const h = ans.herb;
       body += '<div class="verdict ' + q.answered + '">' + (q.answered === "ok" ? "✔ Oui : " : "✘ Non, c’était ") + esc(ans.name) + (ans.hanzi ? " " + esc(ans.hanzi) : "") + "</div>" +
@@ -440,7 +459,7 @@
         if(!items.length) return;
         if(app && last) last.extra.push(...items);
         else if(app && groups.length) groups.forEach(g => g.extra.push(...items));
-        else{ last = {label:label.replace(/^(indications|symptômes|description)\s*(\(([^)]*)\))?$/i, "$3").replace(/^(d['’]après les notes manuscrites|section indications|description)$/i, "").trim(), items, extra:[]}; groups.push(last); }
+        else{ last = {label:label.replace(/^(indications|symptômes|description)\s*(\(([^)]*)\))?$/i, "$3").replace(/^(section indications|description)$/i, "").trim(), items, extra:[]}; groups.push(last); }
       });
     });
     return groups;
@@ -453,7 +472,7 @@
   const elide = (w, s) => /^([aeiouyéèêàâîïôûhœæ])/i.test(s) && !/^(hoquet|hernie|hanche|haut)/i.test(s) ? w.slice(0, -1) + "’" + s : w + " " + s;
   const OPENERS = ["Je souffre de", "Il y a aussi un souci de", "Et puis je me plains de", "Ces derniers temps, je souffre de", "J’ai aussi remarqué un problème de"];
   const ARTICLE = {manque:"un", perte:"une", baisse:"une", augmentation:"une", tendance:"une", sensation:"une", envie:"une", alternance:"une", difficulté:"une", difficultés:"des", lourdeur:"une", brûlure:"une", oppression:"une", distension:"une", tension:"une", raideur:"une", fièvre:"de la", soif:"", grande:"une"};
-  // Le patient parle avec ses mots, pas avec ceux du cours : phrases toutes faites pour les signes les plus techniques,
+  // Le patient parle avec ses mots, pas avec des mots techniques : phrases toutes faites pour les signes les plus techniques,
   // puis remplacement des termes savants dans les autres.
   // {e} {eux} {las} : accords en écriture inclusive (fatigué·e, frileux·se, las·se)
   const LAY = [

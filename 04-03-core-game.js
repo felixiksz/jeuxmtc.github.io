@@ -3256,7 +3256,7 @@ function startTour(){
       title: "Mémo",
       text: isPharmaTour
         ? "Le Mémo PHARMA sert d’aide-mémoire rapide pour les SM, les classes et les repères essentiels."
-        : "Le Mémo ACU sert d’aide-mémoire rapide pour les points, les catégories et les grands repères du cours."
+        : "Le Mémo ACU sert d’aide-mémoire rapide pour les points, les catégories et les grands repères."
     },
     {
       selector: "#statsButton",
@@ -5675,8 +5675,8 @@ function getEditablePointNote(point, originalNote){
     localStorage.getItem(noteStorageKey(point));
 
   if(saved === null) return originalNote || "";
-  // note du cours + note perso : la note perso ne fait plus disparaître celle du cours ;
-  // seules les lignes du cours absentes de la note perso sont ajoutées, au-dessus
+  // note d'origine + note perso : la note perso ne fait plus disparaître l'originale ;
+  // seules les lignes d'origine absentes de la note perso sont ajoutées, au-dessus
   const original = String(originalNote || "").trim();
   if(!original) return saved;
   const flat = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");

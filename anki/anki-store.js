@@ -1,7 +1,8 @@
 /* ============================================================
    anki-store.js
-   Les paquets importés restent dans le navigateur de l'appareil (IndexedDB « mtc_anki_v1 ») :
-   rien n'est envoyé ni publié. Cinq magasins :
+   Les paquets importés restent dans le navigateur de l'appareil (IndexedDB « mtc_anki_v1 »). Rien n'est publié ;
+   seule la synchro (anki-sync.js) les envoie, vers le dépôt GitHub privé de la synchro des notes. Magasins :
+     files     le fichier .apkg d'origine de chaque paquet (pour la synchro)
      packs     un paquet importé (nom, date, nombre de cartes)
      decks     les paquets Anki et sous-paquets d'un fichier (chemin « A > B > C »)
      notes     les notes (champs, type de carte)
@@ -12,20 +13,21 @@
    ============================================================ */
 (function(root){
   "use strict";
-  const DB = "mtc_anki_v1", VER = 1;
+  const DB = "mtc_anki_v1", VER = 2;
   let dbp = null;
   function open(){
     if(dbp) return dbp;
     dbp = new Promise((ok, ko) => {
       const rq = indexedDB.open(DB, VER);
       rq.onupgradeneeded = () => {
-        const d = rq.result;
-        d.createObjectStore("packs", {keyPath:"id"});
-        d.createObjectStore("decks", {keyPath:"id"}).createIndex("pack", "packId");
-        d.createObjectStore("notes", {keyPath:"id"}).createIndex("pack", "packId");
-        d.createObjectStore("cards", {keyPath:"id"}).createIndex("pack", "packId");
-        d.createObjectStore("media", {keyPath:"id"}).createIndex("pack", "packId");
-        d.createObjectStore("progress", {keyPath:"id"});
+        const d = rq.result, has = n => d.objectStoreNames.contains(n);
+        if(!has("packs")) d.createObjectStore("packs", {keyPath:"id"});
+        if(!has("decks")) d.createObjectStore("decks", {keyPath:"id"}).createIndex("pack", "packId");
+        if(!has("notes")) d.createObjectStore("notes", {keyPath:"id"}).createIndex("pack", "packId");
+        if(!has("cards")) d.createObjectStore("cards", {keyPath:"id"}).createIndex("pack", "packId");
+        if(!has("media")) d.createObjectStore("media", {keyPath:"id"}).createIndex("pack", "packId");
+        if(!has("progress")) d.createObjectStore("progress", {keyPath:"id"});
+        if(!has("files")) d.createObjectStore("files", {keyPath:"id"});   // le fichier .apkg d'origine, pour l'envoyer vers les autres appareils
       };
       rq.onsuccess = () => ok(rq.result);
       rq.onerror = () => ko(rq.error);
@@ -67,13 +69,15 @@
       await new Promise((ok, ko) => { rq.onsuccess = () => { const c = rq.result; if(c){ s.delete(c.primaryKey); c.continue(); } else ok(); }; rq.onerror = () => ko(rq.error); });
       await done(tx);
     }
-    const tx = d.transaction("packs", "readwrite"); tx.objectStore("packs").delete(packId); await done(tx);
+    const tx = d.transaction(["packs", "files"], "readwrite"); tx.objectStore("packs").delete(packId); tx.objectStore("files").delete(packId); await done(tx);
   }
 
   // ---- importer un paquet lu par MTCAnkiImport ----
+  // info.at : date de l'import (reprise telle quelle pour un paquet reçu d'un autre appareil) ; info.file : le fichier .apkg à garder
   async function savePack(parsed, info, media){
     const packId = info.id, d = await open();
-    await putMany("packs", [{id:packId, name:info.name, size:info.size, at:Date.now(), notes:parsed.stats.notes, cards:parsed.stats.cards, byType:parsed.stats.byType, media:parsed.stats.media}]);
+    if(info.file) await putMany("files", [{id:packId, blob:info.file}]);
+    await putMany("packs", [{id:packId, name:info.name, size:info.size, at:info.at || Date.now(), notes:parsed.stats.notes, cards:parsed.stats.cards, byType:parsed.stats.byType, media:parsed.stats.media}]);
     await putMany("decks", parsed.decks.map(k => ({id:packId + ":" + k.id, packId, path:k.path})));
     await putMany("notes", parsed.notes.map(n => ({id:n.id, packId, type:n.type, model:n.model, fields:n.fields, tags:n.tags})));
     await putMany("cards", parsed.cards.map(c => ({id:c.id, packId, nid:c.nid, deck:packId + ":" + c.deck, ord:c.ord})));
@@ -81,6 +85,7 @@
     return d;
   }
   async function packs(){ return (await getAll("packs")).sort((a, b) => b.at - a.at); }
+  async function fileOf(packId){ const r = await get("files", packId); return r ? r.blob : null; }
 
   // ---- avancement : répétition espacée (étapes de 0 à 6) ----
   const DAYS = [1, 3, 7, 14, 30, 60, 120];
@@ -104,5 +109,5 @@
     urls.set(k, u); return u;
   }
 
-  root.MTCAnkiStore = {open, putMany, getAll, get, getMany, deleteMany, removePack, savePack, packs, progressOf, saveProgress, mediaUrl, DAYS};
+  root.MTCAnkiStore = {open, putMany, getAll, get, getMany, deleteMany, removePack, savePack, packs, fileOf, progressOf, saveProgress, mediaUrl, DAYS};
 })(window);

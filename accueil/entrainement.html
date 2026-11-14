@@ -25,6 +25,8 @@
   .row{ display:flex; align-items:baseline; gap:12px; }
   .now{ flex:1; min-width:0; }
   .what{ margin:5px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:.9rem; }
+  .how{ margin:3px 0 0; font-size:.78rem; line-height:1.3; color:var(--tint); }
+  .how:empty{ display:none; }
   .go{ flex:none; color:var(--tint); cursor:pointer; background:none; border:0; padding:0; transition:letter-spacing .25s, color .3s; } .go:hover{ letter-spacing:.14em; }
   .go.ready{ color:var(--mtc-accent); animation:nudge 1.6s ease-in-out 2; } @keyframes nudge{ 50%{ transform:translateX(4px); } }
   .segs{ display:flex; gap:4px; margin-top:8px; }
@@ -44,21 +46,37 @@
   #bas{ display:none; flex:none; border-top:1px solid var(--text-color); background:var(--page-bg); touch-action:pan-y; user-select:none; -webkit-user-select:none; }
   #bas .in{ max-width:560px; margin:0 auto; padding:0 20px env(safe-area-inset-bottom); display:flex; align-items:stretch; will-change:transform; }
   #bas .hint{ display:flex; align-items:center; padding-right:14px; }
+  #bas.known .hint{ display:none; }
   #bas button{ flex:1; text-align:right; padding:19px 0 18px; font-size:.74rem; }
   #bas.drag .in{ transition:none; } #bas .in{ transition:transform .2s ease-out, opacity .2s; }
   @media (pointer:coarse), (max-width:760px){ #bas{ display:block; } .band .go{ display:none; } }
   .done #bas{ display:none !important; }
   @media (prefers-reduced-motion:reduce){ .go.ready{ animation:none; } #bas .in{ transition:none; } }
+  /* apprentissage du geste : toute la page glisse vers la gauche, un doigt trace le mouvement et le bord de l'étape suivante apparaît */
+  @keyframes pgSlide{ 0%,12%{ transform:translateX(0); } 42%,62%{ transform:translateX(-58px); } 86%,100%{ transform:translateX(0); } }
+  @keyframes pgPeek{ 0%,12%{ opacity:0; transform:translateX(0); } 42%,62%{ opacity:1; transform:translateX(0); } 80%,100%{ opacity:0; } }
+  @keyframes pgTouch{ 0%{ opacity:0; transform:translateX(0) scale(1); } 8%{ opacity:1; transform:translateX(0) scale(.86); } 42%{ opacity:1; transform:translateX(-150px) scale(.86); } 56%,100%{ opacity:0; transform:translateX(-150px) scale(1); } }
+  #peek, #touch{ display:none; position:fixed; pointer-events:none; z-index:30; }
+  #peek{ top:0; bottom:0; right:0; width:58px; background:var(--page-bg); border-left:1px solid var(--text-color); align-items:center; justify-content:center; }
+  #peek span{ writing-mode:vertical-rl; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; font-weight:700; color:var(--tint); max-height:80%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  #touch{ right:34px; bottom:calc(env(safe-area-inset-bottom) + 14px); width:34px; height:34px; border-radius:50%; border:2px solid var(--text-color); background:rgba(255,255,255,.35); }
+  body.teach{ overflow-x:hidden; }
+  body.teach > .band, body.teach > #jeu, body.teach > #bas{ animation:pgSlide 2.6s ease-in-out both; }
+  body.teach #peek{ display:flex; animation:pgPeek 2.6s ease-in-out both; }
+  body.teach #touch{ display:block; animation:pgTouch 2.6s ease-in-out both; }
+  @media (prefers-reduced-motion:reduce){ body.teach > .band, body.teach > #jeu, body.teach > #bas, body.teach #peek, body.teach #touch{ animation:none; } }
 </style>
 </head>
 <body>
 <div class="band"><div class="in">
   <div class="row"><a class="sc" id="back" href="index.html" aria-label="Retour à l’accueil">←</a><span class="sc now" id="now"></span><button type="button" class="sc go" id="suite">Étape suivante →</button></div>
   <p class="what" id="what"></p>
+  <p class="how" id="how"></p>
   <div class="segs" id="segs"></div>
 </div></div>
 <iframe id="jeu" title="Jeu de l’étape en cours"></iframe>
 <div id="bas"><div class="in"><span class="sc t hint" aria-hidden="true">← glisse</span><button type="button" class="sc go" id="suite2">Étape suivante →</button></div></div>
+<div id="peek" aria-hidden="true"><span id="peekT"></span></div><div id="touch" aria-hidden="true"></div>
 <div id="fin"><div class="in">
   <h1>Entraînement terminé</h1>
   <p class="lead" id="finLead"></p>
@@ -67,6 +85,7 @@
   <a class="sc more" style="display:block; margin-top:12px" href="index.html?coach=1">Continuer avec le coach →</a>
 </div></div>
 <script src="../modules-theme.js?v=20261005-a"></script>
+<script src="coach-textes.js?v=20261113-a"></script>
 <script>
 (function(){
   "use strict";
@@ -90,6 +109,8 @@
     if(!s) return;
     $("now").textContent = "Entraînement · " + (T.i + 1) + " sur " + T.steps.length;
     $("what").innerHTML = esc(s.t) + ' <span class="t">· ' + esc(s.w) + "</span>";
+    // la règle du jeu en une phrase (programmes enregistrés avant l'ajout : prise dans le texte commun)
+    $("how").textContent = s.h || ((window.MTC_COACH || {}).how || {})[s.v] || "";
     suite.textContent = ok ? (lastStep ? "Terminer →" : "Suite : " + T.steps[T.i + 1].t + " →") : lastStep ? "Terminer →" : "Étape suivante →";
     suite.classList.toggle("ready", ok);
     suite2.textContent = suite.textContent; suite2.classList.toggle("ready", ok);
@@ -108,6 +129,21 @@
     };
     frame.src = s.u;
     paint();
+    const mark = ++stepMark; setTimeout(() => { if(mark === stepMark) teach(); }, 2600);
+  }
+  // le geste : montré jusqu'à trois fois, puis plus jamais une fois qu'on a glissé pour de vrai
+  const SW = "mtc_swipe_hint_v1";
+  const swipe = () => { const o = read(SW); return o && typeof o === "object" ? o : {plays:0, learned:false}; };
+  let stepMark = 0, teaching = false;
+  function teach(){
+    const st = swipe(), bas = $("bas");
+    if(st.learned || st.plays >= 3 || teaching || T.fin || document.body.classList.contains("done")) return;
+    if(getComputedStyle(bas).display === "none" || (window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches)) return;
+    const next = T.steps[T.i + 1];
+    $("peekT").textContent = next ? "Suite : " + next.t : "Terminer";
+    st.plays++; try{ localStorage.setItem(SW, JSON.stringify(st)); }catch(e){}
+    teaching = true; document.body.classList.add("teach");
+    setTimeout(() => { document.body.classList.remove("teach"); teaching = false; }, 2700);
   }
   // Pendant l'entraînement, l'écran du jeu est allégé (ses choix du 13/11/2026 sur la maquette). Restent : le plateau, le son,
   // Auto / Manuel, le cadenas, le sous-titre du point, les vies, l'astuce, et recherche / panier / comparer. Sont cachés : le menu,
@@ -125,7 +161,7 @@
     T.fin = true; save(); restoreDomain();
     document.body.classList.add("done"); frame.src = "about:blank";
     const got = T.steps.reduce((a, st, i) => a + Math.min(T.n[i] || 0, st.q), 0), s = read("mtc_daily_streak_v1"), n = s && Number(s.count) || 0;
-    $("now").textContent = "Entraînement du jour"; $("what").style.display = "none"; suite.style.visibility = "hidden";
+    $("now").textContent = "Entraînement du jour"; $("what").style.display = "none"; $("how").style.display = "none"; suite.style.visibility = "hidden";
     $("finLead").textContent = got + (got > 1 ? " bonnes réponses" : " bonne réponse") + " sur " + total + (n ? " · série de " + n + (n > 1 ? " jours" : " jour") : "") + ".";
     $("finList").innerHTML = T.steps.map((st, i) => "<li><span>" + esc(st.t) + ' <span class="w">· ' + esc(st.w) + '</span></span><span class="sc t">' + Math.min(T.n[i] || 0, st.q) + " sur " + st.q + "</span></li>").join("");
     paint();
@@ -142,6 +178,7 @@
   suite.addEventListener("click", () => open(T.i + 1));
   // barre du bas (téléphone) : un toucher ou un glissement vers la gauche passe à l'étape suivante
   const bas = $("bas"), inner = bas.querySelector(".in");
+  if(swipe().learned) bas.classList.add("known");
   let x0 = null, dx = 0, raw = 0, lastGo = 0;
   const avance = () => { if(Date.now() - lastGo < 700) return; lastGo = Date.now(); open(T.i + 1); };
   bas.addEventListener("pointerdown", e => { x0 = e.clientX; dx = 0; raw = 0; bas.classList.add("drag"); try{ bas.setPointerCapture(e.pointerId); }catch(er){} });
@@ -153,6 +190,7 @@
   const fin = () => {
     if(x0 == null) return;
     const mv = dx, tap = Math.abs(raw) < 10; x0 = null; bas.classList.remove("drag"); inner.style.transform = ""; inner.style.opacity = "";
+    if(mv < -60){ const st = swipe(); st.learned = true; try{ localStorage.setItem(SW, JSON.stringify(st)); }catch(e){} document.body.classList.remove("teach"); $("bas").classList.add("known"); }
     if(mv < -60 || tap) avance();   // glissement vers la gauche, ou simple toucher (un glissement vers la droite ne fait rien)
   };
   bas.addEventListener("pointerup", fin);

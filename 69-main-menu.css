@@ -36,6 +36,8 @@ body.mtc-menu-ui .topbar-main-row{
 }
 #mtcMenuButton{ order:-1; }
 body.mtc-menu-ui .topbar-main-buttons{ order:0; }
+#mtcCoachSwitch{ order:0; }
+html body.mtc-menu-ui .practice-row .topbar-main-buttons{ order:9; }
 #mtcTopDomainSwitch{ order:1; }
 #mtcMenuButton, .mtc-domain-switch button{
   background:transparent !important;
@@ -211,7 +213,7 @@ html body.mtc-menu-ui #mtcAudioModeToggle.active{ opacity:1 !important; box-shad
   html body.mtc-menu-ui .practice-row .practice-difficulty-end, #mtcAutoManual{ font-size:10px !important; letter-spacing:.03em !important; }
   /* « À revoir » passe en dessous s'il manque de place, le cadenas reste sur la ligne */
   html body.mtc-menu-ui .practice-row #mtcDueReviewButton{ order:10; }
-  html body.mtc-menu-ui .practice-row #mtcCoachSwitch{ order:9; font-size:11px !important; letter-spacing:.03em !important; }
+  html body.mtc-menu-ui #mtcCoachSwitch{ font-size:11px !important; letter-spacing:.03em !important; }
 }
 /* pendant le chargement : les barres restent cachées jusqu'à ce que le menu les ait réarrangées (pas d'étapes visibles) */
 body.mtc-menu-loading .topbar, body.mtc-menu-loading .bottom-actions, body.mtc-menu-loading #footerTitle{ visibility:hidden !important; }
@@ -294,16 +296,3 @@ html body #advancedSearchPanel .correspondence-checklist{ display:block !importa
 html body #advancedSearchPanel .correspondence-checklist .intersection-column{ width:100% !important; padding-left:0 !important; border-left:0 !important; margin-bottom:6px; }
 html body #advancedSearchPanel .correspondence-checklist .intersection-column-items{ display:grid !important; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)) !important; gap:2px 14px !important; }
 @media (min-width:760px){ html body #advancedSearchPanel .correspondence-checklist .intersection-column-items{ grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)) !important; } }
-
-/* « Soutenir le projet » : portrait en trame de points (portrait-trame.png sert de masque : les points prennent la couleur du halo) */
-#mtcMainMenu .mm-item.mm-has-portrait{ position:relative; padding-left:104px !important; min-height:96px; }
-#mtcMainMenu .mm-portrait{ position:absolute; left:4px; top:6px; width:84px; height:84px; border-radius:50%; background:var(--page-bg);
-  box-shadow:0 6px 16px -8px var(--shadow-color); transition:transform .35s cubic-bezier(.3,1.6,.5,1); animation:mmPortraitIn .7s .15s cubic-bezier(.3,1.6,.5,1) both; }
-#mtcMainMenu .mm-portrait::before{ content:""; position:absolute; inset:0; border-radius:50%; background:var(--shadow-color);
-  -webkit-mask:url("portrait-trame.png") center / cover no-repeat; mask:url("portrait-trame.png") center / cover no-repeat;
-  animation:mmPortraitTurn 240s linear infinite; }
-/* le portrait tourne tout doucement, dans le sens inverse des aiguilles d'une montre (un tour en 4 minutes) */
-@keyframes mmPortraitTurn{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
-#mtcMainMenu .mm-item.mm-has-portrait:hover .mm-portrait{ transform:rotate(-8deg) scale(1.05); }
-@keyframes mmPortraitIn{ 0%{ transform:scale(.4) rotate(12deg); opacity:0; } 60%{ transform:scale(1.12) rotate(-5deg); opacity:1; } 100%{ transform:scale(1) rotate(0); } }
-@media (prefers-reduced-motion:reduce){ #mtcMainMenu .mm-portrait, #mtcMainMenu .mm-portrait::before{ animation:none; } }

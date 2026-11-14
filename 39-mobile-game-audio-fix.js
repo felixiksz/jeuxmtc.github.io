@@ -78,7 +78,8 @@
     const ready = candidates.find(name => decodedBuffers.has(name));
     if(!ready) return false;
     try{
-      if(ctx.state === "suspended") ctx.resume();
+      // lecteur endormi : un son lancé maintenant partirait au prochain toucher, des secondes plus tard ; on laisse le lecteur <audio> jouer tout de suite
+      if(ctx.state !== "running"){ try{ ctx.resume().catch(() => {}); }catch(error){} return false; }
       const source = ctx.createBufferSource();
       source.buffer = decodedBuffers.get(ready);
       const gain = ctx.createGain();

@@ -257,26 +257,11 @@
         (k === tab ? '<div class="mm-phone-list">' + list(k) + "</div>" : "")).join("") + "</div></div>" +
       '<div class="mm-foot"><span class="mm-version">Connections MTC<i class="mm-star">✦</i>v' + MTC_VERSION + "</span>" + thanksHtml() + "</div>";
     menu.setAttribute("data-dom", pharma ? "pharma" : "acu");
-    portrait();
   }
   function domainSwitchHtml(){
     const pharma = isPharma();
     return '<span class="mtc-domain-switch"><button type="button" data-domain="acupuncture" class="' + (pharma ? "" : "on") + '">Acu</button>/' +
       '<button type="button" data-domain="pharmacology" class="' + (pharma ? "on" : "") + '">Pharma</button></span>';
-  }
-  // « Soutenir le projet » : mon portrait en trame de points, aux couleurs du thème (points du halo sur le fond) ;
-  // un petit rebond à l'ouverture du menu, il se penche au survol. Rien si l'image n'est pas là.
-  function portrait(){
-    menu.querySelectorAll(".mm-item").forEach(b => {
-      const n = b.querySelector(".mm-n");
-      if(!n || !/^Soutenir le projet/.test(n.textContent) || b.querySelector(".mm-portrait")) return;
-      const img = new Image();
-      img.onload = () => {
-        const p = document.createElement("span"); p.className = "mm-portrait"; p.setAttribute("aria-hidden", "true");
-        b.classList.add("mm-has-portrait"); b.insertBefore(p, b.firstChild);
-      };
-      img.src = "portrait-trame.png";
-    });
   }
   function open(which){
     if(which) tab = which;
@@ -626,8 +611,13 @@
         try{ localStorage.setItem("mtc_coach", "1"); sessionStorage.removeItem("mtc_entrainement_plus_tard"); }catch(error){}
         window.location.href = "accueil/index.html?coach=1";
       });
-      row.appendChild(co);
+      // Menu, Coach / Libre et Acu / Pharma sont dans la ligne du haut ; Nouvelle partie passe dans la ligne des réglages.
+      // Ainsi Coach / Libre est toujours au même endroit, que « À revoir » soit affiché ou non, et à la même place que sur la page du coach.
+      const topRow = document.querySelector(".topbar-main-row");
+      if(topRow) topRow.insertBefore(co, topRow.querySelector(".topbar-main-buttons") || null); else row.appendChild(co);
     }
+    const nouvelle = document.querySelector(".topbar-main-buttons");
+    if(nouvelle && nouvelle.parentElement !== row) row.appendChild(nouvelle);
     const audio = byId("mtcAudioModeToggle"), lock = byId("gridLockIndicator");
     if(audio && row.firstChild !== audio) row.insertBefore(audio, row.firstChild);
     if(lock && lock.parentElement !== icons) icons.appendChild(lock);

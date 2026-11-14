@@ -213,7 +213,7 @@
       "#cheatsheetButton",
       pharma
         ? "Le Mémo sert d’aide-mémoire rapide pour les SM, les classes et les repères essentiels."
-        : "Le Mémo sert d’aide-mémoire rapide pour les points, les catégories et les grands repères du cours."
+        : "Le Mémo sert d’aide-mémoire rapide pour les points, les catégories et les grands repères."
     );
 
     patchStep(

@@ -3,7 +3,7 @@
 window.mtcEquilibrer = function(main){
   "use strict";
   // Jeu « Équilibrer » : des canaux sont atteints ; choisir le moins de canaux équilibrants possible selon les six
-  // systèmes des canaux unis de Dr Richard Tán (cours « Les six systèmes des canaux unis »). Horloge chinoise des douze
+  // systèmes des canaux unis de Dr Richard Tán. Horloge chinoise des douze
   // canaux ; rèn mài et dū mài hors de l'horloge, sur le passage du yíng qì (F → RM → DM → P), seulement pour le
   // système 1. Un canal atteint peut en équilibrer un autre (pas lui-même).
   // explications du jeu rangées derrière un « ? » (ouvert ou fermé : le choix reste d'un jeu à l'autre)

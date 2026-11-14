@@ -310,9 +310,9 @@
 </aside>
 <div id="tip" role="tooltip"></div>
 <script src="../beta-config.js?v=20261108-a"></script>
-<script src="../beta-gate.js?v=20261110-a"></script>
+<script src="../beta-gate.js?v=20261114-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
-<script src="../beta-modules.js?v=20261113-a"></script>
+<script src="../beta-modules.js?v=20261114-a"></script>
 <script>
   // accès : admins, ou joueurs si les modules bêta sont ouverts (après acceptation : voir beta-gate.js)
   if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Trajets des canaux", onAccept:() => window.dispatchEvent(new Event("mtc-beta-accepted"))})){
@@ -322,8 +322,7 @@
   window.mtcBetaModule("trajets");
   (async () => {
   // ---- données : fichiers locaux (copie de travail) sinon dépôt GitHub PRIVÉ de la synchro ----
-  // Les textes et images du cours ne sont pas sur le site public : la page les lit dans le
-  // dépôt privé configuré dans la synchro GitHub du jeu (même navigateur), avec son token.
+  // La page lit les textes et images dans le dépôt privé configuré dans la synchro GitHub du jeu (même navigateur), avec son token.
   const PRIVATE_DIR = "trajets";
   let dataMode = "local";
   function loadScript(src){
@@ -551,7 +550,7 @@
     distinct:["jīng bié", "Canal distinct"], tendineux:["jīng jīn", "Canal tendineux"], vaisseau:["", ""]
   };
   const TYPE_ORDER = ["principal", "luo", "grand_luo", "distinct", "tendineux", "vaisseau"];
-  // regroupement par couche (comme les listes du cours), puis les merveilleux vaisseaux
+  // regroupement par couche (comme les listes), puis les merveilleux vaisseaux
   const CANAL_ORDER = ["P", "Rt", "GI", "E", "C", "Rn", "IG", "V", "EC", "F", "TF", "VB", "DM", "RM", "CM", "YangQ", "YinQ", "YangW", "YinW", "DaiM"];
   const LAYER_OF = code => CANAL[code] ? CANAL[code].layer : code;
 
@@ -1386,8 +1385,8 @@
   let NET_HL = {mv:false, luo:false, dist:false};
   try{ Object.assign(NET_HL, JSON.parse(localStorage.getItem("mtc_trajets_net_hl") || "{}")); }catch(e){}
   // points luò : canal couplé (biǎo / lǐ) ; RM 15, DM 1 et le grand luò de la rate (Rt 21) n'ont pas de canal couplé
-  // canaux distincts (jīng bié) : points cités dans leur trajet du cours → {point: [canaux distincts qui y passent]}
-  // + mentions des fiches des points (trajets-distincts.js) ; DIST_SRC[point][canal] = source (cours, fiche, selon …)
+  // canaux distincts (jīng bié) : points cités dans leur trajet → {point: [canaux distincts qui y passent]}
+  // + mentions des fiches des points (trajets-distincts.js) ; DIST_SRC[point][canal] = source (trajet, fiche, selon …)
   const DIST_SRC = {};
   function distinctPoints(){
     const out = {};
@@ -1408,7 +1407,7 @@
   }
   const LUO_POINTS = {"P 7":"GI", "GI 6":"P", "E 40":"Rt", "Rt 4":"E", "C 5":"IG", "IG 7":"C", "V 58":"Rn", "Rn 4":"V", "EC 6":"TF", "TF 5":"EC",
     "VB 37":"F", "F 5":"VB", "RM 15":null, "DM 1":null, "Rt 21":null};
-  // les six systèmes des canaux unis (Dr Richard Tán) : canaux qui se rééquilibrent (cours « Les six systèmes des canaux unis »)
+  // les six systèmes des canaux unis (Dr Richard Tán) : canaux qui se rééquilibrent
   const TAN_SYSTEMS = {
     1:{name:"grands canaux de même nom (tóng míng)", pairs:[["P", "Rt"], ["GI", "E"], ["C", "Rn"], ["IG", "V"], ["EC", "F"], ["TF", "VB"], ["DM", "RM"]]},
     2:{name:"six couches (zàng fǔ bié tōng) : tài yīn ↔ tài yáng, shào yīn ↔ shào yáng, jué yīn ↔ yáng míng", pairs:[["P", "V"], ["GI", "F"], ["E", "EC"], ["Rt", "IG"], ["C", "VB"], ["Rn", "TF"]]},

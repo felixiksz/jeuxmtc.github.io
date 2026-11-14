@@ -17,11 +17,15 @@
     --tint:color-mix(in srgb, var(--text-color) 58%, var(--page-bg)); --faint:color-mix(in srgb, var(--text-color) 16%, var(--page-bg)); }
   *{ box-sizing:border-box; }
   body{ margin:0; background:var(--page-bg); color:var(--text-color); font:400 15px/1.4 'Archivo', sans-serif; -webkit-font-smoothing:antialiased; }
-  main{ max-width:560px; margin:0 auto; padding:18px 20px 92px; min-height:100vh; }
+  main{ max-width:560px; margin:0 auto; padding:62px 20px 92px; min-height:100vh; }
   .sc{ font:800 .68rem/1.3 'Archivo', sans-serif; letter-spacing:.09em; text-transform:uppercase; }
   .t{ color:var(--tint); }
   a{ color:inherit; text-decoration:none; }
-  .top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:26px; }
+  /* Les boutons permanents (Menu, Coach / Libre, Série, recherche, panier, comparer, collection, soutien, message) sont aux mêmes
+     endroits que sur la grille, quel que soit le mode : mêmes décalages, mêmes tailles que dans 69-main-menu.css. */
+  .mrow{ position:absolute; top:13px; left:8px; right:8px; max-width:calc(100% - 16px); display:flex; justify-content:space-between; align-items:center; padding:0 6px; gap:10px; z-index:3; }
+  .mmenu{ order:-1; padding:6px 4px; font:700 7.92px 'Archivo', sans-serif; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; color:var(--text-color); }
+  .ph{ width:76.3px; height:20px; }
   .goalbar{ height:3px; background:var(--faint); margin:7px 0 30px; }
   .goalbar i{ display:block; height:3px; background:var(--mtc-accent); width:0; transition:width .8s cubic-bezier(.2,.8,.2,1); }
   h1{ font:400 1.7rem/1.15 'Libre Baskerville', Georgia, serif; margin:0; }
@@ -55,11 +59,31 @@
     font:inherit; color:inherit; text-align:left; cursor:pointer; padding:13px 0; }
   .step.ch:hover .p{ color:var(--mtc-accent); }
   .back, .encore{ display:block; margin:16px 0 0; background:none; border:0; padding:0; cursor:pointer; }
+  /* Même langage visuel que la grille libre : des mots en Libre Baskerville gras, sans cadre ni filet, posés sur le papier avec la
+     même ombre douce (drop-shadow) que les tuiles ; les étapes forment une grille comme les points de la grille. */
+  #seance{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:4px; margin:10px 0 6px; }
+  .step, .step.ch{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; position:relative; width:100%; padding:20px 8px 14px; border:0; background:none; margin:0;
+    filter:drop-shadow(rgba(0, 0, 0, .18) 0 4px 8px); cursor:pointer; }
+  .step:last-child{ border-bottom:0; }
+  .step > svg{ width:50px; height:50px; }
+  .step .k{ position:absolute; top:10px; left:10px; font:800 .66rem 'Archivo', sans-serif; text-align:left; }
+  .step .p{ position:absolute; top:10px; right:10px; }
+  .step .tx{ display:block; min-width:0; }
+  .step .n{ font:800 .86rem/1.25 'Libre Baskerville', serif; letter-spacing:.02em; }
+  .step .w{ margin-top:3px; font-size:.74rem; text-align:center; -webkit-line-clamp:3; }
+  /* questions du coach : une colonne, les règles des jeux en entier */
+  #seance.q{ grid-template-columns:1fr; gap:2px; } .step.ch .w{ display:block; -webkit-line-clamp:unset; overflow:visible; font-size:.8rem; line-height:1.35; margin-top:4px; }
+  .step.ch{ padding:14px 14px 12px; }
+  .step.encours .n, .step.ch:hover .n{ text-decoration:underline; text-decoration-color:var(--shadow-color); text-decoration-thickness:2px; text-underline-offset:5px; }
+  .step.ch .p{ display:none; }
+  .step.ch .n{ font-size:.95rem; } .step.ch{ padding:16px 8px 14px; min-height:64px; justify-content:center; }
+  h1{ font-weight:700; }
+  #seance .back{ grid-column:1 / -1; text-align:left; margin-top:10px; }
   .encore{ margin-top:10px; color:var(--mtc-accent); }
   [hidden]{ display:none !important; }
   /* Coach / Libre : le même interrupteur que sur la grille (comme Auto / Manuel) ; le choix est gardé sur l'appareil (mtc_coach) */
-  .mode{ display:inline-flex; align-items:baseline; gap:5px; white-space:nowrap; }
-  .mode button{ background:none; border:0; padding:0; color:var(--text-color); cursor:pointer; }
+  .mode{ display:inline-flex; align-items:baseline; gap:2px; white-space:nowrap; font:400 12px 'Archivo', sans-serif; letter-spacing:.03em; }
+  .mode button{ background:none; border:0; padding:6px 3px; color:var(--text-color); cursor:pointer; font-family:'Archivo', sans-serif; font-weight:700; font-size:inherit; line-height:normal; text-transform:uppercase; letter-spacing:.06em; }
   .mode button.on{ text-decoration:underline; text-decoration-color:var(--shadow-color); text-decoration-thickness:2px; text-underline-offset:5px; }
   svg .l{ fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
   svg .d{ stroke-dasharray:3 3.4; }
@@ -74,17 +98,25 @@
   .chip{ display:inline-flex; align-items:center; justify-content:center; min-width:40px; height:40px; padding:0 8px; border:1.6px solid var(--text-color); border-radius:999px; font-weight:800; font-size:.86rem; }
   .chip.q{ border-style:dashed; border-color:var(--mtc-accent); color:var(--mtc-accent); }
   .hop{ font-size:.74rem; color:var(--tint); }
-  footer{ position:fixed; left:0; right:0; bottom:0; background:var(--page-bg); }
-  footer div{ max-width:560px; margin:0 auto; padding:10px 20px 14px; display:flex; justify-content:space-between; align-items:center; }
   /* le lexique sous la main, sur toutes les pages : recherche, panier, comparer */
-  .tools{ display:flex; gap:20px; } .tools a{ display:block; } .tools svg{ display:block; width:21px; height:21px; }
-  .tools a:hover{ color:var(--mtc-accent); }
+  #serie{ position:fixed; left:12px; bottom:20px; z-index:5; padding:2px 0; font:700 11px 'Archivo', sans-serif; text-transform:uppercase; letter-spacing:.07em; color:var(--text-color); }
+  #serie small{ font-size:inherit; font-weight:400; margin-left:3px; }
+  #bicons{ position:fixed; left:50%; bottom:14px; height:28px; transform:translateX(-50%); z-index:5; display:flex; align-items:center; gap:12px; }
+  #bicons a{ display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; color:var(--text-color); } #bicons svg{ width:16px; height:16px; display:block; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  #drop, #mail{ position:fixed; bottom:13px; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; z-index:5; color:var(--text-color); }
+  #drop{ right:54px; font-size:15px; line-height:15px; } #mail{ right:12px; font-size:14.3px; line-height:14.3px; }
+  #bicons a:hover, #serie:hover, #mail:hover{ filter:drop-shadow(0 2px 6px var(--shadow-color)); }
+  @media (min-width:761px){
+    .mrow{ left:28px; right:28px; top:21px; max-width:none; } .mmenu{ font-size:18px; } .ph{ width:151.2px; height:31.6px; } .mode{ font-size:12px; letter-spacing:normal; }
+    #serie{ left:16px; } #mail{ right:16px; font-size:24.3px; line-height:24.3px; } #drop, #mail{ width:30px; height:30px; } #bicons{ gap:22px; } #bicons svg{ width:17px; height:17px; }
+  }
+  @media (max-width:760px){ .mode{ font-size:11px; } }
   .note{ margin:30px 0 0; font-size:.8rem; color:var(--tint); }
 </style>
 </head>
 <body>
 <main>
-  <div class="top"><span class="sc">Connections MTC</span><span class="mode" id="mode"><button type="button" class="sc on" data-coach="1" title="Le jeu te donne des sujets à réviser">Coach</button><span class="sc t">/</span><button type="button" class="sc" data-coach="0" title="Tu choisis toi-même ce que tu révises">Libre</button></span><a class="sc t" href="../index.html#ouvrir-menu"><svg viewBox="0 0 12 10" width="12" height="10" style="margin-right:6px" aria-hidden="true"><path class="l" d="M1 1.5H11M1 5H11M1 8.5H11"/></svg>Menu</a></div>
+  <div class="mrow"><a class="mmenu" id="menuLink" href="../index.html#ouvrir-menu">≡ Menu</a><span class="mode" id="mode"><button type="button" class="on" data-coach="1" title="Le jeu te donne des sujets à réviser">Coach</button>/<button type="button" data-coach="0" title="Tu choisis toi-même ce que tu révises">Libre</button></span><span class="ph" aria-hidden="true"></span></div>
 
   <span class="sc t" id="goalTxt">Aujourd’hui</span>
   <div class="goalbar"><i id="goalBar"></i></div>
@@ -98,19 +130,24 @@
     <button type="button" class="sc encore" id="encore" hidden>Continuer avec le coach →</button>
   </div>
   <p class="note" id="note">Le coach (non IA) compose le programme d’après tes réponses et tes résultats.</p>
+  <p class="note"><button type="button" class="sc t" id="tourBtn" style="background:none;border:0;padding:0;cursor:pointer">Revoir les explications</button></p>
 
 
 
 
 </main>
-<footer><div><span class="sc" id="serie">Série</span>
-  <span class="tools">
-    <a href="../index.html#ouvrir-recherche" title="Recherche" aria-label="Recherche"><svg viewBox="0 0 24 24"><circle class="l" cx="10.5" cy="10.5" r="6.5"/><path class="l" d="M15.5 15.5L21 21"/></svg></a>
-    <a href="../index.html#ouvrir-panier" title="Panier" aria-label="Panier"><svg viewBox="0 0 24 24"><path class="l" d="M4 9H20L18.3 19.5H5.7Z"/><path class="l" d="M8.5 9L11 3.5M15.5 9L13 3.5"/></svg></a>
-    <a href="../index.html#ouvrir-comparer" title="Comparer A | B" aria-label="Comparer"><svg viewBox="0 0 24 24"><rect class="l" x="3.5" y="4.5" width="7" height="15" rx="1.5"/><rect class="l" x="13.5" y="4.5" width="7" height="15" rx="1.5"/></svg></a>
-  </span>
-  </div></footer>
+<a id="serie" href="../index.html#ouvrir-stats">Série</a>
+<div id="bicons">
+  <a href="../index.html#ouvrir-recherche" title="Recherche" aria-label="Recherche"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></a>
+  <a href="../index.html#ouvrir-panier" title="Panier" aria-label="Panier"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9H20L18.3 19.5H5.7Z"/><path d="M8.5 9L11 3.5M15.5 9L13 3.5"/></svg></a>
+  <a href="../index.html#ouvrir-comparer" title="Comparer A | B" aria-label="Comparer A | B"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="7" height="15" rx="1.5"/><rect x="13.5" y="4.5" width="7" height="15" rx="1.5"/></svg></a>
+  <a href="../index.html#ouvrir-collection" title="Collection" aria-label="Collection"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="6" r="2.2" fill="currentColor"/><circle cx="12" cy="6" r="2.2"/><circle cx="18.5" cy="6" r="2.2" fill="currentColor"/><circle cx="5.5" cy="12.5" r="2.2"/><circle cx="12" cy="12.5" r="2.2" fill="currentColor"/><circle cx="18.5" cy="12.5" r="2.2"/><circle cx="5.5" cy="19" r="2.2" fill="currentColor"/><circle cx="12" cy="19" r="2.2"/><circle cx="18.5" cy="19" r="2.2" fill="currentColor"/></svg></a>
+</div>
+<a id="drop" href="https://paypal.me/emesepap1" target="_blank" rel="noopener noreferrer" title="Soutenir le projet" aria-label="Soutenir le projet sur PayPal">🩸</a>
+<a id="mail" href="mailto:papemesedorottya@gmail.com?subject=Suggestion%20Connections%20MTC" target="_blank" rel="noopener" title="Envoyer une suggestion" aria-label="Envoyer une suggestion par email">✉︎</a>
 <script src="../modules-theme.js?v=20261005-a"></script>
+<script src="../beta-tour.js?v=20261005-b"></script>
+<script src="coach-textes.js?v=20261113-a"></script>
 <script src="../trajets/trajets-jiaohui.js?v=20261005-dist"></script>
 <script>
 (function(){
@@ -183,7 +220,7 @@
   document.getElementById("goalTxt").textContent = "Aujourd’hui · " + done + " sur " + goal;
   requestAnimationFrame(() => { document.getElementById("goalBar").style.width = Math.min(100, Math.round(done / goal * 100)) + "%"; });
   const s = read("mtc_daily_streak_v1"), n = s && Number(s.count) || 0;
-  document.getElementById("serie").textContent = "Série " + n + (n > 1 ? " jours" : " jour");
+  document.getElementById("serie").innerHTML = "Série " + n + "<small>" + (n > 1 ? "jours" : "jour") + "</small>";
 
   // ---------- l'entraînement du jour : quatre étapes, vingt bonnes réponses (l'objectif du jour) ----------
   const KEY = "mtc_entrainement_v1", VER = 3;   // VER : un programme enregistré avec une ancienne forme est recalculé
@@ -221,7 +258,8 @@
       manquante:{v:"manquante", t:"Substance manquante", w:"des formules à compléter", u:F + "#jeu", q:5},
       cas:{v:"cas", t:"Cas clinique", w:"une consultation", u:F + "#cas", q:1}}};
   }
-  const programme = (steps, extra, choix) => ({d:today, ver:VER, extra:extra || 0, choix:choix || "", steps, i:0, n:steps.map(() => 0), fin:false});
+  const HOW = (window.MTC_COACH || {}).how || {};
+  const programme = (steps, extra, choix) => ({d:today, ver:VER, extra:extra || 0, choix:choix || "", steps:steps.map(s => Object.assign({h:HOW[s.v] || ""}, s)), i:0, n:steps.map(() => 0), fin:false});
   // Le programme du jour : quatre sujets (les points, les canaux, les circuits, la pharmacopée), un jeu par sujet. D'un jour à l'autre,
   // le jeu de chaque sujet change et l'ordre des sujets tourne.
   function varie(extra){
@@ -237,27 +275,27 @@
   const arbre = due => ({q:"Que veux-tu réviser ?", c:[
     {t:"L’acupuncture", q:"Quoi, en acupuncture ?", c:[
       {t:"Les points", q:"Comment veux-tu les revoir ?", c:[
-        {t:"Retrouver des groupes de points", w:"Grille", jeux:["grille"]},
-        {t:"Répondre à des questions", w:"Quiz", jeux:["quiz"]},
-        due > 0 && {t:"Revoir mes erreurs", w:due + (due > 1 ? " points à revoir" : " point à revoir"), jeux:["revoir"]},
-        {t:TOUT, jeux:["grille", "quiz"]}]},
+        {t:"Retrouver des groupes de points", w:"Grille : " + HOW.grille, jeux:["grille"]},
+        {t:"Répondre à des questions", w:"Quiz : " + HOW.quiz, jeux:["quiz"]},
+        due > 0 && {t:"Revoir mes erreurs", w:"Quiz sur les " + due + (due > 1 ? " points" : " point") + " à revoir : ceux que tu as ratés, ou qui reviennent.", jeux:["revoir"]},
+        {t:TOUT, w:"Une grille et un quiz.", jeux:["grille", "quiz"]}]},
       {t:"Les canaux", q:"Quoi, sur les canaux ?", c:[
-        {t:"Où ils se croisent", w:"Correspondance", jeux:["metro"]},
-        {t:"Les six systèmes", w:"Équilibrer", jeux:["equilibrer"]},
-        {t:"Les familles de canaux", w:"Grille des familles", jeux:["familles"]},
-        {t:TOUT, jeux:["metro", "equilibrer", "familles"]}]},
+        {t:"Où ils se croisent", w:"Correspondance : " + HOW.metro, jeux:["metro"]},
+        {t:"Les six systèmes", w:"Équilibrer : " + HOW.equilibrer, jeux:["equilibrer"]},
+        {t:"Les familles de canaux", w:"Grille des familles : " + HOW.familles, jeux:["familles"]},
+        {t:TOUT, w:"Un jeu de chaque.", jeux:["metro", "equilibrer", "familles"]}]},
       {t:"Les circuits", q:"Quoi, sur les circuits ?", c:[
-        {t:"Les reconnaître", w:"Circuit ou pas ?, Quel circuit ?", jeux:["oupas", "quel"]},
-        {t:"Les construire", w:"Fermer le circuit", jeux:["fermer"]},
-        {t:"Raisonner sur un cas", w:"Trois plaintes, Propagation, Le cas mystère", jeux:["plaintes", "propagation", "cache"]},
-        {t:TOUT, jeux:["oupas", "fermer", "plaintes", "quel"]}]},
-      {t:TOUT, jeux:["grille", "metro", "oupas", "quiz"]}]},
+        {t:"Les reconnaître", w:"Circuit ou pas ? : " + HOW.oupas + "\\nQuel circuit ? : " + HOW.quel, jeux:["oupas", "quel"]},
+        {t:"Les construire", w:"Fermer le circuit : " + HOW.fermer, jeux:["fermer"]},
+        {t:"Raisonner sur un cas", w:"Trois plaintes : " + HOW.plaintes + "\\nPropagation : " + HOW.propagation + "\\nLe cas mystère : " + HOW.cache, jeux:["plaintes", "propagation", "cache"]},
+        {t:TOUT, w:"Un peu de chaque.", jeux:["oupas", "fermer", "plaintes", "quel"]}]},
+      {t:TOUT, w:"Les points, les canaux et les circuits.", jeux:["grille", "metro", "oupas", "quiz"]}]},
     {t:"La pharmacopée", q:"Quoi, en pharmacopée ?", c:[
-      {t:"Les substances", w:"Grille", jeux:["grillePh"]},
-      {t:"Les formules", w:"Substance manquante", jeux:["manquante"]},
-      {t:"Un cas clinique", w:"Cas clinique", jeux:["cas"]},
-      {t:TOUT, jeux:["grillePh", "manquante", "cas"]}]},
-    {t:TOUT, w:"le coach choisit", jeux:null}]});
+      {t:"Les substances", w:"Grille : " + HOW.grillePh, jeux:["grillePh"]},
+      {t:"Les formules", w:"Substance manquante : " + HOW.manquante, jeux:["manquante"]},
+      {t:"Un cas clinique", w:"Cas clinique : " + HOW.cas, jeux:["cas"]},
+      {t:TOUT, w:"Une grille, une substance manquante et un cas clinique.", jeux:["grillePh", "manquante", "cas"]}]},
+    {t:TOUT, w:"Le coach choisit, comme dans l’entraînement du jour.", jeux:null}]});
   // dernière question : le temps. Il fixe le nombre d'étapes ; avec peu de jeux, chaque étape dure plus longtemps.
   const TEMPS = {q:"Combien de temps ?", c:[{t:"Cinq minutes", L:2}, {t:"Dix minutes", L:4}, {t:"Vingt minutes", L:8}]};
   function surMesure(feuille, L, extra){
@@ -277,7 +315,7 @@
   let Q = null;   // questions en cours : {chemin:[réponses], noeud, feuille}
   function drawTraining(){
     const begun = T.fin || T.i > 0 || T.n.some(x => x > 0);
-    $("titre").textContent = T.choix ? "Ton programme" : "Entraînement du jour";
+    $("titre").textContent = T.choix ? "Ton programme" : "Entraînement du jour"; $("seance").classList.remove("q");
     $("seance").innerHTML = T.steps.map((st, i) => { const plein = T.n[i] >= st.q, fait = plein || T.fin || i < T.i, cur = !fait && begun && i === T.i;
       return '<a class="step' + (fait ? " fait" : cur ? " encours" : "") + '" href="entrainement.html#' + (i + 1) + '"><span class="k">' + (plein ? CHECK : i + 1) + "</span>" + V[st.v] +
         '<span class="tx"><span class="n">' + st.t + '</span><span class="w">' + esc(st.w) + '</span></span><span class="sc t p">' + (!plein && T.n[i] ? T.n[i] + " sur " + st.q : "") + "</span></a>"; }).join("");
@@ -295,9 +333,9 @@
     const n = Q.noeud;
     $("titre").textContent = n.q;
     $("lead").textContent = Q.chemin.length ? Q.chemin.join(" › ") : "Tes réponses font le programme.";
-    $("seance").innerHTML = n.c.filter(Boolean).map((c, i) => '<button type="button" class="step ch" data-ch="' + i + '"><span class="tx"><span class="n">' + esc(c.t) + "</span>" + (c.w ? '<span class="w">' + esc(c.w) + "</span>" : "") +
+    $("seance").innerHTML = n.c.filter(Boolean).map((c, i) => '<button type="button" class="step ch" data-ch="' + i + '"><span class="tx"><span class="n">' + esc(c.t) + "</span>" + (c.w ? '<span class="w">' + esc(c.w).replace(/\n/g, "<br>") + "</span>" : "") +
       '</span><span class="sc t p">→</span></button>').join("") + '<button type="button" class="sc t back" data-back="1">← ' + (Q.pile.length ? "Question précédente" : "Annuler") + "</button>";
-    $("actions").hidden = true;
+    $("actions").hidden = true; $("seance").classList.add("q");
   }
   function ask(){ Q = {chemin:[], pile:[], noeud:arbre(catalogue(numJour()).due), feuille:null}; drawQ(); window.scrollTo(0, 0); }
   $("seance").addEventListener("click", e => {
@@ -332,6 +370,19 @@
     try{ localStorage.setItem("mtc_coach", "0"); }catch(er){} location.href = "../index.html"; });
   // « Refaire » sert aux essais : réservé au mode admin
   try{ if(localStorage.getItem("mtc_admin") !== "1") $("again").remove(); }catch(e){}
+  // Tutoriel du coach : montré la première fois sur cet appareil (clé mtc_tour_coach_v1), puis à la demande (« Revoir les explications »).
+  const TOUR = [
+    {sel:"#mode", title:"Coach ou Libre", text:"Coach : le jeu te propose chaque jour un entraînement varié, sur des sujets différents. Libre : tu choisis toi-même ; le site s’ouvre alors directement sur la grille. Tu peux changer à tout moment, l’appareil retient ton choix."},
+    {sel:"#seance", title:"Ton entraînement du jour", text:"Quatre étapes, un jeu par sujet : les points, les canaux, les circuits, la pharmacopée. Le programme change chaque jour. Chaque bonne réponse compte pour l’objectif du jour (20 par jour)."},
+    {sel:".step", title:"Une étape", text:"Clique sur une étape pour la jouer tout de suite. Dans le jeu, une ligne rappelle la règle : par exemple, en pharmacopée, « Substance manquante » (retrouver la substance cachée d’une formule) ou « Cas clinique » (conseiller une formule à un·e patient·e)."},
+    {sel:"#go", title:"Commencer", text:"Les étapes s’enchaînent. Sur téléphone, la barre du bas passe à l’étape suivante : touche-la, ou glisse-la vers la gauche."},
+    {sel:"#later", title:"Plus tard", text:"Ouvre la grille sans faire l’entraînement. Il te sera reproposé à la prochaine ouverture du site."},
+    {sel:"#note", title:"Quand c’est fini", text:"Clique sur « Continuer avec le coach » : il te demande ce que tu veux réviser (matière, sujet, façon de jouer, durée) et compose un programme d’après tes réponses. Chaque choix t’explique le jeu qu’il lance. Le coach n’est pas une IA : il suit tes réponses et tes résultats."}
+  ];
+  const tour = force => { if(!window.mtcTour || Q) return; const vis = s => { const e = document.querySelector(s); return !!e && e.getClientRects().length > 0; };
+    window.mtcTour(TOUR.filter(t => vis(t.sel)), {key:"mtc_tour_coach_v1", force:!!force}); };
+  $("tourBtn").addEventListener("click", () => tour(true));
+  setTimeout(() => tour(false), 700);
   // « Plus tard » : la grille s'ouvre sans l'entraînement, jusqu'à la prochaine ouverture du site
   $("later").addEventListener("click", () => { try{ sessionStorage.setItem("mtc_entrainement_plus_tard", "1"); }catch(e){} });
   // (test) repartir de zéro, avec le programme du jour

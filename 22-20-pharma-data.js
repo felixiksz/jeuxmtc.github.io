@@ -5545,7 +5545,7 @@
     "missingDetailedSheet": false,
     "classeEssentielle": "SM qui transforment le tán et arrête la toux",
     "indications": "Mucosités humidité avec toux, expectorations abondantes, oppression thoracique, vertiges ou palpitations liés aux mucosités.\nInversion du qì de l’estomac avec nausées et vomissements.\nSyndrome du noyau de prune, nodosités, abcès et gonflements en usage externe.",
-    "contre_indications": "Vide de yīn, lésions des liquides avec bouche sèche, syndromes du sang et mucosités sècheresse.\nIncompatible avec les substances provenant d’aconites ; également incompatible avec la viande de mouton, le sang de mouton et yí táng selon le cours.",
+    "contre_indications": "Vide de yīn, lésions des liquides avec bouche sèche, syndromes du sang et mucosités sècheresse.\nIncompatible avec les substances provenant d’aconites ; également incompatible avec la viande de mouton, le sang de mouton et yí táng.",
     "preparation": "Bàn xià cru : usage externe seulement en raison de sa toxicité.\nBàn xià préparé au gingembre : usage interne pour tiédir le centre, assécher l’humidité et transformer les mucosités.\nQīng bàn xià : préparation avec bái fán, forme très asséchante.\nFǎ bàn xià : préparation avec chaux et réglisse, utile pour renforcer la rate et harmoniser l’estomac.",
     "incompleteFields": [],
     "detailSource": "00_DOCUMENTATION_TOUT SM.pdf — section SM qui transforment le tán, arrêtent la toux et apaisent la dyspnée"

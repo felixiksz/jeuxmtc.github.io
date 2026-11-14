@@ -4,11 +4,6 @@
    mode de jeu "réseau de transport des méridiens" (métro/bus/
    limousine/hélicoptère). Ce fichier n'affiche rien seul : il
    expose window.MTC_TRANSIT_DATA pour 54-meridian-transit-game.js.
-
-   Sources : cours Zhōng Lì "Les canaux réguliers" (301), "Les
-   vaisseaux liaisons" (302), "Les canaux distincts" (303), et
-   les points de confluence classiques des 8 vaisseaux
-   extraordinaires (qí jīng bā mài).
    ============================================================ */
 (function(){
   "use strict";
@@ -106,8 +101,7 @@
     {id:"C5",  channel:"C",  name:"Bus Cœur → Intestin Grêle",         from:"C5",  to:"IG1"},
     {id:"IG7", channel:"IG", name:"Bus Intestin Grêle → Cœur",         from:"IG7", to:"C9"},
     // La vessie n'a pas de trajet vertical propre : son luò se
-    // connecte uniquement au canal des reins (cas particulier,
-    // relevé explicitement dans le cours).
+    // connecte uniquement au canal des reins (cas particulier).
     {id:"V58", channel:"V",  name:"Bus Vessie → Rein",                 from:"V58", to:"Rn1", special:"pas de trajet vertical propre"},
     {id:"Rn4", channel:"Rn", name:"Bus Rein → Vessie",                 from:"Rn4", to:"V67"},
     {id:"EC6", channel:"EC", name:"Bus Enveloppe du Cœur → Trois Foyers", from:"EC6", to:"TF1"},
@@ -121,8 +115,8 @@
   ];
 
   // === LIMOUSINE — canaux distincts (jīng biè) =================
-  // 12 canaux distincts, sans point d'acupuncture propre (per le
-  // cours), circulant en profondeur puis remontant se réunir deux
+  // 12 canaux distincts, sans point d'acupuncture propre,
+  // circulant en profondeur puis remontant se réunir deux
   // par deux en 6 "unions" (liù hé) sur un point du canal yáng.
   // Modélisé comme 6 lignes "limousine" (une par union), chacune
   // reliant les deux points de séparation (lí) — quand ils sont

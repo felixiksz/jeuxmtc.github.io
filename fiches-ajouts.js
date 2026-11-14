@@ -1,4 +1,4 @@
-/* Ajouts du cours aux fiches (précautions, contre-indications, associations…), intégrés au contenu du jeu.
+/* Ajouts aux fiches (précautions, contre-indications, associations…), intégrés au contenu du jeu.
    Appliqués au chargement, avant les corrections faites dans le jeu (fiches-corrections.js, badge « corrigée »). */
 window.MTC_FICHE_ADDITIONS = {
   "points": {},
