@@ -147,7 +147,7 @@
   function translateAssistantPoint(entry){
     const out = {};
     if(entry.pinyin != null) out.pinyin = entry.pinyin;
-    if(entry.hanzi != null) out.hanzi = entry.hanzi;
+    if(entry.hanzi != null && /[㐀-鿿]/.test(String(entry.hanzi))) out.hanzi = entry.hanzi;   // un hanzi sans caractère chinois (pinyin glissé dans le champ) ne remplace pas le bon
     if(entry.nom_fr != null) out.nom_francais = entry.nom_fr;
     if(entry.localisation != null) out.localisation = entry.localisation;
     if(entry.methode_localisation != null) out.methode_localisation = entry.methode_localisation;
