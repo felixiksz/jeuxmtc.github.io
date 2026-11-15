@@ -10,7 +10,7 @@
 <style>
   /* « Correspondance » : le jeu du module Trajets (il remplace l'Itinéraire).
      Une ligne (un canal), ses points d'intersection en stations, un véhicule arrêté par des travaux :
-     il doit changer de ligne à la bonne station. Les intersections sont celles du plan (trajets-jiaohui.js).
+     il doit prendre la correspondance à la bonne station. Les intersections sont celles du plan (trajets-jiaohui.js).
      Une partie = une série de dix trajets, avec un record. ?ligne=Rt : la série part toujours de cette ligne. */
   :root{ --page-bg:#FCFCFA; --text-color:#271629; --shadow-color:#0000FF; --mtc-accent:#0000FF;
     --tint:color-mix(in srgb, var(--text-color) 58%, var(--page-bg)); --faint:color-mix(in srgb, var(--text-color) 16%, var(--page-bg)); }
@@ -161,7 +161,7 @@
   }
   function draw(){
     const a = R.a, b = R.b;
-    q.innerHTML = "Travaux sur la ligne <b>" + esc(a) + "</b>. " + R.veh[1] + " doit rejoindre la ligne <b>" + esc(b) + "</b> : clique sur la station où il peut changer.";
+    q.innerHTML = "Travaux sur la ligne <b>" + esc(a) + "</b>. " + R.veh[1] + " doit rejoindre la ligne <b>" + esc(b) + "</b> : clique sur la station où il peut prendre la correspondance.";
     res.innerHTML = "";
     let s = "";
     // ligne à rejoindre, en bas, avec son terminus entouré

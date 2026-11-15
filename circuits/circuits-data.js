@@ -91,7 +91,7 @@ window.MTC_CIRCUITS = [
   "indications": [
    "troubles du nez, des yeux, des oreilles, de la tête, migraine au repos..",
    "troubles de la respiration, allergie, asthme, troubles du nez, mei he qi, syndrome de noyau de prune, obstruction de la gorge, allergies au changement de saison..",
-   "troubles psycho-émotionnels, tristesse, colère, psychose dépressive diān, psychose maniaque kuáng, irritabilité, fatigue, irritabilité et fatigue si faim, tension émotionnelle (pénitude plutot), sujet au burn-out hyperactifs, ils poussent jusqu'au bout puis tombent malade en vacances…",
+   "troubles psycho-émotionnels, tristesse, colère, psychose dépressive diān, psychose maniaque kuáng, irritabilité, fatigue, irritabilité et fatigue si faim, tension émotionnelle (plénitude plutôt), sujet au burn-out hyperactifs, ils poussent jusqu'au bout puis tombent malades en vacances…",
    "troubles des mictions",
    "troubles des parties génitales, impuissance…",
    "douleur du dos, des lombes, de la nuque, de la scapula…"

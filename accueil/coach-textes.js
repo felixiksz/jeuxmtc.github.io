@@ -10,7 +10,7 @@ window.MTC_COACH = {
     grille:"Seize points : retrouve les quatre groupes de quatre points qui vont ensemble.",
     grillePh:"Seize substances : retrouve les quatre classes de quatre substances.",
     quiz:"Une question, quatre choix : quel est le point… ? Les points ratés reviennent plus souvent.",
-    metro:"Un métro est arrêté par des travaux sur un canal : clique sur la station (un point d’intersection) où il peut changer pour rejoindre l’autre canal.",
+    metro:"Un métro est arrêté par des travaux sur un canal : clique sur la station (un point d’intersection) où il peut prendre la correspondance pour rejoindre l’autre canal.",
     equilibrer:"Des canaux sont atteints : rééquilibre-les, selon les six systèmes de Dr Tán, avec le moins de canaux possible.",
     familles:"Retrouve à quelle famille appartient chaque canal (tài yīn, shào yīn, jué yīn, tài yáng, shào yáng, yáng míng).",
     oupas:"Quatre canaux forment-ils un circuit ? Réponds oui ou non (sur téléphone, glisse le schéma vers la droite pour oui, vers la gauche pour non).",

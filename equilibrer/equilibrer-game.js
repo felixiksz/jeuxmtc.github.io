@@ -5,7 +5,7 @@ window.mtcEquilibrer = function(main){
   // Jeu « Équilibrer » : des canaux sont atteints ; choisir le moins de canaux équilibrants possible selon les six
   // systèmes des canaux unis de Dr Richard Tán. Horloge chinoise des douze
   // canaux ; rèn mài et dū mài hors de l'horloge, sur le passage du yíng qì (F → RM → DM → P), seulement pour le
-  // système 1. Un canal atteint peut en équilibrer un autre (pas lui-même).
+  // système 1. Un canal atteint peut en équilibrer un autre ; avec le système 6, il s'équilibre lui-même.
   // explications du jeu rangées derrière un « ? » (ouvert ou fermé : le choix reste d'un jeu à l'autre)
   const aide = html => '<details class="aide"' + (window.mtcAideOpen ? " open" : "") + '><summary title="Explications" aria-label="Explications">?</summary><p class="src">' + html + "</p></details>";
   main.addEventListener("toggle", e => { if(e.target.classList && e.target.classList.contains("aide")) window.mtcAideOpen = e.target.open; }, true);
@@ -15,8 +15,10 @@ window.mtcEquilibrer = function(main){
     2:{name:"six couches (zàng fǔ bié tōng)", pairs:[["P", "V"], ["GI", "F"], ["E", "EC"], ["Rt", "IG"], ["C", "VB"], ["Rn", "TF"]]},
     3:{name:"biǎo / lǐ (surface / interne)", pairs:[["P", "GI"], ["E", "Rt"], ["C", "IG"], ["V", "Rn"], ["EC", "TF"], ["VB", "F"]]},
     4:{name:"horloge opposée (zǐ wǔ)", pairs:[["P", "V"], ["GI", "Rn"], ["E", "EC"], ["Rt", "TF"], ["C", "VB"], ["IG", "F"]]},
-    5:{name:"canaux voisins sur l’horloge (liú zhù)", pairs:[["P", "F"], ["GI", "E"], ["Rt", "C"], ["IG", "V"], ["Rn", "EC"], ["TF", "VB"]]}
+    5:{name:"canaux voisins sur l’horloge (liú zhù)", pairs:[["P", "F"], ["GI", "E"], ["Rt", "C"], ["IG", "V"], ["Rn", "EC"], ["TF", "VB"]]},
+    6:{name:"le canal s’équilibre lui-même (zì jǐ)", pairs:[], self:true}
   };
+  const NSYS = [1, 2, 3, 4, 5, 6];
   const NAMES = {P:"Shǒu tài yīn — poumon", GI:"Shǒu yáng míng — gros intestin", E:"Zú yáng míng — estomac", Rt:"Zú tài yīn — rate",
     C:"Shǒu shào yīn — cœur", IG:"Shǒu tài yáng — intestin grêle", V:"Zú tài yáng — vessie", Rn:"Zú shào yīn — reins",
     EC:"Shǒu jué yīn — enveloppe du cœur", TF:"Shǒu shào yáng — trois foyers", VB:"Zú shào yáng — vésicule biliaire", F:"Zú jué yīn — foie",
@@ -33,12 +35,12 @@ window.mtcEquilibrer = function(main){
   const praise = () => { if(window.mtcCelebrate) window.mtcCelebrate(1); return PRAISE[Math.floor(Math.random() * PRAISE.length)]; };
   // difficulté choisie avec un curseur : nombre de canaux atteints
   const LEVELS = [2, 3, 4, 5, 6];
-  const B = {on:new Set([1, 2, 3, 4, 5]), aff:[], pick:new Set(), done:false, hint:false, score:0, played:0, lvl:1, sols:[], view:-1};
-  try{ const s = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem("mtc_trajets_balance") || "{}"); if(Array.isArray(s.on) && s.on.length) B.on = new Set(s.on); B.hint = !!s.hint; B.score = s.score || 0; B.played = s.played || 0;
+  const B = {on:new Set(NSYS), aff:[], pick:new Set(), done:false, hint:false, score:0, played:0, lvl:1, sols:[], view:-1};
+  try{ const s = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem("mtc_trajets_balance") || "{}"); if(Array.isArray(s.on) && s.on.length){ B.on = new Set(s.on); if(!s.v6) B.on.add(6); } B.hint = !!s.hint; B.score = s.score || 0; B.played = s.played || 0;
     if(Number.isInteger(s.lvl)) B.lvl = Math.max(0, Math.min(LEVELS.length - 1, s.lvl)); }catch(e){}
-  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({on:[...B.on], hint:B.hint, score:B.score, played:B.played, lvl:B.lvl})); }catch(e){} };
+  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify({v6:1, on:[...B.on], hint:B.hint, score:B.score, played:B.played, lvl:B.lvl})); }catch(e){} };
   const lvlTxt = i => "Niveau " + (i + 1) + " · " + LEVELS[i] + " canaux atteints";
-  const links = (b, a) => b === a ? [] : [...B.on].filter(n => TAN_SYSTEMS[n].pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
+  const links = (b, a) => b === a ? (B.on.has(6) && ORD.includes(a) ? [6] : []) : [...B.on].filter(n => TAN_SYSTEMS[n].pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
   const pos = c => {
     const pol = (a, r) => [170 + r * Math.cos(a), 170 + r * Math.sin(a)];
     if(c === "RM") return pol(128 * Math.PI / 180, 188);
@@ -93,6 +95,12 @@ window.mtcEquilibrer = function(main){
     g += '<text x="' + (mid[0] + (mid[0] - 170) / md * 34) + '" y="' + (mid[1] + (mid[1] - 170) / md * 34 + 3) + '" text-anchor="middle" class="balflow">YÍNG QÌ</text>';
     D.forEach(b => B.aff.forEach(a => {
       const l = links(b, a); if(!l.length) return;
+      if(a === b){
+        const [x, y] = pos(a), d = Math.hypot(x - 170, y - 170) || 1, cx = x + (x - 170) / d * 41, cy = y + (y - 170) / d * 41;
+        g += '<circle cx="' + cx + '" cy="' + cy + '" r="10" fill="var(--page-bg)" stroke="var(--shadow-color)" stroke-width="1.8"/>' +
+          '<text x="' + cx + '" y="' + (cy + 3.5) + '" text-anchor="middle" class="balsys">6</text>';
+        return;
+      }
       const [p1, p2] = [pos(b), pos(a)], mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2;
       g += '<line x1="' + p1[0] + '" y1="' + p1[1] + '" x2="' + p2[0] + '" y2="' + p2[1] + '" stroke="var(--shadow-color)" stroke-width="1.8"/>' +
         '<rect x="' + (mx - 14) + '" y="' + (my - 8) + '" width="28" height="16" fill="var(--page-bg)" stroke="var(--shadow-color)"/>' +
@@ -117,15 +125,15 @@ window.mtcEquilibrer = function(main){
     const cov = B.aff.map(a => {
       const by = [...D].map(b => [b, links(b, a)]).filter(x => x[1].length);
       return "<li>" + (by.length ? '<span class="balok">✓</span>' : '<span class="balno">—</span>') + chip(a) +
-        (by.length ? ' <span class="balsm">équilibré par</span> ' + by.map(([b, l]) => chip(b) + ' <span class="balsm">(syst. ' + l.join(", ") + ")</span>").join(", ") : ' <span class="balsm">pas encore équilibré</span>') + "</li>";
+        (by.length ? ' <span class="balsm">équilibré par</span> ' + by.map(([b, l]) => (b === a ? '<span class="balsm">lui-même</span>' : chip(b)) + ' <span class="balsm">(syst. ' + l.join(", ") + ")</span>").join(", ") : ' <span class="balsm">pas encore équilibré</span>') + "</li>";
     }).join("");
-    const table = '<details class="balsyst"><summary>Rappel : les cinq systèmes</summary><table><tr><th>Système</th><th>Paires de canaux</th></tr>' +
-      Object.entries(TAN_SYSTEMS).map(([n, s]) => "<tr><td><b>" + n + "</b> · " + esc(s.name) + "</td><td>" + s.pairs.map(([a, b]) => chip(a) + "–" + chip(b)).join(" · ") + "</td></tr>").join("") +
-      "<tr><td><b>6</b> · même canal (zì jǐ)</td><td>le canal se rééquilibre lui-même : pas utilisé dans ce jeu</td></tr></table></details>";
+    const table = '<details class="balsyst"><summary>Rappel : les six systèmes</summary><table><tr><th>Système</th><th>Paires de canaux</th></tr>' +
+      Object.entries(TAN_SYSTEMS).map(([n, s]) => "<tr><td><b>" + n + "</b> · " + esc(s.name) + "</td><td>" + (s.self ? "chaque canal avec lui-même (hors rèn mài et dū mài)" : s.pairs.map(([a, b]) => chip(a) + "–" + chip(b)).join(" · ")) + "</td></tr>").join("") +
+      "</table></details>";
     main.innerHTML =
       '<div class="balbar">' +
-      aide('Des canaux sont atteints : clique sur le moins de canaux possible pour les rééquilibrer tous, selon les six systèmes des canaux unis de Dr Tán. Un canal atteint peut en équilibrer un autre. Rèn mài et dū mài ne comptent que pour le système 1.<br>Les boutons 1 à 5 choisissent les systèmes. « Indices » affiche sur chaque canal le nombre de canaux atteints qu’il équilibre. Après la vérification, clique sur une solution pour la voir sur le cercle.') +
-      '<span class="balsysgrp" title="Systèmes">' + [1, 2, 3, 4, 5].map(n => '<button type="button" class="balsysbtn' + (B.on.has(n) ? " on" : "") + '" data-n="' + n + '" title="Système ' + n + " : " + esc(TAN_SYSTEMS[n].name) + '">' + n + "</button>").join("") + "</span>" +
+      aide('Des canaux sont atteints : clique sur le moins de canaux possible pour les rééquilibrer tous, selon les six systèmes des canaux unis de Dr Tán. Un canal atteint peut en équilibrer un autre, et avec le système 6 il s’équilibre lui-même. Rèn mài et dū mài ne comptent que pour le système 1.<br>Les boutons 1 à 6 choisissent les systèmes. « Indices » affiche sur chaque canal le nombre de canaux atteints qu’il équilibre. Après la vérification, clique sur une solution pour la voir sur le cercle.') +
+      '<span class="balsysgrp" title="Systèmes">' + NSYS.map(n => '<button type="button" class="balsysbtn' + (B.on.has(n) ? " on" : "") + '" data-n="' + n + '" title="Système ' + n + " : " + esc(TAN_SYSTEMS[n].name) + '">' + n + "</button>").join("") + "</span>" +
       '<label title="Afficher sur chaque canal le nombre de canaux atteints qu’il équilibre"><input type="checkbox" id="balHint"' + (B.hint ? " checked" : "") + "> indices</label>" +
       '<span class="balscore" title="Cas résolus avec le minimum de canaux">' + B.score + (B.score > 1 ? " réussis" : " réussi") + "</span></div>" +
       '<div class="balbar ballvl"><span class="balsm">facile</span><input type="range" id="balLvl" min="0" max="' + (LEVELS.length - 1) + '" step="1" value="' + B.lvl + '" aria-label="Niveau">' +
@@ -184,7 +192,7 @@ window.mtcEquilibrer = function(main){
   function resultHtml(){
     if(!B.done) return B.err || "";
     const chip = c => '<b class="balc" style="color:' + ink(c) + '">' + esc(c) + "</b>";
-    const fmt = s => s.map(b => chip(b) + ' <span class="balsm">(→ ' + B.aff.filter(x => links(b, x).length).map(x => esc(x) + " syst. " + links(b, x).join(", ")).join(" ; ") + ")</span>").join(" + ");
+    const fmt = s => s.map(b => chip(b) + ' <span class="balsm">(→ ' + B.aff.filter(x => links(b, x).length).map(x => (x === b ? "lui-même" : esc(x)) + " syst. " + links(b, x).join(", ")).join(" ; ") + ")</span>").join(" + ");
     return B.head + (B.sols.length ? '<br><span class="balsm">' + B.solLbl + " — clique pour voir sur le cercle :</span>" +
       B.sols.map((s, i) => '<button type="button" class="balsol' + (B.view === i ? " on" : "") + '" data-i="' + i + '">' + fmt(s) + "</button>").join("") : "");
   }

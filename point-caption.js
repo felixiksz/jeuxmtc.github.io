@@ -84,7 +84,8 @@
   }
   // le téléphone ne laisse jouer le son qu'après un toucher : on réveille le lecteur à chaque toucher. Sur téléphone, c'est la fin du
   // toucher (pointerup, touchend, click) qui compte comme un geste de l'utilisateur, pas son début (pointerdown).
-  const wake = () => { const c = audioCtx(); if(c && c.state !== "running") c.resume().catch(() => {}); };
+  const wake = () => { const c = audioCtx(); if(c && c.state !== "running") c.resume().catch(() => {}); try{ if(window.mtcAudioUnlock) window.mtcAudioUnlock(); }catch(e){} };
+  const log = t => { try{ if(window.mtcAudioLog) window.mtcAudioLog(t); }catch(e){} };
   ["pointerdown", "pointerup", "touchend", "click", "keydown"].forEach(t => window.addEventListener(t, wake, {capture:true, passive:true}));
   function load(url){
     if(!buffers.has(url)){
@@ -102,6 +103,7 @@
   function playUrl(url, gain){
     return load(url).then(buf => {
       const c = audioCtx(); if(!c) throw 0;
+      log("fichier prêt (" + c.state + ")");
       const go = () => {
         try{ if(src) src.stop(); }catch(e){}
         src = c.createBufferSource(); src.buffer = buf;
@@ -112,7 +114,7 @@
       // Lecteur encore endormi par le téléphone : lancer le son maintenant le ferait partir au PROCHAIN toucher, des secondes plus
       // tard. On le réveille un court instant ; s'il dort toujours, on renonce (le lecteur du jeu ou la synthèse prennent le relais).
       return Promise.race([c.resume().catch(() => {}).then(() => c.state), new Promise(r => setTimeout(() => r(c.state), 300))])
-        .then(() => { if(c.state !== "running") throw 0; return go(); });
+        .then(() => { if(c.state !== "running"){ log("lecteur endormi : repli"); throw 0; } return go(); });
     });
   }
   // même force que le nom chinois (fichiers chinois plus forts, joués à 0,42)
@@ -181,6 +183,7 @@
       let voice = "both"; try{ voice = localStorage.getItem("mtc_point_voice") || "both"; }catch(e){}
       const audio = typeof window.isMtcAudioModeEnabled === "function" && window.isMtcAudioModeEnabled();
       const my = ++turn;
+      log("choix : " + hanzi);
       // chargés tout de suite, pendant la félicitation
       const zh = audio && voice !== "fr" ? zhUrl(hanzi) : null;
       if(zh) load(zh).catch(() => {});
@@ -198,7 +201,7 @@
           const due = performance.now(), fresh = () => my === turn && performance.now() - due < LATE;
           // Le nom chinois passe par le même lecteur que le français, réveillé à chaque toucher : joué après
           // la félicitation, il n'est plus bloqué par le téléphone. Le lecteur du jeu reste en secours.
-          const fallback = () => { if(!fresh()) return; let p = false; try{ p = orig.apply(self, args); }catch(e){} then(p ? 1300 : 0); };
+          const fallback = () => { log("repli sur le lecteur du jeu"); if(!fresh()) return; let p = false; try{ p = orig.apply(self, args); }catch(e){} then(p ? 1300 : 0); };
           if(zh) load(zh).then(() => { if(fresh()) return playUrl(zh, .42).then(d => then(Math.round(d * 1000) + 250)); }).catch(fallback); else fallback();
         }, wait);
       }, 60);

@@ -171,7 +171,7 @@
         // série Réseaux (bêta) : elle contient Équilibrer ; tant qu'elle n'est pas ouverte, les joueur·ses gardent Équilibrer seul
         (admin || isPublic("circuits")) ? ["「 ✦ RÉSEAUX ✦ 」", "Les six systèmes et les circuits de Dr Tán : équilibrer, fermer un circuit, trois plaintes, propagation, familles, quatre membres.", () => module("circuits"), "b"]
           : ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("equilibrer"), "b"],
-        (admin || isPublic("trajets")) && ["Correspondance", "Un métro arrêté par des travaux : trouver la station où il peut changer de canal.", () => { window.location.href = "trajets/correspondance.html"; }, "b"]
+        (admin || isPublic("trajets")) && ["Correspondance", "Un métro arrêté par des travaux : trouver la station où il peut prendre la correspondance.", () => { window.location.href = "trajets/correspondance.html"; }, "b"]
       ],
       reviser: [
         ["Mémo", pharma ? "Toutes les substances, rangées par catégorie." : "Tous les points, rangés par catégorie.", () => call("openCheatsheetPanel")],

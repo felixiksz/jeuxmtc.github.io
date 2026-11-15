@@ -24,6 +24,55 @@
     return sharedAudioEl;
   }
 
+  // --- Journal de diagnostic : ouvrir le jeu avec ?audiodebug=1 (puis ?audiodebug=0 pour l'enlever) ---
+  let debugOn = false;
+  try{
+    const q = /[?&]audiodebug=([01])/.exec(location.search);
+    if(q) localStorage.setItem("mtc_audio_debug", q[1]);
+    debugOn = localStorage.getItem("mtc_audio_debug") === "1";
+  }catch(error){}
+  const debugLines = [];
+  window.mtcAudioLog = function(text){
+    if(!debugOn) return;
+    debugLines.push((performance.now() / 1000).toFixed(1) + "s " + text);
+    while(debugLines.length > 16) debugLines.shift();
+    let box = document.getElementById("mtcAudioDebug");
+    if(!box && document.body){
+      box = document.createElement("pre"); box.id = "mtcAudioDebug";
+      box.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;margin:0;padding:4px 6px;font:10px/1.25 monospace;background:rgba(255,255,255,.92);color:#000;pointer-events:none;white-space:pre-wrap;max-height:40vh;overflow:hidden";
+      document.body.appendChild(box);
+    }
+    if(box) box.textContent = debugLines.join("\n");
+  };
+  const log = text => { try{ window.mtcAudioLog(text); }catch(error){} };
+
+  // --- Déblocage du son : à chaque toucher, le lecteur est réveillé et un son silencieux est joué (Web Audio et <audio>) ---
+  // Sans cela, le téléphone garde le son en attente jusqu'au toucher suivant : le nom est entendu avec des secondes de retard, ou pas du tout.
+  const SILENT = "data:audio/wav;base64,UklGRmQBAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YUABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+  let elUnlocked = false;
+  function unlockAudio(){
+    try{
+      const ctx = getAudioContext();
+      if(ctx){
+        if(ctx.state !== "running"){
+          log("réveil du lecteur (" + ctx.state + ")");
+          ctx.resume().then(() => log("lecteur : " + ctx.state)).catch(() => log("réveil refusé"));
+          try{ const b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0); }catch(error){}
+        }
+      }
+      if(!elUnlocked && !currentGameAudio){
+        const a = getSharedAudio();
+        if(a.paused){
+          a.src = SILENT; a.volume = 0.01;
+          const p = a.play();
+          if(p && p.then) p.then(() => { elUnlocked = true; log("lecteur <audio> débloqué"); }).catch(error => log("<audio> refusé : " + (error && error.name)));
+        }
+      }
+    }catch(error){}
+  }
+  ["pointerup", "touchend", "click", "keydown"].forEach(type => window.addEventListener(type, unlockAudio, {capture:true, passive:true}));
+  window.mtcAudioUnlock = unlockAudio;
+
   // --- Pré-chargement Web Audio : lecture quasi instantanée -------------
   // Le <audio> classique doit re-négocier réseau + décodage à chaque son,
   // même fichier déjà visité. On précharge et pré-décode en tâche de fond
@@ -36,7 +85,7 @@
     if(audioCtx) return audioCtx;
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if(!Ctx) return null;
-    try{ audioCtx = new Ctx(); }catch(error){ audioCtx = null; }
+    try{ audioCtx = new Ctx(); audioCtx.addEventListener("statechange", () => log("lecteur du jeu : " + audioCtx.state)); }catch(error){ audioCtx = null; }
     return audioCtx;
   }
 
@@ -79,7 +128,8 @@
     if(!ready) return false;
     try{
       // lecteur endormi : un son lancé maintenant partirait au prochain toucher, des secondes plus tard ; on laisse le lecteur <audio> jouer tout de suite
-      if(ctx.state !== "running"){ try{ ctx.resume().catch(() => {}); }catch(error){} return false; }
+      if(ctx.state !== "running"){ log("buffer prêt mais lecteur " + ctx.state + " : lecteur <audio>"); try{ ctx.resume().catch(() => {}); }catch(error){} return false; }
+      log("lecture depuis le buffer");
       const source = ctx.createBufferSource();
       source.buffer = decodedBuffers.get(ready);
       const gain = ctx.createGain();
@@ -230,10 +280,11 @@
 
     if(promise && typeof promise.catch === "function"){
       promise.then(() => {
+        log("<audio> joue " + filename);
         if(settled || serial !== gameAudioSerial) return;
         settled = true;
         cleanup();
-      }).catch(fail);
+      }).catch(error => { log("<audio> refusé : " + (error && error.name) + " (" + filename + ")"); fail(); });
     }else{
       settled = true;
       cleanup();
@@ -248,6 +299,7 @@
 
     const clean = normalizeHanzi(hanzi);
     if(!clean || !containsCjk(clean)) return false;
+    log("lecteur du jeu : " + clean);
 
     // Si aucun mp3 confirmé n'existe dans le manifest, on délègue au module
     // principal : il utilise une synthèse vocale immédiate, compatible mobile.
