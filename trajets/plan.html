@@ -66,16 +66,37 @@
   /* vue d'ensemble : une rangée par point d'intersection, canal par canal dans l'ordre des numéros ; une colonne par canal, à la couleur de son
      mouvement ; un rond là où le canal passe par le point. Les ronds ont tous la même taille. */
   #grid{ margin:14px 0 0; font:800 .56rem/1 'Archivo', sans-serif; }
-  .gr{ display:grid; grid-template-columns:46px repeat(20, minmax(0, 1fr)); }
+  .gr{ display:grid; grid-template-columns:90px repeat(20, minmax(0, 1fr)); }
   .gr > *{ display:flex; align-items:center; justify-content:center; height:19px; border-right:1px solid var(--page-bg); border-bottom:1px solid var(--page-bg); background:var(--b, transparent); }
   .gr.hd{ position:sticky; top:0; z-index:2; background:var(--page-bg); cursor:pointer; }
-  .gr.hd > *{ height:46px; flex-direction:column; gap:1px; background:var(--h, var(--page-bg)); color:var(--k, var(--text-color)); }
-  .gr.hd .rot{ writing-mode:vertical-rl; transform:rotate(180deg); } .gr.hd .tri{ font-size:.5rem; line-height:1; }
+  .gr.hd > *{ height:30px; gap:1px; background:var(--h, var(--page-bg)); color:var(--k, var(--text-color)); }
+  .gr.hd .hz{ font-size:.66rem; white-space:nowrap; }
   .gr.hd > .on{ box-shadow:inset 0 0 0 2px var(--text-color); }
-  .gr .lb{ justify-content:flex-start; padding-left:5px; font-size:.62rem; white-space:nowrap; color:var(--k, var(--text-color)); background:var(--h, transparent); cursor:pointer; }
+  .gr .lb{ gap:2px; overflow:hidden; justify-content:flex-start; padding-left:5px; font-size:.62rem; white-space:nowrap; color:var(--k, var(--text-color)); background:var(--h, transparent); cursor:pointer; }
   .gr.pt{ cursor:pointer; } .gr.pt.sel .lb{ box-shadow:inset 0 0 0 2px var(--text-color); }
   .gz{ padding:14px 0 5px; color:var(--tint); font:700 .8rem/1.2 'Archivo', sans-serif; }
   .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--d, #1d1d1f); flex:none; }
+  /* plusieurs canaux choisis : le nom du point est écrit dans chaque case de croisement (blanc sur rond noir, noir sur la colonne eau blanche ;
+     contour pour « selon certains auteurs »). Le canal propre du point garde son simple rond. */
+  /* tableau plus large que l'écran : il défile dans son cadre, la colonne des points et la rangée des canaux restent en vue */
+  #grid.wide{ overflow:auto; max-height:76vh; }
+  #grid.wide .gr.hd > span:first-child, #grid.wide .gr .lb{ position:sticky; left:0; z-index:1; }
+  #grid.wide .gr.hd > span:first-child{ background:var(--page-bg); z-index:3; }
+  #grid.wide .gz{ position:sticky; left:0; width:max-content; max-width:335px; }
+  /* icônes des points : clé (ouverture d'un vaisseau), luò, xì, yuán ; nomenclature colorée pour les points de transport (wǔ shū xué) */
+  /* fond neutre des cellules ; une rangée sur deux et une colonne sur deux plus sombres, pour se repérer */
+  .gr.pt.z1 > span:not(.lb){ background:color-mix(in srgb, var(--text-color) 5%, transparent); }
+  .gr.pt > span.c1:not(.lb){ box-shadow:inset 0 0 0 100px color-mix(in srgb, var(--text-color) 5%, transparent); }
+  svg.pi{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; vertical-align:-2px; }
+  svg.pi.key{ color:var(--mtc-accent); } .lb svg.pi.key{ color:inherit; }
+  .ics{ display:inline-flex; gap:3px; align-items:center; margin-left:5px; vertical-align:middle; }
+  .cd{ display:inline-block; padding:0 4px; border-radius:6px; background:var(--m); color:var(--f); box-shadow:0 0 0 1px var(--ring); }
+  .mvd{ display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--c); box-shadow:0 0 0 1px var(--ring, rgba(0,0,0,.4)); vertical-align:-1px; }
+  .dot.nm.mvt{ background:var(--m); color:var(--f); box-shadow:0 0 0 1px var(--ring); }
+  .dot.maybe.nm.mvt{ background:none; color:var(--text-color); box-shadow:inset 0 0 0 2px var(--m), 0 0 0 1px var(--ring); }
+  .dot.nm svg.pi{ width:10px; height:10px; margin-right:2px; vertical-align:-1px; }
+  .dot.nm{ width:auto; height:auto; padding:1px 4px; border-radius:999px; font:800 .6rem/1.2 'Archivo', sans-serif; white-space:nowrap; color:var(--b2, #fff); }
+  .dot.maybe.nm{ background:none; color:var(--d, #1d1d1f); }
   .dot.maybe{ background:none; box-shadow:inset 0 0 0 1.6px var(--d, #1d1d1f); }
   .dot.key{ box-shadow:0 0 0 1.4px var(--b2, var(--page-bg)), 0 0 0 2.6px var(--d, #1d1d1f); }
   .legend.mxl{ margin-top:10px; border-top:0; padding-top:0; }
@@ -106,7 +127,8 @@
     <span class="sc t pk">Les douze canaux</span><div class="pick" id="mxC"></div>
     <span class="sc t pk">Les huit merveilleux vaisseaux</span><div class="pick" id="mxV"></div>
     <div id="mxMode"></div>
-    <div class="legend mxl"><span><i class="dot"></i>le canal passe par ce point</span><span><i class="dot maybe"></i>selon certains auteurs</span><span><i class="dot key"></i>point d’ouverture</span></div>
+    <div class="legend mxl"><span><i class="dot"></i>le canal passe par ce point</span><span><i class="dot maybe"></i>selon certains auteurs</span></div>
+    <div class="legend mxl" id="lgIc"></div>
     <div class="legend mxl"><span class="sc">Cinq mouvements</span><span><i class="sw" style="background:#2f9a3c"></i>bois</span><span><i class="sw" style="background:#e0261b"></i>feu</span>
       <span><i class="sw" style="background:#d9a400"></i>terre</span><span><i class="sw m" style="background:#fff"></i>métal</span><span><i class="sw m" style="background:#1d1d1f"></i>eau</span></div>
     <div id="grid" role="table" aria-label="Chaque point d’intersection et les canaux qui s’y croisent"></div>
@@ -176,6 +198,39 @@
     own.forEach(s => s.lines.forEach((h, l) => m.set(l, (m.get(l) || 0) + 1))); other.forEach(s => m.set(s.own, (m.get(s.own) || 0) + 1));
     return [...m].sort((a, b) => ALL.indexOf(a[0]) - ALL.indexOf(b[0])); };
 
+  // ---- attributs des points, d'après les fiches (« Point luò-liaison », « Point xì-crevasse », « Point yuán-source », « Point jǐng-puits »…) ----
+  const svgI = (d, cls) => '<svg class="pi ' + (cls || "") + '" viewBox="0 0 24 24" aria-hidden="true">' + d + "</svg>";
+  const IC = {
+    key:['<circle cx="7" cy="12" r="3.8"/><path d="M10.8 12H21M17 12v3.6M20.8 12v2.6"/>', "point d’ouverture d’un vaisseau"],
+    luo:['<rect x="2.6" y="8.4" width="11.4" height="7.2" rx="3.6" transform="rotate(-28 8.3 12)"/><rect x="10" y="8.4" width="11.4" height="7.2" rx="3.6" transform="rotate(-28 15.7 12)"/>', "point luò-liaison"],
+    xi:['<circle cx="12" cy="12" r="8.6"/><path d="M13.4 3.8l-3.8 5.8 4.2 2.2-3.2 8.2"/>', "point xì-crevasse"],
+    yuan:['<circle cx="12" cy="12" r="3"/><path d="M12 3.4v3.4M12 17.2v3.4M3.4 12h3.4M17.2 12h3.4M6 6l2.4 2.4M15.6 15.6L18 18M18 6l-2.4 2.4M8.4 15.6L6 18"/>', "point yuán-source"]
+  };
+  const YIN12 = new Set(["P", "Rt", "C", "Rn", "EC", "F"]), YANG12 = new Set(["GI", "E", "IG", "V", "TF", "VB"]);
+  const SHU = {yin:["bois", "feu", "terre", "metal", "eau"], yang:["metal", "eau", "bois", "feu", "terre"]};
+  const SHU_NOM = ["jǐng-puits", "yíng-jaillissement", "shū-rivière", "jīng-fleuve", "hé-réunion"];
+  const MV_FR = {bois:"bois", feu:"feu", terre:"terre", metal:"métal", eau:"eau"};
+  // fond, texte et liseré de la nomenclature d'un point de transport, selon son mouvement
+  const MV_STYLE = {bois:["#2f9a3c", "#fff", "rgba(0,0,0,.5)"], feu:["#e0261b", "#fff", "rgba(0,0,0,.5)"], terre:["#d9a400", "#1d1d1f", "rgba(0,0,0,.5)"], metal:["#ffffff", "#1d1d1f", "#1d1d1f"], eau:["#1d1d1f", "#fff", "rgba(255,255,255,.75)"]};
+  const nrm = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const ATT = {};
+  function attrs(code){
+    if(ATT[code]) return ATT[code];
+    const d = P[code.replace(" ", "")] || {}, own = code.split(" ")[0], a = {}, lines = nrm(d.categories_du_point).split(/\n/).map(l => l.replace(/^[^a-z]+/, ""));
+    if(lines.some(l => /^point (grande? |du grand )?luo-liaison/.test(l))) a.luo = 1;
+    if(lines.some(l => /^point xi-crevasse/.test(l))) a.xi = 1;
+    if(lines.some(l => /^point yuan-source/.test(l))) a.yuan = 1;
+    let t = -1; lines.forEach(l => { if(/^point jing-puits/.test(l)) t = 0; else if(/^point ying-jaillissement/.test(l)) t = 1; else if(/^point shu-riviere/.test(l)) t = 2; else if(/^point jing-fleuve/.test(l)) t = 3; else if(/^point he-reunion/.test(l) && !/xia/.test(l)) t = 4; });
+    if(t >= 0 && (YIN12.has(own) || YANG12.has(own))){ a.shu = t; a.mov = SHU[YIN12.has(own) ? "yin" : "yang"][t]; }
+    if(Object.values(OPENING).includes(code)) a.key = 1;
+    return (ATT[code] = a);
+  }
+  const mvVars = m => "--m:" + MV_STYLE[m][0] + ";--f:" + MV_STYLE[m][1] + ";--ring:" + MV_STYLE[m][2];
+  // nomenclature d'un point : colorée selon son mouvement quand c'est un point de transport
+  const cd = code => { const a = attrs(code); return a.mov ? '<span class="cd" style="' + mvVars(a.mov) + '" title="' + SHU_NOM[a.shu] + " · " + MV_FR[a.mov] + '">' + esc(code) + "</span>" : esc(code); };
+  const icons = code => { const a = attrs(code), l = ["key", "luo", "xi", "yuan"].filter(k => a[k]); return l.length ? '<span class="ics">' + l.map(k => svgI(IC[k][0], k === "key" ? "key" : "")).join("") + "</span>" : ""; };
+  const legendIc = () => ["key", "luo", "xi", "yuan"].map(k => "<span>" + svgI(IC[k][0], k === "key" ? "key" : "") + ({key:"ouverture d’un vaisseau", luo:"luò-liaison", xi:"xì-crevasse", yuan:"yuán-source"})[k] + "</span>").join("");
+
   const badge = (c, o) => { o = o || {}; return "<" + (o.tag || "span") + (o.tag === "button" ? ' type="button"' : "") + ' class="bd' + (isMV(c) ? " mv" : "") + (metal(c) ? " metal" : "") + (o.sm ? " sm" : "") + (o.how === "certains" ? " maybe" : "") + (o.how === "ouverture" ? " key" : "") + (o.cls ? " " + o.cls : "") +
     '" style="--c:' + col(c) + '"' + (o.attr || "") + ' title="' + esc(NAME[c][0] + (o.how === "certains" ? " (selon certains auteurs)" : o.how === "ouverture" ? " (point d’ouverture)" : "")) + '">' + esc(SIG[c] || c) + "</" + (o.tag || "span") + ">"; };
 
@@ -189,7 +244,7 @@
     const i = info(s.code), tags = s.own === line ? [...s.lines] : [[s.own, s.lines.get(line)]].concat([...s.lines].filter(x => x[0] !== line));
     tags.sort((a, b) => ALL.indexOf(a[0]) - ALL.indexOf(b[0]));
     const has = !only || tags.some(x => x[0] === only);
-    return '<div class="st' + (has ? "" : " dim") + (flash === s.code ? " flash" : "") + '" data-st="' + esc(s.code) + '"><span class="nm"><b>' + esc(s.code) + '</b><span class="py">' + esc(i.py) + "</span><i>" + esc(i.fr) + "</i></span>" +
+    return '<div class="st' + (has ? "" : " dim") + (flash === s.code ? " flash" : "") + '" data-st="' + esc(s.code) + '"><span class="nm"><b>' + cd(s.code) + '</b><span class="py">' + esc(i.py) + "</span>" + icons(s.code) + "<i>" + esc(i.fr) + "</i></span>" +
       '<span class="tags">' + tags.map(([l, how]) => badge(l, {tag:"button", sm:true, how, attr:' data-go="' + l + '" data-at="' + esc(s.code) + '"'})).join("") + "</span></div>";
   }
   function draw(){
@@ -202,7 +257,7 @@
     const list = (arr, parCanal) => { let last = null, s = ""; arr.forEach(x => { const k = parCanal ? x.own : regOf(x.code); if(k !== last){ s += '<span class="sc t zone' + (parCanal ? " pin" : "") + '">' + (parCanal ? esc(NAME[x.own][0]) : regName(k)) + "</span>"; last = k; } s += row(x, cur); }); return s; };
     if(own.length) h += '<div class="line' + (isMV(cur) ? " mv" : "") + (metal(cur) ? " metal" : "") + '" style="--c:' + col(cur) + '">' + list(own, false) + "</div>";
     if(other.length) h += (own.length ? '<span class="sc t zone also">Passe aussi par</span>' : "") + '<div class="line' + (isMV(cur) ? " mv" : "") + (metal(cur) ? " metal" : "") + '" style="--c:' + col(cur) + '">' + list(other, true) + "</div>";
-    h += '<div class="legend"><span>' + badge("E", {sm:true}) + " intersection</span><span>" + badge("E", {sm:true, how:"certains"}) + " selon certains auteurs</span><span>" + badge("CM", {sm:true, how:"ouverture"}) + " point d’ouverture</span></div>";
+    h += '<div class="legend"><span>' + badge("E", {sm:true}) + " intersection</span><span>" + badge("E", {sm:true, how:"certains"}) + " selon certains auteurs</span><span>" + badge("CM", {sm:true, how:"ouverture"}) + " point d’ouverture</span></div><div class=\"legend\">" + legendIc() + "</div>";
     out.innerHTML = h;
     if(flash){ const el = out.querySelector('[data-st="' + flash + '"]'); if(el) el.scrollIntoView({block:"center", behavior:"smooth"}); flash = ""; }
   }
@@ -218,8 +273,8 @@
   // ---------- tous les croisements : les points, pas leur nombre ----------
   const bandBg = l => !MOUV[l] ? "color-mix(in srgb, var(--text-color) 11%, transparent)" : metal(l) ? "rgba(255,255,255,.8)" : eau(l) ? "rgba(29,29,31,.9)" : "color-mix(in srgb, " + col(l) + " 30%, transparent)";
   const headBg = l => !MOUV[l] ? "color-mix(in srgb, var(--text-color) 20%, var(--page-bg))" : metal(l) ? "#fff" : eau(l) ? "#1d1d1f" : "color-mix(in srgb, " + col(l) + " 62%, var(--page-bg))";
-  // en-tête de colonne : le sigle est écrit de bas en haut, mais le triangle du yīn (▼) ou du yáng (▲) reste droit
-  const sigCol = l => { const t = SIG[l] || l, tri = /^[▼▲]/.test(t) ? t[0] : ""; return '<span class="rot">' + esc(tri ? t.slice(1) : t) + "</span>" + (tri ? '<span class="tri">' + tri + "</span>" : ""); };
+  // en-tête de colonne : le sigle est écrit normalement, sans pivoter
+  const sigCol = l => '<span class="hz">' + esc(SIG[l] || l) + "</span>";
   // Un ou plusieurs canaux choisis (pastilles ou en-têtes). Un seul : tous ses points. Plusieurs : le tableau ne garde que leurs colonnes, et
   // « entre eux » (au moins deux des canaux choisis passent par le point) ou « tous leurs points » (au moins un).
   let sel = new Set(), mode = "entre", selPt = "";
@@ -228,24 +283,31 @@
   function grid(){
     const all = Object.values(ST).sort(order), n = sel.size;
     const pts = !n ? all : all.filter(x => { const k = [...sel].filter(l => crossing(x, l)).length; return n === 1 || mode === "tous" ? k >= 1 : k >= 2; });
-    const L = n > 1 ? ALL.filter(l => sel.has(l)) : ALL, tpl = "grid-template-columns:46px repeat(" + L.length + ", minmax(0, 1fr))";
+    const L = n > 1 ? ALL.filter(l => sel.has(l)) : ALL, names = true, tpl = "grid-template-columns:90px repeat(" + L.length + ", minmax(0, 1fr))";
     document.getElementById("mxC").innerHTML = CAN.map(c => badge(c, {tag:"button", attr:' data-col="' + c + '"', cls:sel.has(c) ? "on" : ""})).join("");
     document.getElementById("mxV").innerHTML = MV.map(c => badge(c, {tag:"button", attr:' data-col="' + c + '"', cls:sel.has(c) ? "on" : ""})).join("");
     document.getElementById("mxMode").innerHTML = (n > 1 ? '<span class="mode"><button type="button" data-mode="entre" class="' + (mode === "entre" ? "on" : "") + '">Entre eux</button><button type="button" data-mode="tous" class="' + (mode === "tous" ? "on" : "") + '">Tous leurs points</button></span>' : "") +
       (n ? '<button type="button" class="sc t" data-clear>Effacer</button>' : "");
     let h = '<div class="gr hd" style="' + tpl + '" role="row"><span></span>' + L.map(l => '<span data-col="' + l + '"' + (sel.has(l) ? ' class="sel"' : "") + ' style="' + (headBg(l) ? "--h:" + headBg(l) + ";" : "") + (eau(l) ? "--k:#fff" : "") + '" title="' + esc(NAME[l][0]) + '">' + sigCol(l) + "</span>").join("") + "</div>";
-    let last = "";
+    let last = "", zi = 0;
     pts.forEach(x => {
-      if(x.own !== last){ h += '<div class="gz">' + esc(NAME[x.own][0]) + "</div>"; last = x.own; }
-      h += '<div class="gr pt' + (x.code === selPt ? " sel" : "") + '" style="' + tpl + '" role="row" data-pt="' + esc(x.code) + '"><span class="lb" style="' + (headBg(x.own) ? "--h:" + headBg(x.own) + ";" : "") + (eau(x.own) ? "--k:#fff" : "") + '">' + esc(x.code) + "</span>" +
-        L.map(l => { const how = l === x.own ? "sur" : x.lines.get(l), bg = bandBg(l);
-          return '<span style="' + (bg ? "--b:" + bg + ";" : "") + (eau(l) ? "--d:#fff;--b2:#1d1d1f" : "") + '">' + (how ? '<i class="dot' + (how === "certains" ? " maybe" : how === "ouverture" ? " key" : "") + '"></i>' : "") + "</span>"; }).join("") + "</div>";
+      if(x.own !== last){ h += '<div class="gz">' + esc(NAME[x.own][0]) + "</div>"; last = x.own; zi = 0; }
+      h += '<div class="gr pt' + (zi++ % 2 ? " z1" : "") + (x.code === selPt ? " sel" : "") + '" style="' + tpl + '" role="row" data-pt="' + esc(x.code) + '"><span class="lb" style="' + (headBg(x.own) ? "--h:" + headBg(x.own) + ";" : "") + (eau(x.own) ? "--k:#fff" : "") + '">' + cd(x.code) + icons(x.code) + "</span>" +
+        L.map((l, j) => { const how = l === x.own ? "sur" : x.lines.get(l), nm = l !== x.own, mov = nm && how ? attrs(x.code).mov : "";
+          // la pastille du point : colorée seulement pour un point de transport (couleur de son mouvement), noire sinon
+          return '<span' + (j % 2 ? ' class="c1"' : "") + '>' + (how ? '<i class="dot' + (nm ? " nm" : "") + (mov ? " mvt" : "") + (how === "certains" ? " maybe" : "") + '"' + (mov ? ' style="' + mvVars(mov) + '"' : "") + ">" + (nm ? (how === "ouverture" ? svgI(IC.key[0], "key") : "") + esc(x.code) : "") + "</i>" : "") + "</span>"; }).join("") + "</div>";
     });
-    document.getElementById("grid").innerHTML = h;
+    document.getElementById("lgIc").innerHTML = legendIc();
+    const gd = document.getElementById("grid");
+    gd.innerHTML = h;
+    // les noms demandent de la place : si le tableau est trop étroit pour les colonnes choisies, il défile sur le côté
+    const need = 90 + L.length * 44, wide = need > gd.clientWidth;
+    gd.classList.toggle("wide", wide);
+    gd.querySelectorAll(".gr").forEach(r => { r.style.minWidth = wide ? need + "px" : ""; });
     const info = document.getElementById("mxInfo");
     if(selPt && ST[selPt]){ const x = ST[selPt], i2 = info2(x);
       info.innerHTML = "<b>" + esc(x.code) + "</b> " + esc(i2.py) + " <i>" + esc(i2.fr) + "</i><br>" + badge(x.own, {sm:true}) + " " + [...x.lines].sort((m, k) => ALL.indexOf(m[0]) - ALL.indexOf(k[0])).map(([l, how]) => badge(l, {sm:true, how})).join(" "); }
-    else info.innerHTML = !n ? "<i>Une rangée par point d’intersection, canal par canal, dans l’ordre des numéros. Touche des canaux pour ne voir que leurs croisements, ou un point pour son nom.</i>"
+    else info.innerHTML = !n ? "<i>Une rangée par point d’intersection, canal par canal, dans l’ordre des numéros. Touche des canaux pour ne voir que leurs croisements, ou un point pour son nom. Le tableau défile sur le côté.</i>"
       : n === 1 ? "<b>" + esc(NAME[[...sel][0]][0]) + "</b> : " + plural(pts.length, "point d’intersection", "points d’intersection") + ". <i>Ajoute un autre canal pour ne voir que leurs croisements.</i>"
       : pts.length ? "<b>" + plural(pts.length, "point", "points") + "</b> " + (mode === "entre" ? "partagés par au moins deux de ces canaux." : "où passe l’un de ces canaux.")
       : "<i>Aucun point partagé. Essaie « Tous leurs points ».</i>";
