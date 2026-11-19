@@ -28,6 +28,17 @@
   #navToggle:hover{ opacity:.85; }
   .tool{ background:#fff; color:inherit; text-decoration:none; }
   .tool.on{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  #txOverlay{ position:fixed; inset:0; z-index:90; background:rgba(0,0,0,.35); display:none; align-items:flex-start; justify-content:center; overflow:auto; padding:20px 12px; }
+  #txOverlay.open{ display:flex; }
+  .txbox{ background:#fff; color:var(--text); border:1px solid var(--text); width:min(680px,100%); padding:16px 18px 14px; }
+  .txbox h2{ margin:0 0 4px; font-size:1.05rem; }
+  .txbox p{ margin:4px 0 10px; font-size:.85rem; color:var(--muted); }
+  .txbox .txrow{ display:flex; flex-wrap:wrap; gap:10px 18px; margin:0 0 8px; }
+  .txbox label{ display:flex; flex-direction:column; gap:3px; font-size:.7rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+  .txbox select{ font:inherit; font-size:.85rem; font-weight:400; letter-spacing:0; text-transform:none; padding:4px 6px; border:1px solid var(--text); background:#fff; border-radius:0; }
+  #txPrev{ border:1px solid #ccd; background:#fff; padding:10px 12px; margin:8px 0 10px; max-height:260px; overflow:auto; }
+  .txbox .txact{ display:flex; gap:8px; justify-content:flex-end; align-items:center; }
+  #txEtat{ margin-right:auto; font-size:.8rem; color:var(--muted); }
   .tools{ margin-left:auto; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
   .typefilter{ display:flex; flex-wrap:wrap; gap:4px 10px; font-size:.8rem; color:var(--muted); }
   .typefilter label{ display:inline-flex; align-items:center; gap:3px; cursor:pointer; white-space:nowrap; }
@@ -312,6 +323,7 @@
     <button type="button" class="tool" id="allPlaces">Correspondances…</button>
     <button type="button" class="tool admin-only" id="printPlans" title="Les plans de tous les trajets, en noir et blanc : un fichier SVG (image vectorielle) par plan, dans un .zip">Plans en SVG</button>
     <button type="button" class="tool admin-only" id="printPlansPng" title="Les plans de tous les trajets, en noir et blanc : une image PNG par plan, dans un .zip">Plans en PNG</button>
+    <button type="button" class="tool admin-only" id="printPlansTxt" title="Les plans de tous les trajets écrits en caractères (arbre), pour un carnet imprimé : Word, HTML, Markdown ou texte">Plans en texte</button>
   </div>
 </header>
 <main id="main"></main>
@@ -401,6 +413,7 @@
   const nav = document.getElementById("nav");
   document.getElementById("printPlans").addEventListener("click", () => downloadPlans());
   document.getElementById("printPlansPng").addEventListener("click", () => downloadPlansPng());
+  document.getElementById("printPlansTxt").addEventListener("click", () => txOuvrir());
   (function(){
     const KEY = "mtc_trajets_nav_closed", btn = document.getElementById("navToggle");
     const set = closed => {
@@ -978,7 +991,7 @@
   const zoneBands = html => (html.match(/<g class="node zonepass"[\s\S]*?<\/g>/g) || []).join("");
   const stationsOnly = html => html.replace(/<g class="node zonepass"[\s\S]*?<\/g>/g, "");
   // fichier .zip sans compression (les SVG sont petits) : en-têtes locaux, répertoire central, CRC32
-  function makeZip(files){
+  function makeZip(files, mime){
     const enc = new TextEncoder(), crcTable = [];
     for(let n = 0; n < 256; n++){ let c = n; for(let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; crcTable[n] = c >>> 0; }
     const crc32 = bytes => { let c = 0xFFFFFFFF; for(const b of bytes) c = crcTable[(c ^ b) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
@@ -1001,7 +1014,7 @@
     const end = new DataView(new ArrayBuffer(22));
     end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
     end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
-    return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type:"application/zip"});
+    return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), {type:mime || "application/zip"});
   }
   // plans en noir et blanc, chacun en image vectorielle autonome (SVG) : usage personnel (admin)
   const SVG_BW = "text{fill:#000;font-family:Archivo,Arial,sans-serif;font-size:10.5px;paint-order:stroke;stroke:#fff;stroke-width:7px;stroke-linejoin:round}text.xfer{font-size:9px}tspan{fill:#000}" +
@@ -1026,7 +1039,7 @@
             "<style>" + SVG_BW + "</style>" +
             '<text x="4" y="-9" style="font-family:\'Libre Baskerville\',Georgia,serif;font-size:13px;font-weight:700">' + esc(title) + "</text>" + inner + "</svg>\n";
           const slug = (String(ci + 1).padStart(2, "0") + "-" + c.code + "-" + s.type).replace(/[^A-Za-z0-9_-]+/g, "-");
-          files.push({name:slug + ".svg", text:svg});
+          files.push({name:slug + ".svg", text:svg, code:c.code, canal:c.name});
         });
       });
     }finally{
@@ -1063,6 +1076,214 @@
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     }finally{ if(btn) btn.disabled = false; }
+  }
+  // ---- plans en texte, pour un carnet imprimé : l'arbre de chaque plan, écrit en caractères
+  // chaque mise en forme : [nom, description, style HTML par type de texte, propriétés Word]
+  // types : ca canal, ti titre du plan, br branche, pt point, sg canaux croisés, zo zone, og organe, gl signe, ar traits
+  const TX_FORMATS = {
+    boite:["Points encadrés", "Chaque code de point dans un petit cadre, zones en italique, canaux croisés en petit. Les points se retrouvent d’un coup d’œil, même en noir et blanc.",
+      {ca:"font-weight:700;font-size:1.25em", ti:"font-weight:700", pt:"font-weight:700;border:1px solid #000;padding:0 3px", sg:"font-size:.8em", zo:"font-style:italic", og:"font-weight:700;font-style:italic"},
+      {ca:{b:1, sz:1.4}, ti:{b:1}, pt:{b:1, bdr:1}, sg:{sz:.8}, zo:{i:1}, og:{b:1, i:1}}],
+    gras:["Points en gras", "Le code des points en gras, tout le reste en texte normal. La mise en forme la plus sobre.",
+      {ca:"font-weight:700;font-size:1.25em", ti:"font-weight:700", pt:"font-weight:700"},
+      {ca:{b:1, sz:1.4}, ti:{b:1}, pt:{b:1}}],
+    gi:["Gras et italique", "Points en gras, zones en italique, organes en italique gras.",
+      {ca:"font-weight:700;font-size:1.25em", ti:"font-weight:700", pt:"font-weight:700", zo:"font-style:italic", og:"font-style:italic;font-weight:700"},
+      {ca:{b:1, sz:1.4}, ti:{b:1}, pt:{b:1}, zo:{i:1}, og:{b:1, i:1}}],
+    hier:["Hiérarchie", "Branches soulignées et en gras, points en gras, canaux croisés en petit, zones en italique grisé, organes en petites capitales.",
+      {ca:"font-weight:700;font-size:1.25em", ti:"font-weight:700;font-size:1.15em", br:"font-weight:700;text-decoration:underline", pt:"font-weight:700", sg:"font-size:.8em", zo:"font-style:italic;color:#555", og:"font-variant:small-caps;letter-spacing:.04em;font-weight:700"},
+      {ca:{b:1, sz:1.4}, ti:{b:1, sz:1.2}, br:{b:1, u:1}, pt:{b:1}, sg:{sz:.8}, zo:{i:1, color:"555555"}, og:{b:1, smallCaps:1}}],
+    aucun:["Aucune", "Aucune mise en forme : tout a la même épaisseur.", {ca:"font-weight:700;font-size:1.25em"}, {ca:{b:1, sz:1.4}}]
+  };
+  const TX_SORTIES = {docx:["Word (.docx)", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"], html:["Page HTML à imprimer (A5)", "html", "text/html"], md:["Markdown (.md)", "md", "text/markdown"], txt:["Texte brut (.txt)", "txt", "text/plain"]};
+  const TX_CLE = "mtc_plans_texte_v1";
+  let txPlans = [];
+  // 1. relit un plan SVG (celui du module) : points, zones, organes, lignes et numéros de branches
+  function txModele(ct){
+    const STEP = 30, LANE_W = 132, X0 = 24;
+    const d = new DOMParser().parseFromString(ct, "image/svg+xml");
+    const titre = ((d.querySelector("svg > text") || {}).textContent || "").replace(/\s+/g, " ");
+    const noeuds = [...d.querySelectorAll("g.node")].map(gn => {
+      const zone = gn.classList.contains("zonepass"), pid = gn.getAttribute("data-pid") || "";
+      const base = zone ? gn.querySelector("rect") : [...gn.querySelectorAll("circle")].pop();
+      if(!base) return null;
+      const x = zone ? +base.getAttribute("x") + 8 : +base.getAttribute("cx"), y = zone ? +base.getAttribute("y") + 11 : +base.getAttribute("cy");
+      const t0 = (gn.querySelector("text") || {}).textContent || "", xf = gn.querySelector("text.xfer"), fill = zone ? gn.querySelector("rect").getAttribute("fill") : "";
+      const info = PLACES[pid];
+      const n = {b:+gn.getAttribute("data-bi"), i:+gn.getAttribute("data-idx"),
+        k:zone ? (fill === "#f6dcd2" || fill === "#d6d6d6" ? "organe" : "zone") : pid.startsWith("pt:") ? "point" : pid.startsWith("c:") ? "canal" : "lieu",
+        l:(info && info.label) || t0.replace(/\s·\s.+$/, "").trim(), v:Math.round((x - X0) / LANE_W), r:Math.round(y / STEP),
+        s:xf ? [...xf.querySelectorAll("tspan")].map(t => t.textContent) : []};
+      if(pid.startsWith("pt:")) n.l = pid.slice(3);
+      return n;
+    }).filter(Boolean);
+    if(!noeuds.length) return null;
+    const min = Math.min(...noeuds.map(n => n.r)); noeuds.forEach(n => { n.r -= min; });
+    const lignes = [...d.querySelectorAll("path")].map(p => {
+      const m = /M([\d.]+),([\d.]+)(?: H([\d.]+))?(?: V([\d.]+))?/.exec(p.getAttribute("d") || ""); if(!m) return null;
+      return [Math.round((+m[1] - X0) / LANE_W), Math.round(+m[2] / STEP) - min, m[3] ? Math.round((+m[3] - X0) / LANE_W) : null, m[4] ? Math.round(+m[4] / STEP) - min : null];
+    }).filter(Boolean);
+    const nums = [...d.querySelectorAll("text.br-label")].map(t => [+t.getAttribute("data-bi"), Math.round((+t.getAttribute("x") + 13 - X0) / LANE_W), t.classList.contains("int") ? 1 : 0]);
+    return {titre, noeuds, lignes, nums};
+  }
+  // 2. les branches, et le lieu d'où part chacune
+  function txBranches(m){
+    const noeuds = m.noeuds.slice().sort((a, b) => a.r - b.r || a.v - b.v), par = {};
+    noeuds.forEach(n => (par[n.b] = par[n.b] || {b:n.b, noeuds:[], interne:false}).noeuds.push(n));
+    m.nums.forEach(([b, v, i]) => { if(par[b]){ par[b].interne = !!i; par[b].voie = v; } });
+    const liste = Object.values(par).sort((a, b) => a.b - b.b);
+    liste.forEach(b => b.noeuds.sort((x, y) => x.i - y.i));
+    liste.forEach((b, k) => {
+      const prem = b.noeuds[0]; b.depart = null;
+      if(k === 0) return;
+      let l = m.lignes.find(L => L[2] === b.voie && L[2] !== null && L[0] !== b.voie && L[1] <= prem.r);
+      if(!l) l = m.lignes.find(L => L[2] === null && L[0] === b.voie && L[1] < prem.r && L[3] >= b.noeuds[b.noeuds.length - 1].r);
+      if(l) b.depart = noeuds.find(n => n.v === l[0] && n.r === l[1]) || null;
+    });
+    return liste;
+  }
+  // 3. l'arbre : lignes = suites de [texte, type]; md = liste Markdown. Les zones et organes qui se suivent tiennent sur une ligne (70 colonnes)
+  function txArbre(m, branches){
+    const T = (t, c) => [t, c], LARG = 70;
+    const lignes = [[T(m.titre, "ti")], []], md = ["## " + m.titre, ""];
+    const enfants = new Map();
+    branches.forEach(b => { if(b.depart) (enfants.get(b.depart) || enfants.set(b.depart, []).get(b.depart)).push(b); });
+    const trait = d => d ? "└── " : "├── ", suite = d => d ? "    " : "│   ";
+    const nom = n => n.l.replace(/ \(.*\)$/, "");
+    const echapMd = t => String(t).replace(/\*/g, "\\*");
+    const pointSegs = n => { const sg = [T((n.s.length ? "◉" : "●") + " ", "gl"), T(n.l, "pt")]; if(n.s.length) sg.push(T("  ↔ " + n.s.join(" "), "sg")); return sg; };
+    function ecrire(b, pref, enfant, dernierEnfant, prof){
+      lignes.push([T(pref + (enfant ? trait(dernierEnfant) : ""), "ar"), T("Branche " + (b.b + 1) + (b.interne ? " (interne)" : ""), "br")]);
+      md.push("  ".repeat(prof) + "- **Branche " + (b.b + 1) + "**" + (b.interne ? " (interne)" : ""));
+      const base = pref + (enfant ? suite(dernierEnfant) : ""); let tampon = [];
+      const vider = d => {
+        if(!tampon.length) return;
+        const debut = base + trait(d) + "○ ", suite0 = base + (d ? "    " : "│   ") + "  ", mdl = [];
+        let segs = [T(base + trait(d), "ar"), T("○ ", "gl")], long = debut.length;
+        tampon.forEach((x, i) => {
+          const txt = x.k === "organe" ? "[" + nom(x) + "]" : nom(x), cls = x.k === "organe" ? "og" : "zo", sep = i ? ", " : "";
+          if(i && long + sep.length + txt.length > LARG){ segs.push(T(",", "ar")); lignes.push(segs); segs = [T(suite0, "ar")]; long = suite0.length; }
+          else if(i){ segs.push(T(sep, "ar")); long += sep.length; }
+          segs.push(T(txt, cls)); long += txt.length;
+          mdl.push(x.k === "organe" ? "**[" + echapMd(nom(x)) + "]**" : "*" + echapMd(nom(x)) + "*");
+        });
+        lignes.push(segs); md.push("  ".repeat(prof + 1) + "- ○ " + mdl.join(", ")); tampon = [];
+      };
+      b.noeuds.forEach((n, i) => {
+        const kids = enfants.get(n) || [], dernier = i === b.noeuds.length - 1 && !kids.length;
+        if(n.k !== "point" && !kids.length){ tampon.push(n); if(i === b.noeuds.length - 1) vider(true); return; }
+        vider(false);
+        if(n.k === "point"){
+          lignes.push([T(base + trait(dernier), "ar")].concat(pointSegs(n)));
+          md.push("  ".repeat(prof + 1) + "- " + (n.s.length ? "◉" : "●") + " **" + echapMd(n.l) + "**" + (n.s.length ? echapMd("  ↔ " + n.s.join(" ")) : ""));
+        } else {
+          lignes.push([T(base + trait(dernier), "ar"), T("○ ", "gl"), T(n.k === "organe" ? "[" + nom(n) + "]" : nom(n), n.k === "organe" ? "og" : "zo")]);
+          md.push("  ".repeat(prof + 1) + "- ○ " + (n.k === "organe" ? "**[" + echapMd(nom(n)) + "]**" : "*" + echapMd(nom(n)) + "*"));
+        }
+        kids.forEach((c, j) => ecrire(c, base + suite(dernier), true, j === kids.length - 1, prof + 2));
+      });
+    }
+    branches.filter(b => !b.depart).forEach(b => { ecrire(b, "", false, false, 0); lignes.push([]); md.push(""); });
+    return {lignes, md};
+  }
+  // 4. fichier Word : vrais cadres de caractères (w:bdr), police à chasse fixe, page A5 portrait
+  function txDocx(lignes, fmt, pt){
+    const wp = TX_FORMATS[fmt][3], base = pt * 2, esc2 = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const run = (t, c) => {
+      const o = wp[c] || {};
+      return '<w:r><w:rPr><w:rFonts w:ascii="Consolas" w:hAnsi="Consolas" w:cs="Consolas"/>' + (o.b ? "<w:b/>" : "") + (o.i ? "<w:i/>" : "") + (o.smallCaps ? "<w:smallCaps/>" : "") +
+        (o.color ? '<w:color w:val="' + o.color + '"/>' : "") + '<w:sz w:val="' + Math.round(base * (o.sz || 1)) + '"/>' + (o.u ? '<w:u w:val="single"/>' : "") +
+        (o.bdr ? '<w:bdr w:val="single" w:sz="4" w:space="0" w:color="000000"/>' : "") + '</w:rPr><w:t xml:space="preserve">' + esc2(t) + "</w:t></w:r>";
+    };
+    const para = l => l.length
+      ? "<w:p><w:pPr>" + (l.saut ? "<w:pageBreakBefore/>" : "") + '<w:spacing w:before="0" w:after="0" w:line="264" w:lineRule="auto"/></w:pPr>' + l.map(([t, c]) => run(t, c)).join("") + "</w:p>"
+      : '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr></w:p>';
+    const doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + lignes.map(para).join("") +
+      '<w:sectPr><w:pgSz w:w="8392" w:h="11906"/><w:pgMar w:top="851" w:right="851" w:bottom="851" w:left="851" w:header="400" w:footer="400" w:gutter="0"/></w:sectPr></w:body></w:document>';
+    const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+    const enc = new TextEncoder();
+    return makeZip([
+      {name:"[Content_Types].xml", bytes:enc.encode(X + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>')},
+      {name:"_rels/.rels", bytes:enc.encode(X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>')},
+      {name:"word/document.xml", bytes:enc.encode(doc)}
+    ], TX_SORTIES.docx[2]);
+  }
+  function txHtmlPlan(lignes, fmt, pt){
+    const st = TX_FORMATS[fmt][2];
+    const corps = lignes.map(l => l.map(([t, c]) => st[c] ? '<span style="' + st[c] + '">' + esc(t) + "</span>" : esc(t)).join("")).join("\n");
+    return '<pre style="font-family:Consolas,\'Courier New\',monospace;font-size:' + pt + 'pt;line-height:1.3;margin:0 0 1em;white-space:pre">' + corps + "</pre>";
+  }
+  // 5. le fichier demandé, pour les plans choisis
+  function txFichier(plans, o){
+    const canaux = [];
+    plans.forEach(p => { let g = canaux[canaux.length - 1]; if(!g || g.code !== p.code){ g = {code:p.code, canal:p.canal, plans:[]}; canaux.push(g); } g.plans.push(p); });
+    // le titre du plan principal répète celui du canal : on ne l'écrit qu'une fois
+    canaux.forEach(g => g.plans = g.plans.map(p => p.titre === (g.code + " — " + g.canal).replace(/\s+/g, " ").trim() ? {...p, lignes:p.lignes.slice(2), md:p.md.slice(2)} : p));
+    if(o.out === "docx"){
+      const lignes = [];
+      canaux.forEach((g, i) => { const h = [[g.code + " — " + g.canal, "ca"]]; h.saut = i > 0; lignes.push(h, []); g.plans.forEach(p => { lignes.push(...p.lignes); }); });
+      return txDocx(lignes, o.fmt, o.pt);
+    }
+    let texte;
+    if(o.out === "html"){
+      const corps = canaux.map((g, i) => "<section" + (i ? ' style="page-break-before:always"' : "") + '><h2 style="font:700 1.25em Consolas,\'Courier New\',monospace;margin:0 0 .6em">' + esc(g.code + " — " + g.canal) + "</h2>" + g.plans.map(p => txHtmlPlan(p.lignes, o.fmt, o.pt)).join("") + "</section>").join("\n");
+      texte = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Plans des trajets, en texte</title><style>@page{size:A5 portrait;margin:14mm}body{margin:0;color:#000;background:#fff}</style></head><body>' + corps + "</body></html>";
+    } else if(o.out === "md"){
+      texte = canaux.map(g => "# " + g.code + " — " + g.canal + "\n\n" + g.plans.map(p => p.md.join("\n")).join("\n")).join("\n\n");
+    } else {
+      texte = canaux.map(g => { const t = g.code + " — " + g.canal; return t + "\n" + "=".repeat(Array.from(t).length) + "\n\n" + g.plans.map(p => p.lignes.map(l => l.map(x => x[0]).join("")).join("\n")).join("\n"); }).join("\n\n\n");
+    }
+    return new Blob([texte], {type:TX_SORTIES[o.out][2] + ";charset=utf-8"});
+  }
+  function txPrefs(){
+    const p = {fmt:"boite", out:"docx", scope:"tous", pt:8};
+    try{ Object.assign(p, JSON.parse(localStorage.getItem(TX_CLE) || "{}")); }catch(e){}
+    if(!TX_FORMATS[p.fmt]) p.fmt = "boite"; if(!TX_SORTIES[p.out]) p.out = "docx"; if(![8, 9, 10].includes(+p.pt)) p.pt = 8; p.pt = +p.pt;
+    return p;
+  }
+  function txOuvrir(){
+    let ov = document.getElementById("txOverlay");
+    if(!ov){
+      ov = document.createElement("div"); ov.id = "txOverlay"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", "txTitre");
+      ov.innerHTML = '<div class="txbox"><h2 id="txTitre">Plans en texte</h2>' +
+        "<p>L’arbre de chaque plan, écrit en caractères, pour un carnet imprimé en page A5. Les zones qui se suivent entre deux points tiennent sur une seule ligne.</p>" +
+        '<div class="txrow"><label>Mise en forme<select id="txFmt"></select></label><label>Fichier<select id="txOut"></select></label>' +
+        '<label>Quels plans<select id="txScope"></select></label><label>Caractères<select id="txPt"><option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option></select></label></div>' +
+        '<p id="txNote"></p><div id="txPrev"></div>' +
+        '<div class="txact"><span id="txEtat"></span><button type="button" class="tool" id="txFermer">Fermer</button><button type="button" class="tool on" id="txTelecharger">Télécharger</button></div></div>';
+      document.body.appendChild(ov);
+      ov.addEventListener("click", e => { if(e.target === ov) ov.classList.remove("open"); });
+      document.addEventListener("keydown", e => { if(e.key === "Escape") ov.classList.remove("open"); });
+      document.getElementById("txFermer").addEventListener("click", () => ov.classList.remove("open"));
+      document.getElementById("txFmt").innerHTML = Object.entries(TX_FORMATS).map(([k, v]) => '<option value="' + k + '">' + v[0] + "</option>").join("");
+      document.getElementById("txOut").innerHTML = Object.entries(TX_SORTIES).map(([k, v]) => '<option value="' + k + '">' + v[0] + "</option>").join("");
+      ["txFmt", "txOut", "txScope", "txPt"].forEach(id => document.getElementById(id).addEventListener("change", txMaj));
+      document.getElementById("txTelecharger").addEventListener("click", () => {
+        const o = txChoix(), plans = txChoisis(o); if(!plans.length) return;
+        const blob = txFichier(plans, o), a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = (o.scope === "canal" && current ? "plans-texte-" + String(current).replace(/[^A-Za-z0-9_-]+/g, "-") : "plans-texte-carnet") + "." + TX_SORTIES[o.out][1];
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        document.getElementById("txEtat").textContent = plans.length + " plans téléchargés";
+      });
+    }
+    // les plans sont relus à chaque ouverture, pour suivre les corrections
+    txPlans = planFiles().map(f => { const m = txModele(f.text); if(!m) return null; const A = txArbre(m, txBranches(m)); return {code:f.code, canal:f.canal, titre:m.titre, lignes:A.lignes, md:A.md}; }).filter(Boolean);
+    const p = txPrefs(), canalOk = !!current && txPlans.some(x => x.code === current);
+    document.getElementById("txFmt").value = p.fmt; document.getElementById("txOut").value = p.out; document.getElementById("txPt").value = String(p.pt);
+    document.getElementById("txScope").innerHTML = '<option value="tous">Tous les canaux (' + new Set(txPlans.map(x => x.code)).size + ")</option>" + (canalOk ? '<option value="canal">Le canal affiché (' + esc(current) + ")</option>" : "");
+    document.getElementById("txScope").value = p.scope === "canal" && canalOk ? "canal" : "tous";
+    document.getElementById("txEtat").textContent = "";
+    ov.classList.add("open"); txMaj();
+  }
+  function txChoix(){ return {fmt:document.getElementById("txFmt").value, out:document.getElementById("txOut").value, scope:document.getElementById("txScope").value, pt:+document.getElementById("txPt").value}; }
+  function txChoisis(o){ return o.scope === "canal" && current ? txPlans.filter(x => x.code === current) : txPlans; }
+  function txMaj(){
+    const o = txChoix(), plans = txChoisis(o);
+    try{ localStorage.setItem(TX_CLE, JSON.stringify(o)); }catch(e){}
+    document.getElementById("txNote").textContent = TX_FORMATS[o.fmt][1] + (o.out === "md" || o.out === "txt" ? " (ce format de fichier ne garde pas toute la mise en forme)" : "");
+    document.getElementById("txPrev").innerHTML = plans.length ? txHtmlPlan(plans[0].lignes, o.fmt, 9) : "Aucun plan.";
+    document.getElementById("txEtat").textContent = plans.length + " plans";
   }
   window.mtcPlansPngZip = plansPngZip;
   function downloadPlans(){
