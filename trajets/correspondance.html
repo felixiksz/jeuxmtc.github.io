@@ -36,7 +36,7 @@
   #end h2{ font:400 1.35rem/1.2 'Libre Baskerville', Georgia, serif; margin:8px 0 6px; }
   #end p{ margin:0 0 18px; } #end ul{ list-style:none; margin:8px 0 0; padding:0; } #end li{ padding:8px 0; border-top:1px solid var(--faint); }
   #end .tg{ display:inline-block; min-width:19px; height:19px; padding:0 4px; margin-left:4px; border-radius:999px; color:var(--page-bg); font:800 9.5px/19px 'Archivo', sans-serif; text-align:center; vertical-align:1px; }
-  .lineA, .lineB, .link{ fill:none; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; }
+  .lineA, .lineB, .link, .line{ fill:none; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; }
   .st{ cursor:pointer; outline:none; -webkit-tap-highlight-color:transparent; } .st:focus-visible circle{ stroke-width:3.6; } .st circle{ fill:var(--page-bg); stroke:var(--text-color); stroke-width:2.4; transition:r .2s; }
   .st:hover circle{ r:10.5; } .st.done{ cursor:default; }
   .st text, .lbl{ font:800 11px 'Archivo', sans-serif; fill:var(--text-color); text-anchor:middle; }
@@ -62,6 +62,12 @@
   .pl{ display:inline-block; min-width:26px; height:26px; padding:0 8px; border-radius:999px; color:var(--page-bg); font:800 .8rem/26px 'Archivo', sans-serif; text-align:center; vertical-align:middle; margin:0 3px; }
   .pl.v{ font-size:.74rem; }
   #q{ min-height:3.2em; }
+  .bar{ width:30px; height:28px; flex:none; vertical-align:middle; } .bar .b{ fill:none; stroke:var(--text-color); stroke-width:1.8; stroke-linecap:round; } .bar .r{ stroke:#c0392b; stroke-width:3; fill:none; stroke-linecap:round; }
+  .stem{ fill:none; stroke:var(--text-color); stroke-width:1.6; stroke-linecap:round; }
+  .cap{ fill:var(--page-bg); stroke:var(--text-color); stroke-width:1.4; }
+  .ar{ color:var(--tint); } .ar.sm{ font-size:.86rem; margin:0 2px; }
+  /* canal choisi par erreur : la pastille de ce qu'il fallait rejoindre, barrée */
+  .pl.x{ position:relative; opacity:.7; } .pl.x::after{ content:""; position:absolute; left:-5px; right:-5px; top:50%; height:3.2px; background:#c0392b; border-radius:2px; transform:rotate(-24deg); }
   .bump{ animation:bump .5s; } @keyframes bump{ 30%{ translate:7px 0; } 60%{ translate:-3px 0; } }
   .barrier rect{ fill:var(--page-bg); stroke:var(--text-color); stroke-width:1.8; } .barrier path{ stroke:var(--text-color); stroke-width:1.8; fill:none; stroke-linecap:round; }
   .barrier .stripe{ stroke:#c0392b; stroke-width:3; }
@@ -151,6 +157,11 @@
   }
   function newRound(){
     const prev = R;
+    // trois trajets de la série passent par une ligne intermédiaire (les 4e, 7e et 9e), quand il en existe un
+    if([3, 6, 8].includes(S.marks.length) && !want){
+      const d = roundDeux(prev);
+      if(d){ R = d; S.used.add(d.a + ">" + d.b); next.hidden = true; draw(); head(); return; }
+    }
     for(let t = 0; t < 300; t++){
       const a = want && PLAYABLE.includes(want) && t < 120 ? want : rnd(PLAYABLE), sts = LINES[a];
       const dests = [...new Set(sts.flatMap(s => s.others))].filter(b => { const k = sts.filter(s => s.others.includes(b)).length; return k >= 1 && k < sts.length; });
@@ -173,14 +184,48 @@
       if(!list) continue;
       // certains canaux ne se croisent qu'à leur premier ou à leur dernier point : ces trajets-là restent rares
       if(t < 280 && (at === 0 || at === list.length - 1) && Math.random() > .3) continue;
-      R = {a, b, list, tried:new Set(), done:false, errs:0};
+      R = {mode:"simple", a, b, list, by:216, h:250, leg:{key:"A", y:AY, list, ok:s => s.others.includes(b), shown:new Set(), want:[b]}, tried:new Set(), done:false, errs:0, moved:false, busy:false};
+      R.legs = [R.leg];
       S.used.add(a + ">" + b);
       break;
     }
     next.hidden = true;
     draw(); head();
   }
-  const sx = i => 78 + i * (R.list.length > 1 ? (286 - 78) / (R.list.length - 1) : 0);
+  const sx = (list, i) => list.length > 1 ? 78 + i * (286 - 78) / (list.length - 1) : 182;
+  // jusqu'à cinq stations : une bonne, à une place tirée au hasard sur la ligne, et les fausses qui l'entourent
+  function five(sts, ok){
+    const goods = sts.filter(ok), bads = sts.filter(x => !ok(x)), nb = Math.min(4, bads.length);
+    if(!goods.length) return {list:[], bad:0};
+    for(const p of shuffle(Array.from({length:nb + 1}, (v, i) => i))){
+      const fit = goods.filter(g => bads.filter(x => x.n < g.n).length >= p && bads.filter(x => x.n > g.n).length >= nb - p);
+      if(!fit.length) continue;
+      const g = rnd(fit);
+      return {list:shuffle(bads.filter(x => x.n < g.n)).slice(0, p).concat([g], shuffle(bads.filter(x => x.n > g.n)).slice(0, nb - p)).sort((x, y) => x.n - y.n), bad:nb};
+    }
+    return {list:[rnd(goods)], bad:0};
+  }
+  // deux canaux se croisent-ils quelque part ? (garantit qu'un trajet à deux correspondances n'a pas de chemin direct)
+  const CROSS = new Set();
+  Object.entries(J).forEach(([code, v]) => { const all = [code.split(" ")[0]].concat(v.canaux || [], v.certains || []); all.forEach(x => all.forEach(y => { if(x !== y) CROSS.add(x + ">" + y); })); });
+  function roundDeux(prev){
+    for(let t = 0; t < 400; t++){
+      const a = rnd(PLAYABLE), sts = LINES[a];
+      const mids = [...new Set(sts.flatMap(x => x.others))].filter(c => LINES[c] && c !== a);
+      // ligne d'arrivée : jamais croisée par la ligne arrêtée, mais atteinte par une ligne intermédiaire
+      const dests = [...new Set(mids.flatMap(c => LINES[c].flatMap(x => x.others)))].filter(b => b !== a && !CROSS.has(a + ">" + b));
+      if(!dests.length) continue;
+      const b = rnd(dests);
+      if(prev && prev.a === a && prev.b === b && t < 350) continue;
+      if(S.used.has(a + ">" + b) && t < 300) continue;
+      const via = mids.filter(c => c !== b && LINES[c].some(x => x.others.includes(b)));
+      const f = five(sts, x => x.others.some(c => via.includes(c))); if(!f.bad) continue;
+      const show = shuffle(via).slice(0, 2);
+      const ok = x => x.others.some(c => via.includes(c));
+      return {mode:"deux", a, b, via, list:f.list, by:304, h:336, leg:{key:"A", y:AY, list:f.list, ok, shown:new Set(), want:show}, tried:new Set(), done:false, errs:0, moved:false, busy:false, legs:[], show};
+    }
+    return null;
+  }
 
   function vehicle(kind){
     if(kind === "bateau") return '<path class="body" d="M-17 0H17L12 8H-12Z"/><rect class="body" x="-8" y="-10" width="16" height="10" rx="2"/><rect class="win" x="-4" y="-7" width="8" height="5.6" rx="1"/><circle class="pax" cx="0" cy="-4.2" r="2.7"/>';
@@ -192,70 +237,106 @@
   const pos = (x, y) => "translate(" + x + "px," + (y - 19) + "px)";
   const pill = c => '<span class="pl' + (VES[c] ? " v" : "") + '" style="background:' + col(c) + '"' + ">" + esc(VES[c] ? VES[c][1] : c) + "</span>";
   const persHtml = '<g class="pers" id="pers"><circle cx="0" cy="-9.5" r="3.3"/><path d="M0 -5.5V2.5"/><path class="m b1" d="M0 -4.5L-3.6 1.2"/><path class="m b2" d="M0 -4.5L3.6 1.2"/><path class="m j1" d="M0 2.5L-3 10"/><path class="m j2" d="M0 2.5L3 10"/></g>';
+  const bar = '<svg class="bar" viewBox="-14 -16 28 30" aria-hidden="true"><path class="b" d="M-7 -4V12M7 -4V12"/><rect class="b" x="-11" y="-12" width="22" height="9" rx="1.5"/><path class="r" d="M-6 -4.5L-2 -10.5M1 -4.5L5 -10.5"/></svg>';
+  const pillX = c => pill(c).replace('class="pl', 'class="pl x');
+  const lineHtml = (c, y, x0, x1, anim) => '<path class="line' + (VES[c] ? " ves" : anim ? " draw" : "") + '"' + (anim ? ' style="--len:300"' : "") + ' stroke="' + col(c) + '" d="M' + x0 + " " + y + "H" + x1 + '"/>';
+  const termHtml = (c, x, y, cls) => '<g class="' + cls + '"><circle cx="' + x + '" cy="' + y + '" r="12" fill="' + col(c) + '"/><text' + (VES[c] ? ' class="s"' : "") + ' x="' + x + '" y="' + y + '">' + esc(lab(c)) + "</text></g>";
+  const stationsHtml = (key, list, y, cls) => list.map((st, i) => '<g class="st ' + (cls || "") + '" data-k="' + key + '" data-i="' + i + '" tabindex="0" role="button" aria-label="Station ' + esc(st.code) + '"><rect x="' + (sx(list, i) - 24) + '" y="' + (y - 52) + '" width="48" height="66" fill="transparent"/><circle cx="' + sx(list, i) + '" cy="' + y + '" r="9"/><text x="' + sx(list, i) + '" y="' + (y - 38) + '">' + esc(st.code) + "</text></g>").join("");
   function draw(){
-    const a = R.a, b = R.b;
-    // peu à lire : les deux lignes en pastilles de couleur (le nom d'un vaisseau, lui, est écrit)
-    q.innerHTML = "Travaux " + pill(a) + " &rarr; " + pill(b);
+    const a = R.a, b = R.b, BYv = R.by;
+    board.setAttribute("viewBox", "0 0 360 " + R.h);
+    // peu à lire : un panneau (barrière, ligne arrêtée, « via » les lignes possibles, ligne à rejoindre) en pastilles de couleur
+    q.innerHTML = bar + pill(a) + (R.show ? ' <span class="ar sm">via</span> ' + R.show.map(pill).join(' <span class="ar sm">ou</span> ') : "") + ' <span class="ar">&rarr;</span> ' + pill(b);
     res.innerHTML = "";
     let s = "";
     // ligne à rejoindre, en bas, avec son terminus entouré
-    s += '<path class="lineB' + (VES[b] ? " ves" : "") + '" stroke="' + col(b) + '" d="M' + X0 + " " + BY + "H" + X1 + '"/>';
-    s += '<g class="term"><circle cx="' + X1 + '" cy="' + BY + '" r="12" fill="' + col(b) + '"/><text' + (VES[b] ? ' class="s"' : "") + ' x="' + X1 + '" y="' + BY + '">' + esc(lab(b)) + '</text></g><circle class="goal" cx="' + X1 + '" cy="' + BY + '" r="18"/>';
-    // ligne du véhicule, en haut : terminus, stations, travaux au bout
-    s += '<path class="lineA' + (VES[a] ? " ves" : "") + '" stroke="' + col(a) + '" d="M' + X0 + " " + AY + "H" + (X1 - 22) + '"/>';
-    s += '<g class="term"><circle cx="' + X0 + '" cy="' + AY + '" r="12" fill="' + col(a) + '"/><text x="' + X0 + '" y="' + AY + '">' + esc(a) + "</text></g>";
-    s += '<g id="extra"></g>';
+    s += lineHtml(b, BYv, X0, X1) + termHtml(b, X1, BYv, "term") + '<circle class="goal" cx="' + X1 + '" cy="' + BYv + '" r="18"/>';
+    // ligne arrêtée, en haut : terminus, stations, travaux au bout
+    s += lineHtml(a, AY, X0, X1 - 22) + termHtml(a, X0, AY, "term");
+    s += '<g id="extra"></g><g id="mid"></g>';
     s += '<g class="barrier" transform="translate(' + (X1 - 8) + " " + AY + ')"><path d="M-7 -4V12M7 -4V12"/><rect x="-11" y="-12" width="22" height="9" rx="1.5"/><path class="stripe" d="M-6 -4.5L-2 -10.5M1 -4.5L5 -10.5"/></g>';
-    R.list.forEach((st, i) => { s += '<g class="st" data-i="' + i + '" tabindex="0" role="button" aria-label="Station ' + esc(st.code) + '"><rect x="' + (sx(i) - 24) + '" y="' + (AY - 52) + '" width="48" height="66" fill="transparent"/><circle cx="' + sx(i) + '" cy="' + AY + '" r="9"/><text x="' + sx(i) + '" y="' + (AY - 38) + '">' + esc(st.code) + "</text></g>"; });
+    s += stationsHtml("A", R.leg.list, AY);
     // le transport de la ligne à rejoindre attend à son terminus ; la personne est dans celui de la ligne arrêtée
-    s += '<g class="veh" id="vehB" style="transform:' + pos(X0 + 26, BY) + '">' + vehicle(modeOf(b)) + "</g>";
-    s += '<g class="veh has" id="veh" style="transform:' + pos(X0 + 26, AY) + '">' + vehicle(modeOf(a)) + "</g>" + persHtml;
+    s += '<g class="veh" id="vehB" style="transform:' + pos(X0 + 26, BYv) + '">' + vehicle(modeOf(b)) + "</g>";
+    s += '<g class="veh has" id="veh" style="transform:' + pos(X0 + 26, AY) + '">' + vehicle(modeOf(a)) + "</g>";
+    s += '<g id="vehMid"></g>' + persHtml;
     board.innerHTML = s;
-    board.querySelectorAll(".st").forEach(g => { g.addEventListener("click", () => pick(+g.dataset.i)); g.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(+g.dataset.i); } }); });
+    R.in = $("veh");
+    bind();
     // le véhicule avance jusqu'aux travaux et s'y cogne
     const veh = $("veh"), round = R;
-    setTimeout(() => { if(R === round && !R.done) veh.style.transform = "translate(" + (X1 - 36) + "px," + (AY - 19) + "px)"; }, 250);
-    setTimeout(() => { if(R === round && !R.done) veh.classList.add("bump"); }, 950);
+    setTimeout(() => { if(R === round && !R.moved) veh.style.transform = "translate(" + (X1 - 36) + "px," + (AY - 19) + "px)"; }, 250);
+    setTimeout(() => { if(R === round && !R.moved) veh.classList.add("bump"); }, 950);
   }
-  // correspondances d'une station : petits embranchements de la couleur de chaque ligne
-  function stubs(i, skip){
-    const st = R.list[i], os = st.others.filter(c => c !== skip), x = sx(i);
-    // à la station de correspondance, les autres lignes partent sur le côté pour laisser la place à la liaison
-    // trois correspondances ou plus : sur deux rangs, pour ne pas déborder sur les stations voisines
-    const n = os.length;
-    return os.map((c, j) => { const dx = skip ? (j % 2 ? 1 : -1) * 21 : n < 3 ? (j - (n - 1) / 2) * 20 : (j - (n - 1) / 2) * 13, x2 = x + dx, y2 = AY + 42 + (skip ? (j >> 1) : n < 3 ? 0 : j % 2) * 21;
-      return '<path class="stub ' + (VES[c] ? "ves" : "draw") + '" style="--len:60" stroke="' + col(c) + '" d="M' + x + " " + (AY + 9) + "Q" + x + " " + (AY + 26) + " " + x2 + " " + (y2 - 9) + '"/><g class="tag pop"><circle cx="' + x2 + '" cy="' + y2 + '" r="9.5" fill="' + col(c) + '"/><text' + (VES[c] ? ' class="s"' : "") + ' x="' + x2 + '" y="' + y2 + '">' + esc(lab(c)) + "</text></g>"; }).join("");
+  function bind(){
+    board.querySelectorAll(".st").forEach(g => { if(g.dataset.b) return; g.dataset.b = "1";
+      g.addEventListener("click", () => pick(g.dataset.k, +g.dataset.i));
+      g.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(g.dataset.k, +g.dataset.i); } }); });
   }
-  const liste = a => a.length > 1 ? a.slice(0, -1).join(", ") + " et " + a[a.length - 1] : a[0];
-  function pick(i){
-    if(R.done || R.tried.has(i)) return;
-    const st = R.list[i], g = board.querySelector('.st[data-i="' + i + '"]'), extra = $("extra"), veh = $("veh"), round = R;
-    R.tried.add(i); g.classList.add("done");
-    if(!st.others.includes(R.b)){
+  // les lignes qui se croisent à une station : un cartouche suspendu à la station, pastilles en deux colonnes
+  // (dessiné après le couloir : s'il passe derrière, le cartouche le cache)
+  const tagHtml = (x, y, c, r) => '<g class="tag"><circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + col(c) + '"/><text' + (VES[c] ? ' class="s"' : "") + ' x="' + x + '" y="' + y + '">' + esc(lab(c)) + "</text></g>";
+  function stubs(leg, i, skip){
+    const st = leg.list[i], os = st.others.filter(c => c !== skip), x = sx(leg.list, i), y = leg.y;
+    if(!os.length) return "";
+    const n = os.length, cols = n > 2 ? 2 : n, rows = Math.ceil(n / cols), w = cols * 21 + 6, h = rows * 21 + 6, x0 = x - w / 2, y0 = y + 16;
+    return '<g class="cart pop"><path class="stem" d="M' + x + " " + (y + 9) + "V" + y0 + '"/><rect class="cap" x="' + x0 + '" y="' + y0 + '" width="' + w + '" height="' + h + '" rx="8"/>' +
+      os.map((c, j) => tagHtml(x0 + 13.5 + (j % cols) * 21, y0 + 13.5 + (j / cols | 0) * 21, c, 8.5)).join("") + "</g>";
+  }
+  // la personne descend à la station, suit le couloir à pied et monte dans le transport de l'autre ligne
+  function transfer(from, x, y0, y1, to, toEnd, side){
+    const round = R, pe = $("pers"), at = (ms, fn) => setTimeout(() => { if(R === round) fn(); }, ms);
+    $("extra").insertAdjacentHTML("beforeend", '<path class="couloir fade" d="M' + x + " " + (y0 + 11) + "V" + (y1 - 11) + '"/>' + side);
+    R.moved = true;
+    from.classList.remove("bump"); from.style.transform = pos(x, y0);
+    to.style.transform = pos(x, y1);
+    pe.style.transition = "none"; pe.style.transform = "translate(" + x + "px," + (y0 + 24) + "px)";
+    at(780, () => { pe.style.transition = ""; from.classList.remove("has"); pe.style.opacity = 1; });
+    at(960, () => { pe.classList.add("walk"); pe.style.transform = "translate(" + x + "px," + (y1 - 32) + "px)"; });
+    at(2080, () => { pe.classList.remove("walk"); pe.style.opacity = 0; to.classList.add("has"); });
+    if(toEnd) at(2450, () => { to.style.transform = pos(X1 - 34, y1); });
+  }
+  function pick(key, i){
+    if(!R || R.done || R.busy) return;
+    const leg = R.leg; if(key !== leg.key || R.tried.has(key + i)) return;
+    const st = leg.list[i], g = board.querySelector('.st[data-k="' + key + '"][data-i="' + i + '"]'), extra = $("extra"), round = R, x = sx(leg.list, i);
+    R.tried.add(key + i); g.classList.add("done");
+    if(!leg.ok(st)){
       R.errs++; g.classList.add("bad", "shake");
       if(!S.miss.some(m => m.code === st.code)) S.miss.push(st);
-      extra.insertAdjacentHTML("beforeend", stubs(i));
-      res.innerHTML = '<span class="no">Pas ici.</span> <span class="t">' + esc(st.code) + "</span>";
+      if(!leg.shown.has(i)){ leg.shown.add(i); extra.insertAdjacentHTML("beforeend", stubs(leg, i)); }
+      // ce qu'il fallait trouver, barré : cette station ne mène pas là
+      res.innerHTML = '<span class="no">&#10007;</span> <span class="t">' + esc(st.code) + "</span> " + leg.want.map(pillX).join(" ");
       if(window.mtcMiss) window.mtcMiss();
       return;
     }
-    R.done = true; g.classList.add("good");
-    const x = sx(i);
-    // le véhicule s'arrête à la station, la personne descend, suit le couloir à pied et monte dans le transport de l'autre ligne
-    const pe = $("pers"), vb = $("vehB"), at = (ms, fn) => setTimeout(() => { if(R === round) fn(); }, ms);
-    extra.insertAdjacentHTML("beforeend", '<path class="couloir fade" d="M' + x + " " + (AY + 11) + "V" + (BY - 11) + '"/>' + stubs(i, R.b));
-    veh.classList.remove("bump"); veh.style.transform = pos(x, AY);
-    vb.style.transform = pos(x, BY);
-    pe.style.transition = "none"; pe.style.transform = "translate(" + x + "px," + (AY + 24) + "px)";
-    at(780, () => { pe.style.transition = ""; veh.classList.remove("has"); pe.style.opacity = 1; });
-    at(960, () => { pe.classList.add("walk"); pe.style.transform = "translate(" + x + "px," + (BY - 32) + "px)"; });
-    at(2080, () => { pe.classList.remove("walk"); pe.style.opacity = 0; vb.classList.add("has"); });
-    at(2450, () => { vb.style.transform = pos(X1 - 34, BY); });
-    at(2900, () => {
+    g.classList.add("good");
+    const already = leg.shown.has(i); leg.shown.add(i);
+    if(R.mode === "deux" && key === "A"){
+      // première correspondance : la ligne intermédiaire apparaît avec ses stations et son transport
+      const c = rnd(st.others.filter(o => R.via.includes(o))), CY = 198;
+      const f = five(LINES[c], t => t.others.includes(R.b));
+      const leg2 = {key:"C", y:CY, list:f.list, ok:t => t.others.includes(R.b), shown:new Set(), want:[R.b]};
+      $("mid").innerHTML = lineHtml(c, CY, X0, X1 - 22, true) + termHtml(c, X0, CY, "term pop") + stationsHtml("C", leg2.list, CY, "pop");
+      $("vehMid").innerHTML = '<g class="veh" id="vehC" style="transform:' + pos(X0 + 26, CY) + '">' + vehicle(modeOf(c)) + "</g>";
+      bind();
+      board.querySelectorAll('.st[data-k="A"]').forEach(n => n.classList.add("off"));
+      transfer(R.in, x, AY, CY, $("vehC"), false, already ? "" : stubs(leg, i, c));
+      R.in = $("vehC"); R.legs.push(leg2); R.leg = leg2; R.busy = true;
+      setTimeout(() => { if(R === round) R.busy = false; }, 2200);
+      res.innerHTML = "";
+      if(window.mtcPlayFx) window.mtcPlayFx("good");
+      return;
+    }
+    // correspondance vers la ligne à rejoindre
+    R.done = true;
+    transfer(R.in, x, leg.y, R.by, $("vehB"), true, already ? "" : stubs(leg, i, R.b));
+    setTimeout(() => {
+      if(R !== round) return;
       // le reste du plan se dévoile : les correspondances des autres stations
-      R.list.forEach((s2, k) => { if(k !== i && !R.tried.has(k)) extra.insertAdjacentHTML("beforeend", stubs(k)); });
+      R.legs.forEach(l => l.list.forEach((s2, k) => { if(!l.shown.has(k)){ l.shown.add(k); extra.insertAdjacentHTML("beforeend", stubs(l, k)); } }));
       board.querySelectorAll(".st").forEach(n => n.classList.add("done"));
-    });
+    }, 2900);
     const net = !R.errs;
     S.marks.push(net ? "ok" : "mid");
     res.innerHTML = '<span class="ok">' + (net ? "Bien joué." : "Trouvé.") + '</span> <span class="t">' + esc(st.code) + "</span>";
