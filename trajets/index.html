@@ -262,6 +262,17 @@
   .jtable a.pfiche:hover{ text-decoration:underline; }
   .cchip{ display:inline-block; font-size:.7rem; font-weight:800; color:#fff; background:var(--c); border-radius:5px; padding:0 5px; margin:1px 0; text-shadow:0 0 2px rgba(0,0,0,.4); }
   .places-index h4, #corrBody h4{ font-size:.82rem; margin:12px 0 4px; color:var(--text); }
+  .zidx input[type=search]{ width:100%; font:inherit; font-weight:700; font-size:1.05rem; padding:10px 2px; border:0; border-bottom:1.5px solid var(--text); background:none; outline:none; border-radius:0; }
+  .zlbl{ font-size:.68rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:16px 0 4px; }
+  .zchips, .zorbs{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+  .zchip{ font:inherit; font-size:.8rem; font-weight:700; border:1px solid var(--text); background:none; padding:4px 10px; cursor:pointer; color:inherit; }
+  .zchip.on{ background:var(--text); color:#fff; } .zchip small{ opacity:.65; font-weight:400; }
+  .zorb{ border:0; background:none; padding:2px; cursor:pointer; font-size:1rem; }
+  .zrow{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; font:inherit; background:none; border:0; border-top:1px solid #e6e6ef; padding:11px 0; cursor:pointer; color:inherit; }
+  .zrow .zn{ flex:1; min-width:0; } .zrow b{ display:block; font-size:1rem; } .zrow i{ display:block; font-style:normal; font-size:.78rem; color:var(--muted); }
+  .zrow .zs{ display:flex; flex-wrap:wrap; gap:3px; margin-top:4px; } .zrow .zgo{ color:var(--muted); }
+  .ztop{ display:flex; align-items:center; gap:10px; margin:2px 0 6px; font-size:1.05rem; }
+  .zall{ margin-top:18px; } .zall summary{ cursor:pointer; font-weight:800; font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; }
   .fhead{ font-size:1rem; margin:8px 0 4px; }
   .ftxt{ white-space:pre-line; font-family:"Libre Baskerville", Georgia, serif; font-size:.85rem; line-height:1.6; margin:0 0 6px; }
   .places-index h3{ margin:14px 0 4px; color:var(--text); font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; }
@@ -346,7 +357,7 @@
   }
   async function loadTrajetsData(){
     // ?v= : un fichier de données modifié ne doit pas rester servi par le cache du navigateur
-    const V = "?v=20261113-a";
+    const V = "?v=20261119-b";
     if(await loadScript("trajets-data.js" + V)){
       await loadScript("trajets-places-rx.js" + V);
       await loadScript("trajets-complements.js" + V);
@@ -492,7 +503,7 @@
     // lieux ajoutés par les compléments (point cité seulement sur l'image, ex. E 32)
     Object.entries(FAMILIES).forEach(([fid, f]) => { PLACES[fid] = {label:f.label, group:"familles"}; });
     COMPLEMENTS.forEach(cp => {
-      if(!PLACES[cp.lieu]) PLACES[cp.lieu] = {label:cp.lieu.replace(/^pt:/, ""), group:cp.lieu.startsWith("pt:") ? "points" : "ajoutés"};
+      if(!PLACES[cp.lieu]) PLACES[cp.lieu] = {label:cp.label || cp.lieu.replace(/^pt:/, ""), group:cp.group || (cp.lieu.startsWith("pt:") ? "points" : "ajoutés")};
     });
   }
   // texte d'un paragraphe modifié : les appels de note redeviennent [[nN]]
@@ -568,7 +579,7 @@
     "fam:machoire":{label:"Mâchoire et mandibule", members:["machoire", "mandibule", "angle-mandibule"]},
     "fam:front":{label:"Front", members:["front", "angle-frontal", "cheveux"]},
     "fam:tempe":{label:"Tempe", members:["tempe", "angle-temporal"]},
-    "fam:pommette":{label:"Pommette", members:["pommette", "arcade-zyg", "region-zyg"]},
+    "fam:pommette":{label:"Joue et pommette", members:["pommette", "arcade-zyg", "region-zyg", "joue"]},
     "fam:sommet":{label:"Sommet de la tête", members:["vertex", "parietal"]},
     "fam:thorax":{label:"Thorax et poitrine", members:["thorax", "poitrine", "thorax-lat"]},
     "fam:cotes":{label:"Côtes", members:["cotes", "cotes-flott", "intercostal"]},
@@ -627,7 +638,7 @@
           const passes = s.type === "principal" || (s.branches || []).some(b => b.places.includes(pt));
           if(!passes) return;
           const had = out.find(o => o.c === c && o.si === si);
-          const via = (PLACES[pt] || {label:pt.slice(3)}).label + " (placé dans ce quartier)";
+          const via = (PLACES[pt] || {label:pt.slice(3)}).label + " (placé dans cette zone)";
           if(had) had.via = had.via || via; else out.push({c, s, si, via});
         });
       });
@@ -694,7 +705,7 @@
     if(!v) return;
     corrRestoring = true;
     try{
-      if(v.type === "index") openIndex(); else if(v.type === "corr") openCorr(v.arg); else if(v.type === "fiche") openPointFiche(v.arg);
+      if(v.type === "index") openIndex(); else if(v.type === "corr") openCorr(v.arg); else if(v.type === "fiche") openPointFiche(v.arg); else if(v.type === "canal") openCanalZones(v.arg);
     }finally{ corrRestoring = false; }
     setTimeout(() => { document.getElementById("corrBody").scrollTop = v.scroll || 0; }, v.type === "fiche" ? 300 : 0);
   }
@@ -729,23 +740,102 @@
     document.querySelectorAll(".node").forEach(n => n.classList.toggle("sel", n.dataset.pid === pid));
   }
 
-  function openIndex(){
-    corrNavigate({type:"index"});
-    const groups = {};
-    Object.keys(PLACES).forEach(pid => {
-      const g = PLACES[pid].group || "autres";
-      (groups[g] = groups[g] || []).push(pid);
+  // ---- zones de passage : on cherche (zone, point ou canal), ou on parcourt ; une zone regroupe ses lieux voisins ----
+  const ZGROUPS = ["tête", "tronc", "membre supérieur", "membre inférieur", "organes"];
+  const ZGNAME = {"tête":"Tête", "tronc":"Tronc", "membre supérieur":"Bras", "membre inférieur":"Jambe", "organes":"Organes"};
+  const GROUP_OVERRIDE = {cerveau:"organes"};
+  const groupOf = pid => GROUP_OVERRIDE[pid] || (PLACES[pid] && PLACES[pid].group) || "autres";
+  const zoneLabel = u => FAMILIES[u] ? FAMILIES[u].label : (PLACES[u] ? PLACES[u].label : u);
+  const zoneGroup = u => groupOf(FAMILIES[u] ? FAMILIES[u].members[0] : u);
+  const normZ = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const ZTYPES = [["principal", "principal"], ["luo", "luò"], ["distinct", "distinct"], ["tendineux", "tendineux"], ["vaisseau", "vaisseau"]];
+  let ZC = null, ZCkey = "", zType = "tous", zCanal = null;
+  function zoneData(){
+    const key = JSON.stringify(TYPES_ON);
+    if(!ZC || ZCkey !== key){
+      ZCkey = key; ZC = {};
+      const units = new Set();
+      Object.keys(PLACES).forEach(pid => { if(ZGROUPS.includes(groupOf(pid))) units.add(corrKey(pid)); });
+      units.forEach(u => { const items = corrItems(u); if(items.length) ZC[u] = items; });
+    }
+    return ZC;
+  }
+  const zoneCanals = items => CANAL_ORDER.filter(code => items.some(it => it.c.code === code));
+  const zoneStrip = (items, n) => { const l = zoneCanals(items); return '<span class="zs">' + l.slice(0, n || 9).map(chip).join(" ") + (l.length > (n || 9) ? ' <small>+' + (l.length - (n || 9)) + "</small>" : "") + "</span>"; };
+  const zoneRow = (pid, titre, sous, items, n) => '<button type="button" class="zrow" data-pid="' + esc(pid) + '"><span class="zn"><b>' + esc(titre) + "</b>" + (sous ? "<i>" + esc(sous) + "</i>" : "") + (items ? zoneStrip(items, n) : "") + '</span><span class="zgo">→</span></button>';
+  function zoneSearch(q){
+    const t = normZ(q).trim(); if(!t) return [];
+    const Z = zoneData(), out = [];
+    Object.keys(Z).forEach(u => {
+      const names = (FAMILIES[u] ? FAMILIES[u].members.map(m => (PLACES[m] || {label:m}).label) : []).concat(zoneLabel(u));
+      const hit = names.find(n => normZ(n).includes(t));
+      if(hit) out.push({k:"z", id:u, t:zoneLabel(u), s:hit !== zoneLabel(u) ? "contient « " + hit + " »" : (ZGNAME[zoneGroup(u)] || ""), items:Z[u]});
     });
-    const order = ["familles", "tête", "membre supérieur", "tronc", "membre inférieur", "organes", "canaux", "points", "ajoutés"];
-    document.getElementById("corrTitle").textContent = "Correspondances — lieux de passage";
+    const tp = t.replace(/\s+/g, "");
+    Object.keys(PLACES).filter(pid => pid.startsWith("pt:") && normZ(pid.slice(3)).replace(/\s+/g, "").includes(tp)).slice(0, 6)
+      .forEach(pid => out.push({k:"p", id:pid, t:pid.slice(3), s:"point", items:corrItems(pid)}));
+    data.filter(c => normZ(c.name).includes(t) || normZ(c.code) === t).forEach(c => out.push({k:"c", id:c.code, t:c.name.replace(/ — .*/, ""), s:"canal · toutes ses zones"}));
+    return out.slice(0, 16);
+  }
+  function zoneBrowse(){
+    const Z = zoneData(), groups = {};
+    Object.keys(PLACES).forEach(pid => { const g = groupOf(pid); (groups[g] = groups[g] || []).push(pid); });
+    const unitButtons = g => [...new Set(groups[g].map(corrKey))].filter(u => Z[u]).sort((a, b) => zoneLabel(a).localeCompare(zoneLabel(b), "fr", {numeric:true}))
+      .map(u => '<button type="button" data-pid="' + esc(u) + '">' + esc(zoneLabel(u)) + " (" + Z[u].length + ")</button>").join("");
     const placeButtons = list => list.map(pid => [pid, corrItems(pid).length]).filter(([pid, n]) => n || !ownCanal(pid))
       .sort((a, b) => PLACES[a[0]].label.localeCompare(PLACES[b[0]].label, "fr", {numeric:true}))
       .map(([pid, n]) => '<button type="button" data-pid="' + esc(pid) + '">' + esc(PLACES[pid].label) + " (" + n + ")</button>").join("");
-    document.getElementById("corrBody").innerHTML = '<div class="places-index">' + order.filter(g => groups[g]).map(g =>
-      "<h3>" + esc(g) + "</h3>" + (g === "points" ? intersectionTable() + "<h4>Autres points cités dans les trajets</h4>" + placeButtons(groups[g].filter(pid => !JIAOHUI[pid.slice(3)])) : placeButtons(groups[g]))
-    ).join("") + "</div>";
+    const order = ["familles", "tête", "membre supérieur", "tronc", "membre inférieur", "organes", "canaux", "points", "ajoutés"];
+    return '<details class="zall"><summary>Toutes les zones</summary><div class="places-index">' + order.filter(g => groups[g]).map(g =>
+      "<h3>" + esc(ZGNAME[g] || g) + "</h3>" + (g === "points" ? intersectionTable() + "<h4>Autres points cités dans les trajets</h4>" + placeButtons(groups[g].filter(pid => !JIAOHUI[pid.slice(3)])) : ZGROUPS.includes(g) ? unitButtons(g) : placeButtons(groups[g]))
+    ).join("") + "</div></details>";
+  }
+  function zoneResults(){
+    const q = (document.getElementById("zq") || {}).value || "", box = document.getElementById("zres"); if(!box) return;
+    const Z = zoneData();
+    if(!q.trim()){
+      const freq = Object.keys(Z).sort((a, b) => zoneCanals(Z[b]).length - zoneCanals(Z[a]).length).slice(0, 10);
+      box.innerHTML = '<div class="zlbl">Zones les plus traversées</div><div class="zchips">' + freq.map(u => '<button type="button" class="zchip" data-pid="' + esc(u) + '">' + esc(zoneLabel(u)) + " <small>" + zoneCanals(Z[u]).length + "</small></button>").join("") + "</div>" +
+        '<div class="zlbl">Un canal, toutes ses zones</div><div class="zorbs">' + CANAL_ORDER.filter(c => data.some(d => d.code === c)).map(c => '<button type="button" class="zorb" data-canal="' + esc(c) + '">' + chip(c) + "</button>").join("") + "</div>" + zoneBrowse();
+      return;
+    }
+    const rs = zoneSearch(q);
+    box.innerHTML = rs.length ? rs.map(x => x.k === "c" ? '<button type="button" class="zrow" data-canal="' + esc(x.id) + '"><span class="zn"><b>' + esc(x.t) + "</b><i>" + esc(x.s) + '</i></span><span class="zgo">→</span></button>' : zoneRow(x.id, x.t, x.s, x.items, 7)).join("") : '<p class="jhint">Rien trouvé pour « ' + esc(q) + " ».</p>";
+  }
+  function openIndex(){
+    corrNavigate({type:"index"});
+    document.getElementById("corrTitle").textContent = "Zones de passage";
+    document.getElementById("corrBody").innerHTML = '<div class="zidx"><input type="search" id="zq" placeholder="Une zone, un point, un canal…" autocomplete="off" aria-label="Chercher une zone, un point ou un canal"><div id="zres"></div></div>';
+    zoneResults();
     document.getElementById("corr").classList.add("open");
   }
+  // un canal : toutes les zones qu'il traverse, de la tête aux pieds, par type de trajet
+  function openCanalZones(code){
+    corrNavigate({type:"canal", arg:code});
+    if(zCanal !== code){ zCanal = code; zType = "tous"; }
+    const Z = zoneData(), c = data.find(x => x.code === code);
+    document.getElementById("corrTitle").textContent = "Zones traversées : " + (c ? c.name.replace(/ — .*/, "") : code);
+    const mine = u => Z[u].filter(it => it.c.code === code && (zType === "tous" || typeGroup(it.s.type) === zType));
+    const types = ZTYPES.filter(([t]) => Object.keys(Z).some(u => Z[u].some(it => it.c.code === code && typeGroup(it.s.type) === t)));
+    const lst = Object.keys(Z).filter(u => mine(u).length);
+    let html = '<div class="ztop">' + chip(code) + " <b>" + lst.length + " zones</b></div>" +
+      '<div class="zchips"><button type="button" class="zchip' + (zType === "tous" ? " on" : "") + '" data-ztype="tous">Tous</button>' + types.map(([t, n]) => '<button type="button" class="zchip' + (zType === t ? " on" : "") + '" data-ztype="' + t + '">' + esc(n) + "</button>").join("") + "</div>";
+    ZGROUPS.concat(["autres"]).forEach(g => {
+      const us = lst.filter(u => (ZGROUPS.includes(zoneGroup(u)) ? zoneGroup(u) : "autres") === g).sort((a, b) => zoneLabel(a).localeCompare(zoneLabel(b), "fr"));
+      if(!us.length) return;
+      html += '<div class="zlbl">' + esc(ZGNAME[g] || g) + "</div>" + us.map(u => zoneRow(u, zoneLabel(u), [...new Set(mine(u).map(it => ZTYPES.find(x => x[0] === typeGroup(it.s.type)) ? ZTYPES.find(x => x[0] === typeGroup(it.s.type))[1] : it.s.type))].join(" · "), null)).join("");
+    });
+    document.getElementById("corrBody").innerHTML = html;
+    corrAddBack();
+    document.getElementById("corr").classList.add("open");
+  }
+  document.getElementById("corrBody").addEventListener("input", e => { if(e.target.id === "zq") zoneResults(); });
+  document.getElementById("corrBody").addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest(".zrow, .zchip, .zorb"); if(!b) return;
+    if(b.dataset.ztype){ zType = b.dataset.ztype; openCanalZones(zCanal); return; }
+    if(b.dataset.canal){ zType = "tous"; zCanal = null; openCanalZones(b.dataset.canal); return; }
+    if(b.dataset.pid) openCorr(b.dataset.pid);
+  });
   // tableau des points d'intersection (jiāo huì) : chaque point ouvre sa fiche détaillée
   const chip = c => '<span class="cchip' + (ELEMENT[c] === "metal" ? " metal" : "") + '" style="--c:' + netColor(c) + '">' + esc(sigle(c)) + "</span>";
   const ptOrder = k => { const m = /^(\S+) (\d+)$/.exec(k); return m ? [CANAL_ORDER.indexOf(m[1]), Number(m[2])] : [99, 0]; };
@@ -1150,7 +1240,7 @@
           const organ = info.group === "organes";
           const lab = info.label.length > MAXCH + 2 ? info.label.slice(0, MAXCH + 1) + "…" : info.label;
           stations += '<g class="node zonepass" data-pid="' + esc(p.pid) + '" data-bi="' + p.bi + '" data-idx="' + p.idx + '"><title>Quartier traversé : ' + esc(info.label) +
-            (inQ.length ? " — arrêt(s) du quartier : " + esc(inQ.join(", ")) : "") + "</title>" +
+            (inQ.length ? " — arrêt(s) de la zone : " + esc(inQ.join(", ")) : "") + "</title>" +
             '<rect x="' + (x - 8) + '" y="' + (y - 11) + '" width="' + (MAXCH * 6.4 + 22) + '" height="22" rx="11" fill="' + (organ ? "#f6dcd2" : "#efe9d8") + '" opacity=".9"/>' +
             '<text class="zlabel" x="' + (x + 9) + '" y="' + (y + 4) + '">' + esc(lab) + (inQ.length ? " · " + esc(inQ.join(", ")) : "") + "</text></g>";
           return;
@@ -1173,7 +1263,7 @@
     });
     return '<div class="plan"><h4>Plan des vaisseaux du ' + esc(title) + '</h4><div class="plan-scroll"><svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img">' +
       lines + zoneBands(stations) + stationsOnly(stations) + nums + "</svg></div>" +
-      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="background:#efe9d8;border-radius:4px;width:16px"></i>quartier traversé (zone du corps)</span><span><i style="background:#f6dcd2;border-radius:4px;width:16px"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span><span><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#9aa0c8" stroke-width="2.4" stroke-dasharray="6 4"/></svg>branche interne</span></div></div>';
+      '<div class="legend"><span><i style="background:var(--point)"></i>point</span><span><i style="background:#efe9d8;border-radius:4px;width:16px"></i>zone du corps traversée</span><span><i style="background:#f6dcd2;border-radius:4px;width:16px"></i>organe</span><span><i style="border:2px solid var(--canal)"></i>canal rejoint</span><span><i style="border:2px dashed #8a8aa0"></i>d’après l’illustration</span><span><i style="border:3px solid #1d1d1f"></i>autres canaux ici</span><span>n : début de la branche n</span><span><svg width="22" height="8"><line x1="0" y1="4" x2="22" y2="4" stroke="#9aa0c8" stroke-width="2.4" stroke-dasharray="6 4"/></svg>branche interne</span></div></div>';
   }
 
   // Positions anatomiques des zones du corps : servent à ranger les points de la tête aux pieds

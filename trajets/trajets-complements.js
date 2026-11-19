@@ -70,5 +70,7 @@ window.MTC_TRAJETS_COMPLEMENTS = [
  {"id":"VB-tend-VB1", "canal":"VB", "section":"tendineux", "branche":"canthus externe", "apres":"yeux", "lieu":"pt:VB 1", "page":16, "statut":"validé",
   "note":"VB 1 est nommé sur l'image, au canthus externe."},
  {"id":"F-tend-genou", "canal":"F", "section":"tendineux", "branche":"gros orteil au F 1", "avant":"cuisse", "lieu":"genou", "page":14, "statut":"validé",
-  "note":"L'image montre le trajet au genou ; le texte dit « condyle médial du tibia »."}
+  "note":"L'image montre le trajet au genou ; le texte dit « condyle médial du tibia »."},
+ {"id":"CM-uterus", "canal":"CM", "section":"vaisseau", "branche":"La première branche", "apres":"abdomen-inf", "lieu":"uterus", "label":"Utérus (bāo zhōng)", "group":"organes", "source":"tradition classique", "statut":"validé",
+  "note":"Le chōng mài passe par l’utérus."}
 ];
