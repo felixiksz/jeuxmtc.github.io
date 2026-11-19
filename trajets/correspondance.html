@@ -102,13 +102,13 @@
 <script src="../celebrate.js?v=20261112-f"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
-<script src="../beta-config.js?v=20261108-a"></script>
+<script src="../beta-config.js?v=20261119-a"></script>
 <script src="../beta-gate.js?v=20261114-a"></script>
 <script>
 (function(){
   "use strict";
   // accès : comme le module Trajets (beta-gate.js)
-  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Correspondance"})){
+  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"correspondance", title:"Correspondance"})){
     if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
     throw new Error("trajets : accès réservé");
   }
@@ -354,7 +354,7 @@
       '<p class="t">' + (rec && old ? "Nouveau record : l’ancien était de " + old + "." : rec ? "C’est ton premier record." : "Ton record : " + old + " sur " + N + ".") + "</p>" +
       (S.miss.length ? '<span class="sc t">Stations à revoir</span><ul>' + S.miss.sort((a, b) => a.code.localeCompare(b.code, "fr", {numeric:true})).map(st => "<li><b>" + esc(st.code) + "</b> " +
         st.others.map(c => '<span class="tg" style="background:' + col(c) + '">' + esc(lab(c)) + "</span>").join("") + "</li>").join("") + "</ul>" : '<span class="sc t">Aucune station manquée</span>') +
-      '<p style="margin:22px 0 0"><a class="sc go" target="_top" href="index.html' + (window.mtcIsAdminPage && window.mtcIsAdminPage() ? "?admin=1" : "") + '#reseau">Plan des intersections →</a></p>';
+      '<p style="margin:22px 0 0"><a class="sc go" target="_top" href="' + (window.mtcIsAdminPage && window.mtcIsAdminPage() ? "index.html?admin=1#reseau" : "plan.html") + '">Plan des intersections →</a></p>';
     next.textContent = "Nouvelle série →"; next.hidden = false; head();
     if(ok === N && window.mtcFinale) window.mtcFinale("Série parfaite", N + " trajets du premier coup", {etoiles:"✦✦✦"});
   }

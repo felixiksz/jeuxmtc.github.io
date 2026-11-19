@@ -171,7 +171,7 @@
         // série Réseaux (bêta) : elle contient Équilibrer ; tant qu'elle n'est pas ouverte, les joueur·ses gardent Équilibrer seul
         (admin || isPublic("circuits")) ? ["「 ✦ RÉSEAUX ✦ 」", "Les six systèmes et les circuits de Dr Tán : équilibrer, fermer un circuit, trois plaintes, propagation, familles, quatre membres.", () => module("circuits"), "b"]
           : ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("equilibrer"), "b"],
-        (admin || isPublic("trajets")) && ["Correspondance", "Un métro arrêté par des travaux : trouver la station où il peut prendre la correspondance.", () => { window.location.href = "trajets/correspondance.html"; }, "b"]
+        (admin || isPublic("correspondance")) && ["Correspondance", "Un métro arrêté par des travaux : trouver la station où il peut prendre la correspondance.", () => { window.location.href = "trajets/correspondance.html"; }, "b"]
       ],
       reviser: [
         ["Mémo", pharma ? "Toutes les substances, rangées par catégorie." : "Tous les points, rangés par catégorie.", () => call("openCheatsheetPanel")],
@@ -181,7 +181,7 @@
         // paquets Anki importés dans le jeu (module anki/) : admin seulement tant que « anki » n'est pas ouvert dans beta-config.js
         (admin || isPublic("anki")) && ["Cartes Anki", "Tes paquets Anki, importés et révisés dans le jeu.", () => { window.location.href = "anki/index.html"; }, "b"],
         !pharma && (admin || isPublic("trajets")) && ["Trajets", "Le trajet de chaque canal, en texte et en plan.", () => module("trajets"), "b"],
-        !pharma && (admin || isPublic("trajets")) && ["Plan des intersections", "Les points d’intersection de chaque canal et les canaux qui s’y croisent ; le plan en colonnes, avec les six systèmes de Dr Tán et les canaux distincts.", () => { window.location.href = "trajets/plan.html"; }, "b"],
+        !pharma && (admin || isPublic("plan")) && ["Plan des intersections", "Les points d’intersection de chaque canal et les canaux qui s’y croisent ; le plan en colonnes, avec les six systèmes de Dr Tán et les canaux distincts.", () => { window.location.href = "trajets/plan.html"; }, "b"],
         pharma && (admin || isPublic("formules")) && ["Formules", "Les fiches des formules.", () => module("formules"), "b"],
         // fonctions jusque-là cachées dans les modules, mises en avant dans le menu
         !pharma && (admin || isPublic("trajets")) && ["Zones de correspondance", "Un lieu du corps, et tous les trajets qui y passent.", () => module("trajets", "lieux")],

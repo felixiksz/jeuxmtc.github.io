@@ -114,7 +114,7 @@
 </head>
 <body>
 <main>
-  <div class="top"><a class="sc" href="../index.html">← Accueil</a><a class="sc t" href="index.html#reseau">Plan en colonnes →</a></div>
+  <div class="top"><a class="sc" href="../index.html">← Accueil</a><a class="sc t admin-only" href="index.html#reseau">Plan en colonnes →</a></div>
   <h1>Plan des intersections</h1>
   <p class="lead">Un canal ou un vaisseau à la fois. À chaque point d’intersection, ceux qui s’y croisent : clique sur l’un d’eux pour y passer.</p>
   <div class="views"><button type="button" class="sc on" data-view="ligne">Par canal</button><button type="button" class="sc" data-view="ensemble">Tous les croisements</button></div>
@@ -139,13 +139,13 @@
 <script src="trajets-jiaohui.js?v=20261113-a"></script>
 <script src="trajets-point-zones.js?v=20261113-a"></script>
 <script src="../02-01-point-details-data.js?v=20261113-a"></script>
-<script src="../beta-config.js?v=20261108-a"></script>
+<script src="../beta-config.js?v=20261119-a"></script>
 <script src="../beta-gate.js?v=20261114-a"></script>
 <script>
 (function(){
   "use strict";
   // accès : comme le module Trajets (beta-gate.js)
-  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"trajets", title:"Plan des intersections"})){
+  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"plan", title:"Plan des intersections"})){
     if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
     throw new Error("trajets : accès réservé");
   }

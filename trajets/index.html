@@ -320,7 +320,7 @@
   <div id="corrBody"></div>
 </aside>
 <div id="tip" role="tooltip"></div>
-<script src="../beta-config.js?v=20261108-a"></script>
+<script src="../beta-config.js?v=20261119-a"></script>
 <script src="../beta-gate.js?v=20261114-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
 <script src="../beta-modules.js?v=20261114-a"></script>
@@ -357,7 +357,7 @@
   }
   async function loadTrajetsData(){
     // ?v= : un fichier de données modifié ne doit pas rester servi par le cache du navigateur
-    const V = "?v=20261119-b";
+    const V = "?v=20261119-c";
     if(await loadScript("trajets-data.js" + V)){
       await loadScript("trajets-places-rx.js" + V);
       await loadScript("trajets-complements.js" + V);
@@ -2035,7 +2035,7 @@
 
   applyEdits();
   // nomenclature des merveilleux vaisseaux, toujours visible sous la liste des canaux
-  nav.insertAdjacentHTML("beforeend", '<div class="sigle-legend"><b>▲</b> yáng · <b>▼</b> yīn<br><b>QM</b> qiāo mài<br><b>WM</b> wéi mài<br><b>ChM</b> chōng mài<br><b>DaiM</b> dài mài<br><span class="sopenkey">⚓\uFE0E</span> point d’ouverture<br><span class="sluokey">⛓\uFE0E</span> point luò<br><span class="sdistkey">⁝</span> canal distinct (pointillé fin)</div>');
+  nav.insertAdjacentHTML("beforeend", '<div class="sigle-legend"><b>▲</b> yáng · <b>▼</b> yīn<br><b>RM</b> rèn mài<br><b>DM</b> dū mài<br><b>QM</b> qiāo mài<br><b>WM</b> wéi mài<br><b>ChM</b> chōng mài<br><b>DaiM</b> dài mài<br><span class="sopenkey">⚓\uFE0E</span> point d’ouverture<br><span class="sluokey">⛓\uFE0E</span> point luò<br><span class="sdistkey">⁝</span> canal distinct (pointillé fin)</div>');
   nav.insertAdjacentHTML("afterbegin", '<p class="check-legend">☑ = vérifié · <button type="button" id="toggleChecks" class="linkish">masquer</button></p>');
   const CHECKS_KEY = "mtc_trajets_hide_checks";
   const setChecks = hide => {
@@ -2050,8 +2050,11 @@
     setChecks(hide);
     document.getElementById("toggleChecks").addEventListener("click", () => setChecks(!document.body.classList.contains("hide-checks")));
   });
-  data.forEach((c, i) => {
-    if(i && c.kind === "vaisseau" && data[i - 1].kind !== "vaisseau"){
+  // la liste : les douze canaux, puis les vaisseaux (rèn mài et dū mài d'abord, puis chōng mài et les autres), tous écrits de la même façon
+  const navVessel = c => c.kind === "vaisseau" || c.code === "RM" || c.code === "DM";
+  const navOrder = [...data.filter(c => !navVessel(c)), ...["RM", "DM"].map(k => data.find(c => c.code === k)).filter(Boolean), ...data.filter(c => c.kind === "vaisseau")];
+  navOrder.forEach((c, i) => {
+    if(i && navVessel(c) && !navVessel(navOrder[i - 1])){
       const gap = document.createElement("div"); gap.className = "nav-gap"; nav.appendChild(gap);
     }
     const row = document.createElement("div");
@@ -2066,7 +2069,7 @@
     });
     const b = document.createElement("button");
     b.type = "button"; b.dataset.code = c.code;
-    if(c.kind === "vaisseau") b.innerHTML = '<span class="full">' + esc(c.name.replace(/ — .*/, "").replace(/\s*\(.*$/, "")) + '</span><span class="short">' + esc(sigle(c.code)) + "</span>";
+    if(navVessel(c)) b.innerHTML = '<span class="full">' + esc(c.name.replace(/ — .*/, "").replace(/\s*\(.*$/, "")) + '</span><span class="short">' + esc(sigle(c.code)) + "</span>";
     else b.textContent = c.code;
     b.title = c.name;
     b.addEventListener("click", () => { if(view === "network") toggleNetCanal(c.code); else show(c.code); });
