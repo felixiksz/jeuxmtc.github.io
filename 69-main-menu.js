@@ -721,13 +721,30 @@
   window.mtcOpenMainMenu = open;
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
   // lien direct depuis une autre page (barre d'outils des modules, accueil) : index.html#ouvrir-recherche, -memo, -comparer…
+  // Outil ouvert depuis la page du coach (recherche, panier, comparer, mémo, série, collection) : le fermer ramène au coach.
+  const TOOL_PANELS = ["statsPanel", "advancedSearchPanel", "reviewBasketPanel", "comparisonPanel", "cheatsheetPanel"];
+  const toolOpen = () => TOOL_PANELS.some(id => { const e = byId(id); return e && e.classList.contains("open"); }) || !!byId("mtcCollection");
+  function returnToCoachWhenClosed(){
+    let seen = false;
+    const check = () => {
+      if(toolOpen()){ seen = true; return; }
+      if(!seen) return;
+      obs.disconnect();
+      if(fxOn("mtc_coach")) window.location.replace("accueil/index.html");
+    };
+    const obs = new MutationObserver(check);
+    obs.observe(document.body, {attributes:true, attributeFilter:["class"], subtree:true, childList:true});
+  }
   function openFromHash(){
     const m = /^#ouvrir-([a-z]+)$/.exec(location.hash);
     if(!m) return;
+    let fromCoach = false;
+    try{ fromCoach = sessionStorage.getItem("mtc_from_coach") === "1"; sessionStorage.removeItem("mtc_from_coach"); }catch(error){}
     const action = {memo:() => call("openCheatsheetPanel"), recherche:() => call("toggleAdvancedSearchPanel"), comparer:() => call("toggleComparisonPanel"), cartes:() => clickId("pharmaCardsButton"),
       stats:() => call("toggleStatsPanel"), panier:() => call("toggleReviewBasketPanel"), collection:() => call("mtcOpenCollection"), quiz:() => { if(window.MTCQuizTest) window.MTCQuizTest.open(); }, menu:() => { fromTraining = true; open(); }, revoir:() => { if(window.MTCQuizTest) window.MTCQuizTest.startDueReviewQuiz(); }}[m[1]];
     try{ history.replaceState(null, "", location.pathname + location.search); }catch(error){}
     if(action) setTimeout(action, m[1] === "menu" ? 0 : 700);
+    if(action && fromCoach && ["memo", "recherche", "comparer", "stats", "panier", "collection"].includes(m[1])) setTimeout(returnToCoachWhenClosed, 1500);
   }
   if(document.readyState === "complete") openFromHash(); else window.addEventListener("load", openFromHash);
   window.addEventListener("hashchange", openFromHash);

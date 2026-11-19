@@ -910,6 +910,10 @@
     const c = rnd(choix); dejaDonne.add(c);
     return "Un des canaux cherchés : " + chips([c]) + ".";
   }
+  // « Quel circuit ? » : trois vies. Un canal faux en coûte une ; la réponse ne compte comme erreur qu'à la troisième.
+  const VIES = 3;
+  const viesHtml = n => '<span class="vies" title="Vies : un canal faux en coûte une" style="color:#c0392b;letter-spacing:2px;margin-left:10px;white-space:nowrap">' +
+    "♥".repeat(Math.max(0, VIES - n)) + '<span style="opacity:.25">' + "♥".repeat(Math.min(VIES, n)) + "</span></span>";
   function renderQuel(){
     let q = "", body = "";
     const t = Q5.t;
@@ -934,7 +938,7 @@
       q = "Ce circuit respecte-t-il l’équilibre statique ?";
       body = gridSvg(Q5.c.grid, {noPol:!(Q5.done || Q5.showPol)}) + (Q5.done ? "" : '<div class="act"><button type="button" class="tool st" data-v="1">Statique et dynamique</button><button type="button" class="tool st" data-v="0">Dynamique seulement</button></div>');
     }
-    main.innerHTML = '<div class="bar">' + aide('Les actions, indications et mots-clés des circuits, les astuces de Dr Tán' + (ANNEXES ? ' et l’équilibre statique.' : '.')) + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + "</div>" +
+    main.innerHTML = '<div class="bar">' + aide('Les actions, indications et mots-clés des circuits, les astuces de Dr Tán' + (ANNEXES ? ' et l’équilibre statique.' : '.')) + histNav("quel") + scoreLine("quel", "bonne réponse", "bonnes réponses") + (t === "indications" || t === "actions" || t === "mots" ? viesHtml(Q5.errs || 0) : "") + "</div>" +
       '<div style="max-width:720px"><p class="q">' + q + "</p>" + body +
       (Q5.hintMsgs.length ? '<div class="card">' + Q5.hintMsgs.map(m => "<p><b>Astuce</b> · " + m + "</p>").join("") + (Q5.done ? "" : '<p class="sm">Avec astuce, la réponse ne compte pas comme bonne réponse.</p>') + "</div>" : "") +
       '<div class="act">' + (!Q5.done && (t === "indications" || t === "actions" || t === "mots") ? '<button type="button" class="tool" id="qVal">Valider</button>' : "") +
@@ -951,6 +955,12 @@
       const okc = sets.some(g => [...Q5.pick, c].every(x => g.includes(x)));
       Q5.mark = Q5.mark || {};
       if(okc){ Q5.pick.add(c); Q5.mark[c] = "ok"; stepFx(true, '.pc[data-c="' + c + '"]'); } else { Q5.mark[c] = "no"; Q5.errs = (Q5.errs || 0) + 1; stepFx(false); }
+      if(!okc && Q5.errs >= VIES){
+        const fits = CIRC.filter(o => Q5.lines.every(l => (o[t] || []).includes(l))), right = fits[0];
+        Q5.mark = {}; right.grid.forEach(g => Q5.mark[g] = "ok"); Q5.pick.forEach(g => { if(!right.grid.includes(g)) Q5.mark[g] = "no"; });
+        finish(false, "Plus de vie : voici le circuit." + circuitCard(right), false);
+        return;
+      }
       renderQuel();
     });
     // marque les canaux : ceux de la bonne réponse en vert, les choix en trop en rouge
@@ -959,7 +969,7 @@
     on("qVal", () => {
       const mine = [...Q5.pick];
       const fits = CIRC.filter(o => Q5.lines.every(l => (o[t] || []).includes(l)));
-      const found = fits.some(o => sameSet(o.grid, mine)), ok = found && !Q5.errs;
+      const found = fits.some(o => sameSet(o.grid, mine)), ok = found && (Q5.errs || 0) < VIES;
       const right = fits.find(o => sameSet(o.grid, mine)) || fits[0];
       markPick(right.grid);
       finish(ok, ok ? "" : found ? "Tu as bien retrouvé le circuit, mais avec " + Q5.errs + (Q5.errs > 1 ? " canaux" : " canal") + " faux en chemin : il faut le trouver sans erreur pour que ça compte comme bonne réponse." : "Ce n’est pas le bon circuit.", found && !ok);

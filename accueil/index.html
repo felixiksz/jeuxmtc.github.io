@@ -384,6 +384,8 @@
   $("tourBtn").addEventListener("click", () => tour(true));
   setTimeout(() => tour(false), 700);
   // « Plus tard » : la grille s'ouvre sans l'entraînement, jusqu'à la prochaine ouverture du site
+  // outils ouverts depuis cette page : ils s'ouvrent sur la grille ; les fermer ramène ici
+  document.querySelectorAll("#bicons a, #serie").forEach(a => a.addEventListener("click", () => { try{ sessionStorage.setItem("mtc_from_coach", "1"); }catch(e){} }));
   $("later").addEventListener("click", () => { try{ sessionStorage.setItem("mtc_entrainement_plus_tard", "1"); }catch(e){} });
   // (test) repartir de zéro, avec le programme du jour
   if($("again")) $("again").addEventListener("click", () => { T = build(); save(); Q = null; drawTraining(); });

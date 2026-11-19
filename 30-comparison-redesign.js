@@ -1811,7 +1811,7 @@
         if(aExactPrefix !== bExactPrefix) return aExactPrefix - bExactPrefix;
         return aCode.localeCompare(bCode, "fr-FR", {numeric:true});
       })
-      .slice(0, 9)
+      .slice(0, 40)
       .map(item => item.point);
   }
 

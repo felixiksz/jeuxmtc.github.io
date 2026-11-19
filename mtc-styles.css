@@ -1737,11 +1737,11 @@ body.darkroom .point-info-section{
 }
 
 .category-postit{
-  z-index:5000 !important;
+  z-index:9040 !important;
 }
 
 .association-postit{
-  z-index:5100 !important;
+  z-index:9041 !important;
 }
 
 

@@ -855,6 +855,14 @@
   }
 
   function herbMatchesKeywords(herb, keywords, scopes, mode){
+    const S = window.mtcSearch;
+    if(S){
+      const mots = S.termes(keywords);
+      if(!mots.length) return true;
+      const h = S.normMatch((Array.isArray(scopes) && scopes.length ? scopes : SEARCH_SCOPES).map(scope => herbSearchTextForScope(herb, scope)).join(" "));
+      if(mode === "phrase") return h.includes(S.normMatch(keywords));
+      return S.correspond(mots, h);
+    }
     const query = normalizeText(keywords);
     if(!query) return true;
     const activeScopes = Array.isArray(scopes) && scopes.length ? scopes : SEARCH_SCOPES;
@@ -888,6 +896,8 @@
     // plusieurs mots : les substances où ils se suivent (« chong mai ») passent en tête
     const several = normalizeText(filters.keywords).includes(" ");
     const exact = herb => several && herbMatchesKeywords(herb, filters.keywords, filters.scopes, "phrase") ? 0 : 1;
+    const S = window.mtcSearch, mots = S ? S.termes(filters.keywords) : [], un = !!S && S.mode === "un" && mots.length > 1, nb = new Map();
+    const trouves = herb => { if(!nb.has(herb)) nb.set(herb, S.compte(mots, S.normMatch((filters.scopes.length ? filters.scopes : SEARCH_SCOPES).map(scope => herbSearchTextForScope(herb, scope)).join(" ")))); return nb.get(herb); };
     return allHerbs()
       .filter(herb => herbMatchesKeywords(herb, filters.keywords, filters.scopes))
       .filter(herb => !filters.classCode || String(herb.classCode) === filters.classCode)
@@ -896,7 +906,7 @@
       .filter(herb => herbMatchesFilterValues(herb, "toxicity", filters.toxicityActive ? filters.toxicities : [], filters.toxicityLogic))
       .filter(herb => herbMatchesFilterValues(herb, "tropism", filters.tropismActive ? filters.tropisms : [], filters.tropismLogic))
       .filter(herb => herbMatchesActions(herb, filters.actionActive ? filters.actions : [], filters.actionLogic))
-      .sort((a,b) => exact(a) - exact(b) || normalizeText(herbLabel(a)).localeCompare(normalizeText(herbLabel(b)), "fr"));
+      .sort((a,b) => (un ? trouves(b) - trouves(a) : 0) || exact(a) - exact(b) || normalizeText(herbLabel(a)).localeCompare(normalizeText(herbLabel(b)), "fr"));
   }
 
   function scopeCheckboxHtml(scope, label, selected){
@@ -931,6 +941,8 @@
             oninput="renderAdvancedSearchResults()"
           >
         </label>
+
+        ${window.mtcSearch ? window.mtcSearch.barreHtml() : ""}
 
         <div class="search-scope-options" aria-label="Champs de recherche PHARMA">
           <span>Rechercher dans :</span>
@@ -1009,10 +1021,23 @@
   }
 
   function pharmaSearchResultHtml(herb){
+    let bloc = "", rich = "", code = esc(herbLabel(herb));
+    const S = window.mtcSearch;
+    if(S){
+      try{
+        const mots = S.motsActifs();
+        if(mots.length){
+          const scopes = getCheckedValues("pharmaSearchScope", SEARCH_SCOPES);
+          bloc = S.blocHtml([getHerbHanzi(herb), herb?.nom || ""].filter(Boolean).join(" · "), herb?.classe || "", scopes.map(scope => herbSearchTextForScope(herb, scope)), mots);
+          code = S.marque(herbLabel(herb), mots);
+          rich = " search-result-rich";
+        }
+      }catch(error){}
+    }
     return `
-      <li class="search-result-item pharma-search-result-item">
+      <li class="search-result-item pharma-search-result-item${rich}">
         <div class="compact-point-row" onclick="openPharmaHerbPanel('${attr(herb.id)}')" title="${attr(herbTitle(herb))}" role="button" tabindex="0" onkeydown="openPharmaBasketLineWithKeyboard(event,'${attr(herb.id)}')">
-          <span class="compact-point-code pharma-compact-herb-code">${esc(herbLabel(herb))}</span>
+          <span class="compact-point-code pharma-compact-herb-code">${code}</span>${bloc}
           <span class="compact-point-tools" onclick="event.stopPropagation()">
             ${pharmaBasketButtonHtml(herb.id)}
           </span>
@@ -1027,6 +1052,7 @@
 
     if(!total){
       container.innerHTML = `<p class="stats-small">Aucune substance ne correspond aux filtres.</p>`;
+      if(window.mtcSearch) window.mtcSearch.programmerMessageVide();
       return;
     }
 

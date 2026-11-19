@@ -146,8 +146,13 @@
 
   function translateAssistantPoint(entry){
     const out = {};
-    if(entry.pinyin != null) out.pinyin = entry.pinyin;
-    if(entry.hanzi != null && /[㐀-鿿]/.test(String(entry.hanzi))) out.hanzi = entry.hanzi;   // un hanzi sans caractère chinois (pinyin glissé dans le champ) ne remplace pas le bon
+    // Le pinyin s'écrit en lettres, le hanzi en caractères chinois : les deux champs inversés dans les données sont remis dans l'ordre,
+    // et un champ qui n'a pas la bonne forme ne remplace pas celui du jeu.
+    const cjk = v => /[㐀-鿿]/.test(String(v == null ? "" : v));
+    let py = entry.pinyin, hz = entry.hanzi;
+    if(cjk(py) && !cjk(hz)){ const t = py; py = hz; hz = t; }
+    if(py != null && py !== "" && !cjk(py)) out.pinyin = py;
+    if(hz != null && cjk(hz)) out.hanzi = hz;
     if(entry.nom_fr != null) out.nom_francais = entry.nom_fr;
     if(entry.localisation != null) out.localisation = entry.localisation;
     if(entry.methode_localisation != null) out.methode_localisation = entry.methode_localisation;
