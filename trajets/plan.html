@@ -82,6 +82,12 @@
   .sw{ display:inline-block; width:12px; height:12px; border-radius:2px; opacity:.55; } .sw.m{ opacity:1; box-shadow:inset 0 0 0 1px var(--tint); }
   #mxInfo{ position:sticky; bottom:0; margin:10px -20px 0; padding:10px 20px 14px; background:var(--page-bg); border-top:1px solid var(--text-color); min-height:3.6em; }
   #mxInfo i{ font-style:normal; color:var(--tint); }
+  /* plusieurs canaux : « entre eux » / « tous leurs points » */
+  .mode{ display:inline-flex; border:1px solid var(--text-color); border-radius:999px; overflow:hidden; vertical-align:middle; }
+  .mode button{ padding:5px 11px; font:800 .62rem 'Archivo', sans-serif; letter-spacing:.08em; text-transform:uppercase; color:var(--tint); }
+  .mode button.on{ background:var(--text-color); color:var(--page-bg); }
+  #mxMode{ display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:8px 0 0; min-height:28px; }
+  .gr.hd > .sel{ box-shadow:inset 0 0 0 2px var(--text-color); }
   @media (prefers-reduced-motion:reduce){ .st.flash{ animation:none; } }
 </style>
 </head>
@@ -97,6 +103,9 @@
     <div id="out"></div>
   </div>
   <div id="vEnsemble" hidden>
+    <span class="sc t pk">Les douze canaux</span><div class="pick" id="mxC"></div>
+    <span class="sc t pk">Les huit merveilleux vaisseaux</span><div class="pick" id="mxV"></div>
+    <div id="mxMode"></div>
     <div class="legend mxl"><span><i class="dot"></i>le canal passe par ce point</span><span><i class="dot maybe"></i>selon certains auteurs</span><span><i class="dot key"></i>point d’ouverture</span></div>
     <div class="legend mxl"><span class="sc">Cinq mouvements</span><span><i class="sw" style="background:#2f9a3c"></i>bois</span><span><i class="sw" style="background:#e0261b"></i>feu</span>
       <span><i class="sw" style="background:#d9a400"></i>terre</span><span><i class="sw m" style="background:#fff"></i>métal</span><span><i class="sw m" style="background:#1d1d1f"></i>eau</span></div>
@@ -211,28 +220,42 @@
   const headBg = l => !MOUV[l] ? "color-mix(in srgb, var(--text-color) 20%, var(--page-bg))" : metal(l) ? "#fff" : eau(l) ? "#1d1d1f" : "color-mix(in srgb, " + col(l) + " 62%, var(--page-bg))";
   // en-tête de colonne : le sigle est écrit de bas en haut, mais le triangle du yīn (▼) ou du yáng (▲) reste droit
   const sigCol = l => { const t = SIG[l] || l, tri = /^[▼▲]/.test(t) ? t[0] : ""; return '<span class="rot">' + esc(tri ? t.slice(1) : t) + "</span>" + (tri ? '<span class="tri">' + tri + "</span>" : ""); };
-  let canalOnly = "", selPt = "";
+  // Un ou plusieurs canaux choisis (pastilles ou en-têtes). Un seul : tous ses points. Plusieurs : le tableau ne garde que leurs colonnes, et
+  // « entre eux » (au moins deux des canaux choisis passent par le point) ou « tous leurs points » (au moins un).
+  let sel = new Set(), mode = "entre", selPt = "";
+  const crossing = (x, l) => l === x.own || x.lines.has(l);
+  const plural = (n, a, b) => n + " " + (n > 1 ? b : a);
   function grid(){
-    const pts = Object.values(ST).sort(order).filter(x => !canalOnly || x.own === canalOnly || x.lines.has(canalOnly));
-    let h = '<div class="gr hd" role="row"><span></span>' + ALL.map(l => '<span data-col="' + l + '"' + (l === canalOnly ? ' class="on"' : "") + ' style="' + (headBg(l) ? "--h:" + headBg(l) + ";" : "") + (eau(l) ? "--k:#fff" : "") + '" title="' + esc(NAME[l][0]) + '">' + sigCol(l) + "</span>").join("") + "</div>";
+    const all = Object.values(ST).sort(order), n = sel.size;
+    const pts = !n ? all : all.filter(x => { const k = [...sel].filter(l => crossing(x, l)).length; return n === 1 || mode === "tous" ? k >= 1 : k >= 2; });
+    const L = n > 1 ? ALL.filter(l => sel.has(l)) : ALL, tpl = "grid-template-columns:46px repeat(" + L.length + ", minmax(0, 1fr))";
+    document.getElementById("mxC").innerHTML = CAN.map(c => badge(c, {tag:"button", attr:' data-col="' + c + '"', cls:sel.has(c) ? "on" : ""})).join("");
+    document.getElementById("mxV").innerHTML = MV.map(c => badge(c, {tag:"button", attr:' data-col="' + c + '"', cls:sel.has(c) ? "on" : ""})).join("");
+    document.getElementById("mxMode").innerHTML = (n > 1 ? '<span class="mode"><button type="button" data-mode="entre" class="' + (mode === "entre" ? "on" : "") + '">Entre eux</button><button type="button" data-mode="tous" class="' + (mode === "tous" ? "on" : "") + '">Tous leurs points</button></span>' : "") +
+      (n ? '<button type="button" class="sc t" data-clear>Effacer</button>' : "");
+    let h = '<div class="gr hd" style="' + tpl + '" role="row"><span></span>' + L.map(l => '<span data-col="' + l + '"' + (sel.has(l) ? ' class="sel"' : "") + ' style="' + (headBg(l) ? "--h:" + headBg(l) + ";" : "") + (eau(l) ? "--k:#fff" : "") + '" title="' + esc(NAME[l][0]) + '">' + sigCol(l) + "</span>").join("") + "</div>";
     let last = "";
     pts.forEach(x => {
       if(x.own !== last){ h += '<div class="gz">' + esc(NAME[x.own][0]) + "</div>"; last = x.own; }
-      h += '<div class="gr pt' + (x.code === selPt ? " sel" : "") + '" role="row" data-pt="' + esc(x.code) + '"><span class="lb" style="' + (headBg(x.own) ? "--h:" + headBg(x.own) + ";" : "") + (eau(x.own) ? "--k:#fff" : "") + '">' + esc(x.code) + "</span>" +
-        ALL.map(l => { const how = l === x.own ? "sur" : x.lines.get(l), bg = bandBg(l);
+      h += '<div class="gr pt' + (x.code === selPt ? " sel" : "") + '" style="' + tpl + '" role="row" data-pt="' + esc(x.code) + '"><span class="lb" style="' + (headBg(x.own) ? "--h:" + headBg(x.own) + ";" : "") + (eau(x.own) ? "--k:#fff" : "") + '">' + esc(x.code) + "</span>" +
+        L.map(l => { const how = l === x.own ? "sur" : x.lines.get(l), bg = bandBg(l);
           return '<span style="' + (bg ? "--b:" + bg + ";" : "") + (eau(l) ? "--d:#fff;--b2:#1d1d1f" : "") + '">' + (how ? '<i class="dot' + (how === "certains" ? " maybe" : how === "ouverture" ? " key" : "") + '"></i>' : "") + "</span>"; }).join("") + "</div>";
     });
     document.getElementById("grid").innerHTML = h;
     const info = document.getElementById("mxInfo");
     if(selPt && ST[selPt]){ const x = ST[selPt], i2 = info2(x);
-      info.innerHTML = "<b>" + esc(x.code) + "</b> " + esc(i2.py) + " <i>" + esc(i2.fr) + "</i><br>" + badge(x.own, {sm:true}) + " " + [...x.lines].sort((m, n) => ALL.indexOf(m[0]) - ALL.indexOf(n[0])).map(([l, how]) => badge(l, {sm:true, how})).join(" "); }
-    else info.innerHTML = canalOnly ? "<b>" + esc(NAME[canalOnly][0]) + "</b> : " + pts.length + (pts.length > 1 ? " points d’intersection" : " point d’intersection") + ". <i>Clique encore sur son sigle pour tout revoir.</i>"
-      : "<i>Une rangée par point d’intersection, canal par canal, dans l’ordre des numéros. Clique sur un point pour son nom, ou sur le sigle d’un canal pour ne garder que ses points.</i>";
+      info.innerHTML = "<b>" + esc(x.code) + "</b> " + esc(i2.py) + " <i>" + esc(i2.fr) + "</i><br>" + badge(x.own, {sm:true}) + " " + [...x.lines].sort((m, k) => ALL.indexOf(m[0]) - ALL.indexOf(k[0])).map(([l, how]) => badge(l, {sm:true, how})).join(" "); }
+    else info.innerHTML = !n ? "<i>Une rangée par point d’intersection, canal par canal, dans l’ordre des numéros. Touche des canaux pour ne voir que leurs croisements, ou un point pour son nom.</i>"
+      : n === 1 ? "<b>" + esc(NAME[[...sel][0]][0]) + "</b> : " + plural(pts.length, "point d’intersection", "points d’intersection") + ". <i>Ajoute un autre canal pour ne voir que leurs croisements.</i>"
+      : pts.length ? "<b>" + plural(pts.length, "point", "points") + "</b> " + (mode === "entre" ? "partagés par au moins deux de ces canaux." : "où passe l’un de ces canaux.")
+      : "<i>Aucun point partagé. Essaie « Tous leurs points ».</i>";
   }
   const info2 = x => info(x.code);
   document.addEventListener("click", e => {
-    const colEl = e.target.closest && e.target.closest("[data-col]"), ptEl = e.target.closest && e.target.closest("[data-pt]");
-    if(colEl){ canalOnly = canalOnly === colEl.dataset.col ? "" : colEl.dataset.col; selPt = ""; grid(); }
+    const colEl = e.target.closest && e.target.closest("[data-col]"), ptEl = e.target.closest && e.target.closest("[data-pt]"), modeEl = e.target.closest && e.target.closest("[data-mode]"), clearEl = e.target.closest && e.target.closest("[data-clear]");
+    if(colEl){ const l = colEl.dataset.col; sel.has(l) ? sel.delete(l) : sel.add(l); selPt = ""; grid(); }
+    else if(modeEl){ mode = modeEl.dataset.mode; grid(); }
+    else if(clearEl){ sel = new Set(); selPt = ""; grid(); }
     else if(ptEl){ selPt = selPt === ptEl.dataset.pt ? "" : ptEl.dataset.pt; grid(); }
   });
   grid(); draw();

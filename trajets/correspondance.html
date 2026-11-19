@@ -49,7 +49,7 @@
   .veh .body{ fill:var(--text-color); } .veh .win{ fill:var(--page-bg); } .veh .wire{ fill:none; stroke:var(--text-color); stroke-width:1.6; stroke-linecap:round; }
   .veh .pax{ fill:var(--mtc-accent); opacity:0; transition:opacity .2s; } .veh.has .pax{ opacity:1; }
   /* les merveilleux vaisseaux : lignes en pointillés */
-  .ves{ stroke-dasharray:.1 11; } .tag text.s, .term text.s{ font-size:8px; letter-spacing:-.02em; }
+  .ves{ stroke-dasharray:.1 11; } .tag text.s{ font-size:7.2px; letter-spacing:-.03em; } .term text.s{ font-size:8.5px; letter-spacing:-.03em; }
   /* la personne à pied : tête, corps, bras et jambes qui se balancent */
   .pers{ opacity:0; transition:transform 1.1s linear, opacity .25s; }
   .pers circle{ fill:var(--mtc-accent); } .pers path{ fill:none; stroke:var(--mtc-accent); stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round; }
@@ -117,8 +117,8 @@
   // couleurs des cinq mouvements, comme dans Réseaux ; le yáng un peu plus clair que le yīn pour distinguer deux lignes du même mouvement
   const BASE = {E:"#d9a400", Rt:"#d9a400", VB:"#2f9a3c", F:"#2f9a3c", C:"#e0261b", IG:"#e0261b", EC:"#e0261b", TF:"#e0261b", V:"#1f5fd6", Rn:"#1f5fd6"};
   const YANG = new Set(["GI", "E", "IG", "V", "TF", "VB", "DM"]);
-  // les merveilleux vaisseaux sont des lignes comme les autres (pointillés, bateau) : étiquette courte, nom entier
-  const VES = {YangQ:["yáq", "yáng qiāo mài"], YinQ:["yīq", "yīn qiāo mài"], YangW:["yáw", "yáng wéi mài"], YinW:["yīw", "yīn wéi mài"], CM:["chō", "chōng mài"], DaiM:["dài", "dài mài"]};
+  // les merveilleux vaisseaux sont des lignes comme les autres (pointillés, bateau). Leurs sigles sont ceux du module Trajets (SIGLE) : ▲ yáng, ▼ yīn ; le nom entier ne sert qu'en infobulle
+  const VES = {YangQ:["▲QM", "yáng qiāo mài"], YinQ:["▼QM", "yīn qiāo mài"], YangW:["▲WM", "yáng wéi mài"], YinW:["▼WM", "yīn wéi mài"], CM:["ChM", "chōng mài"], DaiM:["DaiM", "dài mài"]};
   const lab = c => VES[c] ? VES[c][0] : c;
   const MAIN_YANG = new Set(["GI", "IG", "TF"]);
   // chaque ligne a son transport : métro (yīn), tram (yáng de main), bus (yáng de pied), bateau (vaisseaux, rèn mài et dū mài)
@@ -235,7 +235,7 @@
     return '<rect class="body" x="-16" y="-9" width="32" height="17" rx="3"/>' + win + '<rect class="win" x="-13" y="3" width="26" height="1.6"/>';
   }
   const pos = (x, y) => "translate(" + x + "px," + (y - 19) + "px)";
-  const pill = c => '<span class="pl' + (VES[c] ? " v" : "") + '" style="background:' + col(c) + '"' + ">" + esc(VES[c] ? VES[c][1] : c) + "</span>";
+  const pill = c => '<span class="pl' + (VES[c] ? " v" : "") + '" style="background:' + col(c) + '"' + (VES[c] ? ' title="' + esc(VES[c][1]) + '"' : "") + ">" + esc(lab(c)) + "</span>";
   const persHtml = '<g class="pers" id="pers"><circle cx="0" cy="-9.5" r="3.3"/><path d="M0 -5.5V2.5"/><path class="m b1" d="M0 -4.5L-3.6 1.2"/><path class="m b2" d="M0 -4.5L3.6 1.2"/><path class="m j1" d="M0 2.5L-3 10"/><path class="m j2" d="M0 2.5L3 10"/></g>';
   const bar = '<svg class="bar" viewBox="-14 -16 28 30" aria-hidden="true"><path class="b" d="M-7 -4V12M7 -4V12"/><rect class="b" x="-11" y="-12" width="22" height="9" rx="1.5"/><path class="r" d="M-6 -4.5L-2 -10.5M1 -4.5L5 -10.5"/></svg>';
   const pillX = c => pill(c).replace('class="pl', 'class="pl x');
