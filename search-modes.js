@@ -8,7 +8,7 @@
   "use strict";
   const KEY = "mtc_search_mode_v1";
   const MODES = [
-    ["tous", "Tous les mots", "Tous les mots doivent être dans la fiche, où que ce soit."],
+    ["tous", "Tous les mots", "Tous les mots doivent être dans la fiche, où que ce soit. Chaque mot est cherché par son début, au singulier comme au pluriel."],
     ["proches", "Mots proches", "Tous les mots, mais rapprochés : dans un même passage (quelques mots d’écart au plus)."],
     ["exact", "« » Expression exacte", "La suite de mots telle quelle (par exemple « foie gras » ne trouve pas « foie » ici et « gras » là). Tu peux aussi mettre une expression entre guillemets dans n’importe quel mode."],
     ["un", "Un des mots", "Au moins un des mots ; les points qui en contiennent le plus passent en tête."]
@@ -24,32 +24,68 @@
   const normMatch = s => normSimple(s).replace(/\s+/g, " ").trim();
   const esc = s => typeof escapeHtml === "function" ? escapeHtml(s) : String(s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
 
+  const ENTIER = "\u0001";   // marque un terme à chercher en mots entiers
+  const lisible = t => String(t).replace(/\u0001/g, "");
   // termes : chaque mot, ou une expression entre guillemets (guillemet pas encore refermé compris) ; en mode exact, toute la saisie
   function termes(query){
     const brut = String(query == null ? "" : query);
-    if(mode === "exact"){ const t = normMatch(brut.replace(/["«»“”]/g, " ")); return t ? [t] : []; }
+    if(mode === "exact"){ const t = normMatch(brut.replace(/["«»“”]/g, " ")); return t ? [ENTIER + t] : []; }
     const res = [];
-    let reste = brut.replace(/["«“]([^"»”]+)["»”]/g, (_, p) => { const t = normMatch(p); if(t) res.push(t); return " "; });
+    let reste = brut.replace(/["«“]([^"»”]+)["»”]/g, (_, p) => { const t = normMatch(p); if(t) res.push(ENTIER + t); return " "; });
     const ouv = reste.match(/["«“]([^"»”]*)$/);
-    if(ouv){ const t = normMatch(ouv[1]); if(t) res.push(t); reste = reste.slice(0, ouv.index); }
+    if(ouv){ const t = normMatch(ouv[1]); if(t) res.push(ENTIER + t); reste = reste.slice(0, ouv.index); }
     normMatch(reste).split(" ").filter(Boolean).forEach(w => res.push(w));
     return res;
   }
+  // Un mot se cherche par son début (« insom » trouve « insomnie », « dents » ne trouve pas « accidents »), au singulier comme au pluriel
+  // (« dent » = « dents »). Un mot de trois lettres ou moins, une expression entre guillemets et le mode « Expression exacte » se cherchent en
+  // mots entiers. Une étoile ouvre le début (« *ite » trouve « arthrite ») ou la fin (« dent* ») d'un mot. Les codes (Rt4) et les hanzi se cherchent tels quels.
+  const ech = t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const RX = new Map();
+  function rxOf(t){
+    if(RX.has(t)) return RX.get(t);
+    const marque = t.charCodeAt(0) === 1, brut = marque ? t.slice(1) : t;
+    const gauche = brut.startsWith("*"), droite = brut.length > 1 && brut.endsWith("*"), coeur = brut.replace(/^\*+|\*+$/g, "").trim();
+    let r = null;
+    if(coeur){
+      const tel = /[0-9]/.test(coeur) || /[㐀-鿿]/.test(coeur);
+      const entier = marque || coeur.length <= 3 || coeur.includes(" ");
+      const racine = w => w.length > 3 && /[sx]$/.test(w) ? w.slice(0, -1) : w;
+      const motif = tel ? ech(coeur).replace(/ +/g, " +")
+        : entier ? coeur.split(" ").map(w => w.length > 3 ? ech(racine(w)) + "[sx]?" : ech(w)).join(" +")
+        : ech(racine(coeur));
+      r = new RegExp((tel || gauche ? "()" : "(^|[^\\p{L}\\p{N}])") + "(" + motif + ")" + (tel || droite || !entier ? "" : "(?![\\p{L}\\p{N}])"), "gu");
+    }
+    if(RX.size > 300) RX.clear();
+    RX.set(t, r);
+    return r;
+  }
+  // positions [début, fin] des occurrences d'un terme dans un texte déjà normalisé
+  function trouves(h, t, max){
+    const re = rxOf(t); if(!re) return [];
+    re.lastIndex = 0;
+    const out = []; let m;
+    while((m = re.exec(h)) && out.length < (max || 400)){ const d = m.index + m[1].length; out.push([d, d + m[2].length]); }
+    return out;
+  }
+  const contient = (h, t) => trouves(h, t, 1).length > 0;
+
   // mots rapprochés : chacun a une occurrence à moins de `fen` caractères d'une occurrence du mot le plus rare
   function proche(h, mots, fen){
     fen = fen || 80;
     if(mots.length < 2) return true;
-    const pos = mots.map(m => { const l = []; let i = 0, j; while((j = h.indexOf(m, i)) >= 0 && l.length < 400){ l.push(j); i = j + 1; } return l; });
+    const pos = mots.map(m => trouves(h, m).map(x => x[0]));
     if(pos.some(l => !l.length)) return false;
     let bi = 0; pos.forEach((l, k) => { if(l.length < pos[bi].length) bi = k; });
     return pos[bi].some(p => pos.every((l, k) => k === bi || l.some(q => Math.abs(q - p) <= fen)));
   }
 
-  const compte = (mots, h) => mots.filter(w => h.includes(w)).length;
-  const correspond = (mots, h) => mode === "un" ? mots.some(w => h.includes(w)) : mots.every(w => h.includes(w)) && (mode !== "proches" || proche(h, mots));
+  const compte = (mots, h) => mots.filter(w => contient(h, w)).length;
+  const correspond = (mots, h) => mode === "un" ? mots.some(w => contient(h, w)) : mots.every(w => contient(h, w)) && (mode !== "proches" || proche(h, mots));
   const motsActifs = () => { const i = document.getElementById("pharmaSearchKeywords") || document.getElementById("advancedSearchKeywords"); return termes(i ? i.value : ""); };
   const barreHtml = () => '<div class="srm" role="group" aria-label="Façon de chercher">' +
-    MODES.map(([k, l, aide]) => '<button type="button" data-m="' + k + '" aria-pressed="' + (k === mode) + '" title="' + esc(aide) + '">' + esc(l) + "</button>").join("") + "</div>";
+    MODES.map(([k, l, aide]) => '<button type="button" data-m="' + k + '" aria-pressed="' + (k === mode) + '" title="' + esc(aide) + '">' + esc(l) + "</button>").join("") +
+    '<span class="srm-note">Un mot se cherche par son début (insom trouve insomnie), au singulier comme au pluriel. Entre guillemets : mots entiers. *ite cherche une fin de mot.</span></div>';
 
   // texte échappé, termes surlignés ; si la longueur normalisée diffère, pas de surlignage
   function marque(texte, mots){
@@ -59,7 +95,7 @@
     const chars = Array.from(texte), nt = Array.from(normSimple(texte));
     if(chars.length !== nt.length) return esc(texte);
     const nts = nt.join(""), on = new Array(chars.length).fill(false);
-    m.forEach(w => { let j, i = 0; while((j = nts.indexOf(w, i)) >= 0){ for(let k = j; k < j + w.length; k++) on[k] = true; i = j + w.length; } });
+    m.forEach(w => trouves(nts, w).forEach(([d, f]) => { for(let k = d; k < f; k++) on[k] = true; }));
     let html = "", k = 0;
     while(k < chars.length){
       let e = k; while(e < chars.length && on[e] === on[k]) e++;
@@ -79,7 +115,7 @@
       if(nt.length > 3) for(let g = 0; g < 4; g++){ const p = normSimple(t).indexOf(nt); if(p < 0 || p > 300) break; t = (t.slice(0, p) + " " + t.slice(p + nt.length)).replace(/\s+/g, " ").trim(); }
       if(!t) return;
       const n = normSimple(t); let nb = 0, idx = -1;
-      mots.forEach(w => { const j = n.indexOf(w); if(j >= 0){ nb++; if(idx < 0 || j < idx) idx = j; } });
+      mots.forEach(w => { const ps = trouves(n, w, 1); if(ps.length){ nb++; const j = ps[0][0]; if(idx < 0 || j < idx) idx = j; } });
       if(nb && (!meilleur || nb > meilleur.nb)) meilleur = {t, idx, nb};
     });
     if(!meilleur) return "";
@@ -103,9 +139,8 @@
     const mots = termes(keywords);
     if(!mots.length) return true;
     const h = normMatch(pointSearchHaystack(point, scopes));
-    if(m === "phrase") return h.includes(normMatch(keywords));
-    if(mode === "un") return mots.some(w => h.includes(w));
-    return mots.every(w => h.includes(w)) && (mode !== "proches" || proche(h, mots));
+    if(m === "phrase") return contient(h, normMatch(String(keywords).replace(/["«»“”*]/g, " ")));
+    return correspond(mots, h);
   };
 
   const prevResults = window.advancedSearchResults;
@@ -114,7 +149,7 @@
     if(pharma() || mode !== "un") return r;
     const f = getAdvancedSearchFilters(), mots = termes(f.keywords);
     if(mots.length < 2) return r;
-    const nb = new Map(r.map(p => { const h = normMatch(pointSearchHaystack(p, f.scopes)); return [p, mots.filter(w => h.includes(w)).length]; }));
+    const nb = new Map(r.map(p => { const h = normMatch(pointSearchHaystack(p, f.scopes)); return [p, compte(mots, h)]; }));
     return r.map((p, i) => [p, i]).sort((a, b) => nb.get(b[0]) - nb.get(a[0]) || a[1] - b[1]).map(x => x[0]);
   };
 
@@ -145,7 +180,7 @@
     c.querySelectorAll("p.stats-small:not(.srx-vide)").forEach(x => x.remove());
     let p = c.querySelector(".srx-vide");
     if(!p){ p = document.createElement("p"); p.className = "srx-vide"; c.appendChild(p); }
-    p.textContent = (pharma() ? "Aucune substance ne correspond à « " : "Aucun point ne correspond à « ") + mots.join(" + ") + " » (" + lib().replace(/^« » /, "") + ")." + (mode === "un" ? "" : " Essaie une façon de chercher plus large, juste au-dessus.");
+    p.textContent = (pharma() ? "Aucune substance ne correspond à « " : "Aucun point ne correspond à « ") + mots.map(lisible).join(" + ") + " » (" + lib().replace(/^« » /, "") + ")." + (mode === "un" ? "" : " Essaie une façon de chercher plus large, juste au-dessus.");
   }
   const prevWith = window.renderAdvancedSearchResultsWith;
   window.renderAdvancedSearchResultsWith = function(results, total){
@@ -191,7 +226,7 @@
       const txt = n.nodeValue, nt = normSimple(txt);
       if(Array.from(txt).length !== Array.from(nt).length) return;
       const plages = [];
-      mots.forEach(w => { let j, i = 0; while((j = nt.indexOf(w, i)) >= 0){ plages.push([j, j + w.length]); i = j + w.length; } });
+      mots.forEach(w => trouves(nt, w).forEach(p => plages.push(p)));
       if(!plages.length) return;
       plages.sort((x, y) => x[0] - y[0]);
       const fus = []; plages.forEach(p => { const l = fus[fus.length - 1]; if(l && p[0] <= l[1]) l[1] = Math.max(l[1], p[1]); else fus.push(p.slice()); });
@@ -226,15 +261,19 @@
     ".srx-vide{ display:block !important; font-size:.85rem; line-height:1.4; margin:8px 0; }" +
     ".srm{ display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 10px; grid-column:1 / -1; width:100%; }" +
     ".srm button{ background:none; border:1px solid var(--shadow-color, currentColor); color:var(--text-color, inherit); padding:5px 10px; font:700 .72rem 'Archivo', sans-serif; letter-spacing:.03em; cursor:pointer; border-radius:0; }" +
+    ".srm-note{ flex-basis:100%; font-size:.74rem; line-height:1.35; opacity:.7; }" +
     ".srm button[aria-pressed='true']{ border-color:var(--text-color, currentColor); box-shadow:inset 0 -2px 0 var(--text-color, currentColor); }" +
     "mark.surlignage{ background:#f4ff00; color:#000; font-weight:inherit; padding:0 .12em; border-radius:2px; box-shadow:0 0 0 1px #c9d100; }" +
     "mark.gsr-fluo{ scroll-margin-top:8rem; }" +
-    ".search-results-list:has(.search-result-rich){ display:block !important; }" +
-    ".search-result-rich{ display:block !important; width:100% !important; max-width:none !important; }" +
-    ".search-result-rich .compact-point-row{ display:flex !important; align-items:flex-start; gap:12px; width:100%; }" +
-    ".search-result-rich .compact-point-code{ flex:0 0 auto !important; width:auto !important; min-width:3.2em; }" +
-    ".search-result-rich .compact-point-tools{ flex:0 0 auto; margin-left:auto; }" +
-    ".search-result-rich .srx{ flex:1 1 0; min-width:0; display:block; text-align:left; font-weight:400; text-transform:none; letter-spacing:0; font-size:.85rem; }" +
+    "html body #advancedSearchPanel .search-results-list:has(.search-result-rich){ display:block !important; grid-template-columns:none !important; column-count:auto !important; gap:0 !important; }" +
+    "html body #advancedSearchPanel .search-result-rich{ display:block !important; width:100% !important; max-width:none !important; margin:0 !important; padding:0 !important; float:none !important; }" +
+    "html body #advancedSearchPanel .search-result-rich .compact-point-row{ display:flex !important; align-items:flex-start !important; justify-content:flex-start !important; gap:12px !important; width:100% !important; padding:9px 10px !important; border-radius:10px !important; box-shadow:none; }" +
+    "html body #advancedSearchPanel .search-result-rich .compact-point-row:hover, html body #advancedSearchPanel .search-result-rich .compact-point-row:active{ box-shadow:0 3px 10px var(--shadow-color) !important; }" +
+    "html body #advancedSearchPanel .search-result-rich .compact-point-code{ flex:0 0 auto !important; width:auto !important; min-width:3.2em; max-width:8.5em !important; white-space:normal !important; overflow:visible !important; line-height:1.25 !important; }" +
+    "html body #advancedSearchPanel .search-result-rich.pharma-search-result-item .compact-point-code{ flex:0 0 7.2em !important; width:7.2em !important; }" +
+    "html body #advancedSearchPanel .search-result-rich:not(.pharma-search-result-item) .compact-point-code{ flex:0 0 3.8em !important; width:3.8em !important; }" +
+    "html body #advancedSearchPanel .search-result-rich .compact-point-tools{ flex:0 0 auto; margin-left:auto; }" +
+    "html body #advancedSearchPanel .search-result-rich .srx{ flex:1 1 0; min-width:0; display:block; text-align:left; font-weight:400; text-transform:none; letter-spacing:0; font-size:.85rem; }" +
     ".search-result-rich .srx > span{ display:block; }" +
     ".search-result-rich .srx-t{ font-weight:700; font-size:.9rem; }" +
     ".search-result-rich .srx-s{ font-size:.78rem; opacity:.75; }" +
