@@ -411,3 +411,34 @@ body.mtc-quiz-open [aria-label="Choix rapide de matière"]{
     padding:14px 12px;
   }
 }
+
+/* Téléphone : Précédent / Suivant restent en bas de l'écran, à portée du pouce, sans défilement
+   (l'ancien mode « Réponse », qui a son propre bouton fixe, garde sa mise en page). */
+@media(max-width:699px), (hover:none), (pointer:coarse){
+  .mtc-quiz-shell{
+    padding-bottom:0;
+  }
+  .mtc-quiz-shell:has(.mtc-quiz-reveal-button){
+    padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 225px);
+  }
+  #mtcQuizContent{
+    display:flex;
+    flex-direction:column;
+    min-height:calc(100vh - 8px);
+    min-height:calc(100dvh - 8px);
+  }
+  .mtc-quiz-shell:not(:has(.mtc-quiz-reveal-button)) .mtc-quiz-nav{
+    position:sticky;
+    bottom:0;
+    z-index:8;
+    margin:auto -8px 0;
+    padding:10px 8px calc(env(safe-area-inset-bottom, 0px) + 10px);
+    background:var(--page-bg, #fff);
+    border-top:1px solid color-mix(in srgb, var(--text-color, #111) 16%, var(--page-bg, #fff));
+  }
+  .mtc-quiz-shell:not(:has(.mtc-quiz-reveal-button)) .mtc-quiz-nav button{
+    flex:1;
+    min-height:52px;
+    font-size:1rem;
+  }
+}
