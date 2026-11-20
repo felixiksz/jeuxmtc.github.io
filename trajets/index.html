@@ -1143,7 +1143,7 @@
     return liste;
   }
   // 3. l'arbre : lignes = suites de [texte, type]; md = liste Markdown. Les zones et organes qui se suivent tiennent sur une ligne (70 colonnes)
-  function txArbre(m, branches){
+  function txArbre(m, branches, seul, une){
     const T = (t, c) => [t, c], LARG = 70;
     const lignes = [[T(m.titre, "ti")], []], md = ["## " + m.titre, ""];
     const enfants = new Map();
@@ -1156,6 +1156,8 @@
       lignes.push([T(pref + (enfant ? trait(dernierEnfant) : ""), "ar"), T("Branche " + (b.b + 1) + (b.interne ? " (interne)" : ""), "br")]);
       md.push("  ".repeat(prof) + "- **Branche " + (b.b + 1) + "**" + (b.interne ? " (interne)" : ""));
       const base = pref + (enfant ? suite(dernierEnfant) : ""); let tampon = [];
+      // « zones seulement » : on garde le premier et le dernier point de la branche, et les points d'où une autre branche se détache
+      const pts = b.noeuds.filter(x => x.k === "point"), garde = x => !seul || x.k !== "point" || x === pts[0] || x === pts[pts.length - 1] || (enfants.get(x) || []).length > 0;
       const vider = d => {
         if(!tampon.length) return;
         const debut = base + trait(d) + "○ ", suite0 = base + (d ? "    " : "│   ") + "  ", mdl = [];
@@ -1170,8 +1172,9 @@
         lignes.push(segs); md.push("  ".repeat(prof + 1) + "- ○ " + mdl.join(", ")); tampon = [];
       };
       b.noeuds.forEach((n, i) => {
+        if(!garde(n)) return;
         const kids = enfants.get(n) || [], dernier = i === b.noeuds.length - 1 && !kids.length;
-        if(n.k !== "point" && !kids.length){ tampon.push(n); if(i === b.noeuds.length - 1) vider(true); return; }
+        if(n.k !== "point" && !kids.length && !une){ tampon.push(n); if(i === b.noeuds.length - 1) vider(true); return; }
         vider(false);
         if(n.k === "point"){
           lignes.push([T(base + trait(dernier), "ar")].concat(pointSegs(n)));
@@ -1236,9 +1239,9 @@
     return new Blob([texte], {type:TX_SORTIES[o.out][2] + ";charset=utf-8"});
   }
   function txPrefs(){
-    const p = {fmt:"boite", out:"docx", scope:"tous", pt:8};
+    const p = {fmt:"boite", out:"docx", scope:"tous", pt:8, pts:"tous", zl:"groupe"};
     try{ Object.assign(p, JSON.parse(localStorage.getItem(TX_CLE) || "{}")); }catch(e){}
-    if(!TX_FORMATS[p.fmt]) p.fmt = "boite"; if(!TX_SORTIES[p.out]) p.out = "docx"; if(![8, 9, 10].includes(+p.pt)) p.pt = 8; p.pt = +p.pt;
+    if(!TX_FORMATS[p.fmt]) p.fmt = "boite"; if(!TX_SORTIES[p.out]) p.out = "docx"; if(![8, 9, 10].includes(+p.pt)) p.pt = 8; p.pt = +p.pt; if(p.pts !== "zones") p.pts = "tous"; if(p.zl !== "une") p.zl = "groupe";
     return p;
   }
   function txOuvrir(){
@@ -1248,7 +1251,7 @@
       ov.innerHTML = '<div class="txbox"><h2 id="txTitre">Plans en texte</h2>' +
         "<p>L’arbre de chaque plan, écrit en caractères, pour un carnet imprimé en page A5. Les zones qui se suivent entre deux points tiennent sur une seule ligne.</p>" +
         '<div class="txrow"><label>Mise en forme<select id="txFmt"></select></label><label>Fichier<select id="txOut"></select></label>' +
-        '<label>Quels plans<select id="txScope"></select></label><label>Caractères<select id="txPt"><option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option></select></label></div>' +
+        '<label>Quels plans<select id="txScope"></select></label><label>Points<select id="txPts"><option value="tous">Tous les points</option><option value="zones">Zones et organes seulement</option></select></label><label>Zones<select id="txZl"><option value="groupe">Sur une même ligne</option><option value="une">Une zone par ligne</option></select></label><label>Caractères<select id="txPt"><option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option></select></label></div>' +
         '<p id="txNote"></p><div id="txPrev"></div>' +
         '<div class="txact"><span id="txEtat"></span><button type="button" class="tool" id="txFermer">Fermer</button><button type="button" class="tool on" id="txTelecharger">Télécharger</button></div></div>';
       document.body.appendChild(ov);
@@ -1257,7 +1260,7 @@
       document.getElementById("txFermer").addEventListener("click", () => ov.classList.remove("open"));
       document.getElementById("txFmt").innerHTML = Object.entries(TX_FORMATS).map(([k, v]) => '<option value="' + k + '">' + v[0] + "</option>").join("");
       document.getElementById("txOut").innerHTML = Object.entries(TX_SORTIES).map(([k, v]) => '<option value="' + k + '">' + v[0] + "</option>").join("");
-      ["txFmt", "txOut", "txScope", "txPt"].forEach(id => document.getElementById(id).addEventListener("change", txMaj));
+      ["txFmt", "txOut", "txScope", "txPt", "txPts", "txZl"].forEach(id => document.getElementById(id).addEventListener("change", txMaj));
       document.getElementById("txTelecharger").addEventListener("click", () => {
         const o = txChoix(), plans = txChoisis(o); if(!plans.length) return;
         const blob = txFichier(plans, o), a = document.createElement("a");
@@ -1268,20 +1271,22 @@
       });
     }
     // les plans sont relus à chaque ouverture, pour suivre les corrections
-    txPlans = planFiles().map(f => { const m = txModele(f.text); if(!m) return null; const A = txArbre(m, txBranches(m)); return {code:f.code, canal:f.canal, titre:m.titre, lignes:A.lignes, md:A.md}; }).filter(Boolean);
+    txPlans = planFiles().map(f => { const m = txModele(f.text); return m ? {code:f.code, canal:f.canal, m, br:txBranches(m)} : null; }).filter(Boolean);
     const p = txPrefs(), canalOk = !!current && txPlans.some(x => x.code === current);
-    document.getElementById("txFmt").value = p.fmt; document.getElementById("txOut").value = p.out; document.getElementById("txPt").value = String(p.pt);
+    document.getElementById("txFmt").value = p.fmt; document.getElementById("txOut").value = p.out; document.getElementById("txPt").value = String(p.pt); document.getElementById("txPts").value = p.pts; document.getElementById("txZl").value = p.zl;
     document.getElementById("txScope").innerHTML = '<option value="tous">Tous les canaux (' + new Set(txPlans.map(x => x.code)).size + ")</option>" + (canalOk ? '<option value="canal">Le canal affiché (' + esc(current) + ")</option>" : "");
     document.getElementById("txScope").value = p.scope === "canal" && canalOk ? "canal" : "tous";
     document.getElementById("txEtat").textContent = "";
     ov.classList.add("open"); txMaj();
   }
-  function txChoix(){ return {fmt:document.getElementById("txFmt").value, out:document.getElementById("txOut").value, scope:document.getElementById("txScope").value, pt:+document.getElementById("txPt").value}; }
-  function txChoisis(o){ return o.scope === "canal" && current ? txPlans.filter(x => x.code === current) : txPlans; }
+  function txChoix(){ return {fmt:document.getElementById("txFmt").value, out:document.getElementById("txOut").value, scope:document.getElementById("txScope").value, pt:+document.getElementById("txPt").value, pts:document.getElementById("txPts").value, zl:document.getElementById("txZl").value}; }
+  function txChoisis(o){
+    return (o.scope === "canal" && current ? txPlans.filter(x => x.code === current) : txPlans).map(x => { const A = txArbre(x.m, x.br, o.pts === "zones", o.zl === "une"); return {code:x.code, canal:x.canal, titre:x.m.titre, lignes:A.lignes, md:A.md}; });
+  }
   function txMaj(){
     const o = txChoix(), plans = txChoisis(o);
     try{ localStorage.setItem(TX_CLE, JSON.stringify(o)); }catch(e){}
-    document.getElementById("txNote").textContent = TX_FORMATS[o.fmt][1] + (o.out === "md" || o.out === "txt" ? " (ce format de fichier ne garde pas toute la mise en forme)" : "");
+    document.getElementById("txNote").textContent = (o.pts === "zones" ? "Seuls les points de départ et d’arrivée de chaque branche, et ceux d’où une autre branche se détache, sont écrits ; entre eux, les zones et organes traversés. " : "") + TX_FORMATS[o.fmt][1] + (o.out === "md" || o.out === "txt" ? " (ce format de fichier ne garde pas toute la mise en forme)" : "");
     document.getElementById("txPrev").innerHTML = plans.length ? txHtmlPlan(plans[0].lignes, o.fmt, 9) : "Aucun plan.";
     document.getElementById("txEtat").textContent = plans.length + " plans";
   }
