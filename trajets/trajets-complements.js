@@ -78,5 +78,21 @@ window.MTC_TRAJETS_COMPLEMENTS = [
  {"id":"IG-princ-seins", "canal":"IG", "section":"principal", "branche":"cavité thoracique", "apres":"thorax", "lieu":"seins", "statut":"validé",
   "note":"Confirmé le 20/11/2026 d'après le plan en arbre du carnet : le canal régulier de l'intestin grêle passe par les seins et le mamelon, en plus du thorax."},
  {"id":"IG-princ-mamelon", "canal":"IG", "section":"principal", "branche":"cavité thoracique", "apres":"seins", "lieu":"mamelon", "statut":"validé",
-  "note":"Confirmé le 20/11/2026 d'après le plan en arbre du carnet (voir IG-princ-seins)."}
+  "note":"Confirmé le 20/11/2026 d'après le plan en arbre du carnet (voir IG-princ-seins)."},
+ {"id":"TF-luo-susclav", "canal":"TF", "section":"luo", "branche":"passe au-dessus", "apres":"pt:E 12", "lieu":"sus-clav", "statut":"validé",
+  "note":"E 12 est au creux sus-claviculaire : le vaisseau liaison du TF passe par cette zone. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"},
+ {"id":"TF-princ-thorax", "canal":"TF", "section":"principal", "branche":"entre les deux seins", "avant":"pt:RM 17", "lieu":"thorax", "statut":"validé",
+  "note":"RM 17 est au centre du thorax : le canal régulier du TF passe par le thorax. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"},
+ {"id":"E-princ-aine", "canal":"E", "section":"principal", "branche":"pour atteindre le point E 30", "apres":"pt:E 30", "lieu":"aine", "statut":"validé",
+  "note":"E 30 est à l'aine : le canal régulier de l'estomac passe par l'aine. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"},
+ {"id":"Rt-princ-thoraxlat", "canal":"Rt", "section":"principal", "branche":"se terminer au point Rt 21", "apres":"pt:Rt 21", "lieu":"thorax-lat", "statut":"validé",
+  "note":"Rt 21 est sur la région thoracique latérale : le canal régulier de la rate y passe. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"},
+ {"id":"GI-luo-epaule", "canal":"GI", "section":"luo", "branche":"jusqu'à GI 15", "apres":"pt:GI 15", "lieu":"epaule", "statut":"validé",
+  "note":"GI 15 est à l'épaule : le vaisseau liaison du GI passe par l'épaule. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"},
+ {"id":"GI-dist-epaule", "canal":"GI", "section":"distinct", "branche":"passe dans la région du point GI 15", "apres":"pt:GI 15", "lieu":"epaule", "statut":"validé",
+  "note":"GI 15 est à l'épaule : le canal distinct du GI passe par l'épaule. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"},
+ {"id":"GI-tend-epaule", "canal":"GI", "section":"tendineux", "branche":"dans la région de GI 15", "apres":"pt:GI 15", "lieu":"epaule", "statut":"validé",
+  "note":"GI 15 est à l'épaule : le canal tendineux du GI passe par l'épaule. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"},
+ {"id":"Rn-tend-pubis", "canal":"Rn", "section":"tendineux", "branche":"RM 2 (qū gǔ) et RM 3", "apres":"pt:RM 3", "lieu":"pubis", "statut":"validé",
+  "note":"RM 3 est au pubis : le canal tendineux du Rn passe par le pubis. (zone ajoutée le 20/11/2026 : le canal passe par ce point, donc par la zone où il se trouve ; validé par la thérapeute)"}
 ];
