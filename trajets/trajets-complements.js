@@ -21,8 +21,8 @@ window.MTC_TRAJETS_COMPLEMENTS = [
   "note":"V 11 est nommé sur l'image, entre DM 14 et TF 15 (point d'intersection de TF selon certains auteurs)."},
  {"id":"TF-princ-RM12", "canal":"TF", "section":"principal", "branche":"angle unguéal cubital", "apres":"diaphragme", "lieu":"pt:RM 12", "page":7, "statut":"à valider",
   "note":"RM 12 est nommé sur l'image, sur la ligne qui descend relier les trois foyers."},
- {"id":"TF-princ-vessie", "canal":"TF", "section":"principal", "branche":"angle unguéal cubital", "apres":"o-tf", "lieu":"o-vessie", "page":7, "statut":"à valider",
-  "note":"L'image fait descendre le trajet jusqu'à la vessie (le texte dit « jusqu'au niveau de la vessie »)."},
+ {"id":"TF-princ-vessie", "canal":"TF", "section":"principal", "branche":"angle unguéal cubital", "apres":"o-tf", "lieu":"o-vessie", "page":7, "statut":"refusé",
+  "note":"L'image fait descendre le trajet jusqu'à la vessie (le texte dit « jusqu'au niveau de la vessie »). Refusé le 20/11/2026 : le canal régulier des trois foyers n'est plus rattaché à la vessie (la branche interne V 39 reste sous « Trois foyers »)."},
  {"id":"TF-dist-E12", "canal":"TF", "section":"distinct", "branche":"trois foyers", "apres":"sus-clav", "lieu":"pt:E 12", "page":10, "statut":"à valider",
   "note":"E 12 est nommé sur l'image, au creux sus-claviculaire."},
  {"id":"TF-luo-E12", "canal":"TF", "section":"luo", "branche":"passe au-dessus", "apres":"epaule", "lieu":"pt:E 12", "page":11, "statut":"à valider",
@@ -72,5 +72,11 @@ window.MTC_TRAJETS_COMPLEMENTS = [
  {"id":"F-tend-genou", "canal":"F", "section":"tendineux", "branche":"gros orteil au F 1", "avant":"cuisse", "lieu":"genou", "page":14, "statut":"validé",
   "note":"L'image montre le trajet au genou ; le texte dit « condyle médial du tibia »."},
  {"id":"CM-uterus", "canal":"CM", "section":"vaisseau", "branche":"La première branche", "apres":"abdomen-inf", "lieu":"uterus", "label":"Utérus (bāo zhōng)", "group":"organes", "source":"tradition classique", "statut":"validé",
-  "note":"Le chōng mài passe par l’utérus."}
+  "note":"Le chōng mài passe par l’utérus."},
+ {"id":"E-grandluo-thorax", "canal":"E", "section":"grand_luo", "branche":"se connecte au point RM 17", "apres":"pt:RM 17", "lieu":"thorax", "statut":"validé",
+  "note":"RM 17 est au centre du thorax : le grand vaisseau liaison de l'estomac passe par le thorax (zone ajoutée le 20/11/2026, d'après le plan en arbre du carnet)."},
+ {"id":"IG-princ-seins", "canal":"IG", "section":"principal", "branche":"cavité thoracique", "apres":"thorax", "lieu":"seins", "statut":"validé",
+  "note":"Confirmé le 20/11/2026 d'après le plan en arbre du carnet : le canal régulier de l'intestin grêle passe par les seins et le mamelon, en plus du thorax."},
+ {"id":"IG-princ-mamelon", "canal":"IG", "section":"principal", "branche":"cavité thoracique", "apres":"seins", "lieu":"mamelon", "statut":"validé",
+  "note":"Confirmé le 20/11/2026 d'après le plan en arbre du carnet (voir IG-princ-seins)."}
 ];
