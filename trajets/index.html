@@ -1171,10 +1171,16 @@
         });
         lignes.push(segs); md.push("  ".repeat(prof + 1) + "- ○ " + mdl.join(", ")); tampon = [];
       };
-      b.noeuds.forEach((n, i) => {
-        if(!garde(n)) return;
-        const kids = enfants.get(n) || [], dernier = i === b.noeuds.length - 1 && !kids.length;
-        if(n.k !== "point" && !kids.length && !une){ tampon.push(n); if(i === b.noeuds.length - 1) vider(true); return; }
+      // une fois les points retirés, deux zones identiques peuvent se toucher : on n'en garde qu'une
+      let prec = "";
+      const liste = b.noeuds.filter(x => {
+        if(!garde(x)) return false;
+        const cle = x.k === "point" ? "" : x.k + "|" + nom(x), doublon = seul && cle && cle === prec && !(enfants.get(x) || []).length;
+        prec = cle; return !doublon;
+      });
+      liste.forEach((n, i) => {
+        const kids = enfants.get(n) || [], dernier = i === liste.length - 1 && !kids.length;
+        if(n.k !== "point" && !kids.length && !une){ tampon.push(n); if(i === liste.length - 1) vider(true); return; }
         vider(false);
         if(n.k === "point"){
           lignes.push([T(base + trait(dernier), "ar")].concat(pointSegs(n)));
