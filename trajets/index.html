@@ -321,9 +321,7 @@
     <button type="button" class="tool" id="editToggle" aria-pressed="false">✎ Modifier</button>
     <button type="button" class="tool" id="netToggle">Plan des intersections</button>
     <button type="button" class="tool" id="allPlaces">Correspondances…</button>
-    <button type="button" class="tool admin-only" id="printPlans" title="Les plans de tous les trajets, en noir et blanc : un fichier SVG (image vectorielle) par plan, dans un .zip">Plans en SVG</button>
-    <button type="button" class="tool admin-only" id="printPlansPng" title="Les plans de tous les trajets, en noir et blanc : une image PNG par plan, dans un .zip">Plans en PNG</button>
-    <button type="button" class="tool admin-only" id="printPlansTxt" title="Les plans de tous les trajets écrits en caractères (arbre), pour un carnet imprimé : Word, HTML, Markdown ou texte">Plans en texte</button>
+    <button type="button" class="tool admin-only" id="printPlansTxt" title="Les plans de tous les trajets : en texte pour un carnet imprimé (Word, HTML, Markdown, texte) ou en images noir et blanc (SVG, PNG)">Télécharger les plans</button>
   </div>
 </header>
 <main id="main"></main>
@@ -369,7 +367,7 @@
   }
   async function loadTrajetsData(){
     // ?v= : un fichier de données modifié ne doit pas rester servi par le cache du navigateur
-    const V = "?v=20261119-c";
+    const V = "?v=20261120-b";
     if(await loadScript("trajets-data.js" + V)){
       await loadScript("trajets-places-rx.js" + V);
       await loadScript("trajets-complements.js" + V);
@@ -411,8 +409,6 @@
   const data = window.MTC_TRAJETS || [];
   const PLACES = window.MTC_TRAJETS_PLACES || {};
   const nav = document.getElementById("nav");
-  document.getElementById("printPlans").addEventListener("click", () => downloadPlans());
-  document.getElementById("printPlansPng").addEventListener("click", () => downloadPlansPng());
   document.getElementById("printPlansTxt").addEventListener("click", () => txOuvrir());
   (function(){
     const KEY = "mtc_trajets_nav_closed", btn = document.getElementById("navToggle");
@@ -596,7 +592,7 @@
     "fam:sommet":{label:"Sommet de la tête", members:["vertex", "parietal"]},
     "fam:thorax":{label:"Thorax et poitrine", members:["thorax", "poitrine", "thorax-lat"]},
     "fam:cotes":{label:"Côtes", members:["cotes", "cotes-flott", "intercostal"]},
-    "fam:seins":{label:"Seins et mamelons", members:["seins", "mamelon"]},
+    "fam:seins":{label:"Seins et mamelons", members:["seins", "sein-gauche", "mamelon"]},
     "fam:abdomen":{label:"Abdomen", members:["abdomen", "abdomen-inf"]},
     "fam:colonne":{label:"Colonne vertébrale", members:["colonne", "vertebres", "lombaires"]},
     "fam:pubis":{label:"Pubis", members:["pubis", "symphyse"]},
@@ -1048,9 +1044,9 @@
     return files;
   }
   // même chose en images PNG (3 × la taille d'écran, fond blanc) : une par plan
-  async function plansPngZip(){
+  async function plansPngZip(files){
     const out = [];
-    for(const f of planFiles()){
+    for(const f of files || planFiles()){
       const m = /width="(\d+(?:\.\d+)?)" height="(\d+(?:\.\d+)?)"/.exec(f.text);
       const W = +m[1], H = +m[2], S = 3;
       const url = URL.createObjectURL(new Blob([f.text], {type:"image/svg+xml"}));
@@ -1065,17 +1061,6 @@
       out.push({name:f.name.replace(/\.svg$/, ".png"), bytes:new Uint8Array(await blob.arrayBuffer())});
     }
     return makeZip(out);
-  }
-  async function downloadPlansPng(){
-    const btn = document.getElementById("printPlansPng");
-    if(btn) btn.disabled = true;
-    try{
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(await plansPngZip());
-      a.download = "plans-trajets-noir-et-blanc-png.zip";
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-    }finally{ if(btn) btn.disabled = false; }
   }
   // ---- plans en texte, pour un carnet imprimé : l'arbre de chaque plan, écrit en caractères
   // chaque mise en forme : [nom, description, style HTML par type de texte, propriétés Word]
@@ -1095,7 +1080,9 @@
       {ca:{b:1, sz:1.4}, ti:{b:1, sz:1.2}, br:{b:1, u:1}, pt:{b:1}, sg:{sz:.8}, zo:{i:1, color:"555555"}, og:{b:1, smallCaps:1}}],
     aucun:["Aucune", "Aucune mise en forme : tout a la même épaisseur.", {ca:"font-weight:700;font-size:1.25em"}, {ca:{b:1, sz:1.4}}]
   };
-  const TX_SORTIES = {docx:["Word (.docx)", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"], html:["Page HTML à imprimer (A5)", "html", "text/html"], md:["Markdown (.md)", "md", "text/markdown"], txt:["Texte brut (.txt)", "txt", "text/plain"]};
+  const TX_SORTIES = {docx:["Word (.docx)", "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"], html:["Page HTML à imprimer (A5)", "html", "text/html"], md:["Markdown (.md)", "md", "text/markdown"], txt:["Texte brut (.txt)", "txt", "text/plain"],
+    svg:["Images SVG, noir et blanc (.zip)", "zip", "application/zip"], png:["Images PNG, noir et blanc (.zip)", "zip", "application/zip"]};
+  const TX_IMAGES = {svg:1, png:1};
   const TX_CLE = "mtc_plans_texte_v1";
   let txPlans = [];
   // 1. relit un plan SVG (celui du module) : points, zones, organes, lignes et numéros de branches
@@ -1254,8 +1241,8 @@
     let ov = document.getElementById("txOverlay");
     if(!ov){
       ov = document.createElement("div"); ov.id = "txOverlay"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", "txTitre");
-      ov.innerHTML = '<div class="txbox"><h2 id="txTitre">Plans en texte</h2>' +
-        "<p>L’arbre de chaque plan, écrit en caractères, pour un carnet imprimé en page A5. Les zones qui se suivent entre deux points tiennent sur une seule ligne.</p>" +
+      ov.innerHTML = '<div class="txbox"><h2 id="txTitre">Télécharger les plans</h2>' +
+        "<p id=\"txIntro\"></p>" +
         '<div class="txrow"><label>Mise en forme<select id="txFmt"></select></label><label>Fichier<select id="txOut"></select></label>' +
         '<label>Quels plans<select id="txScope"></select></label><label>Points<select id="txPts"><option value="tous">Tous les points</option><option value="zones">Zones et organes seulement</option></select></label><label>Zones<select id="txZl"><option value="groupe">Sur une même ligne</option><option value="une">Une zone par ligne</option></select></label><label>Caractères<select id="txPt"><option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option></select></label></div>' +
         '<p id="txNote"></p><div id="txPrev"></div>' +
@@ -1267,17 +1254,22 @@
       document.getElementById("txFmt").innerHTML = Object.entries(TX_FORMATS).map(([k, v]) => '<option value="' + k + '">' + v[0] + "</option>").join("");
       document.getElementById("txOut").innerHTML = Object.entries(TX_SORTIES).map(([k, v]) => '<option value="' + k + '">' + v[0] + "</option>").join("");
       ["txFmt", "txOut", "txScope", "txPt", "txPts", "txZl"].forEach(id => document.getElementById(id).addEventListener("change", txMaj));
-      document.getElementById("txTelecharger").addEventListener("click", () => {
-        const o = txChoix(), plans = txChoisis(o); if(!plans.length) return;
-        const blob = txFichier(plans, o), a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = (o.scope === "canal" && current ? "plans-texte-" + String(current).replace(/[^A-Za-z0-9_-]+/g, "-") : "plans-texte-carnet") + "." + TX_SORTIES[o.out][1];
-        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-        document.getElementById("txEtat").textContent = plans.length + " plans téléchargés";
+      document.getElementById("txTelecharger").addEventListener("click", async () => {
+        const o = txChoix(), image = !!TX_IMAGES[o.out], etat = document.getElementById("txEtat"), bouton = document.getElementById("txTelecharger");
+        const plans = image ? txFichiers(o) : txChoisis(o); if(!plans.length) return;
+        bouton.disabled = true; etat.textContent = "Préparation…";
+        try{
+          const blob = o.out === "svg" ? makeZip(plans) : o.out === "png" ? await plansPngZip(plans) : txFichier(plans, o), a = document.createElement("a"), cle = o.scope === "canal" && current ? String(current).replace(/[^A-Za-z0-9_-]+/g, "-") : "";
+          a.href = URL.createObjectURL(blob);
+          a.download = (image ? "plans-trajets" + (cle ? "-" + cle : "") + "-" + o.out : cle ? "plans-texte-" + cle : "plans-texte-carnet") + "." + TX_SORTIES[o.out][1];
+          document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+          etat.textContent = plans.length + " plans téléchargés";
+        }catch(e){ etat.textContent = "Échec du téléchargement"; }
+        finally{ bouton.disabled = false; }
       });
     }
     // les plans sont relus à chaque ouverture, pour suivre les corrections
-    txPlans = planFiles().map(f => { const m = txModele(f.text); return m ? {code:f.code, canal:f.canal, m, br:txBranches(m)} : null; }).filter(Boolean);
+    txPlans = planFiles().map(f => { const m = txModele(f.text); return m ? {code:f.code, canal:f.canal, m, br:txBranches(m), f} : null; }).filter(Boolean);
     const p = txPrefs(), canalOk = !!current && txPlans.some(x => x.code === current);
     document.getElementById("txFmt").value = p.fmt; document.getElementById("txOut").value = p.out; document.getElementById("txPt").value = String(p.pt); document.getElementById("txPts").value = p.pts; document.getElementById("txZl").value = p.zl;
     document.getElementById("txScope").innerHTML = '<option value="tous">Tous les canaux (' + new Set(txPlans.map(x => x.code)).size + ")</option>" + (canalOk ? '<option value="canal">Le canal affiché (' + esc(current) + ")</option>" : "");
@@ -1289,22 +1281,27 @@
   function txChoisis(o){
     return (o.scope === "canal" && current ? txPlans.filter(x => x.code === current) : txPlans).map(x => { const A = txArbre(x.m, x.br, o.pts === "zones", o.zl === "une"); return {code:x.code, canal:x.canal, titre:x.m.titre, lignes:A.lignes, md:A.md}; });
   }
+  // fichiers SVG des plans choisis (pour les formats en images)
+  function txFichiers(o){ return (o.scope === "canal" && current ? txPlans.filter(x => x.code === current) : txPlans).map(x => x.f); }
   function txMaj(){
-    const o = txChoix(), plans = txChoisis(o);
+    const o = txChoix(), image = !!TX_IMAGES[o.out];
     try{ localStorage.setItem(TX_CLE, JSON.stringify(o)); }catch(e){}
+    // les réglages d'écriture ne servent qu'aux formats en texte
+    ["txFmt", "txPts", "txZl", "txPt"].forEach(id => { document.getElementById(id).parentElement.style.display = image ? "none" : ""; });
+    document.getElementById("txIntro").textContent = image ? "Un fichier par plan, en noir et blanc, rangés dans un .zip." : "L’arbre de chaque plan, écrit en caractères, pour un carnet imprimé en page A5. Les zones qui se suivent entre deux points tiennent sur une seule ligne.";
+    if(image){
+      const fichiers = txFichiers(o);
+      document.getElementById("txNote").textContent = o.out === "svg" ? "Images vectorielles : elles restent nettes à toutes les tailles." : "Images PNG trois fois plus grandes que l’écran, sur fond blanc.";
+      document.getElementById("txPrev").innerHTML = fichiers.length ? fichiers[0].text.replace(/^<\?xml[^>]*\?>\s*/, "").replace("<svg ", '<svg style="max-width:100%;height:auto" ') : "Aucun plan.";
+      document.getElementById("txEtat").textContent = fichiers.length + " plans";
+      return;
+    }
+    const plans = txChoisis(o);
     document.getElementById("txNote").textContent = (o.pts === "zones" ? "Seuls les points de départ et d’arrivée de chaque branche, et ceux d’où une autre branche se détache, sont écrits ; entre eux, les zones et organes traversés. " : "") + TX_FORMATS[o.fmt][1] + (o.out === "md" || o.out === "txt" ? " (ce format de fichier ne garde pas toute la mise en forme)" : "");
     document.getElementById("txPrev").innerHTML = plans.length ? txHtmlPlan(plans[0].lignes, o.fmt, 9) : "Aucun plan.";
     document.getElementById("txEtat").textContent = plans.length + " plans";
   }
   window.mtcPlansPngZip = plansPngZip;
-  function downloadPlans(){
-    const files = planFiles();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(makeZip(files));
-    a.download = "plans-trajets-noir-et-blanc.zip";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  }
   // version imprimable : tous les plans, en noir et blanc, un canal par page (fenêtre à part, Imprimer / PDF)
   function printPlans(){
     const keepCurrent = current, keepTypes = Object.assign({}, TYPES_ON), keepEditing = editing;
@@ -1516,7 +1513,7 @@
     cou:[600,242], gorge:[600,236], trachee:[600,252], nuque:[690,232], "o-oesophage":[604,300],
     "sus-clav":[560,272], clavicule:[540,266], "zone-clav":[540,270], epaule:[472,286], acromion:[462,278], trapeze:[650,266],
     omoplate:[722,302], supraep:[712,288], infraep:[728,316], delto:[502,292], aisselle:[466,322], "pli-axill":[470,332],
-    thorax:[600,332], poitrine:[590,342], "thorax-lat":[500,372], seins:[562,352], mamelon:[556,354],
+    thorax:[600,332], poitrine:[590,342], "thorax-lat":[500,372], seins:[562,352], "sein-gauche":[638,352], mamelon:[556,354],
     intercostal:[540,382], cotes:[520,402], "cotes-flott":[520,432], hypocondre:[520,452], diaphragme:[600,422],
     dos:[722,362], paravert:[706,382], colonne:[690,422], vertebres:[692,432], lombes:[702,522], lombaires:[692,522],
     // organes
@@ -1649,7 +1646,7 @@
     poignet:"poignet", "dos-poignet":"poignet", "cun-kou":"poignet", "styloide-rad":"poignet", "styloide-uln":"poignet", pisiforme:"poignet",
     paume:"main", thenar:"main", main:"main", "dos-main":"main", metacarpe:"main",
     pouce:"doigts", index:"doigts", medius:"doigts", annulaire:"doigts", "petit-doigt":"doigts",
-    thorax:"thorax", poitrine:"thorax", "thorax-lat":"cotes", seins:"seins", mamelon:"seins",
+    thorax:"thorax", poitrine:"thorax", "thorax-lat":"cotes", seins:"seins", "sein-gauche":"seins", mamelon:"seins",
     intercostal:"cotes", cotes:"cotes", "cotes-flott":"cotes", hypocondre:"hypocondre", diaphragme:"diaphragme",
     dos:"dos", paravert:"dos", colonne:"colonne", vertebres:"colonne", lombes:"lombes", lombaires:"lombes",
     "o-poumon":"poumon", "o-systeme-poumon":"poumon", "o-coeur":"coeur", "o-systeme-coeur":"coeur", "o-ec":"ec",

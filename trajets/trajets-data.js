@@ -1927,6 +1927,39 @@ window.MTC_TRAJETS = [
       ]
      }
     ]
+   },
+   {
+    "type": "grand_luo",
+    "title": "Trajet du grand vaisseau liaison",
+    "paragraphs": [
+     "- Xū lǐ (虚里)[[n1]] est la grande liaison de l’estomac (wèi zhī dà luò 胃之大络) qui prend naissance dans l’**estomac**, traverse le **diaphragme**, se connecte au point RM 17 (dàn zhōng), puis se ramifie dans tout le **poumon** avant de traverser le **cœur** pour finir sa course sous le **sein gauche**, au niveau d’E 18 (rǔ gēn) là où l’on sent battre le cœur (xū lǐ)."
+    ],
+    "notes": [
+     {
+      "n": 1,
+      "text": "Le grand luò de l’estomac est également connu sous le nom de « Battement du Cœur » (ou pulsation cardiaque), le qì qui propulse la circulation sanguine. Le Líng Shū désigne le grand luò de l’estomac comme le « Mille Vide » (ou « Lieue Vide »), signifiant qu’en cas d’insuffisance de sang, l’organisme fonctionne « à vide »."
+     }
+    ],
+    "images": [],
+    "pages": [],
+    "label": "Grand vaisseau liaison",
+    "branches": [
+     {
+      "p": 0,
+      "ps": [
+       0
+      ],
+      "places": [
+       "o-estomac",
+       "diaphragme",
+       "pt:RM 17",
+       "o-poumon",
+       "o-coeur",
+       "sein-gauche",
+       "pt:E 18"
+      ]
+     }
+    ]
    }
   ]
  },
@@ -7399,6 +7432,10 @@ window.MTC_TRAJETS_PLACES = {
   "label": "Seins",
   "group": "tronc"
  },
+ "sein-gauche": {
+  "label": "Sein gauche",
+  "group": "tronc"
+ },
  "petit-doigt": {
   "label": "Petit doigt",
   "group": "membre supérieur"
@@ -8109,6 +8146,10 @@ window.MTC_TRAJETS_PLACES = {
  },
  "pt:VB 28": {
   "label": "VB 28",
+  "group": "points"
+ },
+ "pt:E 18": {
+  "label": "E 18",
   "group": "points"
  }
 };

@@ -103,6 +103,7 @@ window.MTC_TRAJETS_RX = {
  "thorax-lat": "région\\s+thoracique\\s+latérale|paroi\\s+latérale\\s+du\\s+thorax|face\\s+latérale\\s+du\\s+thorax",
  "sternum": "sternum",
  "seins": "seins?",
+ "sein-gauche": "seins?\\s+gauche",
  "mamelon": "mamelons?",
  "cotes": "côtes|costal(?:e|es)?",
  "cotes-flott": "côtes\\s+flottantes",
