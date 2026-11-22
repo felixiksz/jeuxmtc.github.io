@@ -13,7 +13,7 @@
   .tool{ font:inherit; cursor:pointer; text-decoration:none; }
   .tool:disabled{ opacity:.4; cursor:default; }
   .tools{ display:flex; gap:4px; align-items:center; margin-left:auto; }
-  /* les huit jeux en trois familles sous le titre */
+  /* les neuf jeux en trois familles sous le titre */
   .modes{ flex-basis:100%; display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:0 22px; border-top:1px solid var(--hair, #ddd); padding-top:6px; }
   .mgt{ font-size:.64rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin:0 0 1px; }
   .mode{ display:block; font:inherit; font-weight:800; font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; background:none; border:0; padding:3px 0; color:var(--text-color); cursor:pointer; text-align:left; }
@@ -140,7 +140,7 @@
   .xswipe[data-sw="non"]::after{ content:"Non"; right:10px; color:#c0392b; opacity:1; transform:rotate(10deg); }
   .xhint{ margin:4px 0 0; }
 </style>
-<link href="../equilibrer/equilibrer.css?v=20261112-a" rel="stylesheet">
+<link href="../equilibrer/equilibrer.css?v=20261122-a" rel="stylesheet">
 <link href="../modules-theme.css?v=20261107-b" rel="stylesheet">
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="../celebrate.js?v=20261112-f"></script>
@@ -148,7 +148,7 @@
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 <script src="circuits-data.js?v=20261115-a"></script>
 <script src="circuits-assistant-sync.js?v=20261112-c"></script>
-<script src="../equilibrer/equilibrer-game.js?v=20261115-a"></script>
+<script src="../equilibrer/equilibrer-game.js?v=20261122-c"></script>
 <script src="../beta-config.js?v=20261119-a"></script>
 <script src="../beta-gate.js?v=20261114-a"></script>
 <script src="../beta-tour.js?v=20261005-b"></script>
@@ -1243,6 +1243,7 @@
 
   const MODES = [
     EQ && ["equilibrer", "Équilibrer", EQ.start, EQ.render],
+    EQ && EQ.horloge && ["horloge", "Les six systèmes", EQ.horloge.start, EQ.horloge.render],
     ["fermer", "Fermer le circuit", newFermer, renderFermer],
     ["plaintes", "Trois plaintes", newPlaintes, renderPlaintes],
     ["propagation", "Propagation", newPropagation, renderPropagation],
@@ -1252,7 +1253,7 @@
     ["cache", "Le cas mystère", newCache, renderCache]
   ].filter(Boolean);
   // trois familles, dans l'ordre : les liens entre canaux, le circuit, la clinique
-  const GROUPS = [["Les liens", ["equilibrer", "grille"]], ["Le circuit", ["fermer", "quel", "circuitoupas"]], ["La clinique", ["plaintes", "propagation", "cache"]]];
+  const GROUPS = [["Les liens", ["equilibrer", "horloge", "grille"]], ["Le circuit", ["fermer", "quel", "circuitoupas"]], ["La clinique", ["plaintes", "propagation", "cache"]]];
   const started = {};
   let mode = (MODES.find(m => "#" + m[0] === location.hash) || MODES[0])[0];
   function show(m){
