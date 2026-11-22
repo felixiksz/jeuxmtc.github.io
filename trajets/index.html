@@ -274,6 +274,9 @@
   .cchip{ display:inline-block; font-size:.7rem; font-weight:800; color:#fff; background:var(--c); border-radius:5px; padding:0 5px; margin:1px 0; text-shadow:0 0 2px rgba(0,0,0,.4); }
   .places-index h4, #corrBody h4{ font-size:.82rem; margin:12px 0 4px; color:var(--text); }
   .zidx input[type=search]{ width:100%; font:inherit; font-weight:700; font-size:1.05rem; padding:10px 2px; border:0; border-bottom:1.5px solid var(--text); background:none; outline:none; border-radius:0; }
+  .zbloc{ font:400 1.05rem/1.2 'Libre Baskerville', Georgia, serif; margin:18px 0 2px; padding-top:8px; border-top:1px solid #e6e6ef; }
+  .zind{ margin-left:14px; }
+  .zsub{ font-size:.66rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:12px 0 0; }
   .zlbl{ font-size:.68rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:16px 0 4px; }
   .zchips, .zorbs{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
   .zchip{ font:inherit; font-size:.8rem; font-weight:700; border:1px solid var(--text); background:none; padding:4px 10px; cursor:pointer; color:inherit; }
@@ -753,6 +756,13 @@
   const ZGROUPS = ["tête", "tronc", "membre supérieur", "membre inférieur", "organes"];
   const ZGNAME = {"tête":"Tête", "tronc":"Tronc", "membre supérieur":"Bras", "membre inférieur":"Jambe", "organes":"Organes"};
   const GROUP_OVERRIDE = {cerveau:"organes"};
+  // La tête et le cou sont rangés comme dans le carnet : Crâne et cerveau, Visage (Yeux, Oreilles, Nez, Bouche langue et dents, Joue et mâchoire), Cou et gorge.
+  const TETE_BLOCS = ["Crâne et cerveau", "Visage", "Cou et gorge"], VISAGE_SOUS = ["Yeux", "Oreilles", "Nez", "Bouche, langue et dents", "Joue et mâchoire"];
+  const TETE_RANG = {"cerveau":["Crâne et cerveau"], "fam:sommet":["Crâne et cerveau"], "fam:front":["Crâne et cerveau"], "occiput":["Crâne et cerveau"], "fam:tempe":["Crâne et cerveau"], "tete":["Crâne et cerveau"], "crane":["Crâne et cerveau"],
+    "fam:yeux":["Visage", "Yeux"], "sourcil":["Visage", "Yeux"], "fam:oreille":["Visage", "Oreilles"], "mastoide":["Visage", "Oreilles"], "fam:nez":["Visage", "Nez"], "nasopharynx":["Visage", "Nez"],
+    "fam:bouche":["Visage", "Bouche, langue et dents"], "fam:dents":["Visage", "Bouche, langue et dents"], "langue":["Visage", "Bouche, langue et dents"], "menton":["Visage", "Bouche, langue et dents"], "sillon-ml":["Visage", "Bouche, langue et dents"],
+    "fam:machoire":["Visage", "Joue et mâchoire"], "fam:pommette":["Visage", "Joue et mâchoire"], "visage":["Visage", "Joue et mâchoire"],
+    "cou":["Cou et gorge"], "nuque":["Cou et gorge"], "gorge":["Cou et gorge"], "trachee":["Cou et gorge"]};
   const groupOf = pid => GROUP_OVERRIDE[pid] || (PLACES[pid] && PLACES[pid].group) || "autres";
   const zoneLabel = u => FAMILIES[u] ? FAMILIES[u].label : (PLACES[u] ? PLACES[u].label : u);
   const zoneGroup = u => groupOf(FAMILIES[u] ? FAMILIES[u].members[0] : u);
@@ -829,10 +839,21 @@
     const lst = Object.keys(Z).filter(u => mine(u).length);
     let html = '<div class="ztop">' + chip(code) + " <b>" + lst.length + " zones</b></div>" +
       '<div class="zchips"><button type="button" class="zchip' + (zType === "tous" ? " on" : "") + '" data-ztype="tous">Tous</button>' + types.map(([t, n]) => '<button type="button" class="zchip' + (zType === t ? " on" : "") + '" data-ztype="' + t + '">' + esc(n) + "</button>").join("") + "</div>";
+    const rowOf = u => zoneRow(u, zoneLabel(u), [...new Set(mine(u).map(it => ZTYPES.find(x => x[0] === typeGroup(it.s.type)) ? ZTYPES.find(x => x[0] === typeGroup(it.s.type))[1] : it.s.type))].join(" · "), null);
+    const byName = (a, b) => zoneLabel(a).localeCompare(zoneLabel(b), "fr");
     ZGROUPS.concat(["autres"]).forEach(g => {
-      const us = lst.filter(u => (ZGROUPS.includes(zoneGroup(u)) ? zoneGroup(u) : "autres") === g).sort((a, b) => zoneLabel(a).localeCompare(zoneLabel(b), "fr"));
+      const us = lst.filter(u => (ZGROUPS.includes(zoneGroup(u)) ? zoneGroup(u) : "autres") === g).sort(byName);
       if(!us.length) return;
-      html += '<div class="zlbl">' + esc(ZGNAME[g] || g) + "</div>" + us.map(u => zoneRow(u, zoneLabel(u), [...new Set(mine(u).map(it => ZTYPES.find(x => x[0] === typeGroup(it.s.type)) ? ZTYPES.find(x => x[0] === typeGroup(it.s.type))[1] : it.s.type))].join(" · "), null)).join("");
+      if(g !== "tête"){ html += '<div class="zlbl">' + esc(ZGNAME[g] || g) + "</div>" + us.map(rowOf).join(""); return; }
+      // tête et cou : trois blocs, et dans « Visage » cinq sous-titres ; une zone sans place connue reste à la fin
+      html += '<div class="zlbl">Tête et cou</div>';
+      TETE_BLOCS.forEach(bl => {
+        const zs = us.filter(u => (TETE_RANG[u] || [])[0] === bl); if(!zs.length) return;
+        html += '<div class="zbloc">' + esc(bl) + "</div>";
+        if(bl !== "Visage"){ html += zs.map(rowOf).join(""); return; }
+        VISAGE_SOUS.forEach(sb => { const z2 = zs.filter(u => TETE_RANG[u][1] === sb); if(z2.length) html += '<div class="zind"><div class="zsub">' + esc(sb) + "</div>" + z2.map(rowOf).join("") + "</div>"; });
+      });
+      const reste = us.filter(u => !TETE_RANG[u]); if(reste.length) html += '<div class="zbloc">Autres zones de la tête</div>' + reste.map(rowOf).join("");
     });
     document.getElementById("corrBody").innerHTML = html;
     corrAddBack();
