@@ -63,6 +63,21 @@
   .pl.v{ font-size:.74rem; }
   #q{ min-height:3.2em; }
   .bar{ width:30px; height:28px; flex:none; vertical-align:middle; } .bar .b{ fill:none; stroke:var(--text-color); stroke-width:1.8; stroke-linecap:round; } .bar .r{ stroke:#c0392b; stroke-width:3; fill:none; stroke-linecap:round; }
+  .hit{ fill:none; stroke:var(--text-color); stroke-width:1.6; }
+  /* où sont les points : la figure, de face et de dos, et la liste */
+  #locbtn{ display:block; margin:2px 0 0; } #locbtn[hidden], #loc[hidden]{ display:none; }
+  #loc{ margin:12px 0 0; border-top:1px solid var(--faint); padding-top:14px; }
+  #loc .leg{ margin:0 0 22px; } #loc h3{ margin:0 0 8px; font:800 .68rem/1.3 'Archivo', sans-serif; letter-spacing:.09em; text-transform:uppercase; color:var(--tint); }
+  #loc .figs{ display:flex; gap:8px; justify-content:center; margin:0 0 6px; } #loc .fig{ flex:1 1 0; max-width:240px; height:auto; display:block; } #loc .fig.gros{ max-width:300px; }
+  .fig .vis{ fill:none; stroke:var(--tint); stroke-width:.9; stroke-linecap:round; } .fig circle.vis{ fill:var(--tint); stroke:none; }
+  .fig .cap2{ font:800 11px 'Archivo', sans-serif; letter-spacing:.09em; text-transform:uppercase; fill:var(--tint); text-anchor:middle; }
+  .fig .spine{ fill:none; stroke:var(--tint); stroke-width:1; stroke-dasharray:2 4; }
+  .fig .dot circle{ fill:var(--page-bg); stroke:var(--mtc-accent); stroke-width:1.8; } .fig .dot text{ font:800 10.5px 'Archivo', sans-serif; fill:var(--mtc-accent); text-anchor:middle; dominant-baseline:central; }
+  .fig .dot.sol circle{ fill:var(--mtc-accent); } .fig .dot.sol text{ fill:var(--page-bg); }
+  #loc ul{ list-style:none; margin:12px 0 0; padding:0; } #loc li{ display:flex; gap:10px; align-items:baseline; padding:6px 0; border-top:1px solid var(--faint); font-size:.92rem; }
+  #loc .n{ flex:none; min-width:21px; height:21px; border-radius:50%; border:1.6px solid var(--mtc-accent); color:var(--mtc-accent); font:800 .72rem/18px 'Archivo', sans-serif; text-align:center; }
+  #loc .n.sol{ background:var(--mtc-accent); color:var(--page-bg); } #loc .fc{ color:var(--tint); font-size:.84rem; }
+  #loc .note{ margin:8px 0 0; }
   .stem{ fill:none; stroke:var(--text-color); stroke-width:1.6; stroke-linecap:round; }
   .cap{ fill:var(--page-bg); stroke:var(--text-color); stroke-width:1.4; }
   .ar{ color:var(--tint); } .ar.sm{ font-size:.86rem; margin:0 2px; }
@@ -89,6 +104,8 @@
   <p id="q"></p>
   <svg id="board" viewBox="0 0 360 250" role="img" aria-label="Une ligne arrêtée par des travaux, ses stations, et la ligne à rejoindre"></svg>
   <p id="res"></p>
+  <button type="button" class="sc go" id="locbtn" hidden>Où sont ces points ? ↓</button>
+  <div id="loc" hidden></div>
   <div id="end"></div>
   <div class="act"><span class="sc t" id="rec"></span><button type="button" class="sc go" id="next" hidden>Trajet suivant →</button></div>
 </main>
@@ -99,6 +116,8 @@
 </span></div></footer>
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="trajets-jiaohui.js?v=20261113-a"></script>
+<script src="trajets-point-zones.js?v=20261113-a"></script>
+<script src="trajets-zones-figure.js?v=20261124-b"></script>
 <script src="../celebrate.js?v=20261112-f"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
@@ -160,7 +179,7 @@
     // trois trajets de la série passent par une ligne intermédiaire (les 4e, 7e et 9e), quand il en existe un
     if([3, 6, 8].includes(S.marks.length) && !want){
       const d = roundDeux(prev);
-      if(d){ R = d; S.used.add(d.a + ">" + d.b); next.hidden = true; draw(); head(); return; }
+      if(d){ R = d; S.used.add(d.a + ">" + d.b); next.hidden = true; hideLoc(); draw(); head(); return; }
     }
     for(let t = 0; t < 300; t++){
       const a = want && PLAYABLE.includes(want) && t < 120 ? want : rnd(PLAYABLE), sts = LINES[a];
@@ -184,12 +203,12 @@
       if(!list) continue;
       // certains canaux ne se croisent qu'à leur premier ou à leur dernier point : ces trajets-là restent rares
       if(t < 280 && (at === 0 || at === list.length - 1) && Math.random() > .3) continue;
-      R = {mode:"simple", a, b, list, by:216, h:250, leg:{key:"A", y:AY, list, ok:s => s.others.includes(b), shown:new Set(), want:[b]}, tried:new Set(), done:false, errs:0, moved:false, busy:false};
+      R = {mode:"simple", a, b, list, by:216, h:250, leg:{key:"A", y:AY, list, ok:s => s.others.includes(b), shown:new Set(), want:[b], hi:[b], line:a}, tried:new Set(), done:false, errs:0, moved:false, busy:false};
       R.legs = [R.leg];
       S.used.add(a + ">" + b);
       break;
     }
-    next.hidden = true;
+    next.hidden = true; hideLoc();
     draw(); head();
   }
   const sx = (list, i) => list.length > 1 ? 78 + i * (286 - 78) / (list.length - 1) : 182;
@@ -222,7 +241,7 @@
       const f = five(sts, x => x.others.some(c => via.includes(c))); if(!f.bad) continue;
       const show = shuffle(via).slice(0, 2);
       const ok = x => x.others.some(c => via.includes(c));
-      return {mode:"deux", a, b, via, list:f.list, by:304, h:336, leg:{key:"A", y:AY, list:f.list, ok, shown:new Set(), want:show}, tried:new Set(), done:false, errs:0, moved:false, busy:false, legs:[], show};
+      return {mode:"deux", a, b, via, list:f.list, by:304, h:336, leg:{key:"A", y:AY, list:f.list, ok, shown:new Set(), want:show, hi:via, line:a}, tried:new Set(), done:false, errs:0, moved:false, busy:false, legs:[], show};
     }
     return null;
   }
@@ -281,7 +300,8 @@
     if(!os.length) return "";
     const n = os.length, cols = n > 2 ? 2 : n, rows = Math.ceil(n / cols), w = cols * 21 + 6, h = rows * 21 + 6, x0 = x - w / 2, y0 = y + 16;
     return '<g class="cart pop"><path class="stem" d="M' + x + " " + (y + 9) + "V" + y0 + '"/><rect class="cap" x="' + x0 + '" y="' + y0 + '" width="' + w + '" height="' + h + '" rx="8"/>' +
-      os.map((c, j) => tagHtml(x0 + 13.5 + (j % cols) * 21, y0 + 13.5 + (j / cols | 0) * 21, c, 8.5)).join("") + "</g>";
+      os.map((c, j) => { const cx = x0 + 13.5 + (j % cols) * 21, cy = y0 + 13.5 + (j / cols | 0) * 21;
+        return tagHtml(cx, cy, c, 8.5) + ((leg.hi || []).includes(c) ? '<circle class="hit" cx="' + cx + '" cy="' + cy + '" r="11"/>' : ""); }).join("") + "</g>";
   }
   // la personne descend à la station, suit le couloir à pied et monte dans le transport de l'autre ligne
   function transfer(from, x, y0, y1, to, toEnd, side){
@@ -316,13 +336,13 @@
       // première correspondance : la ligne intermédiaire apparaît avec ses stations et son transport
       const c = rnd(st.others.filter(o => R.via.includes(o))), CY = 198;
       const f = five(LINES[c], t => t.others.includes(R.b));
-      const leg2 = {key:"C", y:CY, list:f.list, ok:t => t.others.includes(R.b), shown:new Set(), want:[R.b]};
+      const leg2 = {key:"C", y:CY, list:f.list, ok:t => t.others.includes(R.b), shown:new Set(), want:[R.b], hi:[R.b], line:c};
       $("mid").innerHTML = lineHtml(c, CY, X0, X1 - 22, true) + termHtml(c, X0, CY, "term pop") + stationsHtml("C", leg2.list, CY, "pop");
       $("vehMid").innerHTML = '<g class="veh" id="vehC" style="transform:' + pos(X0 + 26, CY) + '">' + vehicle(modeOf(c)) + "</g>";
       bind();
       board.querySelectorAll('.st[data-k="A"]').forEach(n => n.classList.add("off"));
-      transfer(R.in, x, AY, CY, $("vehC"), false, already ? "" : stubs(leg, i, c));
-      R.in = $("vehC"); R.legs.push(leg2); R.leg = leg2; R.busy = true;
+      transfer(R.in, x, AY, CY, $("vehC"), false, already ? "" : stubs(leg, i));
+      R.in = $("vehC"); R.legA = leg; R.legs.push(leg2); R.leg = leg2; R.busy = true;
       setTimeout(() => { if(R === round) R.busy = false; }, 2200);
       res.innerHTML = "";
       if(window.mtcPlayFx) window.mtcPlayFx("good");
@@ -330,7 +350,7 @@
     }
     // correspondance vers la ligne à rejoindre
     R.done = true;
-    transfer(R.in, x, leg.y, R.by, $("vehB"), true, already ? "" : stubs(leg, i, R.b));
+    transfer(R.in, x, leg.y, R.by, $("vehB"), true, already ? "" : stubs(leg, i));
     setTimeout(() => {
       if(R !== round) return;
       // le reste du plan se dévoile : les correspondances des autres stations
@@ -345,8 +365,63 @@
     if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();   // un trajet terminé compte pour la série de jours
     next.textContent = S.marks.length >= N ? "Voir le résultat →" : "Trajet suivant →";
     next.hidden = false; head();
+    showLocBtn(R.mode === "deux" ? [R.legA].concat(R.legs) : R.legs);
   }
+  // ---- où sont les points : la figure (de face et de dos) et la liste, d'après la zone vérifiée de chaque point
+  const ZF = window.MTC_TRAJETS_ZONE_FIG || {}, ZP = window.MTC_TRAJETS_POINT_ZONES || {};
+  const FACE = {"antérieur":"face antérieure", externe:"face externe", interne:"face interne", "postérieur":"face postérieure"};
+  function silhouette(dos){
+    const lim = [["M58 80L41 138", 17], ["M142 80L159 138", 17], ["M38 142L28 198", 13], ["M162 142L172 198", 13], ["M28 200L23 228", 10], ["M172 200L177 228", 10],
+      ["M80 212L73 298", 27], ["M120 212L127 298", 27], ["M73 300L70 384", 19], ["M127 300L130 384", 19], ["M70 386L68 410", 12], ["M130 386L132 410", 12], ["M100 48V68", 15]];
+    const par = (col, grow) => '<g fill="none" stroke="' + col + '" stroke-linecap="round">' + lim.map(([d, w]) => '<path d="' + d + '" stroke-width="' + (w + grow) + '"/>').join("") + "</g>";
+    return par("var(--text-color)", 2.4) + par("var(--page-bg)", 0) +
+      '<path d="M60 72Q100 60 140 72L132 130Q128 168 136 206L64 206Q72 168 68 130Z" fill="var(--page-bg)" stroke="var(--text-color)" stroke-width="1.2" stroke-linejoin="round"/>' +
+      '<circle cx="100" cy="32" r="20" fill="var(--page-bg)" stroke="var(--text-color)" stroke-width="1.2"/>' + (dos ? '<path class="spine" d="M100 68V205"/>' : "");
+  }
+  // les points de la face de la tête sont trop serrés pour la silhouette : ils vont sur un gros plan (vue "tete") ; les autres sur le corps
+  function placeDots(list, vue){
+    const out = [], sep = vue === "tete" ? 10 : 15;
+    list.forEach((it, i) => {
+      const z = ZP[it.st.code], f = z && ZF[z.zone]; if(!f) return;
+      const v = f[3], dos = v === 1 || v === 3 || (v === 2 && z.face === "postérieur"), tete = !dos && f[2] < 58;
+      if(vue === "tete" ? !tete : tete) return;
+      let x = (v === 2 || v === 3) && dos ? 200 - f[1] : f[1], y = f[2];
+      const free = (a, b) => out.every(o => o.dos !== dos || Math.hypot(o.x - a, o.y - b) > sep);
+      for(const dx of (vue === "tete" ? [0, 10, -10, 20, -20] : [0, 14, -14, 28, -28])){ if(free(x + dx, y)){ x += dx; break; } }
+      out.push({n:i + 1, x, y, dos, sol:it.sol});
+    });
+    return out;
+  }
+  function locPanel(legs){
+    return '<div class="locin">' + legs.map(L => {
+      const items = L.list.map(st => ({st, sol:!!L.ok(st)})), dots = placeDots(items), tdots = placeDots(items, "tete");
+      const fig = dos => '<svg class="fig" viewBox="0 0 200 446" role="img" aria-label="' + (dos ? "Silhouette vue de dos" : "Silhouette vue de face") + '">' + silhouette(dos) +
+        dots.filter(d => d.dos === dos).map(d => '<g class="dot' + (d.sol ? " sol" : "") + '"><circle cx="' + d.x + '" cy="' + d.y + '" r="8"/><text x="' + d.x + '" y="' + d.y + '">' + d.n + "</text></g>").join("") +
+        '<text class="cap2" x="100" y="440">' + (dos ? "Dos" : "Face") + "</text></svg>";
+      const backOn = dots.some(d => d.dos), frontOn = dots.some(d => !d.dos);
+      const visage = '<path class="vis" d="M84 26Q88 24 93 26M107 26Q112 24 116 26"/><circle class="vis" cx="90" cy="31" r="1.3"/><circle class="vis" cx="110" cy="31" r="1.3"/><path class="vis" d="M100 33V40L97 41"/><path class="vis" d="M92 46Q100 49 108 46"/><path class="vis" d="M79 31Q76 36 79 41M121 31Q124 36 121 41"/>';
+      const gros = tdots.length ? '<div class="figs"><svg class="fig gros" viewBox="52 2 96 68" role="img" aria-label="Gros plan de la tête, vue de face">' + silhouette(false) + visage +
+        tdots.map(d => '<g class="dot' + (d.sol ? " sol" : "") + '"><circle cx="' + d.x + '" cy="' + d.y + '" r="4.4"/><text x="' + d.x + '" y="' + d.y + '" style="font-size:5.6px">' + d.n + "</text></g>").join("") + "</svg></div>" : "";
+      const figs = gros + (dots.length ? '<div class="figs">' + (frontOn || !backOn ? fig(false) : "") + (backOn ? fig(true) : "") + "</div>" : "");
+      const li = items.map((it, i) => { const z = ZP[it.st.code] || {}, f = ZF[z.zone];
+        return '<li><span class="n' + (it.sol ? " sol" : "") + '">' + (i + 1) + "</span><span><b>" + esc(it.st.code) + "</b> " + esc(f ? f[0] : z.zone || "—") +
+          (z.face && FACE[z.face] ? ' <span class="fc">· ' + FACE[z.face] + "</span>" : "") + "</span></li>"; }).join("");
+      return '<div class="leg">' + (L.line ? "<h3>Ligne " + pill(L.line) + "</h3>" : "") + figs + "<ul>" + li + "</ul>" +
+        (L.list.some(L.ok) ? '<p class="sc t note">Pastille pleine : la station où se prend la correspondance</p>' : "") + "</div>";
+    }).join("") + "</div>";
+  }
+  function hideLoc(){ $("locbtn").hidden = true; $("loc").hidden = true; $("loc").innerHTML = ""; }
+  function showLocBtn(legs){
+    const b = $("locbtn"), box = $("loc");
+    box.innerHTML = locPanel(legs); box.hidden = true; b.hidden = false; b.textContent = "Où sont ces points ? ↓";
+  }
+  $("locbtn").addEventListener("click", () => {
+    const box = $("loc"); box.hidden = !box.hidden;
+    $("locbtn").textContent = box.hidden ? "Où sont ces points ? ↓" : "Masquer la localisation ↑";
+    if(!box.hidden) box.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
   function end(){
+    hideLoc();
     const ok = S.marks.filter(m => m === "ok").length, old = best(), rec = ok > old;
     if(rec){ try{ localStorage.setItem(RKEY, String(ok)); }catch(e){} }
     main.classList.add("fin");
@@ -354,6 +429,7 @@
       '<p class="t">' + (rec && old ? "Nouveau record : l’ancien était de " + old + "." : rec ? "C’est ton premier record." : "Ton record : " + old + " sur " + N + ".") + "</p>" +
       (S.miss.length ? '<span class="sc t">Stations à revoir</span><ul>' + S.miss.sort((a, b) => a.code.localeCompare(b.code, "fr", {numeric:true})).map(st => "<li><b>" + esc(st.code) + "</b> " +
         st.others.map(c => '<span class="tg" style="background:' + col(c) + '">' + esc(lab(c)) + "</span>").join("") + "</li>").join("") + "</ul>" : '<span class="sc t">Aucune station manquée</span>') +
+      (S.miss.length ? '<div id="locMiss" style="margin:18px 0 0">' + locPanel([{line:null, list:S.miss.slice().sort((a, b) => a.code.localeCompare(b.code, "fr", {numeric:true})), ok:() => false}]) + "</div>" : "") +
       '<p style="margin:22px 0 0"><a class="sc go" target="_top" href="' + (window.mtcIsAdminPage && window.mtcIsAdminPage() ? "index.html?admin=1#reseau" : "plan.html") + '">Plan des intersections →</a></p>';
     next.textContent = "Nouvelle série →"; next.hidden = false; head();
     if(ok === N && window.mtcFinale) window.mtcFinale("Série parfaite", N + " trajets du premier coup", {etoiles:"✦✦✦"});

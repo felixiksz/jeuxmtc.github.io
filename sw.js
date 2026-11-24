@@ -1,5 +1,5 @@
 /* Service worker — Connections MTC offline cache */
-const MTC_OFFLINE_VERSION = "v2.4-20261120-j";
+const MTC_OFFLINE_VERSION = "v2.4-20261120-k";
 const MTC_CACHE_NAME = "connections-mtc-" + MTC_OFFLINE_VERSION;
 const CORE_ASSETS = [
   "./",
@@ -97,6 +97,8 @@ const CORE_ASSETS = [
   "accueil/entrainement.html",
   "modules-theme.js",
   "trajets/trajets-jiaohui.js",
+  "trajets/trajets-point-zones.js",
+  "trajets/trajets-zones-figure.js",
   "trajets/correspondance.html",
   "69-main-menu.css",
   "70-progress-sync.js",
