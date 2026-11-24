@@ -171,7 +171,10 @@
         // série Réseaux (bêta) : elle contient Équilibrer ; tant qu'elle n'est pas ouverte, les joueur·ses gardent Équilibrer seul
         (admin || isPublic("circuits")) ? ["「 ✦ RÉSEAUX ✦ 」", "Les six systèmes et les circuits de Dr Tán : équilibrer, fermer un circuit, trois plaintes, propagation, familles, quatre membres.", () => module("circuits"), "b"]
           : ["Équilibrer", "Rééquilibrer des canaux atteints selon les six systèmes de Dr Tán.", () => module("equilibrer"), "b"],
-        (admin || isPublic("correspondance")) && ["Correspondance", "Un métro arrêté par des travaux : trouver la station où il peut prendre la correspondance.", () => { window.location.href = "trajets/correspondance.html"; }, "b"]
+        (admin || isPublic("correspondance")) && ["Correspondance", "Un métro arrêté par des travaux : trouver la station où il peut prendre la correspondance.", () => { window.location.href = "trajets/correspondance.html"; }, "b"],
+        // jeux sur les syndromes de l'Assistant et les trajets : admin seulement tant que « quelcanal » et « signetrajet » ne sont pas ouverts dans beta-config.js
+        !pharma && (admin || isPublic("quelcanal")) && ["Quel canal ?", "Des signes arrivent un par un : trouver le canal et le vaisseau.", () => { window.location.href = "trajets/quel-canal.html"; }, "b"],
+        !pharma && (admin || isPublic("signetrajet")) && ["Signe ou trajet ?", "Où passe un canal, et quels canaux passent par une zone.", () => { window.location.href = "trajets/signe-trajet.html"; }, "b"]
       ],
       reviser: [
         ["Mémo", pharma ? "Toutes les substances, rangées par catégorie." : "Tous les points, rangés par catégorie.", () => call("openCheatsheetPanel")],

@@ -64,16 +64,10 @@
   #q{ min-height:3.2em; }
   .bar{ width:30px; height:28px; flex:none; vertical-align:middle; } .bar .b{ fill:none; stroke:var(--text-color); stroke-width:1.8; stroke-linecap:round; } .bar .r{ stroke:#c0392b; stroke-width:3; fill:none; stroke-linecap:round; }
   .hit{ fill:none; stroke:var(--text-color); stroke-width:1.6; }
-  /* où sont les points : la figure, de face et de dos, et la liste */
+  /* où sont les points : la liste, zone par zone */
   #locbtn{ display:block; margin:2px 0 0; } #locbtn[hidden], #loc[hidden]{ display:none; }
   #loc{ margin:12px 0 0; border-top:1px solid var(--faint); padding-top:14px; }
   #loc .leg{ margin:0 0 22px; } #loc h3{ margin:0 0 8px; font:800 .68rem/1.3 'Archivo', sans-serif; letter-spacing:.09em; text-transform:uppercase; color:var(--tint); }
-  #loc .figs{ display:flex; gap:8px; justify-content:center; margin:0 0 6px; } #loc .fig{ flex:1 1 0; max-width:240px; height:auto; display:block; } #loc .fig.gros{ max-width:300px; }
-  .fig .vis{ fill:none; stroke:var(--tint); stroke-width:.9; stroke-linecap:round; } .fig circle.vis{ fill:var(--tint); stroke:none; }
-  .fig .cap2{ font:800 11px 'Archivo', sans-serif; letter-spacing:.09em; text-transform:uppercase; fill:var(--tint); text-anchor:middle; }
-  .fig .spine{ fill:none; stroke:var(--tint); stroke-width:1; stroke-dasharray:2 4; }
-  .fig .dot circle{ fill:var(--page-bg); stroke:var(--mtc-accent); stroke-width:1.8; } .fig .dot text{ font:800 10.5px 'Archivo', sans-serif; fill:var(--mtc-accent); text-anchor:middle; dominant-baseline:central; }
-  .fig .dot.sol circle{ fill:var(--mtc-accent); } .fig .dot.sol text{ fill:var(--page-bg); }
   #loc ul{ list-style:none; margin:12px 0 0; padding:0; } #loc li{ display:flex; gap:10px; align-items:baseline; padding:6px 0; border-top:1px solid var(--faint); font-size:.92rem; }
   #loc .n{ flex:none; min-width:21px; height:21px; border-radius:50%; border:1.6px solid var(--mtc-accent); color:var(--mtc-accent); font:800 .72rem/18px 'Archivo', sans-serif; text-align:center; }
   #loc .n.sol{ background:var(--mtc-accent); color:var(--page-bg); } #loc .fc{ color:var(--tint); font-size:.84rem; }
@@ -117,7 +111,7 @@
 <script src="../modules-theme.js?v=20261005-a"></script>
 <script src="trajets-jiaohui.js?v=20261113-a"></script>
 <script src="trajets-point-zones.js?v=20261113-a"></script>
-<script src="trajets-zones-figure.js?v=20261124-b"></script>
+<script src="trajets-zones-labels.js?v=20261124-c"></script>
 <script src="../celebrate.js?v=20261112-f"></script>
 <script src="../70-progress-sync.js?v=20261112-b"></script>
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
@@ -367,46 +361,15 @@
     next.hidden = false; head();
     showLocBtn(R.mode === "deux" ? [R.legA].concat(R.legs) : R.legs);
   }
-  // ---- où sont les points : la figure (de face et de dos) et la liste, d'après la zone vérifiée de chaque point
-  const ZF = window.MTC_TRAJETS_ZONE_FIG || {}, ZP = window.MTC_TRAJETS_POINT_ZONES || {};
+  // ---- où sont les points : la liste (zone et face), d'après la zone vérifiée de chaque point ; aucun dessin du corps
+  const ZL = window.MTC_TRAJETS_ZONE_LABELS || {}, ZP = window.MTC_TRAJETS_POINT_ZONES || {};
   const FACE = {"antérieur":"face antérieure", externe:"face externe", interne:"face interne", "postérieur":"face postérieure"};
-  function silhouette(dos){
-    const lim = [["M58 80L41 138", 17], ["M142 80L159 138", 17], ["M38 142L28 198", 13], ["M162 142L172 198", 13], ["M28 200L23 228", 10], ["M172 200L177 228", 10],
-      ["M80 212L73 298", 27], ["M120 212L127 298", 27], ["M73 300L70 384", 19], ["M127 300L130 384", 19], ["M70 386L68 410", 12], ["M130 386L132 410", 12], ["M100 48V68", 15]];
-    const par = (col, grow) => '<g fill="none" stroke="' + col + '" stroke-linecap="round">' + lim.map(([d, w]) => '<path d="' + d + '" stroke-width="' + (w + grow) + '"/>').join("") + "</g>";
-    return par("var(--text-color)", 2.4) + par("var(--page-bg)", 0) +
-      '<path d="M60 72Q100 60 140 72L132 130Q128 168 136 206L64 206Q72 168 68 130Z" fill="var(--page-bg)" stroke="var(--text-color)" stroke-width="1.2" stroke-linejoin="round"/>' +
-      '<circle cx="100" cy="32" r="20" fill="var(--page-bg)" stroke="var(--text-color)" stroke-width="1.2"/>' + (dos ? '<path class="spine" d="M100 68V205"/>' : "");
-  }
-  // les points de la face de la tête sont trop serrés pour la silhouette : ils vont sur un gros plan (vue "tete") ; les autres sur le corps
-  function placeDots(list, vue){
-    const out = [], sep = vue === "tete" ? 10 : 15;
-    list.forEach((it, i) => {
-      const z = ZP[it.st.code], f = z && ZF[z.zone]; if(!f) return;
-      const v = f[3], dos = v === 1 || v === 3 || (v === 2 && z.face === "postérieur"), tete = !dos && f[2] < 58;
-      if(vue === "tete" ? !tete : tete) return;
-      let x = (v === 2 || v === 3) && dos ? 200 - f[1] : f[1], y = f[2];
-      const free = (a, b) => out.every(o => o.dos !== dos || Math.hypot(o.x - a, o.y - b) > sep);
-      for(const dx of (vue === "tete" ? [0, 10, -10, 20, -20] : [0, 14, -14, 28, -28])){ if(free(x + dx, y)){ x += dx; break; } }
-      out.push({n:i + 1, x, y, dos, sol:it.sol});
-    });
-    return out;
-  }
   function locPanel(legs){
     return '<div class="locin">' + legs.map(L => {
-      const items = L.list.map(st => ({st, sol:!!L.ok(st)})), dots = placeDots(items), tdots = placeDots(items, "tete");
-      const fig = dos => '<svg class="fig" viewBox="0 0 200 446" role="img" aria-label="' + (dos ? "Silhouette vue de dos" : "Silhouette vue de face") + '">' + silhouette(dos) +
-        dots.filter(d => d.dos === dos).map(d => '<g class="dot' + (d.sol ? " sol" : "") + '"><circle cx="' + d.x + '" cy="' + d.y + '" r="8"/><text x="' + d.x + '" y="' + d.y + '">' + d.n + "</text></g>").join("") +
-        '<text class="cap2" x="100" y="440">' + (dos ? "Dos" : "Face") + "</text></svg>";
-      const backOn = dots.some(d => d.dos), frontOn = dots.some(d => !d.dos);
-      const visage = '<path class="vis" d="M84 26Q88 24 93 26M107 26Q112 24 116 26"/><circle class="vis" cx="90" cy="31" r="1.3"/><circle class="vis" cx="110" cy="31" r="1.3"/><path class="vis" d="M100 33V40L97 41"/><path class="vis" d="M92 46Q100 49 108 46"/><path class="vis" d="M79 31Q76 36 79 41M121 31Q124 36 121 41"/>';
-      const gros = tdots.length ? '<div class="figs"><svg class="fig gros" viewBox="52 2 96 68" role="img" aria-label="Gros plan de la tête, vue de face">' + silhouette(false) + visage +
-        tdots.map(d => '<g class="dot' + (d.sol ? " sol" : "") + '"><circle cx="' + d.x + '" cy="' + d.y + '" r="4.4"/><text x="' + d.x + '" y="' + d.y + '" style="font-size:5.6px">' + d.n + "</text></g>").join("") + "</svg></div>" : "";
-      const figs = gros + (dots.length ? '<div class="figs">' + (frontOn || !backOn ? fig(false) : "") + (backOn ? fig(true) : "") + "</div>" : "");
-      const li = items.map((it, i) => { const z = ZP[it.st.code] || {}, f = ZF[z.zone];
-        return '<li><span class="n' + (it.sol ? " sol" : "") + '">' + (i + 1) + "</span><span><b>" + esc(it.st.code) + "</b> " + esc(f ? f[0] : z.zone || "—") +
+      const li = L.list.map((st, i) => { const z = ZP[st.code] || {}, sol = !!L.ok(st);
+        return '<li><span class="n' + (sol ? " sol" : "") + '">' + (i + 1) + "</span><span><b>" + esc(st.code) + "</b> " + esc(ZL[z.zone] || z.zone || "—") +
           (z.face && FACE[z.face] ? ' <span class="fc">· ' + FACE[z.face] + "</span>" : "") + "</span></li>"; }).join("");
-      return '<div class="leg">' + (L.line ? "<h3>Ligne " + pill(L.line) + "</h3>" : "") + figs + "<ul>" + li + "</ul>" +
+      return '<div class="leg">' + (L.line ? "<h3>Ligne " + pill(L.line) + "</h3>" : "") + "<ul>" + li + "</ul>" +
         (L.list.some(L.ok) ? '<p class="sc t note">Pastille pleine : la station où se prend la correspondance</p>' : "") + "</div>";
     }).join("") + "</div>";
   }

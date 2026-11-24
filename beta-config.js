@@ -9,7 +9,7 @@
      que les commentaires ne sont pas encore activés.
    ============================================================ */
 window.MTC_BETA = {
-  public: {trajets: false, correspondance: true, plan: true, formules: true, circuits: true},
+  public: {trajets: false, correspondance: true, plan: true, formules: true, circuits: true, quelcanal: false, signetrajet: false},
   giscus: {
     repo: "felixiksz/jeuxmtc.github.io",
     repoId: "R_kgDOS3f7kg",

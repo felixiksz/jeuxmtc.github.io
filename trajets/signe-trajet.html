@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FCFCFA">
+<meta name="robots" content="noindex, nofollow">
+<title>Signe ou trajet ?</title>
+<link href="../fonts/fonts.css?v=20261006-a" rel="stylesheet">
+<link href="jeux-syndromes.css?v=20261124-a" rel="stylesheet">
+</head>
+<body>
+<main>
+  <div class="top"><a class="sc" id="back" href="../index.html">← Accueil</a><span class="sc t" id="score"></span></div>
+  <h1>Signe ou trajet ?</h1>
+  <div class="modes" id="modes"><button type="button" class="mode on" data-m="ou">Où passe-t-il ?</button><button type="button" class="mode" data-m="qui">Qui passe par là ?</button></div>
+  <div class="prog" id="prog"></div>
+  <p class="t" id="empty" hidden></p>
+  <div id="stage">
+    <div id="ask"></div>
+    <div id="ans"></div>
+    <div style="margin:12px 0 0"><button type="button" class="lnk" id="valid" hidden>Valider</button></div>
+    <div id="res"></div>
+    <div class="rv" id="reveal" hidden></div>
+  </div>
+  <div id="end"></div>
+  <div class="act"><span class="sc t" id="rec"></span><button type="button" class="sc go" id="next" hidden>Cas suivant →</button></div>
+</main>
+<footer><div><span class="tools">
+  <a href="../index.html#ouvrir-recherche" target="_top" title="Recherche" aria-label="Recherche"><svg viewBox="0 0 24 24"><circle class="l" cx="10.5" cy="10.5" r="6.5"/><path class="l" d="M15.5 15.5L21 21"/></svg></a>
+  <a href="../index.html#ouvrir-panier" target="_top" title="Panier" aria-label="Panier"><svg viewBox="0 0 24 24"><path class="l" d="M4 9H20L18.3 19.5H5.7Z"/><path class="l" d="M8.5 9L11 3.5M15.5 9L13 3.5"/></svg></a>
+</span></div></footer>
+<script src="../modules-theme.js?v=20261005-a"></script>
+<script src="../celebrate.js?v=20261112-f"></script>
+<script src="../70-progress-sync.js?v=20261112-b"></script>
+<script src="../daily-streak-shared.js?v=20261006-a"></script>
+<script src="../beta-config.js?v=20261119-a"></script>
+<script src="../beta-gate.js?v=20261114-a"></script>
+<script src="jeux-syndromes.js?v=20261124-a"></script>
+<script>
+(function(){
+  "use strict";
+  // accès : comme le module Trajets (beta-gate.js)
+  if(!window.mtcBetaGate || !window.mtcBetaGate({module:"signetrajet", title:"Signe ou trajet ?"})){
+    if(!window.mtcBetaGate) document.body.innerHTML = '<p style="padding:24px;font-family:system-ui,sans-serif">Page réservée.</p>';
+    throw new Error("signe ou trajet : accès réservé");
+  }
+  // Deux façons de réviser les trajets avec les syndromes de l'Assistant, sans dessin du corps : les zones sont écrites, rangées par groupe.
+  //  « Où passe-t-il ? » : un signe d'un canal et d'un vaisseau ; parmi quatre zones, laquelle ce vaisseau traverse-t-il ?
+  //  « Qui passe par là ? » : une zone et un vaisseau ; quels canaux la traversent ? (plusieurs réponses)
+  // Une série = dix cas, avec un record par mode.
+  const Y = window.mtcSyn, $ = id => document.getElementById(id), main = document.querySelector("main");
+  const {esc, rnd, shuffle, pill, col, NIV, NIVNOM, ORD, NAMES, TYPES} = Y;
+  const N = 10, RKEY = {ou:"mtc_signetrajet_record_ou_v1", qui:"mtc_signetrajet_record_qui_v1"};
+  let mode = "ou", S = null, R = null, CAND = null;
+  const best = () => { try{ return Number(localStorage.getItem(RKEY[mode])) || 0; }catch(e){ return 0; } };
+  if(window.top !== window) $("back").style.visibility = "hidden";
+  const zlab = z => esc(Y.zoneLabel(z)), zgrp = z => esc(Y.groupLabel(z));
+
+  function head(){
+    const k = S.marks.length, fin = main.classList.contains("fin");
+    $("score").textContent = fin ? "Série terminée" : "Cas " + Math.min(N, k + (R && R.done ? 0 : 1)) + " sur " + N;
+    $("prog").innerHTML = Array.from({length:N}, (v, i) => '<i class="' + (S.marks[i] || (i === k && !fin ? "cur" : "")) + '"></i>').join("");
+    $("rec").textContent = best() ? "Record · " + best() + " sur " + N : "Série de " + N;
+    document.querySelectorAll(".mode").forEach(b => b.classList.toggle("on", b.dataset.m === mode));
+  }
+  function newSeries(){ S = {marks:[], miss:[], last:""}; CAND = null; main.classList.remove("fin"); newRound(); }
+  // cas du mode « Où passe-t-il ? » : un signe dont la zone est traversée par son vaisseau
+  function candOu(){
+    const out = [];
+    Y.usableSigns().forEach(g => { const tr = Y.traversed(g.c, g.n);
+      g.ok.forEach(l => { const inter = Y.zonesOfSign(l.t).filter(z => tr.has(z)); if(inter.length) out.push({c:g.c, n:g.n, l, inter}); }); });
+    return out;
+  }
+  // cas du mode « Qui passe par là ? » : une zone et un vaisseau qui ont entre un et cinq canaux
+  function candQui(){
+    const out = [], Z = Y.data() && Y.data().zones ? Object.keys(Y.data().zones.zones) : [];
+    Z.forEach(z => ["regulier", "luo", "tendineux"].forEach(n => { const set = ORD.filter(c => Y.traversed(c, n).has(z)); if(set.length >= 1 && set.length <= 5) out.push({z, n, set}); }));
+    return out;
+  }
+  function newRound(){
+    CAND = CAND || (mode === "ou" ? candOu() : candQui());
+    if(!CAND.length){ R = null; $("stage").hidden = true; $("empty").hidden = false; $("empty").innerHTML = Y.vide(); $("next").hidden = true; head(); return; }
+    $("stage").hidden = false; $("empty").hidden = true;
+    const list = CAND.filter(x => (mode === "ou" ? x.l.t : x.z + x.n) !== S.last), g = rnd(list.length ? list : CAND);
+    S.last = mode === "ou" ? g.l.t : g.z + g.n;
+    if(mode === "ou"){
+      // trois zones que le canal ne traverse jamais et que le signe ne nomme pas, de groupes différents si possible
+      const all = Object.keys(Y.data().zones.zones), tr = Y.traversed(g.c), zs = Y.zonesOfSign(g.l.t);
+      const bonne = rnd(g.inter), far = shuffle(all.filter(z => !tr.has(z) && !zs.includes(z))), dis = [], used = new Set([Y.data().zones.zones[bonne].groupe]);
+      far.forEach(z => { if(dis.length < 3 && !used.has(Y.data().zones.zones[z].groupe)){ dis.push(z); used.add(Y.data().zones.zones[z].groupe); } });
+      far.forEach(z => { if(dis.length < 3 && !dis.includes(z)) dis.push(z); });
+      R = {c:g.c, n:g.n, l:g.l, inter:g.inter, opts:shuffle([bonne].concat(dis)), marks:{}, wrong:0, done:false, msg:""};
+    }else{
+      R = {z:g.z, n:g.n, set:g.set, pick:new Set(), done:false, wrong:0, msg:"", res:null};
+    }
+    $("next").hidden = true; draw(); head();
+  }
+  function extrait(c, n, z){
+    const zc = (Y.data().zones.canaux[c] || {})[z] || [];
+    return zc.filter(p => TYPES[n].includes(p.type)).map(p => p.extrait).filter((x, i, a) => x && a.indexOf(x) === i);
+  }
+  function draw(){
+    if(!R) return;
+    const rv = $("reveal"); rv.hidden = true; rv.innerHTML = "";
+    $("valid").hidden = true;
+    if(mode === "ou"){
+      $("ask").innerHTML = '<p class="sc t" style="margin:0 0 8px">' + pill(R.c) + " " + esc(NIVNOM[R.n]) + '</p><div class="clues"><p>' + esc(R.l.t) + '</p></div><p class="q">Quelle zone ce vaisseau traverse-t-il pour expliquer ce signe ?</p>';
+      $("ans").innerHTML = R.opts.map(z => '<button type="button" class="opt' + (R.marks[z] ? " mk-" + R.marks[z] : "") + '" data-z="' + z + '"' + (R.done || R.marks[z] === "no" ? " disabled" : "") + ">" + zlab(z) + "<small>" + zgrp(z) + "</small></button>").join("");
+      if(R.done){
+        const ok = R.opts.find(z => R.marks[z] === "ok"), ex = extrait(R.c, R.n, ok), tr = [...Y.traversed(R.c, R.n)].map(z => Y.zoneLabel(z));
+        rv.hidden = false;
+        rv.innerHTML = "<p>" + pill(R.c) + " " + esc(NIVNOM[R.n]) + " · <b>" + zlab(ok) + "</b></p>" + (ex.length ? '<p class="ex">' + ex.map(esc).join(" · ") + "</p>" : "") +
+          '<p class="ex">Zones de ce vaisseau : ' + tr.map(esc).join(", ") + ".</p>";
+      }
+    }else{
+      $("ask").innerHTML = '<p class="sc t" style="margin:0 0 8px">' + zgrp(R.z) + '</p><div class="clues"><p><b>' + zlab(R.z) + "</b></p><p>" + esc(NIVNOM[R.n]) + '</p></div><p class="q">Quels canaux passent par là ? Plusieurs réponses.</p>';
+      $("ans").innerHTML = '<div class="row">' + ORD.map(c => { const on = R.pick.has(c), inSet = R.set.includes(c);
+        let st = on ? "background:" + col(c) + ";color:var(--page-bg);border-color:" + col(c) : "color:" + col(c);
+        if(R.done && inSet && !on) st = "color:" + col(c) + ";border-style:dashed;border-width:2.5px";
+        return '<button type="button" class="pc' + (R.done && on && !inSet ? " mk-no" : "") + '" data-c="' + c + '" title="' + esc(NAMES[c]) + '" style="' + st + '"' + (R.done ? " disabled" : "") + ">" + c + "</button>"; }).join("") + "</div>";
+      $("valid").hidden = R.done;
+      if(R.done){
+        rv.hidden = false;
+        rv.innerHTML = R.set.map(c => "<p>" + pill(c) + " " + esc(extrait(c, R.n, R.z).join(" · ") || "") + "</p>").join("");
+      }
+    }
+    $("res").innerHTML = R.msg;
+  }
+  function finish(exact){
+    R.done = true;
+    S.marks.push(exact && !R.wrong ? "ok" : "mid");
+    if(!exact || R.wrong) S.miss.push(mode === "ou" ? {c:R.c, n:R.n, t:R.l.t, z:R.opts.find(z => R.marks[z] === "ok")} : {z:R.z, n:R.n, set:R.set.slice()});
+    if(window.mtcRecordDailyPlay) window.mtcRecordDailyPlay();
+    if(exact && !R.wrong){ if(window.mtcCelebrate) window.mtcCelebrate(1); } else if(exact && window.mtcPlayFx) window.mtcPlayFx("good");
+    $("next").textContent = S.marks.length >= N ? "Voir le résultat →" : "Cas suivant →"; $("next").hidden = false;
+    draw(); head();
+  }
+  function pickZone(z){
+    if(!R || R.done || R.marks[z]) return;
+    if(R.inter.includes(z)){
+      R.marks[z] = "ok"; R.msg = '<span class="ok">Oui.</span> ' + pill(R.c) + " traverse « " + zlab(z) + " » (" + esc(NIVNOM[R.n].toLowerCase()) + ").";
+      finish(true);
+    }else{
+      R.marks[z] = "no"; R.wrong++; if(window.mtcMiss) window.mtcMiss();
+      R.msg = '<span class="no">Non :</span> ' + pill(R.c) + " ne traverse pas « " + zlab(z) + " » dans ce vaisseau.";
+      draw();
+    }
+  }
+  function validate(){
+    if(!R || R.done) return;
+    if(!R.pick.size){ R.msg = '<span class="no">Choisis au moins un canal.</span>'; draw(); return; }
+    const picks = [...R.pick], good = picks.filter(c => R.set.includes(c)), extra = picks.filter(c => !R.set.includes(c)), missed = R.set.filter(c => !R.pick.has(c));
+    const exact = !extra.length && !missed.length;
+    if(!exact) R.wrong = extra.length + missed.length;
+    R.msg = exact ? '<span class="ok">Exact.</span> Tous les canaux sont là.' :
+      '<span class="no">' + (missed.length ? "Oubliés : " : "") + "</span>" + missed.map(pill).join("") + (extra.length ? ' <span class="no">En trop : </span>' + extra.map(pill).join("") : "") + (good.length ? ' <span class="ok">Trouvés : </span>' + good.map(pill).join("") : "");
+    if(!exact && window.mtcMiss) window.mtcMiss();
+    finish(exact);
+  }
+  $("stage").addEventListener("click", e => {
+    const b = e.target.closest("button"); if(!b || b.disabled || !R) return;
+    if(b.dataset.z) pickZone(b.dataset.z);
+    else if(b.dataset.c && mode === "qui" && !R.done){ if(R.pick.has(b.dataset.c)) R.pick.delete(b.dataset.c); else R.pick.add(b.dataset.c); R.msg = ""; draw(); }
+    else if(b.id === "valid") validate();
+  });
+  function end(){
+    const ok = S.marks.filter(m => m === "ok").length, old = best(), rec = ok > old;
+    if(rec){ try{ localStorage.setItem(RKEY[mode], String(ok)); }catch(e){} }
+    main.classList.add("fin");
+    $("end").innerHTML = "<h2>" + ok + " cas" + " sur " + N + " du premier coup</h2>" +
+      '<p class="t">' + (rec && old ? "Nouveau record : l’ancien était de " + old + "." : rec ? "C’est ton premier record." : "Ton record : " + old + " sur " + N + ".") + "</p>" +
+      (S.miss.length ? '<span class="sc t">À revoir</span><ul>' + S.miss.map(m => mode === "ou" ?
+        "<li>" + pill(m.c) + " " + esc(NIVNOM[m.n]) + " · <b>" + zlab(m.z) + "</b><small>" + esc(m.t) + "</small></li>" :
+        "<li><b>" + zlab(m.z) + "</b> · " + esc(NIVNOM[m.n]) + "<small>" + m.set.map(pill).join("") + "</small></li>").join("") + "</ul>" : '<span class="sc t">Rien à revoir</span>');
+    $("next").textContent = "Nouvelle série →"; $("next").hidden = false; head();
+    if(ok === N && window.mtcFinale) window.mtcFinale("Série parfaite", N + " cas du premier coup", {etoiles:"✦✦✦"});
+  }
+  $("next").addEventListener("click", () => { if(main.classList.contains("fin")) newSeries(); else if(S.marks.length >= N) end(); else newRound(); });
+  $("modes").addEventListener("click", e => { const b = e.target.closest(".mode"); if(!b || b.dataset.m === mode) return; mode = b.dataset.m; newSeries(); });
+  document.addEventListener("mtc-syndromes-ready", () => { if(!R){ CAND = null; newSeries(); } });
+  newSeries();
+})();
+</script>
+</body>
+</html>
