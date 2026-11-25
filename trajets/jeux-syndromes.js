@@ -96,6 +96,9 @@
   }
   const zoneLabel = id => { const z = DATA && DATA.zones && DATA.zones.zones[id]; return z ? z.label : id; };
   const groupLabel = id => { const z = DATA && DATA.zones && DATA.zones.zones[id], g = z && DATA.zones.groupes.find(x => x.id === z.groupe); return g ? g.label : ""; };
+  // signes psychiques : ils ne s'expliquent pas par une zone traversée mais par une connexion au cerveau, au cœur, ou par l'influence sur le sang, support du shen
+  const PSY = /\b(?:phobi|frayeur|peur|effroi|terreur|psychos|manie|maniaque|depress|anxi|angoiss|agitation|agite|irritab|coler|tristesse|melanc|demence|folie|fou|delire|hallucin|insomn|reves?|memoire|pleure|pleurs|rire|chante|chanter|deshabill|dysphori|taciturne|apathie|confusion|obsess|hysteri|nervosit|humeur|emotion|stress|mental|shen|esprit|conscience|evanoui|syncope|lethargie|suicid|panique|sursaut|tracas|soucis|desespoir|culpab|honte)/;
+  const estPsy = t => PSY.test(sans(t));
   const normTxt = t => String(t).toLowerCase().replace(/[^a-zà-ÿ0-9]+/g, " ").trim();
   const PTRX = /\b(?:P|GI|E|Rt|C|IG|V|Rn|EC|TF|VB|F|RM|DM)\s?\d{1,2}\b/;
   // signes utilisables comme indice : ni nom de point, ni texte identique dans un autre canal
@@ -115,6 +118,6 @@
       "Ce jeu lit les syndromes de l’Assistant : règle d’abord la synchro GitHub de l’Assistant sur cet appareil.";
   }
   window.mtcSyn = {configured, available:() => configured() || !!DATA, data:() => DATA, loading:() => loading, error:() => error, refresh,
-    ORD, NAMES, NIV, NIVNOM, TYPES, esc, rnd, shuffle, col, pill, zonesOfSign, traversed, zoneLabel, groupLabel, usableSigns, vide};
+    ORD, NAMES, NIV, NIVNOM, TYPES, esc, rnd, shuffle, col, pill, zonesOfSign, estPsy, traversed, zoneLabel, groupLabel, usableSigns, vide};
   if(document.readyState === "complete") refresh(); else window.addEventListener("load", refresh);
 })();

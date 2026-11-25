@@ -36,7 +36,7 @@
 <script src="../daily-streak-shared.js?v=20261006-a"></script>
 <script src="../beta-config.js?v=20261119-a"></script>
 <script src="../beta-gate.js?v=20261114-a"></script>
-<script src="jeux-syndromes.js?v=20261124-a"></script>
+<script src="jeux-syndromes.js?v=20261125-a"></script>
 <script>
 (function(){
   "use strict";
@@ -69,7 +69,7 @@
   function candOu(){
     const out = [];
     Y.usableSigns().forEach(g => { const tr = Y.traversed(g.c, g.n);
-      g.ok.forEach(l => { const inter = Y.zonesOfSign(l.t).filter(z => tr.has(z)); if(inter.length) out.push({c:g.c, n:g.n, l, inter}); }); });
+      g.ok.filter(l => !Y.estPsy(l.t)).forEach(l => { const inter = Y.zonesOfSign(l.t).filter(z => tr.has(z)); if(inter.length) out.push({c:g.c, n:g.n, l, inter}); }); });
     return out;
   }
   // cas du mode « Qui passe par là ? » : une zone et un vaisseau qui ont entre un et cinq canaux
