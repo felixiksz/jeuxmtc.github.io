@@ -111,7 +111,15 @@
     const nt = normSimple(String(titre || "")).trim();
     let meilleur = null;
     (champs || []).forEach(c => {
-      let t = String(c == null ? "" : c).replace(/\S*_\S*/g, " ").replace(/\s+/g, " ").trim();
+      let src = String(c == null ? "" : c);
+      // texte en blocs séparés par une ligne vide (par exemple un bloc par point, comme les points Huá Tuó) : seul le bloc où se trouvent les mots est montré,
+      // sur une ligne, avec son titre devant
+      if(/\n\s*\n/.test(src)){
+        let bloc = null;
+        src.split(/\n\s*\n/).forEach(b => { const nb = mots.filter(w => trouves(normSimple(b), w, 1).length).length; if(nb && (!bloc || nb > bloc.nb)) bloc = {b, nb}; });
+        if(bloc){ const ls = bloc.b.split("\n").map(l => l.replace(/^\s*[-•➢]\s*/, "").trim()).filter(Boolean); src = ls.length > 1 && ls[0].length <= 24 ? ls[0] + " · " + ls.slice(1).join(" · ") : ls.join(" · "); }
+      }
+      let t = src.replace(/\S*_\S*/g, " ").replace(/\s+/g, " ").trim();
       if(nt.length > 3) for(let g = 0; g < 4; g++){ const p = normSimple(t).indexOf(nt); if(p < 0 || p > 300) break; t = (t.slice(0, p) + " " + t.slice(p + nt.length)).replace(/\s+/g, " ").trim(); }
       if(!t) return;
       const n = normSimple(t); let nb = 0, idx = -1;
